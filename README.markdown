@@ -1,5 +1,5 @@
-hermes
-======
+thor
+====
 
 Map options to a class. Simply create a class with the appropriate annotations, and have options automatically map
 to functions and parameters.

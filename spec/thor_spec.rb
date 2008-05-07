@@ -1,8 +1,28 @@
 require File.dirname(__FILE__) + '/spec_helper'
-require "hermes"
+require "thor"
 
-class MyApp
-  extend Hermes
+class StdOutCapturer
+  attr_reader :output
+
+  def initialize
+    @output = ""
+  end
+
+  def self.call_func
+    old_out = $stdout
+    output = new
+    $stdout = output
+    yield
+    $stdout = old_out
+    output.output
+  end
+
+  def write(s)
+    @output += s
+  end
+end
+
+class MyApp < Thor
   
   map "-T" => :animal
   
@@ -35,7 +55,7 @@ class MyApp
   end
 end
 
-describe "hermes" do
+describe "thor" do
   it "calls a no-param method when no params are passed" do
     ARGV.replace ["zoo"]
     MyApp.start.should == true
@@ -83,6 +103,26 @@ describe "hermes" do
   
   it "calls a method with an empty Hash for options if an optional key/value param is not provided" do
     ARGV.replace ["baz", "one"]
-    MyApp.start.should == ["one", {}]    
+    MyApp.start.should == ["one", {}]
   end
+  
+  it "provides useful help info for a simple method" do
+    StdOutCapturer.call_func { ARGV.replace ["help"]; MyApp.start }.should =~ /zoo +zoo around/
+  end
+  
+  it "provides useful help info for a method with one param" do
+    StdOutCapturer.call_func { ARGV.replace ["help"]; MyApp.start }.should =~ /animal TYPE +horse around/
+  end  
+  
+  it "provides useful help info for a method with boolean options" do
+    StdOutCapturer.call_func { ARGV.replace ["help"]; MyApp.start }.should =~ /foo BAR \-\-force +do some fooing/
+  end
+  
+  it "provides useful help info for a method with required options" do
+    StdOutCapturer.call_func { ARGV.replace ["help"]; MyApp.start }.should =~ /bar BAZ BAT \-\-option1=OPTION1 +do some barring/
+  end
+  
+  it "provides useful help info for a method with optional options" do
+    StdOutCapturer.call_func { ARGV.replace ["help"]; MyApp.start }.should =~ /baz BAT \[\-\-option1=OPTION1\] +do some bazzing/
+  end    
 end
