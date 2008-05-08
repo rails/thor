@@ -34,7 +34,8 @@ class Thor
   end
 
   def self.map(map)
-    @map = map
+    @map ||= superclass.instance_variable_get("@map") || {}
+    @map.merge! map
   end
 
   def self.desc(usage, description)
@@ -94,18 +95,30 @@ class Thor
     if defined?(@map) && @map[meth]
       meth = @map[meth].to_s
     end
+    
     if @opts.assoc(meth)
       opts = @opts.assoc(meth).last.map {|opt, val| [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten}
       options = Getopt::Long.getopts(*opts)
       params << options
     end
     new(meth, params).instance_variable_get("@results")
-  end  
+  end
 
   def initialize(op, params)
-    @results = send(op.to_sym, *params) if public_methods.include?(op) || !methods.include?(op)
+    begin
+      @results = send(op.to_sym, *params) if public_methods.include?(op) || !methods.include?(op)
+    rescue ArgumentError
+      puts "`#{op}' was called incorrectly. Call as `#{usage(op)}'"
+    end
   end
-    
+  
+  def usage(meth)
+    list = self.class.help_list
+    list.usages.assoc(meth)[1] + (list.opts.assoc(meth) ? " " + self.class.format_opts(list.opts.assoc(meth)[1]) : "")
+  end
+  
+  map "--help" => :help
+  
   desc "help", "show this screen"
   def help
     list = self.class.help_list
@@ -113,7 +126,7 @@ class Thor
     puts "-------"
     list.usages.each do |meth, usage|
       format = "%-" + (list.max.usage + list.max.opt + 4).to_s + "s"
-      print format % (list.usages.assoc(meth)[1] + (list.opts.assoc(meth) ? " " + self.class.format_opts(list.opts.assoc(meth)[1]) : ""))
+      print format % (usage)
       puts  list.descriptions.assoc(meth)[1]
     end
   end
