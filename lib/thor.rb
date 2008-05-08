@@ -3,7 +3,7 @@ require "#{File.dirname(__FILE__)}/getopt"
 class Thor
   def self.inherited(klass)
     subclass_files[File.expand_path(caller[0].split(":")[0])] << klass
-    subclasses << klass
+    subclasses << klass unless subclasses.include?(klass)
   end
   
   def self.subclass_files
@@ -15,13 +15,21 @@ class Thor
   end
   
   def self.method_added(meth)
-    return if !public_instance_methods.include?(meth.to_s) || !@usage
+    meth = meth.to_s
+    return if !public_instance_methods.include?(meth) || !@usage
     @descriptions ||= []
     @usages ||= []
     @opts ||= []
-    @descriptions << [meth.to_s, @desc]
-    @usages << [meth.to_s, @usage]
-    @opts << [meth.to_s, @method_options] if @method_options
+
+    @descriptions.delete(@descriptions.assoc(meth))
+    @descriptions << [meth, @desc]
+
+    @usages.delete(@usages.assoc(meth))
+    @usages << [meth, @usage]
+    
+    @opts.delete(@opts.assoc(meth))    
+    @opts << [meth, @method_options] if @method_options
+
     @usage, @desc, @method_options = nil
   end
 

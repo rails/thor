@@ -1,4 +1,8 @@
 require "thor"
+require "open-uri"
+require "fileutils"
+require "yaml"
+require "digest/md5"
 
 class Thor::Util
   # @public
@@ -40,37 +44,68 @@ class Thor::Runner < Thor
     ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
   end
 
-  def initialize(*args)
-    thorfiles.each {|f| load f unless Thor.subclass_files.keys.include?(File.expand_path(f))}
-    super
+  def initialize_thorfiles
+    thorfiles.each {|f| load f unless Thor.subclass_files.keys.include?(File.expand_path(f))}    
   end
 
-  map "-T" => :list
+  map "-T" => :list, "-i" => :install, "-u" => :update
+  
+  desc "install NAME", "install a Thor file into your system tasks"
+  def install(name)
+    initialize_thorfiles
+    begin
+      contents = open(name).read
+    rescue OpenURI::HTTPError
+      puts "The URI you provided: `#{name}' was invalid"
+    rescue Errno::ENOENT
+      puts "`#{name}' is not a valid file"
+    end
+    
+    name = name =~ /\.thor$/ ? name : "#{name}.thor"
+    
+    thor_root = File.join(ENV["HOME"], ".thor")
+    FileUtils.mkdir_p thor_root
+    
+    yaml_file = File.join(thor_root, "thor.yml")
+    FileUtils.touch(yaml_file)
+    yaml = YAML.load_file(yaml_file) || {}
+    
+    yaml[name] = Digest::MD5.hexdigest(name)
+    
+    File.open(yaml_file, "w") do |file|
+      file.puts yaml.to_yaml
+    end
+    
+    puts "Storing thor file in your system repository"
+    
+    File.open(File.join(thor_root, yaml[name] + ".thor"), "w") do |file|
+      file.puts contents
+    end
+  end
+  
+  desc "update NAME", "update a Thor file from its original location"
+  def update(name)
+    
+  end
+  
+  def installed
+    Dir["#{ENV["HOME"]}/.thor/**/*.thor"].each do |f| 
+      load f unless Thor.subclass_files.keys.include?(File.expand_path(f))
+    end
+    display_klasses
+  end
   
   desc "list [SEARCH]", "list the available thor tasks"
   method_options :force => :boolean
   def list(search = "")
+    initialize_thorfiles
     search = /.*#{search}.*/
     
-    # Calculate the largest base class name
-    max_base = Thor.subclasses.max do |x,y| 
-      Thor::Util.constant_to_thor_path(x.name).size <=> Thor::Util.constant_to_thor_path(y.name).size
-    end.name.size
-    
-    # Calculate the size of the largest option description
-    max_left_item = Thor.subclasses.max do |x,y| 
-      (x.help_list && x.help_list.max.usage + x.help_list.max.opt).to_i <=> 
-      (y.help_list && y.help_list.max.usage + y.help_list.max.opt).to_i
-    end
-    
-    max_left = max_left_item.help_list.max.usage + max_left_item.help_list.max.opt
-    
-    Thor.subclasses.map {|k| k.help_list}.compact.each do |item|
-      display_tasks(item, max_base, max_left)
-    end
+    display_klasses
   end
-  
+    
   def method_missing(meth, *args)
+    initialize_thorfiles
     meth = meth.to_s
     unless meth =~ /:/
       puts "Thor tasks must contain a :"
@@ -102,6 +137,26 @@ class Thor::Runner < Thor
   end
   
   private
+  def display_klasses
+    klasses = Thor.subclasses.reject {|x| x == Thor::Runner}
+    # Calculate the largest base class name
+    max_base = klasses.max do |x,y| 
+      Thor::Util.constant_to_thor_path(x.name).size <=> Thor::Util.constant_to_thor_path(y.name).size
+    end.name.size
+    
+    # Calculate the size of the largest option description
+    max_left_item = klasses.max do |x,y| 
+      (x.help_list && x.help_list.max.usage + x.help_list.max.opt).to_i <=> 
+      (y.help_list && y.help_list.max.usage + y.help_list.max.opt).to_i
+    end
+    
+    max_left = max_left_item.help_list.max.usage + max_left_item.help_list.max.opt
+        
+    klasses.map {|k| k.help_list}.compact.each do |item|
+      display_tasks(item, max_base, max_left)
+    end    
+  end  
+  
   def display_tasks(item, max_base, max_left)
     base = Thor::Util.constant_to_thor_path(item.klass.name)
     item.usages.each do |name, usage|
@@ -136,7 +191,7 @@ class Thor::Runner < Thor
       path = File.dirname(path)
       break if path == "/"
     end
-    thorfiles
+    thorfiles + system_thorfiles
   end
     
 end
