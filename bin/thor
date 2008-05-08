@@ -1,0 +1,131 @@
+require "thor"
+
+class Thor::Util
+  # @public
+  def self.constant_to_thor_path(str)
+    snake_case(str).squeeze(":")
+  end
+
+  # @public
+  def self.constant_from_thor_path(str)
+    make_constant(to_constant(str))
+  end
+
+  private
+  # @private
+  def self.to_constant(str)
+    str.gsub(/:(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
+  end
+  
+  # @private
+  def self.make_constant(str)
+    list = str.split("::")
+    obj = Object
+    list.each {|x| obj = obj.const_get(x) }
+    obj
+  end
+  
+  # @private
+  def self.snake_case(str)
+    return str.downcase if str =~ /^[A-Z]+$/
+    str.gsub(/([A-Z]+)(?=[A-Z][a-z]?)|\B[A-Z]/, '_\&') =~ /_*(.*)/
+      return $+.downcase
+  end  
+  
+end
+
+class Thor::Runner < Thor
+  
+  def self.globs_for(path)
+    ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
+  end
+
+  map "-T" => :list
+  
+  desc "list [SEARCH]", "list the available thor tasks"
+  method_options :force => :boolean
+  def list(search = "")
+    search = /.*#{search}.*/
+    thorfiles.each {|f| load f unless Thor.subclass_files.keys.include?(File.expand_path(f))}
+    
+    # Calculate the largest base class name
+    max_base = Thor.subclasses.max do |x,y| 
+      Thor::Util.constant_to_thor_path(x.name).size <=> Thor::Util.constant_to_thor_path(y.name).size
+    end.name.size
+    
+    # Calculate the size of the largest option description
+    max_left_item = Thor.subclasses.max do |x,y| 
+      (x.help_list && x.help_list.max.usage + x.help_list.max.opt).to_i <=> 
+      (y.help_list && y.help_list.max.usage + y.help_list.max.opt).to_i
+    end
+    
+    max_left = max_left_item.help_list.max.usage + max_left_item.help_list.max.opt
+    
+    Thor.subclasses.map {|k| k.help_list}.compact.each do |item|
+      display_tasks(item, max_base, max_left)
+    end
+  end
+  
+  def method_missing(meth, *args)
+    meth = meth.to_s
+    unless meth =~ /:/
+      puts "Thor tasks must contain a :"
+      return
+    end
+    
+    klass = meth.split(":")[0...-1].join(":")
+    to_call = meth.split(":").last
+    begin
+      klass = Thor::Util.constant_from_thor_path(klass)
+    rescue NameError
+      puts "There was no available namespace `#{klass}'."
+      return
+    end
+    
+    ARGV.replace [to_call, ARGV[1..-1]].compact
+    klass.start
+  end
+  
+  private
+  def display_tasks(item, max_base, max_left)
+    base = Thor::Util.constant_to_thor_path(item.klass.name)
+    item.usages.each do |name, usage|
+      format_string = "%-#{max_left + max_base + 5}s"
+      print format_string %
+        "#{base}:#{item.usages.assoc(name).last} #{display_opts(item.opts.assoc(name) && item.opts.assoc(name).last)}"
+      puts item.descriptions.assoc(name).last
+    end    
+  end
+  
+  def display_opts(opts)
+    return "" unless opts
+    opts.map do |opt, val|
+      if val == true || val == "BOOLEAN"
+        "[#{opt}]"
+      elsif val == "REQUIRED"
+        opt + "=" + opt.gsub(/\-/, "").upcase
+      elsif val == "OPTIONAL"
+        "[" + opt + "=" + opt.gsub(/\-/, "").upcase + "]"
+      end
+    end.join(" ")
+  end  
+  
+  def thorfiles
+    path = Dir.pwd
+    system_thorfiles = Dir["#{ENV["HOME"]}/.thor/**/*.thor"]
+    thorfiles = []
+    
+    # Look for Thorfile or *.thor in the current directory or a parent directory, until the root
+    while thorfiles.empty?
+      thorfiles = Dir[*Thor::Runner.globs_for(path)]
+      path = File.dirname(path)
+      break if path == "/"
+    end
+    thorfiles
+  end
+    
+end
+
+unless defined?(Spec)
+  Thor::Runner.start
+end

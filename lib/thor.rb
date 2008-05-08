@@ -1,6 +1,19 @@
 require "#{File.dirname(__FILE__)}/getopt"
 
 class Thor
+  def self.inherited(klass)
+    subclass_files[File.expand_path(caller[0].split(":")[0])] << klass
+    subclasses << klass
+  end
+  
+  def self.subclass_files
+    @subclass_files ||= Hash.new {|h,k| h[k] = []}
+  end
+  
+  def self.subclasses
+    @subclasses ||= []
+  end
+  
   def self.method_added(meth)
     return if !public_instance_methods.include?(meth.to_s) || !@usage
     @descriptions ||= []
@@ -26,6 +39,31 @@ class Thor
     end
   end
 
+  def self.help_list
+    return nil unless @usages
+    @help_list ||= begin
+      max_usage = @usages.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last.size
+      max_opts  = @opts.empty? ? 0 : format_opts(@opts.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last).size 
+      max_desc  = @descriptions.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last.size
+      Struct.new(:klass, :usages, :opts, :descriptions, :max).new(
+        self, @usages, @opts, @descriptions, Struct.new(:usage, :opt, :desc).new(max_usage, max_opts, max_desc)
+      )
+    end
+  end
+  
+  def self.format_opts(opts)
+    return "" unless opts
+    opts.map do |opt, val|
+      if val == true || val == "BOOLEAN"
+        "[#{opt}]"
+      elsif val == "REQUIRED"
+        opt + "=" + opt.gsub(/\-/, "").upcase
+      elsif val == "OPTIONAL"
+        "[" + opt + "=" + opt.gsub(/\-/, "").upcase + "]"
+      end
+    end.join(" ")
+  end
+  
   def self.start
     meth = ARGV.shift
     params = []
@@ -42,51 +80,22 @@ class Thor
       params << options
     end
     new(meth, params).instance_variable_get("@results")
-  end
-  
-  def thor_usages
-    self.class.instance_variable_get("@usages")
-  end
-  
-  def thor_descriptions
-    self.class.instance_variable_get("@descriptions")
-  end
-
-  def thor_opts
-    self.class.instance_variable_get("@opts")
   end  
-  
 
   def initialize(op, params)
-    @results = send(op.to_sym, *params) if public_methods.include?(op)
+    @results = send(op.to_sym, *params) if public_methods.include?(op) || !methods.include?(op)
   end
-  
-  private
-  def format_opts(opts)
-    return "" unless opts
-    opts.map do |opt, val|
-      if val == true || val == "BOOLEAN"
-        opt
-      elsif val == "REQUIRED"
-        opt + "=" + opt.gsub(/\-/, "").upcase
-      elsif val == "OPTIONAL"
-        "[" + opt + "=" + opt.gsub(/\-/, "").upcase + "]"
-      end
-    end.join(" ")
-  end
-  
-  public
+    
   desc "help", "show this screen"
   def help
+    list = self.class.help_list
     puts "Options"
     puts "-------"
-    max_usage = thor_usages.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last.size
-    max_opts  = thor_opts.empty? ? 0 : format_opts(thor_opts.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last).size 
-    max_desc  = thor_descriptions.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last.size
-    thor_usages.each do |meth, usage|
-      format = "%-" + (max_usage + max_opts + 4).to_s + "s"
-      print format % (thor_usages.assoc(meth)[1] + (thor_opts.assoc(meth) ? " " + format_opts(thor_opts.assoc(meth)[1]) : ""))
-      puts  thor_descriptions.assoc(meth)[1]
+    list.usages.each do |meth, usage|
+      format = "%-" + (list.max.usage + list.max.opt + 4).to_s + "s"
+      print format % (list.usages.assoc(meth)[1] + (list.opts.assoc(meth) ? " " + self.class.format_opts(list.opts.assoc(meth)[1]) : ""))
+      puts  list.descriptions.assoc(meth)[1]
     end
-  end  
+  end
+  
 end

@@ -28,7 +28,9 @@ spec = Gem::Specification.new do |s|
   
   s.require_path = 'lib'
   s.autorequire = GEM
-  s.files = %w(LICENSE README.markdown Rakefile) + Dir.glob("{lib,specs}/**/*")
+  s.bindir = "bin"
+  s.executables = %w( thor )
+  s.files = %w(LICENSE README.markdown Rakefile) + Dir.glob("{bin,lib,specs}/**/*")
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|
@@ -43,6 +45,7 @@ Spec::Rake::SpecTask.new do |t|
   t.spec_opts << "-fs --color"
 end
 
+task :specs => :spec
 
 desc "install the gem locally"
 task :install => [:package] do
