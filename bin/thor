@@ -40,13 +40,17 @@ class Thor::Runner < Thor
     ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
   end
 
+  def initialize(*args)
+    thorfiles.each {|f| load f unless Thor.subclass_files.keys.include?(File.expand_path(f))}
+    super
+  end
+
   map "-T" => :list
   
   desc "list [SEARCH]", "list the available thor tasks"
   method_options :force => :boolean
   def list(search = "")
     search = /.*#{search}.*/
-    thorfiles.each {|f| load f unless Thor.subclass_files.keys.include?(File.expand_path(f))}
     
     # Calculate the largest base class name
     max_base = Thor.subclasses.max do |x,y| 
@@ -73,17 +77,28 @@ class Thor::Runner < Thor
       return
     end
     
-    klass = meth.split(":")[0...-1].join(":")
+    thor_klass = meth.split(":")[0...-1].join(":")
     to_call = meth.split(":").last
     begin
-      klass = Thor::Util.constant_from_thor_path(klass)
+      klass = Thor::Util.constant_from_thor_path(thor_klass)
     rescue NameError
-      puts "There was no available namespace `#{klass}'."
+      puts "There was no available namespace `#{thor_klass}'."
       return
     end
     
-    ARGV.replace [to_call, ARGV[1..-1]].compact
-    klass.start
+    unless klass.ancestors.include?(Thor)
+      puts "`#{thor_klass}' is not a Thor module"
+      return
+    end
+    
+    ARGV.replace [to_call, *args].compact
+    begin
+      klass.start
+    rescue ArgumentError
+      puts "You need to call #{to_call} as `#{klass.usage_for_method(to_call)}'"
+    rescue NoMethodError
+      puts "`#{to_call}' is not available in #{thor_klass}"
+    end
   end
   
   private
