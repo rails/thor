@@ -1,4 +1,5 @@
-require "#{File.dirname(__FILE__)}/getopt"
+$:.unshift File.expand_path(File.dirname(__FILE__))
+require "getopt"
 
 class Thor
   def self.inherited(klass)
@@ -73,7 +74,7 @@ class Thor
   end
   
   def self.format_opts(opts)
-    return "" unless opts
+    return "" if !opts
     opts.map do |opt, val|
       if val == true || val == "BOOLEAN"
         "[#{opt}]"
@@ -96,16 +97,22 @@ class Thor
       meth = @map[meth].to_s
     end
     
+    args = ARGV.dup
+    
     if @opts.assoc(meth)
       opts = @opts.assoc(meth).last.map {|opt, val| [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten}
       options = Getopt::Long.getopts(*opts)
       params << options
     end
+    
+    ARGV.replace args
+    
     new(meth, params).instance_variable_get("@results")
   end
 
   def initialize(op, params)
     begin
+      op ||= "help"
       @results = send(op.to_sym, *params) if public_methods.include?(op) || !methods.include?(op)
     rescue ArgumentError
       puts "`#{op}' was called incorrectly. Call as `#{usage(op)}'"
@@ -124,9 +131,9 @@ class Thor
     list = self.class.help_list
     puts "Options"
     puts "-------"
-    list.usages.each do |meth, usage|
+    list.usages.each do |meth, use|
       format = "%-" + (list.max.usage + list.max.opt + 4).to_s + "s"
-      print format % (usage)
+      print format % ("#{usage(meth)}")
       puts  list.descriptions.assoc(meth)[1]
     end
   end

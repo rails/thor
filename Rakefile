@@ -22,10 +22,7 @@ spec = Gem::Specification.new do |s|
   s.author = AUTHOR
   s.email = EMAIL
   s.homepage = HOMEPAGE
-  
-  # Uncomment this to add a dependency
-  # s.add_dependency "foo"
-  
+    
   s.require_path = 'lib'
   s.autorequire = GEM
   s.bindir = "bin"
