@@ -97,8 +97,8 @@ class Thor
     
     new(meth, params).instance_variable_get("@results")
   end
-
-  def init(op, params)
+  
+  def initialize(op, params)
     begin
       op ||= "help"
       @results = send(op.to_sym, *params) if public_methods.include?(op) || !methods.include?(op)
@@ -106,10 +106,8 @@ class Thor
       puts "`#{op}' was called incorrectly. Call as `#{usage(op)}'"
     end
   end
-  
-  def initialize(op, params)
-    init(op, params)
-  end
+
+  public :initialize
   
   def usage(meth)
     list = self.class.help_list

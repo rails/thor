@@ -115,7 +115,7 @@ describe Thor::Runner, " update" do
     runner = Thor::Runner.allocate
     runner.should_receive(:install).with(original_yaml["random"][:location], {"as" => "random"})
     
-    silence_stdout { runner.init("update", ["random"]) }
+    silence_stdout { runner.initialize("update", ["random"]) }
   end
 end
 
@@ -132,7 +132,7 @@ describe Thor::Runner, " uninstall" do
     File.should_receive(:delete).with(File.join(ENV["HOME"], ".thor", "4a33b894ffce85d7b412fc1b36f88fe0.thor"))
     original_yaml.should_receive(:delete).with("random")
     
-    silence_stdout { runner.init("uninstall", ["random"])}
+    silence_stdout { runner.initialize("uninstall", ["random"])}
   end
 end
 
@@ -142,7 +142,7 @@ describe Thor::Runner, " installed" do
     
     runner = Thor::Runner.allocate
     
-    stdout = stdout_from { runner.init("installed", []) }
+    stdout = stdout_from { runner.initialize("installed", []) }
     stdout.must =~ /random\s*amazing/
     stdout.must =~ /amazing:describe NAME \[\-\-forcefully\]\s*say that someone is amazing/
     stdout.must =~ /amazing:hello\s*say hello/
