@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require "thor"
 require "open-uri"
 require "fileutils"
@@ -163,12 +165,15 @@ class Thor::Runner < Thor
     display_klasses(true)
   end
   
-  desc "list [SEARCH]", "list the available thor tasks"
-  def list(search = "")
+  desc "list [SEARCH]", "list the available thor tasks (--substring means SEARCH can be anywhere in the module)"
+  method_options :substring => :boolean
+  def list(search = "", options = {})
     initialize_thorfiles
-    search = /.*#{search}.*/
+    search = ".*#{search}" if options["substring"]
+    search = /^#{search}.*/i
     
-    display_klasses
+    display_klasses(false, Thor.subclasses.select {|k| 
+      Thor::Util.constant_to_thor_path(k.name) =~ search})
   end
     
   def method_missing(meth, *args)
@@ -185,7 +190,7 @@ class Thor::Runner < Thor
     yaml = thor_yaml
 
     klass_str = Thor::Util.to_constant(thor_klass)
-    files = yaml.inject([]) { |a,(k,v)| a << v[:filename] if v[:constants].include?(klass_str); a }
+    files = yaml.inject([]) { |a,(k,v)| a << v[:filename] if v[:constants] && v[:constants].include?(klass_str); a }
 
     unless files.empty?
       files.each do |f|
@@ -232,8 +237,8 @@ class Thor::Runner < Thor
     File.open(yaml_file, "w") {|f| f.puts yaml.to_yaml }
   end
   
-  def display_klasses(with_modules = false)
-    klasses = Thor.subclasses - [Thor::Runner]
+  def display_klasses(with_modules = false, klasses = Thor.subclasses)
+    klasses = klasses - [Thor::Runner]
     
     if klasses.empty?
       puts "No thorfiles available"

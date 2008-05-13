@@ -106,45 +106,45 @@ describe Thor::Runner, " install" do
   end
 end
 
-describe Thor::Runner, " update" do
-  it "updates existing thor files" do
-    original_yaml = {"random" => 
+describe Thor::Runner do
+  before :each do
+    @original_yaml = {"random" => 
       {:location => "#{File.dirname(__FILE__)}/fixtures/task.thor", :filename => "4a33b894ffce85d7b412fc1b36f88fe0", :constants => ["Amazing"]}}
-    YAML.stub!(:load_file).and_return(original_yaml)
+    File.stub!(:exists?).and_return(true)
+    YAML.stub!(:load_file).and_return(@original_yaml)    
     
-    runner = Thor::Runner.allocate
-    runner.should_receive(:install).with(original_yaml["random"][:location], {"as" => "random"})
-    
-    silence_stdout { runner.initialize("update", ["random"]) }
+    @runner = Thor::Runner.allocate
   end
-end
-
-
-describe Thor::Runner, " uninstall" do
-  it "uninstalls existing thor modules" do
-    original_yaml = {"random" => 
-      {:location => "#{File.dirname(__FILE__)}/fixtures/task.thor", :filename => "4a33b894ffce85d7b412fc1b36f88fe0", :constants => ["Amazing"]}}
-    YAML.stub!(:load_file).and_return(original_yaml)
-
-    runner = Thor::Runner.allocate
-    runner.should_receive(:save_yaml)
+  
+  describe " update" do
+    it "updates existing thor files" do
+      runner = Thor::Runner.allocate
+      runner.should_receive(:install).with(@original_yaml["random"][:location], {"as" => "random"})
     
-    File.should_receive(:delete).with(File.join(ENV["HOME"], ".thor", "4a33b894ffce85d7b412fc1b36f88fe0.thor"))
-    original_yaml.should_receive(:delete).with("random")
-    
-    silence_stdout { runner.initialize("uninstall", ["random"])}
+      silence_stdout { runner.initialize("update", ["random"]) }
+    end
   end
-end
 
-describe Thor::Runner, " installed" do
-  it "displays the modules installed in a pretty way" do
-    Dir.stub!(:[]).and_return([])
+
+  describe " uninstall" do
+    it "uninstalls existing thor modules" do
+      @runner.should_receive(:save_yaml)
     
-    runner = Thor::Runner.allocate
+      File.should_receive(:delete).with(File.join(ENV["HOME"], ".thor", "4a33b894ffce85d7b412fc1b36f88fe0.thor"))
+      @original_yaml.should_receive(:delete).with("random")
     
-    stdout = stdout_from { runner.initialize("installed", []) }
-    stdout.must =~ /random\s*amazing/
-    stdout.must =~ /amazing:describe NAME \[\-\-forcefully\]\s*say that someone is amazing/
-    stdout.must =~ /amazing:hello\s*say hello/
+      silence_stdout { @runner.initialize("uninstall", ["random"])}
+    end
+  end
+
+  describe " installed" do
+    it "displays the modules installed in a pretty way" do
+      Dir.stub!(:[]).and_return([])
+        
+      stdout = stdout_from { @runner.initialize("installed", []) }
+      stdout.must =~ /random\s*amazing/
+      stdout.must =~ /amazing:describe NAME \[\-\-forcefully\]\s*say that someone is amazing/
+      stdout.must =~ /amazing:hello\s*say hello/
+    end
   end
 end
