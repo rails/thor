@@ -4,6 +4,8 @@ $:.push File.join(File.dirname(__FILE__), '..', 'lib')
 module Spec::Expectations::ObjectExpectations
   alias_method :must, :should
   alias_method :must_not, :should_not
+  undef_method :should
+  undef_method :should_not
 end
 
 class StdOutCapturer
