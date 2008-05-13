@@ -29,3 +29,9 @@ class StdOutCapturer
     @output += s
   end
 end
+
+Spec::Runner.configure do |config|
+  def stdout_from(&blk)
+    StdOutCapturer.call_func(&blk)
+  end
+end

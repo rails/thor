@@ -63,21 +63,21 @@ end
 describe Thor::Runner do
   it "can give a list of the available tasks" do
     ARGV.replace ["list"]
-    StdOutCapturer.call_func { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
+    stdout_from { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
   end
   
   it "runs tasks from other Thor files" do
     ARGV.replace ["my_tasks:thor_task:foo"]
-    Thor::Runner.start.should == "foo"
+    Thor::Runner.start.must == "foo"
   end
   
   it "prints an error if a thor task is not namespaced" do
     ARGV.replace ["hello"]
-    StdOutCapturer.call_func { Thor::Runner.start }.must =~ /Thor tasks must contain a :/
+    stdout_from { Thor::Runner.start }.must =~ /Thor tasks must contain a :/
   end
   
   it "prints an error if the namespace could not be found" do
     ARGV.replace ["hello:goodbye"]
-    StdOutCapturer.call_func { Thor::Runner.start }.must =~ /There was no available namespace `hello'/
+    stdout_from { Thor::Runner.start }.must =~ /There was no available namespace `hello'/
   end  
 end

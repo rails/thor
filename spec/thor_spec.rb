@@ -61,7 +61,7 @@ describe "thor" do
   
   it "raises an error if a required param is not provided" do
     ARGV.replace ["animal"]
-    lambda { MyApp.start }.must raise_error(ArgumentError)
+    stdout_from { MyApp.start }.must =~ /`animal' was called incorrectly\. Call as `animal TYPE'/
   end
   
   it "calls a method with an optional boolean param when the param is passed" do
@@ -105,22 +105,22 @@ describe "thor" do
   end
   
   it "provides useful help info for a simple method" do
-    StdOutCapturer.call_func { ARGV.replace ["help"]; MyApp.start }.must =~ /zoo +zoo around/
+    stdout_from { ARGV.replace ["help"]; MyApp.start }.must =~ /zoo +zoo around/
   end
   
   it "provides useful help info for a method with one param" do
-    StdOutCapturer.call_func { ARGV.replace ["help"]; MyApp.start }.must =~ /animal TYPE +horse around/
+    stdout_from { ARGV.replace ["help"]; MyApp.start }.must =~ /animal TYPE +horse around/
   end  
   
   it "provides useful help info for a method with boolean options" do
-    StdOutCapturer.call_func { ARGV.replace ["help"]; MyApp.start }.must =~ /foo BAR \[\-\-force\] +do some fooing/
+    stdout_from { ARGV.replace ["help"]; MyApp.start }.must =~ /foo BAR \[\-\-force\] +do some fooing/
   end
   
   it "provides useful help info for a method with required options" do
-    StdOutCapturer.call_func { ARGV.replace ["help"]; MyApp.start }.must =~ /bar BAZ BAT \-\-option1=OPTION1 +do some barring/
+    stdout_from { ARGV.replace ["help"]; MyApp.start }.must =~ /bar BAZ BAT \-\-option1=OPTION1 +do some barring/
   end
   
   it "provides useful help info for a method with optional options" do
-    StdOutCapturer.call_func { ARGV.replace ["help"]; MyApp.start }.must =~ /baz BAT \[\-\-option1=OPTION1\] +do some bazzing/
+    stdout_from { ARGV.replace ["help"]; MyApp.start }.must =~ /baz BAT \[\-\-option1=OPTION1\] +do some bazzing/
   end    
 end

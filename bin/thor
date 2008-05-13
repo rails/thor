@@ -195,8 +195,12 @@ class Thor::Runner < Thor
       end
       klass = Thor::Util.constant_from_thor_path(thor_klass)
     else
-      puts "There was no available namespace `#{thor_klass}'."
-      return      
+      begin
+        klass = Thor::Util.constant_from_thor_path(thor_klass)
+      rescue
+        puts "There was no available namespace `#{thor_klass}'."
+        return      
+      end
     end
     
     unless klass.ancestors.include?(Thor)
