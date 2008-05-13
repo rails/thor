@@ -182,9 +182,7 @@ class Thor::Runner < Thor
     thor_klass = meth.split(":")[0...-1].join(":")
     to_call = meth.split(":").last
     
-    thor_root = File.join(ENV["HOME"], ".thor")
-    yaml_file = File.join(thor_root, "thor.yml")
-    yaml = YAML.load_file(yaml_file) || {}
+    yaml = thor_yaml
 
     klass_str = Thor::Util.to_constant(thor_klass)
     files = yaml.inject([]) { |a,(k,v)| a << v[:filename] if v[:constants].include?(klass_str); a }
@@ -225,7 +223,8 @@ class Thor::Runner < Thor
   
   def thor_yaml
     yaml_file = File.join(thor_root, "thor.yml")
-    YAML.load_file(yaml_file) || {}    
+    yaml = YAML.load_file(yaml_file) if File.exists?(yaml_file)
+    yaml || {}
   end
   
   def save_yaml(yaml)
