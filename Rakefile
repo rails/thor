@@ -5,7 +5,7 @@ require 'spec/rake/spectask'
 require 'date'
 
 GEM = "thor"
-GEM_VERSION = "0.9.1"
+GEM_VERSION = "0.9.2"
 AUTHOR = "Yehuda Katz"
 EMAIL = "wycats@gmail.com"
 HOMEPAGE = "http://yehudakatz.com"
@@ -34,31 +34,8 @@ Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
 end
 
-task :default => :spec
-desc "Run the specs"
-Spec::Rake::SpecTask.new do |t|
-  t.libs << "spec"
-  t.spec_files = FileList["spec/**/*_spec.rb"]
-  t.spec_opts << "-fs --color"
-end
-
-desc "Run all examples with RCov"
-Spec::Rake::SpecTask.new('rcov') do |t|
-  t.spec_files = FileList['spec/**/*_spec.rb']
-  t.rcov = true
-  t.rcov_opts = %w( --exclude spec --exclude /Library --exclude /Users --exclude task.thor --exclude lib/getopt.rb)
-end
-
-task :specs => :spec
-
+task :default => :install
 desc "install the gem locally"
 task :install => [:package] do
   sh %{sudo gem install pkg/#{GEM}-#{GEM_VERSION} --no-rdoc --no-ri --no-update-sources}
-end
-
-desc "create a gemspec file"
-task :make_spec do
-  File.open("#{GEM}.gemspec", "w") do |file|
-    file.puts spec.to_ruby
-  end
 end
