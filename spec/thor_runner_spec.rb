@@ -81,3 +81,25 @@ describe Thor::Runner do
     stdout_from { Thor::Runner.start }.must =~ /There was no available namespace `hello'/
   end  
 end
+
+describe Thor::Runner, " install" do
+  it "installs thor files" do
+    ARGV.replace ["install", "#{File.dirname(__FILE__)}/fixtures/task.thor"]
+
+    Kernel.stub!(:puts)
+    Readline.stub!(:readline).and_return("y")
+    FileUtils.stub!(:mkdir_p)
+    FileUtils.stub!(:touch)
+    original_yaml = {:random => 
+      {:location => "task.thor", :filename => "4a33b894ffce85d7b412fc1b36f88fe0", :constants => ["Amazing"]}}
+    YAML.stub!(:load_file).and_return(original_yaml)
+    
+    file = mock("File")
+    file.should_receive(:puts)
+    
+    File.should_receive(:open).with(File.join(ENV["HOME"], ".thor", Digest::MD5.hexdigest("#{File.dirname(__FILE__)}/fixtures/task.thor" + "randomness")) + ".thor", "w")
+    File.should_receive(:open).with(File.join(ENV["HOME"], ".thor", "thor.yml"), "w").once.and_yield(file)
+    
+    Thor::Runner.start    
+  end
+end

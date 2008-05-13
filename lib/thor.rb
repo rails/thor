@@ -49,10 +49,6 @@ class Thor
     end
   end
 
-  def self.callable_methods
-    @usages.map {|x,y| x}
-  end
-
   def self.help_list
     return nil unless @usages
     @help_list ||= begin
@@ -63,14 +59,6 @@ class Thor
         self, @usages, @opts, @descriptions, Struct.new(:usage, :opt, :desc).new(max_usage, max_opts, max_desc)
       )
     end
-  end
-  
-  def self.usage_for_method(meth)
-    usage = @usages.assoc(meth).last
-    opt = @opts.assoc(meth) && format_opts(@opts.assoc(meth).last)
-    ret = usage
-    ret << opt if opt
-    ret
   end
   
   def self.format_opts(opts)

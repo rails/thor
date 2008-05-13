@@ -42,6 +42,13 @@ Spec::Rake::SpecTask.new do |t|
   t.spec_opts << "-fs --color"
 end
 
+desc "Run all examples with RCov"
+Spec::Rake::SpecTask.new('rcov') do |t|
+  t.spec_files = FileList['spec/**/*_spec.rb']
+  t.rcov = true
+  t.rcov_opts = %w( --exclude spec --exclude /Library --exclude /Users --exclude task.thor --exclude lib/getopt.rb)
+end
+
 task :specs => :spec
 
 desc "install the gem locally"
