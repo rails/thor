@@ -1,7 +1,8 @@
 require File.dirname(__FILE__) + '/spec_helper'
 require "thor"
 
-load File.join("#{File.dirname(__FILE__)}", "..", "bin", "thor")
+load File.join(File.dirname(__FILE__), "..", "bin", "thor")
+load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
 
 class StdOutCapturer
   attr_reader :output
@@ -86,6 +87,7 @@ describe Thor::Runner, " install" do
   it "installs thor files" do
     ARGV.replace ["install", "#{File.dirname(__FILE__)}/fixtures/task.thor"]
 
+    # Stubs for the file system interactions
     Kernel.stub!(:puts)
     Readline.stub!(:readline).and_return("y")
     FileUtils.stub!(:mkdir_p)
@@ -100,6 +102,49 @@ describe Thor::Runner, " install" do
     File.should_receive(:open).with(File.join(ENV["HOME"], ".thor", Digest::MD5.hexdigest("#{File.dirname(__FILE__)}/fixtures/task.thor" + "randomness")) + ".thor", "w")
     File.should_receive(:open).with(File.join(ENV["HOME"], ".thor", "thor.yml"), "w").once.and_yield(file)
     
-    Thor::Runner.start    
+    silence_stdout { Thor::Runner.start }
+  end
+end
+
+describe Thor::Runner, " update" do
+  it "updates existing thor files" do
+    original_yaml = {"random" => 
+      {:location => "#{File.dirname(__FILE__)}/fixtures/task.thor", :filename => "4a33b894ffce85d7b412fc1b36f88fe0", :constants => ["Amazing"]}}
+    YAML.stub!(:load_file).and_return(original_yaml)
+    
+    runner = Thor::Runner.allocate
+    runner.should_receive(:install).with(original_yaml["random"][:location], {"as" => "random"})
+    
+    silence_stdout { runner.init("update", ["random"]) }
+  end
+end
+
+
+describe Thor::Runner, " uninstall" do
+  it "uninstalls existing thor modules" do
+    original_yaml = {"random" => 
+      {:location => "#{File.dirname(__FILE__)}/fixtures/task.thor", :filename => "4a33b894ffce85d7b412fc1b36f88fe0", :constants => ["Amazing"]}}
+    YAML.stub!(:load_file).and_return(original_yaml)
+
+    runner = Thor::Runner.allocate
+    runner.should_receive(:save_yaml)
+    
+    File.should_receive(:delete).with(File.join(ENV["HOME"], ".thor", "4a33b894ffce85d7b412fc1b36f88fe0.thor"))
+    original_yaml.should_receive(:delete).with("random")
+    
+    silence_stdout { runner.init("uninstall", ["random"])}
+  end
+end
+
+describe Thor::Runner, " installed" do
+  it "displays the modules installed in a pretty way" do
+    Dir.stub!(:[]).and_return([])
+    
+    runner = Thor::Runner.allocate
+    
+    stdout = stdout_from { runner.init("installed", []) }
+    stdout.must =~ /random\s*amazing/
+    stdout.must =~ /amazing:describe NAME \[\-\-forcefully\]\s*say that someone is amazing/
+    stdout.must =~ /amazing:hello\s*say hello/
   end
 end

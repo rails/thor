@@ -98,13 +98,17 @@ class Thor
     new(meth, params).instance_variable_get("@results")
   end
 
-  def initialize(op, params)
+  def init(op, params)
     begin
       op ||= "help"
       @results = send(op.to_sym, *params) if public_methods.include?(op) || !methods.include?(op)
     rescue ArgumentError
       puts "`#{op}' was called incorrectly. Call as `#{usage(op)}'"
     end
+  end
+  
+  def initialize(op, params)
+    init(op, params)
   end
   
   def usage(meth)
