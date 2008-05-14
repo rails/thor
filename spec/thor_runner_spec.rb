@@ -118,10 +118,9 @@ describe Thor::Runner do
   
   describe " update" do
     it "updates existing thor files" do
-      runner = Thor::Runner.allocate
-      runner.should_receive(:install).with(@original_yaml["random"][:location], {"as" => "random"})
+      @runner.should_receive(:install).with(@original_yaml["random"][:location], {"as" => "random"})
     
-      silence_stdout { runner.initialize("update", ["random"]) }
+      silence_stdout { @runner.initialize("update", ["random"]) }
     end
   end
 
