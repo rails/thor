@@ -6,9 +6,7 @@ to functions and parameters.
 
 Examples:
 
-    class MyApp
-      extend Hermes                                                           # [1]
-      
+    class MyApp < Thor                                                        # [1]
       map "-L" => :list                                                       # [2]
       
       desc "install APP_NAME", "install one of the available apps"            # [3]
@@ -29,7 +27,7 @@ Examples:
     
     MyApp.start
     
-Hermes automatically maps commands as follows:
+Thor automatically maps commands as follows:
 
     app install name --force
     
@@ -37,7 +35,7 @@ That gets converted to:
 
     MyApp.new.install("name", :force => true)
   
-[1] Use `extend Hermes` to turn a class into an option mapper
+[1] Inherit from Thor to turn a class into an option mapper
 
 [2] Map additional non-valid identifiers to specific methods. In this case,
     convert -L to :list
