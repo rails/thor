@@ -34,6 +34,11 @@ module MyTasks
     def foo
       "foo"
     end
+    
+    desc "uhoh", "raises NoMethodError"
+    def uhoh
+      Object.new.raise_no_method_error_please
+    end
   end
 end
 
@@ -81,6 +86,11 @@ describe Thor::Runner do
     ARGV.replace ["hello:goodbye"]
     stdout_from { Thor::Runner.start }.must =~ /There was no available namespace `hello'/
   end  
+  
+  it "does not swallow NoMethodErrors that occur inside the called method" do
+    ARGV.replace ["my_tasks:thor_task:uhoh"]
+    proc { Thor::Runner.start }.must raise_error(NoMethodError)
+  end
 end
 
 describe Thor::Runner, " install" do

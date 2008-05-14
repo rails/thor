@@ -216,7 +216,8 @@ class Thor::Runner < Thor
       klass.start
     rescue ArgumentError
       puts "You need to call #{to_call} as `#{klass.usage_for_method(to_call)}'"
-    rescue NoMethodError
+    rescue NoMethodError => e
+      raise e unless e.message =~ /undefined method #{to_call} for #<#{klass}:.*>/
       puts "`#{to_call}' is not available in #{thor_klass}"
     end
   end
