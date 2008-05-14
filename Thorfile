@@ -29,7 +29,7 @@ SPEC = Gem::Specification.new do |s|
   s.files = %w(LICENSE README.markdown Rakefile) + Dir.glob("{bin,lib,specs}/**/*")
 end
 
-class Meta < Thor
+class Default < Thor
   # Set up standard Thortasks
   spec_task(Dir["spec/**/*_spec.rb"])
   spec_task(Dir["spec/**/*_spec.rb"], :name => "rcov", :rcov =>

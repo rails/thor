@@ -37,7 +37,7 @@ module MyTasks
   end
 end
 
-class Meta < Thor
+class Default < Thor
   desc "test", "prints 'test'"
   def test
     puts "test"
@@ -66,7 +66,7 @@ end
 
 describe Thor do
   it "tracks its subclasses, grouped by the files they come from" do
-    Thor.subclass_files[File.expand_path(__FILE__)].must == [MyTasks::ThorTask, Meta, Amazing, ThorTask2]
+    Thor.subclass_files[File.expand_path(__FILE__)].must == [MyTasks::ThorTask, Default, Amazing, ThorTask2]
   end
 
   it "tracks a single subclass across multiple files" do
@@ -102,12 +102,12 @@ describe Thor::Runner do
     stdout_from { Thor::Runner.start }.must =~ /There was no available namespace `hello'/
   end
 
-#   it "presents tasks in the meta namespace with an empty namespace" do
+#   it "presents tasks in the default namespace with an empty namespace" do
 #     ARGV.replace ["list"]
 #     stdout_from { Thor::Runner.start }.must =~ /^:test +prints 'test'/
 #   end
 
-#   it "runs tasks with an empty namespace from the meta namespace" do
+#   it "runs tasks with an empty namespace from the default namespace" do
 #     ARGV.replace [":test"]
 #     stdout_from { Thor::Runner.start }.must == "test\n"
 #   end
