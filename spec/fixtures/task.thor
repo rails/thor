@@ -7,9 +7,4 @@ class Amazing < Thor
     ret = "#{name} is amazing"
     puts opts["forcefully"] ? ret.upcase : ret
   end
-  
-  desc "hello", "say hello"
-  def hello
-    puts "Hello"
-  end
 end

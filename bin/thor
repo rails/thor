@@ -26,7 +26,7 @@ class Thor::Util
   
   # @public
   def self.constant_to_thor_path(str)
-    snake_case(str).squeeze(":")
+    snake_case(str).squeeze(":").gsub(/^meta/, '')
   end
 
   # @public
@@ -35,6 +35,7 @@ class Thor::Util
   end
 
   def self.to_constant(str)
+    str = 'meta' if str.empty?
     str.gsub(/:(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
   end
 
