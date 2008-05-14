@@ -2,29 +2,25 @@ require "thor"
 require "fileutils"
 
 class Thor
-  def self.package_task
-    self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-      desc "package", "package up the gem"
-      def package
-        FileUtils.mkdir_p(File.join(Dir.pwd, "pkg"))
-        Gem::Builder.new(SPEC).build
-        FileUtils.mv(SPEC.file_name, File.join(Dir.pwd, "pkg", SPEC.file_name))
-      end    
-    RUBY
+  def self.package_task(spec)
+    desc "package", "package up the gem"
+    define_method :package do
+      FileUtils.mkdir_p(File.join(Dir.pwd, "pkg"))
+      Gem::Builder.new(spec).build
+      FileUtils.mv(spec.file_name, File.join(Dir.pwd, "pkg", spec.file_name))
+    end
   end
   
-  def self.install_task
-    package_task
+  def self.install_task(spec)
+    package_task spec
     
-    self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-      desc "install", "install the gem"
-      def install
-        old_stderr, $stderr = $stderr.dup, File.open("/dev/null", "w")
-        package
-        $stderr = old_stderr
-        system %{sudo gem install pkg/#{GEM}-#{GEM_VERSION} --no-rdoc --no-ri --no-update-sources}
-      end
-    RUBY
+    desc "install", "install the gem"
+    define_method :install do
+      old_stderr, $stderr = $stderr.dup, File.open("/dev/null", "w")
+      package
+      $stderr = old_stderr
+      system %{sudo gem install pkg/#{spec.name}-#{spec.version} --no-rdoc --no-ri --no-update-sources}
+    end
   end
   
   def self.spec_task(file_list, opts = {})
@@ -42,23 +38,21 @@ class Thor
       FileUtils.rm_rf(File.join(Dir.pwd, rcov_dir))
     end
     
-    self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-      desc("#{name}", "spec task")
-      def #{name}
-        cmd = "ruby "
-        if #{rcov.inspect}
-          cmd << "-S rcov -o #{rcov_dir} #{rcov_opts.inspect[1...-1]} "
-        end
-        cmd << `which spec`.chomp
-        cmd << " -- " if #{rcov.inspect}
-        cmd << " "
-        cmd << #{file_list.inspect}
-        cmd << " "
-        cmd << #{options.inspect}
-        puts cmd if #{verbose.inspect}
-        system(cmd)
+    desc(name, "spec task")
+    define_method(name) do
+      cmd = "ruby "
+      if rcov
+        cmd << "-S rcov -o #{rcov_dir} #{rcov_opts} "
       end
-    RUBY
+      cmd << `which spec`.chomp
+      cmd << " -- " if rcov
+      cmd << " "
+      cmd << file_list
+      cmd << " "
+      cmd << options
+      puts cmd if verbose
+      system(cmd)
+    end
   end
   
   private
