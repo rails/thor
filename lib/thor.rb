@@ -3,7 +3,17 @@ require "getopt"
 
 class Thor
   def self.inherited(klass)
-    subclass_files[File.expand_path(caller[0].split(":")[0])] << klass
+    register_klass_file klass
+  end
+
+  def self.register_klass_file(klass, file = caller[1].split(":")[0])
+    unless self == Thor
+      superclass.register_klass_file(klass, file)
+      return
+    end
+
+    file_subclasses = subclass_files[File.expand_path(file)]
+    file_subclasses << klass unless file_subclasses.include?(klass)
     subclasses << klass unless subclasses.include?(klass)
   end
   
@@ -18,6 +28,8 @@ class Thor
   def self.method_added(meth)
     meth = meth.to_s
     return if !public_instance_methods.include?(meth) || !@usage
+    register_klass_file self
+
     @descriptions ||= []
     @usages ||= []
     @opts ||= []

@@ -37,6 +37,13 @@ module MyTasks
   end
 end
 
+class Amazing
+  desc "hello", "say hello"
+  def hello
+    puts "Hello"
+  end
+end
+
 class ThorTask2 < Thor
 end
 
@@ -52,7 +59,13 @@ end
 
 describe Thor do
   it "tracks its subclasses, grouped by the files they come from" do
-    Thor.subclass_files[File.expand_path(__FILE__)].must == [MyTasks::ThorTask, ThorTask2]
+    Thor.subclass_files[File.expand_path(__FILE__)].must == [MyTasks::ThorTask, Amazing, ThorTask2]
+  end
+
+  it "tracks a single subclass across multiple files" do
+    thorfile = File.join(File.dirname(__FILE__), "fixtures", "task.thor")
+    Thor.subclass_files[File.expand_path(thorfile)].must include(Amazing)
+    Thor.subclass_files[File.expand_path(__FILE__)].must include(Amazing)
   end
   
   it "tracks its subclasses in an Array" do
