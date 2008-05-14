@@ -42,6 +42,20 @@ module MyTasks
   end
 end
 
+class Default < Thor
+  desc "test", "prints 'test'"
+  def test
+    puts "test"
+  end
+end
+
+class Amazing
+  desc "hello", "say hello"
+  def hello
+    puts "Hello"
+  end
+end
+
 class ThorTask2 < Thor
 end
 
@@ -57,7 +71,13 @@ end
 
 describe Thor do
   it "tracks its subclasses, grouped by the files they come from" do
-    Thor.subclass_files[File.expand_path(__FILE__)].must == [MyTasks::ThorTask, ThorTask2]
+    Thor.subclass_files[File.expand_path(__FILE__)].must == [MyTasks::ThorTask, Default, Amazing, ThorTask2]
+  end
+
+  it "tracks a single subclass across multiple files" do
+    thorfile = File.join(File.dirname(__FILE__), "fixtures", "task.thor")
+    Thor.subclass_files[File.expand_path(thorfile)].must include(Amazing)
+    Thor.subclass_files[File.expand_path(__FILE__)].must include(Amazing)
   end
   
   it "tracks its subclasses in an Array" do
@@ -91,6 +111,16 @@ describe Thor::Runner do
     ARGV.replace ["my_tasks:thor_task:uhoh"]
     proc { Thor::Runner.start }.must raise_error(NoMethodError)
   end
+
+#   it "presents tasks in the default namespace with an empty namespace" do
+#     ARGV.replace ["list"]
+#     stdout_from { Thor::Runner.start }.must =~ /^:test +prints 'test'/
+#   end
+
+#   it "runs tasks with an empty namespace from the default namespace" do
+#     ARGV.replace [":test"]
+#     stdout_from { Thor::Runner.start }.must == "test\n"
+#   end
 end
 
 describe Thor::Runner, " install" do
@@ -128,10 +158,9 @@ describe Thor::Runner do
   
   describe " update" do
     it "updates existing thor files" do
-      runner = Thor::Runner.allocate
-      runner.should_receive(:install).with(@original_yaml["random"][:location], {"as" => "random"})
+      @runner.should_receive(:install).with(@original_yaml["random"][:location], {"as" => "random"})
     
-      silence_stdout { runner.initialize("update", ["random"]) }
+      silence_stdout { @runner.initialize("update", ["random"]) }
     end
   end
 

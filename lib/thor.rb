@@ -3,7 +3,17 @@ require "getopt"
 
 class Thor
   def self.inherited(klass)
-    subclass_files[File.expand_path(caller[0].split(":")[0])] << klass
+    register_klass_file klass
+  end
+
+  def self.register_klass_file(klass, file = caller[1].split(":")[0])
+    unless self == Thor
+      superclass.register_klass_file(klass, file)
+      return
+    end
+
+    file_subclasses = subclass_files[File.expand_path(file)]
+    file_subclasses << klass unless file_subclasses.include?(klass)
     subclasses << klass unless subclasses.include?(klass)
   end
   
@@ -18,6 +28,8 @@ class Thor
   def self.method_added(meth)
     meth = meth.to_s
     return if !public_instance_methods.include?(meth) || !@usage
+    register_klass_file self
+
     @descriptions ||= []
     @usages ||= []
     @opts ||= []
@@ -49,14 +61,25 @@ class Thor
     end
   end
 
+  def self.descriptions
+    (@descriptions || []) + (self == Thor ? [] : superclass.descriptions)
+  end
+
+  def self.usages
+    (@usages || []) + (self == Thor ? [] : superclass.usages)
+  end
+
+  def self.opts
+    (@opts || []) + (self == Thor ? [] : superclass.opts)
+  end
+
   def self.help_list
-    return nil unless @usages
     @help_list ||= begin
-      max_usage = @usages.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last.size
-      max_opts  = @opts.empty? ? 0 : format_opts(@opts.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last).size 
-      max_desc  = @descriptions.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last.size
+      max_usage = usages.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last.size
+      max_opts  = opts.empty? ? 0 : format_opts(opts.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last).size 
+      max_desc  = descriptions.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last.size
       Struct.new(:klass, :usages, :opts, :descriptions, :max).new(
-        self, @usages, @opts, @descriptions, Struct.new(:usage, :opt, :desc).new(max_usage, max_opts, max_desc)
+        self, usages, opts, descriptions, Struct.new(:usage, :opt, :desc).new(max_usage, max_opts, max_desc)
       )
     end
   end
@@ -87,8 +110,8 @@ class Thor
     
     args = ARGV.dup
     
-    if @opts.assoc(meth)
-      opts = @opts.assoc(meth).last.map {|opt, val| [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten}
+    if opts.assoc(meth)
+      opts = self.opts.assoc(meth).last.map {|opt, val| [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten}
       options = Getopt::Long.getopts(*opts)
       params << options
     end

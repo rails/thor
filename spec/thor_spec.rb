@@ -122,5 +122,9 @@ describe "thor" do
   
   it "provides useful help info for a method with optional options" do
     stdout_from { ARGV.replace ["help"]; MyApp.start }.must =~ /baz BAT \[\-\-option1=OPTION1\] +do some bazzing/
-  end    
+  end
+
+  it "provides useful help info for the help method itself" do
+    stdout_from { ARGV.replace ["help"]; MyApp.start }.must =~ /help +show this screen/
+  end
 end
