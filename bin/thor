@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require "thor"
+require File.dirname(__FILE__) + "/../lib/thor"
 require "open-uri"
 require "fileutils"
 require "yaml"
