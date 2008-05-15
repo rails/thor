@@ -1,6 +1,7 @@
 $:.unshift File.expand_path(File.dirname(__FILE__))
 require "getopt"
 require "thor/task"
+require "thor/ordered_hash"
 
 class Thor
   def self.inherited(klass)
@@ -31,9 +32,8 @@ class Thor
     return if !public_instance_methods.include?(meth) || !@usage
     register_klass_file self
 
-    @tasks ||= []
-    @tasks.delete(@tasks.assoc(meth))
-    @tasks << [meth, Task.new(meth, self, @desc, @usage, @method_options)]
+    @tasks ||= OrderedHash.new
+    @tasks[meth] = Task.new(meth, self, @desc, @usage, @method_options)
 
     @usage, @desc, @method_options = nil
   end
@@ -54,15 +54,15 @@ class Thor
   end
 
   def self.tasks
-    (@tasks || []) + (self == Thor ? [] : superclass.tasks)
+    (@tasks || OrderedHash.new) + (self == Thor ? OrderedHash.new : superclass.tasks)
   end
 
   def self.maxima
     @maxima ||= begin
       tasks = self.tasks
-      max_usage = tasks.map {|t| t[1].usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
-      max_desc  = tasks.map {|t| t[1].description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
-      opts      = tasks.map {|t| t[1].opts}.compact
+      max_usage = tasks.map {|_, t| t.usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
+      max_desc  = tasks.map {|_, t| t.description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
+      opts      = tasks.map {|_, t| t.opts}.compact
       max_opts  = opts.empty? ? 0 : format_opts(opts.max {|x,y| x.to_s.size <=> y.to_s.size}).size 
       Struct.new(:description, :usage, :opt).new(max_desc, max_usage, max_opts)
     end
@@ -94,8 +94,8 @@ class Thor
     
     args = ARGV.dup
     
-    if (task = tasks.assoc(meth)) && task[1].opts
-      opts = task[1].opts.map {|opt, val| [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten}
+    if tasks[meth] && tasks[meth].opts
+      opts = tasks[meth].opts.map {|opt, val| [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten}
       options = Getopt::Long.getopts(*opts)
       params << options
     end
@@ -117,7 +117,7 @@ class Thor
   public :initialize
   
   def usage(meth)
-    task = self.class.tasks.assoc(meth)[1]
+    task = self.class.tasks[meth]
     task.usage + (task.opts ? " " + self.class.format_opts(task.opts) : "")
   end
   
