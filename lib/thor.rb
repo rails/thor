@@ -1,7 +1,7 @@
 $:.unshift File.expand_path(File.dirname(__FILE__))
 require "getopt"
 require "thor/task"
-require "thor/ordered_hash"
+require "thor/task_hash"
 
 class Thor
   def self.inherited(klass)
@@ -32,8 +32,8 @@ class Thor
     return if !public_instance_methods.include?(meth) || !@usage
     register_klass_file self
 
-    @tasks ||= OrderedHash.new
-    @tasks[meth] = Task.new(meth, self, @desc, @usage, @method_options)
+    @tasks ||= TaskHash.new(self)
+    @tasks[meth] = Task.new(meth, @desc, @usage, @method_options)
 
     @usage, @desc, @method_options = nil
   end
@@ -54,12 +54,11 @@ class Thor
   end
 
   def self.tasks
-    (@tasks || OrderedHash.new) + (self == Thor ? OrderedHash.new : superclass.tasks)
+    @tasks || TaskHash.new(self)
   end
 
   def self.maxima
     @maxima ||= begin
-      tasks = self.tasks
       max_usage = tasks.map {|_, t| t.usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
       max_desc  = tasks.map {|_, t| t.description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
       max_opts  = tasks.map {|_, t| t.formatted_opts}.max {|x,y| x.to_s.size <=> y.to_s.size}.size

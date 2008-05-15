@@ -1,5 +1,11 @@
 class Thor
-  class Task < Struct.new(:meth, :klass, :description, :usage, :opts)
+  class Task < Struct.new(:meth, :description, :usage, :opts, :klass)
+    def with_klass(klass)
+      new = self.dup
+      new.klass = klass
+      new
+    end
+
     def formatted_opts
       return "" if opts.nil?
       opts.map do |opt, val|
