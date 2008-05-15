@@ -153,14 +153,15 @@ describe Thor::Runner do
     File.stub!(:exists?).and_return(true)
     YAML.stub!(:load_file).and_return(@original_yaml)    
     
-    @runner = Thor::Runner.allocate
+    @runner = Thor::Runner.new
+    Thor::Runner.stub!(:new).and_return(@runner)
   end
   
   describe " update" do
     it "updates existing thor files" do
       @runner.should_receive(:install).with(@original_yaml["random"][:location], {"as" => "random"})
     
-      silence_stdout { @runner.initialize("update", ["random"]) }
+      silence_stdout { Thor::Runner.tasks["update"].run("random") }
     end
   end
 
@@ -172,7 +173,7 @@ describe Thor::Runner do
       File.should_receive(:delete).with(File.join(ENV["HOME"], ".thor", "4a33b894ffce85d7b412fc1b36f88fe0.thor"))
       @original_yaml.should_receive(:delete).with("random")
     
-      silence_stdout { @runner.initialize("uninstall", ["random"])}
+      silence_stdout { Thor::Runner.tasks["uninstall"].run("random") }
     end
   end
 
@@ -180,7 +181,7 @@ describe Thor::Runner do
     it "displays the modules installed in a pretty way" do
       Dir.stub!(:[]).and_return([])
         
-      stdout = stdout_from { @runner.initialize("installed", []) }
+      stdout = stdout_from { Thor::Runner.tasks["installed"].run }
       stdout.must =~ /random\s*amazing/
       stdout.must =~ /amazing:describe NAME \[\-\-forcefully\]\s*say that someone is amazing/
       stdout.must =~ /amazing:hello\s*say hello/

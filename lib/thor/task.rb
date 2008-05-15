@@ -1,5 +1,18 @@
 class Thor
   class Task < Struct.new(:meth, :description, :usage, :opts, :klass)
+    def self.dynamic(meth, klass)
+      new(meth, "A dynamically-generated task", meth.to_s, nil, klass)
+    end
+
+    def run(*params)
+      raise Error, "klass is not defined for #{self.inspect}" unless klass
+      raise NoMethodError, "the `#{meth}' task of #{klass} is private" if
+        (klass.private_instance_methods + klass.protected_instance_methods).include?(meth)
+      klass.new.send(meth, *params)
+    rescue ArgumentError
+      puts "`#{meth}' was called incorrectly. Call as `#{formatted_usage}'"
+    end
+
     def with_klass(klass)
       new = self.dup
       new.klass = klass

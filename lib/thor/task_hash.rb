@@ -1,4 +1,5 @@
 require 'thor/ordered_hash'
+require 'thor/task'
 
 class Thor::TaskHash < Thor::OrderedHash
   def initialize(klass)
@@ -12,7 +13,10 @@ class Thor::TaskHash < Thor::OrderedHash
   end
 
   def [](name)
-    task = super(name)
-    task.with_klass(@klass) if task
+    if task = super(name)
+      return task.with_klass(@klass)
+    end
+
+    Thor::Task.dynamic(name, @klass)
   end
 end

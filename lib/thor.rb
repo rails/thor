@@ -72,31 +72,22 @@ class Thor
     params = []
     params << args.shift until args.empty? || args.first[0] == ?-
     meth = @map[meth].to_s if @map && @map[meth]
+    meth ||= "help"
+    task = tasks[meth]
     
     old_argv = ARGV.dup
     ARGV.replace args
     
-    if tasks[meth] && tasks[meth].opts
-      opts = tasks[meth].opts.map {|opt, val| [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten}
+    if task.opts
+      opts = task.opts.map {|opt, val| [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten}
       options = Getopt::Long.getopts(*opts)
       params << options
     end
     
     ARGV.replace old_argv
     
-    new(meth, params).instance_variable_get("@results")
+    task.run(*params)
   end
-  
-  def initialize(op, params)
-    begin
-      op ||= "help"
-      @results = send(op.to_sym, *params) if public_methods.include?(op) || !methods.include?(op)
-    rescue ArgumentError
-      puts "`#{op}' was called incorrectly. Call as `#{self.class.tasks[op].formatted_usage}'"
-    end
-  end
-
-  public :initialize
   
   map "--help" => :help
   

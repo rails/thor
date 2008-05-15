@@ -89,7 +89,7 @@ describe "thor" do
   end
   
   it "does not call a private method no matter what" do
-    MyApp.start(["what"]).must == nil
+    lambda { MyApp.start(["what"]) }.must raise_error(NoMethodError, "the `what' task of MyApp is private")
   end
   
   it "provides useful help info for a simple method" do
