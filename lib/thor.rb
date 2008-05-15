@@ -62,23 +62,9 @@ class Thor
       tasks = self.tasks
       max_usage = tasks.map {|_, t| t.usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
       max_desc  = tasks.map {|_, t| t.description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
-      opts      = tasks.map {|_, t| t.opts}.compact
-      max_opts  = opts.empty? ? 0 : format_opts(opts.max {|x,y| x.to_s.size <=> y.to_s.size}).size 
+      max_opts  = tasks.map {|_, t| t.formatted_opts}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
       Struct.new(:description, :usage, :opt).new(max_desc, max_usage, max_opts)
     end
-  end
-  
-  def self.format_opts(opts)
-    return "" if !opts
-    opts.map do |opt, val|
-      if val == true || val == "BOOLEAN"
-        "[#{opt}]"
-      elsif val == "REQUIRED"
-        opt + "=" + opt.gsub(/\-/, "").upcase
-      elsif val == "OPTIONAL"
-        "[" + opt + "=" + opt.gsub(/\-/, "").upcase + "]"
-      end
-    end.join(" ")
   end
   
   def self.start
@@ -110,16 +96,11 @@ class Thor
       op ||= "help"
       @results = send(op.to_sym, *params) if public_methods.include?(op) || !methods.include?(op)
     rescue ArgumentError
-      puts "`#{op}' was called incorrectly. Call as `#{usage(op)}'"
+      puts "`#{op}' was called incorrectly. Call as `#{self.class.tasks[op].formatted_usage}'"
     end
   end
 
   public :initialize
-  
-  def usage(meth)
-    task = self.class.tasks[meth]
-    task.usage + (task.opts ? " " + self.class.format_opts(task.opts) : "")
-  end
   
   map "--help" => :help
   
@@ -127,9 +108,9 @@ class Thor
   def help
     puts "Options"
     puts "-------"
-    self.class.tasks.each do |name, task|
+    self.class.tasks.each do |_, task|
       format = "%-" + (self.class.maxima.usage + self.class.maxima.opt + 4).to_s + "s"
-      print format % ("#{usage(name)}")
+      print format % ("#{task.formatted_usage}")
       puts  task.description
     end
   end
