@@ -274,11 +274,10 @@ class Thor::Runner < Thor
     
     # Calculate the size of the largest option description
     max_left_item = klasses.max do |x,y| 
-      (x.help_list && x.help_list.max.usage + x.help_list.max.opt).to_i <=> 
-      (y.help_list && y.help_list.max.usage + y.help_list.max.opt).to_i
+      (x.maxima.usage + x.maxima.opt).to_i <=> (y.maxima.usage + y.maxima.opt).to_i
     end
     
-    max_left = max_left_item.help_list.max.usage + max_left_item.help_list.max.opt
+    max_left = max_left_item.maxima.usage + max_left_item.maxima.opt
         
     klasses.each {|k| display_tasks(k, max_base, max_left)}
   end  

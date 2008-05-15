@@ -57,16 +57,14 @@ class Thor
     (@tasks || []) + (self == Thor ? [] : superclass.tasks)
   end
 
-  def self.help_list
-    @help_list ||= begin
+  def self.maxima
+    @maxima ||= begin
       tasks = self.tasks
       max_usage = tasks.map {|t| t[1].usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
       max_desc  = tasks.map {|t| t[1].description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
       opts      = tasks.map {|t| t[1].opts}.compact
       max_opts  = opts.empty? ? 0 : format_opts(opts.max {|x,y| x.to_s.size <=> y.to_s.size}).size 
-      Struct.new(:klass, :tasks, :max).new(
-        self, tasks, Struct.new(:usage, :opt, :desc).new(max_usage, max_opts, max_desc)
-      )
+      Struct.new(:description, :usage, :opt).new(max_desc, max_usage, max_opts)
     end
   end
   
@@ -127,11 +125,10 @@ class Thor
   
   desc "help", "show this screen"
   def help
-    list = self.class.help_list
     puts "Options"
     puts "-------"
     self.class.tasks.each do |name, task|
-      format = "%-" + (list.max.usage + list.max.opt + 4).to_s + "s"
+      format = "%-" + (self.class.maxima.usage + self.class.maxima.opt + 4).to_s + "s"
       print format % ("#{usage(name)}")
       puts  task.description
     end
