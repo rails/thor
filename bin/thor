@@ -280,18 +280,16 @@ class Thor::Runner < Thor
     
     max_left = max_left_item.help_list.max.usage + max_left_item.help_list.max.opt
         
-    klasses.map {|k| k.help_list}.compact.each do |item|
-      display_tasks(item, max_base, max_left)
-    end    
+    klasses.each {|k| display_tasks(k, max_base, max_left)}
   end  
   
-  def display_tasks(item, max_base, max_left)
-    base = Thor::Util.constant_to_thor_path(item.klass.name)
-    item.usages.each do |name, usage|
+  def display_tasks(klass, max_base, max_left)
+    base = Thor::Util.constant_to_thor_path(klass.name)
+    klass.tasks.each do |name, task|
       format_string = "%-#{max_left + max_base + 5}s"
       print format_string %
-        "#{base}:#{item.usages.assoc(name).last} #{display_opts(item.opts.assoc(name) && item.opts.assoc(name).last)}"
-      puts item.descriptions.assoc(name).last
+        "#{base}:#{task.usage} #{display_opts(task.opts)}"
+      puts task.description
     end    
   end
   

@@ -1,5 +1,6 @@
 $:.unshift File.expand_path(File.dirname(__FILE__))
 require "getopt"
+require "thor/task"
 
 class Thor
   def self.inherited(klass)
@@ -30,18 +31,9 @@ class Thor
     return if !public_instance_methods.include?(meth) || !@usage
     register_klass_file self
 
-    @descriptions ||= []
-    @usages ||= []
-    @opts ||= []
-
-    @descriptions.delete(@descriptions.assoc(meth))
-    @descriptions << [meth, @desc]
-
-    @usages.delete(@usages.assoc(meth))
-    @usages << [meth, @usage]
-    
-    @opts.delete(@opts.assoc(meth))    
-    @opts << [meth, @method_options] if @method_options
+    @tasks ||= []
+    @tasks.delete(@tasks.assoc(meth))
+    @tasks << [meth, Task.new(meth, self, @desc, @usage, @method_options)]
 
     @usage, @desc, @method_options = nil
   end
@@ -61,25 +53,19 @@ class Thor
     end
   end
 
-  def self.descriptions
-    (@descriptions || []) + (self == Thor ? [] : superclass.descriptions)
-  end
-
-  def self.usages
-    (@usages || []) + (self == Thor ? [] : superclass.usages)
-  end
-
-  def self.opts
-    (@opts || []) + (self == Thor ? [] : superclass.opts)
+  def self.tasks
+    (@tasks || []) + (self == Thor ? [] : superclass.tasks)
   end
 
   def self.help_list
     @help_list ||= begin
-      max_usage = usages.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last.size
-      max_opts  = opts.empty? ? 0 : format_opts(opts.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last).size 
-      max_desc  = descriptions.max {|x,y| x.last.to_s.size <=> y.last.to_s.size}.last.size
-      Struct.new(:klass, :usages, :opts, :descriptions, :max).new(
-        self, usages, opts, descriptions, Struct.new(:usage, :opt, :desc).new(max_usage, max_opts, max_desc)
+      tasks = self.tasks
+      max_usage = tasks.map {|t| t[1].usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
+      max_desc  = tasks.map {|t| t[1].description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
+      opts      = tasks.map {|t| t[1].opts}.compact
+      max_opts  = opts.empty? ? 0 : format_opts(opts.max {|x,y| x.to_s.size <=> y.to_s.size}).size 
+      Struct.new(:klass, :tasks, :max).new(
+        self, tasks, Struct.new(:usage, :opt, :desc).new(max_usage, max_opts, max_desc)
       )
     end
   end
@@ -110,8 +96,8 @@ class Thor
     
     args = ARGV.dup
     
-    if opts.assoc(meth)
-      opts = self.opts.assoc(meth).last.map {|opt, val| [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten}
+    if (task = tasks.assoc(meth)) && task[1].opts
+      opts = task[1].opts.map {|opt, val| [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten}
       options = Getopt::Long.getopts(*opts)
       params << options
     end
@@ -133,8 +119,8 @@ class Thor
   public :initialize
   
   def usage(meth)
-    list = self.class.help_list
-    list.usages.assoc(meth)[1] + (list.opts.assoc(meth) ? " " + self.class.format_opts(list.opts.assoc(meth)[1]) : "")
+    task = self.class.tasks.assoc(meth)[1]
+    task.usage + (task.opts ? " " + self.class.format_opts(task.opts) : "")
   end
   
   map "--help" => :help
@@ -144,10 +130,10 @@ class Thor
     list = self.class.help_list
     puts "Options"
     puts "-------"
-    list.usages.each do |meth, use|
+    self.class.tasks.each do |name, task|
       format = "%-" + (list.max.usage + list.max.opt + 4).to_s + "s"
-      print format % ("#{usage(meth)}")
-      puts  list.descriptions.assoc(meth)[1]
+      print format % ("#{usage(name)}")
+      puts  task.description
     end
   end
   
