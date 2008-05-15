@@ -212,9 +212,8 @@ class Thor::Runner < Thor
       return
     end
         
-    ARGV.replace [to_call, *(args + ARGV)].compact
     begin
-      klass.start
+      klass.start [to_call, *ARGV[1..-1]]
     rescue ArgumentError
       puts "You need to call #{to_call} as `#{klass.usage_for_method(to_call)}'"
     rescue NoMethodError => e

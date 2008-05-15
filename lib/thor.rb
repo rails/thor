@@ -67,18 +67,15 @@ class Thor
     end
   end
   
-  def self.start
-    meth = ARGV.shift
+  def self.start(args = ARGV)
+    args = args.dup
+    meth = args.shift
     params = []
-    while !ARGV.empty?
-      break if ARGV.first =~ /^\-/
-      params << ARGV.shift
-    end
-    if defined?(@map) && @map[meth]
-      meth = @map[meth].to_s
-    end
+    params << args.shift until args.empty? || args.first[0] == ?-
+    meth = @map[meth].to_s if @map && @map[meth]
     
-    args = ARGV.dup
+    old_argv = ARGV.dup
+    ARGV.replace args
     
     if tasks[meth] && tasks[meth].opts
       opts = tasks[meth].opts.map {|opt, val| [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten}
@@ -86,7 +83,7 @@ class Thor
       params << options
     end
     
-    ARGV.replace args
+    ARGV.replace old_argv
     
     new(meth, params).instance_variable_get("@results")
   end
