@@ -91,6 +91,11 @@ describe Thor::Runner do
     ARGV.replace ["list"]
     stdout_from { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
   end
+
+  it "dosn't list superclass tasks in the subclass" do
+    ARGV.replace ["list"]
+    stdout_from { Thor::Runner.start }.must_not =~ /my_tasks:thor_task:help/
+  end
   
   it "runs tasks from other Thor files" do
     ARGV.replace ["my_tasks:thor_task:foo"]
