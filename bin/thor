@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# -*- mode: ruby -*-
 
 require File.dirname(__FILE__) + "/../lib/thor"
 require "open-uri"
