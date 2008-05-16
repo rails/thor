@@ -144,15 +144,11 @@ class Thor::Runner < Thor
       return
     end
     
-    thor_klass = meth.split(":")[0...-1].join(":")
-    yaml = thor_yaml
-    klass_str = Thor::Util.to_constant(thor_klass)
-    files = yaml.inject([]) { |a,(k,v)| a << v[:filename] if v[:constants] && v[:constants].include?(klass_str); a }
-
-    unless files.empty?
-      files.each do |f|
-        load File.join(thor_root, "#{f}.thor")
-      end
+    klass_str = Thor::Util.to_constant(meth.split(":")[0...-1].join(":"))
+    thor_yaml.select do |k, v|
+      v[:constants] && v[:constants].include?(klass_str)
+    end.each do |k, v|
+      load File.join(thor_root, "#{v[:filename]}.thor")
     end
 
     Thor[meth].run *ARGV[1..-1]
