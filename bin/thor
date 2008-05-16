@@ -30,8 +30,8 @@ class Thor::Runner < Thor
     ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
   end
 
-  def initialize_thorfiles(include_system = true)
-    thorfiles(include_system).each {|f| load f unless Thor.subclass_files.keys.include?(File.expand_path(f))}
+  def initialize_thorfiles(relevant_to = nil)
+    thorfiles(relevant_to).each {|f| load f unless Thor.subclass_files.keys.include?(File.expand_path(f))}
   end
 
   map "-T" => :list, "-i" => :install, "-u" => :update
@@ -135,17 +135,10 @@ class Thor::Runner < Thor
   end
     
   def method_missing(meth, *args)
-    initialize_thorfiles(false)
     meth = meth.to_s
     super(meth.to_sym, *args) unless meth.include? ?:
-    
-    klass_str = Thor::Util.to_constant(meth.split(":")[0...-1].join(":"))
-    thor_yaml.select do |k, v|
-      v[:constants] && v[:constants].include?(klass_str)
-    end.each do |k, v|
-      load File.join(thor_root, "#{v[:filename]}.thor")
-    end
 
+    initialize_thorfiles(meth)
     Thor[meth].run *ARGV[1..-1]
   end
   
@@ -214,9 +207,8 @@ class Thor::Runner < Thor
     end
   end
   
-  def thorfiles(include_system = true)
+  def thorfiles(relevant_to = nil)
     path = Dir.pwd
-    system_thorfiles = Dir["#{ENV["HOME"]}/.thor/**/*.thor"]
     thorfiles = []
     
     # Look for Thorfile or *.thor in the current directory or a parent directory, until the root
@@ -225,9 +217,17 @@ class Thor::Runner < Thor
       path = File.dirname(path)
       break if path == "/"
     end
-    thorfiles + (include_system ? system_thorfiles : [])
+    thorfiles + (relevant_to ? thorfiles_relevant_to(relevant_to) :
+                 Dir["#{ENV["HOME"]}/.thor/**/*.thor"])
   end
-    
+
+  def thorfiles_relevant_to(meth)
+    klass_str = Thor::Util.to_constant(meth.split(":")[0...-1].join(":"))
+    thor_yaml.select do |k, v|
+      v[:constants] && v[:constants].include?(klass_str)
+    end.map { |k, v| File.join(thor_root, "#{v[:filename]}.thor") }
+  end
+
 end
 
 unless defined?(Spec)
