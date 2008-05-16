@@ -43,8 +43,9 @@ class Thor
       end.join(" ")
     end
 
-    def formatted_usage
-      usage + (opts ? " " + formatted_opts : "")
+    def formatted_usage(namespace = false)
+      (namespace ? self.namespace + ':' : '') + usage +
+        (opts ? " " + formatted_opts : "")
     end
   end
 end

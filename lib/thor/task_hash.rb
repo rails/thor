@@ -8,8 +8,8 @@ class Thor::TaskHash < Thor::OrderedHash
   end
 
   def each(local = false, &block)
-    super(&block)
-    @klass.superclass.tasks.each(&block) unless local || @klass == Thor
+    super() { |k, t| yield k, t.with_klass(@klass) }
+    @klass.superclass.tasks.each { |k, t| yield k, t.with_klass(@klass) } unless local || @klass == Thor
   end
 
   def [](name)
