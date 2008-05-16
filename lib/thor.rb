@@ -63,6 +63,13 @@ class Thor
     @tasks || TaskHash.new(self)
   end
 
+  def self.[](task)
+    namespaces = task.split(":")
+    klass = Thor::Util.constant_from_thor_path(namespaces[0...-1].join(":"))
+    raise Error, "`#{klass}' is not a Thor class" unless klass <= Thor
+    klass.tasks[namespaces.last]
+  end
+
   def self.maxima
     @maxima ||= begin
       max_usage = tasks.map {|_, t| t.usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
@@ -93,6 +100,8 @@ class Thor
     ARGV.replace old_argv
     
     task.run(*params)
+  rescue Thor::Error => e
+    puts e.message
   end
   
   map ["-h", "-?", "--help"] => :help

@@ -1,3 +1,6 @@
+require 'thor/error'
+require 'thor/util'
+
 class Thor
   class Task < Struct.new(:meth, :description, :usage, :opts, :klass)
     def self.dynamic(meth, klass)
@@ -9,8 +12,16 @@ class Thor
       raise NoMethodError, "the `#{meth}' task of #{klass} is private" if
         (klass.private_instance_methods + klass.protected_instance_methods).include?(meth)
       klass.new.send(meth, *params)
-    rescue ArgumentError
-      puts "`#{meth}' was called incorrectly. Call as `#{formatted_usage}'"
+    rescue ArgumentError => e
+      raise e unless e.backtrace.first =~ /:in `#{meth}'$/
+      raise Error, "`#{meth}' was called incorrectly. Call as `#{formatted_usage}'"
+    rescue NoMethodError => e
+      raise e unless e.message =~ /^undefined method `#{meth}' for #<#{klass}:.*>$/
+      raise Error, "The #{namespace false} namespace doesn't have a `#{meth}' task"
+    end
+
+    def namespace(remove_default = true)
+      Thor::Util.constant_to_thor_path(klass, remove_default)
     end
 
     def with_klass(klass)

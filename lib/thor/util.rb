@@ -1,12 +1,19 @@
+require 'thor/error'
+
 class Thor
   module Util
     
-    def self.constant_to_thor_path(str)
-      snake_case(str.to_s).squeeze(":").gsub(/^default/, '')
+    def self.constant_to_thor_path(str, remove_default = true)
+      str = snake_case(str.to_s).squeeze(":")
+      str.gsub!(/^default/, '') if remove_default
+      str
     end
 
     def self.constant_from_thor_path(str)
       make_constant(to_constant(str))
+    rescue NameError => e
+      raise e unless e.message =~ /^uninitialized constant (.*)$/
+      raise Error, "There was no available namespace `#{str}'."
     end
 
     def self.to_constant(str)

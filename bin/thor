@@ -145,10 +145,7 @@ class Thor::Runner < Thor
     end
     
     thor_klass = meth.split(":")[0...-1].join(":")
-    to_call = meth.split(":").last
-    
     yaml = thor_yaml
-
     klass_str = Thor::Util.to_constant(thor_klass)
     files = yaml.inject([]) { |a,(k,v)| a << v[:filename] if v[:constants] && v[:constants].include?(klass_str); a }
 
@@ -156,29 +153,9 @@ class Thor::Runner < Thor
       files.each do |f|
         load File.join(thor_root, "#{f}.thor")
       end
-      klass = Thor::Util.constant_from_thor_path(thor_klass)
-    else
-      begin
-        klass = Thor::Util.constant_from_thor_path(thor_klass)
-      rescue
-        puts "There was no available namespace `#{thor_klass}'."
-        return      
-      end
     end
-    
-    unless klass.ancestors.include?(Thor)
-      puts "`#{thor_klass}' is not a Thor module"
-      return
-    end
-        
-    begin
-      klass.start [to_call, *ARGV[1..-1]]
-    rescue ArgumentError
-      puts "You need to call #{to_call} as `#{klass.usage_for_method(to_call)}'"
-    rescue NoMethodError => e
-      raise e unless e.message =~ /undefined method #{to_call} for #<#{klass}:.*>/
-      puts "`#{to_call}' is not available in #{thor_klass}"
-    end
+
+    Thor[meth].run *ARGV[1..-1]
   end
   
   private
