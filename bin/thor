@@ -139,10 +139,7 @@ class Thor::Runner < Thor
   def method_missing(meth, *args)
     initialize_thorfiles(false)
     meth = meth.to_s
-    unless meth =~ /:/
-      puts "Thor tasks must contain a :"
-      return
-    end
+    super(meth.to_sym, *args) unless meth.include? ?:
     
     klass_str = Thor::Util.to_constant(meth.split(":")[0...-1].join(":"))
     thor_yaml.select do |k, v|
