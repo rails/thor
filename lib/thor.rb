@@ -91,7 +91,7 @@ class Thor
   
   map "--help" => :help
   
-  desc "help", "show this screen"
+  desc "help", "describe available tasks"
   def help
     puts "Options"
     puts "-------"

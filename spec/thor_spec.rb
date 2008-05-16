@@ -113,6 +113,6 @@ describe "thor" do
   end
 
   it "provides useful help info for the help method itself" do
-    stdout_from { MyApp.start(["help"]) }.must =~ /help +show this screen/
+    stdout_from { MyApp.start(["help"]) }.must =~ /help +describe available tasks/
   end
 end
