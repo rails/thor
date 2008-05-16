@@ -95,7 +95,7 @@ class Thor
     task.run(*params)
   end
   
-  map "--help" => :help
+  map ["-h", "-?", "--help"] => :help
   
   desc "help", "describe available tasks"
   def help
