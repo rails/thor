@@ -4,30 +4,6 @@ require "thor"
 load File.join(File.dirname(__FILE__), "..", "bin", "thor")
 load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
 
-class StdOutCapturer
-  attr_reader :output
-
-  def initialize
-    @output = ""
-  end
-
-  def self.call_func
-    begin
-      old_out = $stdout
-      output = new
-      $stdout = output
-      yield
-    ensure
-      $stdout = old_out
-    end
-    output.output
-  end
-
-  def write(s)
-    @output += s
-  end
-end
-
 module MyTasks
   class ThorTask < Thor
     desc "foo", "bar"
@@ -89,12 +65,12 @@ end
 describe Thor::Runner do
   it "can give a list of the available tasks" do
     ARGV.replace ["list"]
-    stdout_from { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
+    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
   end
 
   it "dosn't list superclass tasks in the subclass" do
     ARGV.replace ["list"]
-    stdout_from { Thor::Runner.start }.must_not =~ /my_tasks:thor_task:help/
+    capture(:stdout) { Thor::Runner.start }.must_not =~ /my_tasks:thor_task:help/
   end
   
   it "runs tasks from other Thor files" do
@@ -104,12 +80,12 @@ describe Thor::Runner do
   
   it "prints an error if a toplevel thor task is not found" do
     ARGV.replace ["hello"]
-    stdout_from { Thor::Runner.start }.must =~ /The thor:runner namespace doesn't have a `hello' task/
+    capture(:stderr) { Thor::Runner.start }.must =~ /The thor:runner namespace doesn't have a `hello' task/
   end
   
   it "prints an error if the namespace could not be found" do
     ARGV.replace ["hello:goodbye"]
-    stdout_from { Thor::Runner.start }.must =~ /There was no available namespace `hello'/
+    capture(:stderr) { Thor::Runner.start }.must =~ /There was no available namespace `hello'/
   end  
   
   it "does not swallow NoMethodErrors that occur inside the called method" do
@@ -119,12 +95,12 @@ describe Thor::Runner do
 
 #   it "presents tasks in the default namespace with an empty namespace" do
 #     ARGV.replace ["list"]
-#     stdout_from { Thor::Runner.start }.must =~ /^:test +prints 'test'/
+#     capture(:stdout) { Thor::Runner.start }.must =~ /^:test +prints 'test'/
 #   end
 
 #   it "runs tasks with an empty namespace from the default namespace" do
 #     ARGV.replace [":test"]
-#     stdout_from { Thor::Runner.start }.must == "test\n"
+#     capture(:stdout) { Thor::Runner.start }.must == "test\n"
 #   end
 end
 
@@ -147,7 +123,7 @@ describe Thor::Runner, " install" do
     File.should_receive(:open).with(File.join(ENV["HOME"], ".thor", Digest::MD5.hexdigest("#{File.dirname(__FILE__)}/fixtures/task.thor" + "randomness")) + ".thor", "w")
     File.should_receive(:open).with(File.join(ENV["HOME"], ".thor", "thor.yml"), "w").once.and_yield(file)
     
-    silence_stdout { Thor::Runner.start }
+    silence(:stdout) { Thor::Runner.start }
   end
 end
 
@@ -166,7 +142,7 @@ describe Thor::Runner do
     it "updates existing thor files" do
       @runner.should_receive(:install).with(@original_yaml["random"][:location], {"as" => "random"})
     
-      silence_stdout { Thor::Runner.tasks["update"].run("random") }
+      silence(:stdout) { Thor::Runner.tasks["update"].run("random") }
     end
   end
 
@@ -178,7 +154,7 @@ describe Thor::Runner do
       File.should_receive(:delete).with(File.join(ENV["HOME"], ".thor", "4a33b894ffce85d7b412fc1b36f88fe0.thor"))
       @original_yaml.should_receive(:delete).with("random")
     
-      silence_stdout { Thor::Runner.tasks["uninstall"].run("random") }
+      silence(:stdout) { Thor::Runner.tasks["uninstall"].run("random") }
     end
   end
 
@@ -186,7 +162,7 @@ describe Thor::Runner do
     it "displays the modules installed in a pretty way" do
       Dir.stub!(:[]).and_return([])
         
-      stdout = stdout_from { Thor::Runner.tasks["installed"].run }
+      stdout = capture(:stdout) { Thor::Runner.tasks["installed"].run }
       stdout.must =~ /random\s*amazing/
       stdout.must =~ /amazing:describe NAME \[\-\-forcefully\]\s*say that someone is amazing/
       stdout.must =~ /amazing:hello\s*say hello/

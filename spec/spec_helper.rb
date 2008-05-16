@@ -1,6 +1,8 @@
 $TESTING=true
 $:.push File.join(File.dirname(__FILE__), '..', 'lib')
 
+require 'stringio'
+
 module Spec::Expectations::ObjectExpectations
   alias_method :must, :should
   alias_method :must_not, :should_not
@@ -8,34 +10,19 @@ module Spec::Expectations::ObjectExpectations
   undef_method :should_not
 end
 
-class StdOutCapturer
-  attr_reader :output
-
-  def initialize
-    @output = ""
-  end
-
-  def self.call_func
-    begin
-      old_out = $stdout
-      output = new
-      $stdout = output
-      yield
-    ensure
-      $stdout = old_out
-    end
-    output.output
-  end
-
-  def write(s)
-    @output += s
-  end
-end
-
 Spec::Runner.configure do |config|
-  def stdout_from(&blk)
-    StdOutCapturer.call_func(&blk)
+  def capture(stream)
+    begin
+      stream = stream.to_s
+      eval "$#{stream} = StringIO.new"
+      yield
+      result = eval("$#{stream}").string
+    ensure 
+      eval("$#{stream} = #{stream.upcase}")
+    end
+
+    result
   end
   
-  alias silence_stdout stdout_from
+  alias silence capture
 end

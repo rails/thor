@@ -62,7 +62,7 @@ describe "thor" do
   end
   
   it "raises an error if a required param is not provided" do
-    stdout_from { MyApp.start(["animal"]) }.must =~ /`animal' was called incorrectly\. Call as `animal TYPE'/
+    capture(:stderr) { MyApp.start(["animal"]) }.must =~ /`animal' was called incorrectly\. Call as `animal TYPE'/
   end
   
   it "calls a method with an optional boolean param when the param is passed" do
@@ -98,26 +98,26 @@ describe "thor" do
   end
   
   it "provides useful help info for a simple method" do
-    stdout_from { MyApp.start(["help"]) }.must =~ /zoo +zoo around/
+    capture(:stdout) { MyApp.start(["help"]) }.must =~ /zoo +zoo around/
   end
   
   it "provides useful help info for a method with one param" do
-    stdout_from { MyApp.start(["help"]) }.must =~ /animal TYPE +horse around/
+    capture(:stdout) { MyApp.start(["help"]) }.must =~ /animal TYPE +horse around/
   end  
   
   it "provides useful help info for a method with boolean options" do
-    stdout_from { MyApp.start(["help"]) }.must =~ /foo BAR \[\-\-force\] +do some fooing/
+    capture(:stdout) { MyApp.start(["help"]) }.must =~ /foo BAR \[\-\-force\] +do some fooing/
   end
   
   it "provides useful help info for a method with required options" do
-    stdout_from { MyApp.start(["help"]) }.must =~ /bar BAZ BAT \-\-option1=OPTION1 +do some barring/
+    capture(:stdout) { MyApp.start(["help"]) }.must =~ /bar BAZ BAT \-\-option1=OPTION1 +do some barring/
   end
   
   it "provides useful help info for a method with optional options" do
-    stdout_from { MyApp.start(["help"]) }.must =~ /baz BAT \[\-\-option1=OPTION1\] +do some bazzing/
+    capture(:stdout) { MyApp.start(["help"]) }.must =~ /baz BAT \[\-\-option1=OPTION1\] +do some bazzing/
   end
 
   it "provides useful help info for the help method itself" do
-    stdout_from { MyApp.start(["help"]) }.must =~ /help +describe available tasks/
+    capture(:stdout) { MyApp.start(["help"]) }.must =~ /help +describe available tasks/
   end
 end

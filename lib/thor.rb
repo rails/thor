@@ -101,7 +101,7 @@ class Thor
     
     task.run(*params)
   rescue Thor::Error => e
-    puts e.message
+    $stderr.puts e.message
   end
   
   map ["-h", "-?", "--help"] => :help
