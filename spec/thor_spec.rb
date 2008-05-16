@@ -3,7 +3,7 @@ require "thor"
 
 class MyApp < Thor
   
-  map "-T" => :animal
+  map "-T" => :animal, ["-f", "--foo"] => :foo
   
   desc "zoo", "zoo around"
   def zoo
@@ -54,6 +54,11 @@ describe "thor" do
   
   it "calls the alias of a method if one is provided via .map" do
     MyApp.start(["-T", "fish"]).must == ["fish"]
+  end
+
+  it "calls the alias of a method if several are provided via .map" do
+    MyApp.start(["-f", "fish"]).must == ["fish", {}]
+    MyApp.start(["--foo", "fish"]).must == ["fish", {}]
   end
   
   it "raises an error if a required param is not provided" do

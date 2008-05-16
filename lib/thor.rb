@@ -40,7 +40,13 @@ class Thor
 
   def self.map(map)
     @map ||= superclass.instance_variable_get("@map") || {}
-    @map.merge! map
+    map.each do |key, value|
+      if key.respond_to?(:each)
+        key.each {|subkey| @map[subkey] = value}
+      else
+        @map[key] = value
+      end
+    end
   end
 
   def self.desc(usage, description)
@@ -97,7 +103,7 @@ class Thor
     puts "-------"
     self.class.tasks.each do |_, task|
       format = "%-" + (self.class.maxima.usage + self.class.maxima.opt + 4).to_s + "s"
-      print format % ("#{task.formatted_usage}")
+      print format % ("#{task.formatted_usage}")      
       puts  task.description
     end
   end
