@@ -111,11 +111,16 @@ class Thor::Runner < Thor
     install(yaml[name][:location], "as" => name)
   end
   
-  def installed
+  desc "installed", "list the installed Thor modules and tasks (--internal means list the built-in tasks as well)"
+  method_options :internal => :boolean
+  def installed(opts = {})
     Dir["#{ENV["HOME"]}/.thor/**/*.thor"].each do |f|
       load f unless Thor.subclass_files.keys.include?(File.expand_path(f))
     end
-    display_klasses(true)
+
+    klasses = Thor.subclasses
+    klasses -= [Thor, Thor::Runner] unless opts['internal']
+    display_klasses(true, klasses)
   end
   
   desc "list [SEARCH]", "list the available thor tasks (--substring means SEARCH can be anywhere in the module)"
@@ -161,17 +166,18 @@ class Thor::Runner < Thor
   end
   
   def display_klasses(with_modules = false, klasses = Thor.subclasses)
-    klasses = klasses - [Thor::Runner]
-    raise Error, "No thorfiles available" if klasses.empty?
+    unless with_modules
+      klasses -= [Thor, Thor::Runner]
+      raise Error, "No thorfiles available" if klasses.empty?
+    end
     
-    if with_modules
-      yaml = thor_yaml
+    if with_modules && !(yaml = thor_yaml).empty?
       max_name = yaml.max {|(xk,xv),(yk,yv)| xk.size <=> yk.size }.first.size
       
-      print "%-#{max_name + 4}s" % "Name"
-      puts "Modules"
-      print "%-#{max_name + 4}s" % "----"
-      puts "-------"
+      print "%-#{max_name + 4}s" % "Modules"
+      puts "Namespaces"
+      print "%-#{max_name + 4}s" % "-------"
+      puts "----------"
       
       yaml.each do |name, info|
         print "%-#{max_name + 4}s" % name
