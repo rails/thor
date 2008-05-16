@@ -1,8 +1,8 @@
 class Thor
-  class Util
+  module Util
     
     def self.constant_to_thor_path(str)
-      snake_case(str).squeeze(":").gsub(/^default/, '')
+      snake_case(str.to_s).squeeze(":").gsub(/^default/, '')
     end
 
     def self.constant_from_thor_path(str)
@@ -22,18 +22,13 @@ class Thor
       ret
     end
 
-    private  
-
     def self.make_constant(str)
-      list = str.split("::")
-      obj = Object
-      list.each {|x| obj = obj.const_get(x) }
-      obj
+      list = str.split("::").inject(Object) {|obj, x| obj.const_get(x)}
     end
     
     def self.snake_case(str)
-      return str.downcase if str =~ /^[A-Z]+$/
-      str.gsub(/([A-Z]+)(?=[A-Z][a-z]?)|\B[A-Z]/, '_\&') =~ /_*(.*)/
+      return str.downcase if str =~ /^[A-Z_]+$/
+      str.gsub(/\B[A-Z]/, '_\&').squeeze('_') =~ /_*(.*)/
       return $+.downcase
     end  
     
