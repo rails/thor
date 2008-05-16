@@ -32,6 +32,16 @@ class MyApp < Thor
   def baz(bat, opts)
     [bat, opts]
   end
+
+  desc "bang FOO", <<END
+bangs around some
+  This is more info!
+  Everyone likes more info!
+END
+  method_options :fup => :boolean
+  def bang(foo)
+    "bang"
+  end
   
   def method_missing(meth, *args)
     [meth, args]
@@ -118,6 +128,19 @@ describe "thor" do
   end
 
   it "provides useful help info for the help method itself" do
-    capture(:stdout) { MyApp.start(["help"]) }.must =~ /help +describe available tasks/
+    capture(:stdout) { MyApp.start(["help"]) }.must =~ /help \[TASK\] +describe available tasks/
+  end
+
+  it "provides one line of help info per task when talking about all tasks" do
+    capture(:stdout) { MyApp.start(["help"]) }.must =~ /bang FOO \[--fup\] +bangs around some/
+  end
+
+  it "provides full help info when talking about a specific task" do
+    capture(:stdout) { MyApp.start(["help", "bang"]) }.must == <<END
+bang FOO [--fup]
+bangs around some
+  This is more info!
+  Everyone likes more info!
+END
   end
 end

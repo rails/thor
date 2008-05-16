@@ -106,14 +106,27 @@ class Thor
   
   map ["-h", "-?", "--help"] => :help
   
-  desc "help", "describe available tasks"
-  def help
+  desc "help [TASK]", "describe available tasks or one specific task"
+  def help(task = nil)
+    if task
+      if task.include? ?:
+        task = self.class[task]
+        namespace = true
+      else
+        task = self.class.tasks[task]
+      end
+
+      puts task.formatted_usage(namespace)
+      puts task.description
+      return
+    end
+
     puts "Options"
     puts "-------"
     self.class.tasks.each do |_, task|
       format = "%-" + (self.class.maxima.usage + self.class.maxima.opt + 4).to_s + "s"
       print format % ("#{task.formatted_usage}")      
-      puts  task.description
+      puts  task.description.split("\n").first
     end
   end
   
