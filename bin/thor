@@ -43,11 +43,9 @@ class Thor::Runner < Thor
     begin
       contents = open(name).read
     rescue OpenURI::HTTPError
-      puts "The URI you provided: `#{name}' was invalid"
-      return
+      raise Error, "Error opening URI `#{name}'"
     rescue Errno::ENOENT
-      puts "`#{name}' is not a valid file"
-      return
+      raise Error, "Error opening file `#{name}'"
     end
     
     puts "Your Thorfile contains: "
@@ -92,10 +90,7 @@ class Thor::Runner < Thor
   desc "uninstall NAME", "uninstall a named Thor module"
   def uninstall(name)
     yaml = thor_yaml
-    unless yaml[name]
-      puts "There was no module by that name installed"
-      return
-    end
+    raise Error, "Can't find module `#{name}'" unless yaml[name]
     
     puts "Uninstalling #{name}."
     
@@ -110,12 +105,10 @@ class Thor::Runner < Thor
   desc "update NAME", "update a Thor file from its original location"
   def update(name)
     yaml = thor_yaml
-    if !yaml[name] || !yaml[name][:location]
-      puts "`#{name}' was not found in the system repository"
-    else
-      puts "Updating `#{name}' from #{yaml[name][:location]}"
-      install(yaml[name][:location], "as" => name)
-    end
+    raise Error, "Can't find module `#{name}'" if !yaml[name] || !yaml[name][:location]
+
+    puts "Updating `#{name}' from #{yaml[name][:location]}"
+    install(yaml[name][:location], "as" => name)
   end
   
   def installed
@@ -169,11 +162,7 @@ class Thor::Runner < Thor
   
   def display_klasses(with_modules = false, klasses = Thor.subclasses)
     klasses = klasses - [Thor::Runner]
-    
-    if klasses.empty?
-      puts "No thorfiles available"
-      return
-    end
+    raise Error, "No thorfiles available" if klasses.empty?
     
     if with_modules
       yaml = thor_yaml

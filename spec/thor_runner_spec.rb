@@ -102,9 +102,9 @@ describe Thor::Runner do
     Thor::Runner.start.must == "foo"
   end
   
-  it "prints an error if a thor task is not namespaced" do
+  it "prints an error if a toplevel thor task is not found" do
     ARGV.replace ["hello"]
-    stdout_from { Thor::Runner.start }.must =~ /Thor tasks must contain a :/
+    stdout_from { Thor::Runner.start }.must =~ /The thor:runner namespace doesn't have a `hello' task/
   end
   
   it "prints an error if the namespace could not be found" do
