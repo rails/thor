@@ -283,12 +283,12 @@ class Thor::Runner < Thor
   
   def display_tasks(klass, max_base, max_left)
     base = Thor::Util.constant_to_thor_path(klass.name)
-    klass.tasks.each do |name, task|
+    klass.tasks.each true do |name, task|
       format_string = "%-#{max_left + max_base + 5}s"
       print format_string %
         "#{base}:#{task.usage} #{display_opts(task.opts)}"
       puts task.description
-    end    
+    end
   end
   
   def display_opts(opts)

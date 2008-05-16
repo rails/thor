@@ -7,9 +7,9 @@ class Thor::TaskHash < Thor::OrderedHash
     @klass = klass
   end
 
-  def each(&block)
+  def each(local = false, &block)
     super(&block)
-    @klass.superclass.tasks.each(&block) unless @klass == Thor
+    @klass.superclass.tasks.each(&block) unless local || @klass == Thor
   end
 
   def [](name)
