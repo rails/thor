@@ -133,6 +133,12 @@ class Thor::Runner < Thor
     display_klasses(false, Thor.subclasses.select {|k| 
       Thor::Util.constant_to_thor_path(k.name) =~ search})
   end
+
+  # Override Thor#help so we can give info about not-yet-loaded tasks
+  def help(task = nil)
+    initialize_thorfiles(task) if task && task.include?(?:)
+    super
+  end
     
   def method_missing(meth, *args)
     meth = meth.to_s
