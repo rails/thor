@@ -11,6 +11,8 @@ class Thor
       raise Error, "klass is not defined for #{self.inspect}" unless klass
       raise NoMethodError, "the `#{meth}' task of #{klass} is private" if
         (klass.private_instance_methods + klass.protected_instance_methods).include?(meth)
+
+      params << {} if opts && !params.last.is_a?(Hash)
       klass.new.send(meth, *params)
     rescue ArgumentError => e
       raise e unless e.backtrace.first =~ /:in `#{meth}'$/
