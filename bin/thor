@@ -38,7 +38,7 @@ class Thor::Runner < Thor
   
   desc "install NAME", "install a Thor file into your system tasks, optionally named for future updates"
   method_options :as => :optional
-  def install(name, opts)
+  def install(name, opts = {})
     initialize_thorfiles
     begin
       contents = open(name).read
