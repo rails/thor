@@ -223,8 +223,11 @@ class Thor::Runner < Thor
       path = File.dirname(path)
       break if path == "/"
     end
-    thorfiles + (relevant_to ? thorfiles_relevant_to(relevant_to) :
-                 Dir["#{ENV["HOME"]}/.thor/**/*.thor"])
+
+    # We want to load system-wide Thorfiles first
+    # so the local Thorfiles will override them.
+    (relevant_to ? thorfiles_relevant_to(relevant_to) :
+     Dir["#{ENV["HOME"]}/.thor/**/*.thor"]) + thorfiles
   end
 
   def thorfiles_relevant_to(meth)
