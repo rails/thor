@@ -165,10 +165,8 @@ class Thor::Runner < Thor
   end
   
   def display_klasses(with_modules = false, klasses = Thor.subclasses)
-    unless with_modules
-      klasses -= [Thor, Thor::Runner]
-      raise Error, "No thorfiles available" if klasses.empty?
-    end
+    klasses -= [Thor, Thor::Runner] unless with_modules
+    raise Error, "No thorfiles available" if klasses.empty?
     
     if with_modules && !(yaml = thor_yaml).empty?
       max_name = yaml.max {|(xk,xv),(yk,yv)| xk.size <=> yk.size }.first.size
