@@ -25,7 +25,7 @@ SPEC = Gem::Specification.new do |s|
     
   s.require_path = 'lib'
   s.bindir = "bin"
-  s.executables = %w( thor )
+  s.executables = %w( thor rake2thor )
   s.files = %w(LICENSE README.markdown Rakefile) + Dir.glob("{bin,lib,specs}/**/*")
 end
 
