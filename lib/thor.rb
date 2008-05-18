@@ -1,5 +1,6 @@
 $:.unshift File.expand_path(File.dirname(__FILE__))
 require "getopt"
+require "thor/util"
 require "thor/task"
 require "thor/task_hash"
 
