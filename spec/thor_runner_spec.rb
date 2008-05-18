@@ -1,7 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
-require "thor"
+require "thor/runner"
 
-load File.join(File.dirname(__FILE__), "..", "bin", "thor")
 load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
 
 module MyTasks

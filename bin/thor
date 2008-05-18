@@ -2,13 +2,7 @@
 # -*- mode: ruby -*-
 
 require File.dirname(__FILE__) + "/../lib/thor"
-require 'thor/util'
 require 'thor/runner'
-require "open-uri"
-require "fileutils"
-require "yaml"
-require "digest/md5"
-require "readline"
 
 module ObjectSpace
   
@@ -25,6 +19,4 @@ module ObjectSpace
   
 end
 
-unless defined?(Spec)
-  Thor::Runner.start
-end
+Thor::Runner.start

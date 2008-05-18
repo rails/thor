@@ -1,3 +1,11 @@
+require 'thor'
+require "thor/util"
+require "open-uri"
+require "fileutils"
+require "yaml"
+require "digest/md5"
+require "readline"
+
 class Thor::Runner < Thor
   
   def self.globs_for(path)
