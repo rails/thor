@@ -12,10 +12,6 @@ class Thor::Runner < Thor
     ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
   end
 
-  def initialize_thorfiles(relevant_to = nil)
-    thorfiles(relevant_to).each {|f| load f unless Thor.subclass_files.keys.include?(File.expand_path(f))}
-  end
-
   map "-T" => :list, "-i" => :install, "-u" => :update
   
   desc "install NAME", "install a Thor file into your system tasks, optionally named for future updates"
@@ -191,6 +187,10 @@ class Thor::Runner < Thor
       print format_string % task.formatted_usage(true)
       puts task.description
     end
+  end
+
+  def initialize_thorfiles(relevant_to = nil)
+    thorfiles(relevant_to).each {|f| load f unless Thor.subclass_files.keys.include?(File.expand_path(f))}
   end
   
   def thorfiles(relevant_to = nil)
