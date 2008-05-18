@@ -30,6 +30,8 @@ class Thor::Runner < Thor
       raise Error, "Error opening file `#{name}'"
     end
     
+    is_uri = File.exist?(name) ? false : true
+    
     puts "Your Thorfile contains: "
     puts contents
     print "Do you wish to continue [y/N]? "
@@ -39,7 +41,7 @@ class Thor::Runner < Thor
     
     constants = Thor::Util.constants_in_contents(contents)
     
-    name = name =~ /\.thor$/ ? name : "#{name}.thor"
+    name = name =~ /\.thor$/ || is_uri ? name : "#{name}.thor"
     
     as = opts["as"] || begin
       first_line = contents.split("\n")[0]
