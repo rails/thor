@@ -35,7 +35,7 @@ class Thor
   end
   
   def self.tasks
-    @tasks || TaskHash.new(self)
+    @tasks ||= TaskHash.new(self)
   end
 
   def self.[](task)
@@ -90,8 +90,7 @@ class Thor
       return if !public_instance_methods.include?(meth) || !@usage
       register_klass_file self
 
-      @tasks ||= TaskHash.new(self)
-      @tasks[meth] = Task.new(meth, @desc, @usage, @method_options)
+      tasks[meth] = Task.new(meth, @desc, @usage, @method_options)
 
       @usage, @desc, @method_options = nil
     end
