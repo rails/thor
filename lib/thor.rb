@@ -5,40 +5,6 @@ require "thor/task"
 require "thor/task_hash"
 
 class Thor
-  def self.inherited(klass)
-    register_klass_file klass
-  end
-
-  def self.register_klass_file(klass, file = caller[1].split(":")[0])
-    unless self == Thor
-      superclass.register_klass_file(klass, file)
-      return
-    end
-
-    file_subclasses = subclass_files[File.expand_path(file)]
-    file_subclasses << klass unless file_subclasses.include?(klass)
-    subclasses << klass unless subclasses.include?(klass)
-  end
-  
-  def self.subclass_files
-    @subclass_files ||= Hash.new {|h,k| h[k] = []}
-  end
-  
-  def self.subclasses
-    @subclasses ||= []
-  end
-  
-  def self.method_added(meth)
-    meth = meth.to_s
-    return if !public_instance_methods.include?(meth) || !@usage
-    register_klass_file self
-
-    @tasks ||= TaskHash.new(self)
-    @tasks[meth] = Task.new(meth, @desc, @usage, @method_options)
-
-    @usage, @desc, @method_options = nil
-  end
-
   def self.map(map)
     @map ||= superclass.instance_variable_get("@map") || {}
     map.each do |key, value|
@@ -60,6 +26,14 @@ class Thor
     end
   end
 
+  def self.subclass_files
+    @subclass_files ||= Hash.new {|h,k| h[k] = []}
+  end
+  
+  def self.subclasses
+    @subclasses ||= []
+  end
+  
   def self.tasks
     @tasks || TaskHash.new(self)
   end
@@ -103,6 +77,35 @@ class Thor
     task.run(*params)
   rescue Thor::Error => e
     $stderr.puts e.message
+  end
+
+  class << self
+    protected
+    def inherited(klass)
+      register_klass_file klass
+    end
+
+    def method_added(meth)
+      meth = meth.to_s
+      return if !public_instance_methods.include?(meth) || !@usage
+      register_klass_file self
+
+      @tasks ||= TaskHash.new(self)
+      @tasks[meth] = Task.new(meth, @desc, @usage, @method_options)
+
+      @usage, @desc, @method_options = nil
+    end
+
+    def register_klass_file(klass, file = caller[1].split(":")[0])
+      unless self == Thor
+        superclass.register_klass_file(klass, file)
+        return
+      end
+
+      file_subclasses = subclass_files[File.expand_path(file)]
+      file_subclasses << klass unless file_subclasses.include?(klass)
+      subclasses << klass unless subclasses.include?(klass)
+    end
   end
   
   map ["-h", "-?", "--help", "-D"] => :help
