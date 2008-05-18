@@ -104,7 +104,7 @@ class Thor
     $stderr.puts e.message
   end
   
-  map ["-h", "-?", "--help"] => :help
+  map ["-h", "-?", "--help", "-D"] => :help
   
   desc "help [TASK]", "describe available tasks or one specific task"
   def help(task = nil)
