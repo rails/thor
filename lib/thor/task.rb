@@ -7,12 +7,15 @@ class Thor
       new(meth, "A dynamically-generated task", meth.to_s, nil, klass)
     end
 
+    def parse(args)
+      run(*parse_args(args))
+    end
+
     def run(*params)
       raise Error, "klass is not defined for #{self.inspect}" unless klass
       raise NoMethodError, "the `#{meth}' task of #{klass} is private" if
         (klass.private_instance_methods + klass.protected_instance_methods).include?(meth)
 
-      params << {} if opts && !params.last.is_a?(Hash)
       klass.new.send(meth, *params)
     rescue ArgumentError => e
       raise e unless e.backtrace.first =~ /:in `#{meth}'$/
@@ -48,6 +51,24 @@ class Thor
     def formatted_usage(namespace = false)
       (namespace ? self.namespace + ':' : '') + usage +
         (opts ? " " + formatted_opts : "")
+    end
+
+    protected
+
+    def parse_args(args)
+      return args unless opts
+
+      args = args.dup
+      params = []
+      params << args.shift until args.empty? || args.first[0] == ?-
+
+      old_argv = ARGV.dup
+      ARGV.replace args
+      options = Getopt::Long.getopts(*opts.map do |opt, val|
+        [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten
+      end)
+      ARGV.replace old_argv
+      params + [options]
     end
   end
 end

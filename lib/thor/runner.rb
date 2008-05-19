@@ -125,7 +125,7 @@ class Thor::Runner < Thor
     super(meth.to_sym, *args) unless meth.include? ?:
 
     initialize_thorfiles(meth)
-    Thor[meth].run *ARGV[1..-1]
+    Thor[meth].parse ARGV[1..-1]
   end
   
   private

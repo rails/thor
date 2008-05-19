@@ -55,26 +55,11 @@ class Thor
   end
   
   def self.start(args = ARGV)
-    args = args.dup
-    meth = args.shift
-    params = []
-    params << args.shift until args.empty? || args.first[0] == ?-
+    meth = args.first
     meth = @map[meth].to_s if @map && @map[meth]
     meth ||= "help"
-    task = tasks[meth]
     
-    old_argv = ARGV.dup
-    ARGV.replace args
-    
-    if task.opts
-      opts = task.opts.map {|opt, val| [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten}
-      options = Getopt::Long.getopts(*opts)
-      params << options
-    end
-    
-    ARGV.replace old_argv
-    
-    task.run(*params)
+    tasks[meth].parse args[1..-1]
   rescue Thor::Error => e
     $stderr.puts e.message
   end
