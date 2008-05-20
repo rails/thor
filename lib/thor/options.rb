@@ -37,11 +37,11 @@ class Thor
       # If a string is passed, split it and convert it to an array of arrays
       if switches.first.kind_of?(String)
         switches = switches.join.split
-        switches.map!{ |switch| switch = [switch] }
+        switches.map! {|switch| switch = [switch]}
       end
 
       # Set our list of valid switches, and proper types for each switch
-      switches.each{ |switch|
+      switches.each do |switch|
         valid.push(switch[0])       # Set valid long switches
 
         # Set type for long switch, default to :boolean.
@@ -61,28 +61,28 @@ class Thor
         syns[switch[0]] = switch[1] unless syns[switch[1]]
         syns[switch[1]] = switch[0] unless syns[switch[1]]
 
-        switch[1].each{ |char|      
+        switch[1].each do |char|      
           types[char] = switch[2]  # Set type for short switch
           valid.push(char)         # Set valid short switches
-        }
+        end
 
         if args.empty? && switch[2] == :required
           raise Error, "no value provided for required argument '#{switch[0]}'"
         end            
-      }
+      end
 
       re_long     = /^(--\w+[-\w+]*)?$/
       re_short    = /^(-\w)$/
       re_long_eq  = /^(--\w+[-\w+]*)?=(.*?)$|(-\w?)=(.*?)$/
       re_short_sq = /^(-\w)(\S+?)$/
 
-      args.each_with_index{ |opt, index|
+      args.each_with_index do |opt, index|
 
         # Allow either -x -v or -xv style for single char args
         if re_short_sq.match(opt)
-          chars = opt.split("")[1..-1].map{ |s| s = "-#{s}" }
+          chars = opt.split("")[1..-1].map {|s| s = "-#{s}"}
 
-          chars.each_with_index{ |char, i|
+          chars.each_with_index do |char, i|
             unless valid.include?(char)  
               raise Error, "invalid switch '#{char}'"
             end
@@ -118,7 +118,7 @@ class Thor
             else
               args.push(char)
             end
-          }
+          end
           next
         end
 
@@ -195,7 +195,7 @@ class Thor
             args.delete_at(index+1)
           end
         end
-      }
+      end
 
       # Set synonymous switches to the same value, e.g. if -t is a synonym
       # for --test, and the user passes "--test", then set "-t" to the same
@@ -203,16 +203,16 @@ class Thor
       #
       # This allows users to refer to the long or short switch and get
       # the same value
-      hash.each{ |switch, val|
+      hash.each do |switch, val|
         if syns.keys.include?(switch)
-          syns[switch].each{ |key|
+          syns[switch].each do |key|
             hash[key] = val   
-          }
+          end
         end
-      }
+      end
 
       # Get rid of leading "--" and "-" to make it easier to reference
-      hash.each{ |key, value|
+      hash.each do |key, value|
         if key[0,2] == '--'
           nkey = key.sub('--', '')
         else
@@ -220,7 +220,7 @@ class Thor
         end
         hash.delete(key)
         hash[nkey] = value
-      }
+      end
 
       hash
     end
