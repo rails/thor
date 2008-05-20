@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Yehuda Katz"]
-  s.date = %q{2008-05-18}
+  s.date = %q{2008-05-19}
   s.description = %q{A gem that maps options to a class}
   s.email = %q{wycats@gmail.com}
   s.executables = ["thor", "rake2thor"]
