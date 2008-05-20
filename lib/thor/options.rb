@@ -1,5 +1,7 @@
-# This is a modified version of Daniel Berger's Getopt::Long class,
+# This is a modified version of Daniel Berger's Getopt::ong class,
 # licensed under Ruby's license.
+
+require 'set'
 
 class Thor
   class Options
@@ -30,7 +32,7 @@ class Thor
       end
 
       hash  = {} # Hash returned to user
-      valid = [] # Tracks valid switches
+      valid = Set.new # Tracks valid switches
       types = {} # Tracks argument types
       syns  = {} # Tracks long and short arguments, or multiple shorts
 
@@ -40,10 +42,8 @@ class Thor
         switches.map! {|switch| switch = [switch]}
       end
 
-      # Set our list of valid switches, and proper types for each switch
+      # Set proper types for each switch
       switches.each do |switch|
-        valid.push(switch[0])       # Set valid long switches
-
         # Set type for long switch, default to :boolean.
         if switch[1].kind_of?(Symbol)
           switch[2] = switch[1]
@@ -61,15 +61,15 @@ class Thor
         syns[switch[0]] = switch[1] unless syns[switch[1]]
         syns[switch[1]] = switch[0] unless syns[switch[1]]
 
-        switch[1].each do |char|      
-          types[char] = switch[2]  # Set type for short switch
-          valid.push(char)         # Set valid short switches
-        end
+        # Set types for short switches
+        switch[1].each {|char| types[char] = switch[2] }
 
         if args.empty? && switch[2] == :required
           raise Error, "no value provided for required argument '#{switch[0]}'"
         end            
       end
+
+      valid = switches.flatten.reject {|s| s.is_a?(Symbol)}.to_set
 
       re_long     = /^(--\w+[-\w+]*)?$/
       re_short    = /^(-\w)$/
