@@ -63,8 +63,8 @@ class Thor
 
       old_argv = ARGV.dup
       ARGV.replace args
-      options = Getopt::Long.getopts(*opts.map do |opt, val|
-        [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten
+      options = Thor::Options.getopts(*opts.map do |opt, val|
+        [opt, val == true ? Thor::Options::BOOLEAN : Thor::Options.const_get(val)].flatten
       end)
       ARGV.replace old_argv
       params + [options]

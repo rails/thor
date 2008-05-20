@@ -88,7 +88,7 @@ describe "thor" do
   end
   
   it "errors out when a required key/value option is not passed" do
-    lambda { MyApp.start(["bar", "one", "two"]) }.must raise_error(Getopt::Long::Error)
+    lambda { MyApp.start(["bar", "one", "two"]) }.must raise_error(Thor::Options::Error)
   end
   
   it "calls a method with an optional key/value param" do

@@ -1,18 +1,17 @@
-# The last time the Getopt gem was modified was August 2007, so it's safe to vendor (it does everything we need)
+# This is a modified version of Daniel Berger's Getopt::Long class,
+# licensed under Ruby's license.
 
-module Getopt
+class Thor
+   class Options
 
-   REQUIRED  = 0
-   BOOLEAN   = 1
-   OPTIONAL  = 2
-   INCREMENT = 3
-   NEGATABLE = 4
-   NUMERIC   = 5
+      REQUIRED  = 0
+      BOOLEAN   = 1
+      OPTIONAL  = 2
+      INCREMENT = 3
+      NEGATABLE = 4
+      NUMERIC   = 5
 
-   class Long
       class Error < StandardError; end
-
-      VERSION = '1.3.6'
 
       # Takes an array of switches. Each array consists of up to three
       # elements that indicate the name and type of switch. Returns a hash
@@ -25,7 +24,7 @@ module Getopt
       #
       # Example:
       #
-      # opts = Getopt::Long.getopts(
+      # opts = Thor::Options.getopts(
       #    ["--debug"],
       #    ["--verbose", "-v"],
       #    ["--level", "-l", NUMERIC]
