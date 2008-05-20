@@ -15,7 +15,7 @@ class Thor::Runner < Thor
   map "-T" => :list, "-i" => :install, "-u" => :update
   
   desc "install NAME", "install a Thor file into your system tasks, optionally named for future updates"
-  method_options :as => :optional
+  method_options :as => :optional, :absolute => :boolean
   def install(name, opts = {})
     initialize_thorfiles
     begin
@@ -56,7 +56,9 @@ class Thor::Runner < Thor
     FileUtils.touch(yaml_file)
     yaml = thor_yaml
     
-    yaml[as] = {:filename => Digest::MD5.hexdigest(name + as), :location => name, :constants => constants}
+    location = (opts["absolute"] && !is_uri) ? File.expand_path(name) : name
+    
+    yaml[as] = {:filename => Digest::MD5.hexdigest(name + as), :location => location, :constants => constants}
     
     save_yaml(yaml)
     
