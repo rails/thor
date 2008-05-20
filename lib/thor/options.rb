@@ -16,7 +16,7 @@ class Thor
     #
     # Example:
     #
-    # opts = Thor::Options.getopts(
+    # opts = Thor::Options.getopts(args,
     #    ["--debug"],
     #    ["--verbose", "-v"],
     #    ["--level", "-l", :numeric]
@@ -24,7 +24,7 @@ class Thor
     #
     # See the README file for more information.
     #
-    def self.getopts(*switches)
+    def self.getopts(args, *switches)
       if switches.empty?
         raise ArgumentError, "no switches provided"
       end
@@ -66,7 +66,7 @@ class Thor
           valid.push(char)         # Set valid short switches
         }
 
-        if ARGV.empty? && switch[2] == :required
+        if args.empty? && switch[2] == :required
           raise Error, "no value provided for required argument '#{switch[0]}'"
         end            
       }
@@ -76,7 +76,7 @@ class Thor
       re_long_eq  = /^(--\w+[-\w+]*)?=(.*?)$|(-\w?)=(.*?)$/
       re_short_sq = /^(-\w)(\S+?)$/
 
-      ARGV.each_with_index{ |opt, index|
+      args.each_with_index{ |opt, index|
 
         # Allow either -x -v or -xv style for single char args
         if re_short_sq.match(opt)
@@ -92,31 +92,31 @@ class Thor
               # Deal with a argument squished up against switch
               if chars[i+1]
                 arg = chars[i+1..-1].join.tr("-","")
-                ARGV.push(char, arg)
+                args.push(char, arg)
                 break
               else
-                arg = ARGV.delete_at(index+1)
+                arg = args.delete_at(index+1)
                 if arg.nil? || valid.include?(arg) # Minor cheat here
                   err = "no value provided for required argument '#{char}'"
                   raise Error, err
                 end
-                ARGV.push(char, arg)
+                args.push(char, arg)
               end
             elsif types[char] == :optional
               if chars[i+1] && !valid.include?(chars[i+1])
                 arg = chars[i+1..-1].join.tr("-","")
-                ARGV.push(char, arg)
+                args.push(char, arg)
                 break
               elsif
-                if ARGV[index+1] && !valid.include?(ARGV[index+1])
-                  arg = ARGV.delete_at(index+1)
-                  ARGV.push(char, arg)
+                if args[index+1] && !valid.include?(args[index+1])
+                  arg = args.delete_at(index+1)
+                  args.push(char, arg)
                 end
               else
-                ARGV.push(char)
+                args.push(char)
               end
             else
-              ARGV.push(char)
+              args.push(char)
             end
           }
           next
@@ -128,7 +128,7 @@ class Thor
 
         if match = re_long_eq.match(opt)
           switch, value = match.captures.compact
-          ARGV.push(switch, value)
+          args.push(switch, value)
           next
         end
 
@@ -142,7 +142,7 @@ class Thor
 
         # Required arguments
         if types[switch] == :required
-          nextval = ARGV[index+1]
+          nextval = args[index+1]
 
           # Make sure there's a value for mandatory arguments
           if nextval.nil?
@@ -163,7 +163,7 @@ class Thor
           else
             hash[switch] = nextval
           end
-          ARGV.delete_at(index+1)
+          args.delete_at(index+1)
         end
 
         # For boolean arguments set the switch's value to true.
@@ -187,12 +187,12 @@ class Thor
         # For optional argument, there may be an argument.  If so, it
         # cannot be another switch.  If not, it is set to true.
         if types[switch] == :optional
-          nextval = ARGV[index+1]
+          nextval = args[index+1]
           if valid.include?(nextval)
             hash[switch] = true
           else
             hash[switch] = nextval
-            ARGV.delete_at(index+1)
+            args.delete_at(index+1)
           end
         end
       }

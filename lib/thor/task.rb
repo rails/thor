@@ -61,12 +61,10 @@ class Thor
       params = []
       params << args.shift until args.empty? || args.first[0] == ?-
 
-      old_argv = ARGV.dup
-      ARGV.replace args
-      options = Thor::Options.getopts(*opts.map do |opt, val|
-        [opt, val == true ? :boolean : val].flatten
-      end)
-      ARGV.replace old_argv
+      options = Thor::Options.getopts(args,
+        *opts.map do |opt, val|
+          [opt, val == true ? :boolean : val].flatten
+        end)
       params + [options]
     end
   end
