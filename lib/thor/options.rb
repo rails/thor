@@ -55,12 +55,6 @@ class Thor
           switch[1] ||= switch[0][1..2]
         end
 
-        # Create synonym hash.  Default to first char of long switch for 
-        # short switch, e.g. "--verbose" creates a "-v" synonym.  The same
-        # synonym can only be used once - first one wins.
-        syns[switch[0]] = switch[1] unless syns[switch[1]]
-        syns[switch[1]] = switch[0] unless syns[switch[1]]
-
         # Set types for short switches
         switch[1].each {|char| types[char] = switch[2] }
 
@@ -70,6 +64,11 @@ class Thor
       end
 
       valid = switches.flatten.reject {|s| s.is_a?(Symbol)}.to_set
+      syns  = switches.inject({}) do |h, (f1,f2,_)|
+        h[f1] ||= f2
+        h[f2] ||= f1
+        h
+      end
 
       re_long     = /^(--\w+[-\w+]*)?$/
       re_short    = /^(-\w)$/
