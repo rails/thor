@@ -42,21 +42,16 @@ class Thor
         switches.map! {|switch| switch = [switch]}
       end
 
-      # Set proper types for each switch
+      # Normalize the switches list
       switches.each do |switch|
         # Set type for long switch, default to :boolean.
         if switch[1].kind_of?(Symbol)
           switch[2] = switch[1]
-          types[switch[0]] = switch[2]
           switch[1] = switch[0][1..2]
         else
           switch[2] ||= :boolean
-          types[switch[0]] = switch[2]
           switch[1] ||= switch[0][1..2]
         end
-
-        # Set types for short switches
-        switch[1].each {|char| types[char] = switch[2] }
 
         if args.empty? && switch[2] == :required
           raise Error, "no value provided for required argument '#{switch[0]}'"
@@ -64,6 +59,11 @@ class Thor
       end
 
       valid = switches.flatten.reject {|s| s.is_a?(Symbol)}.to_set
+      types = switches.inject({}) do |h, (f1,f2,v)|
+        h[f1] ||= v
+        h[f2] ||= v
+        h
+      end
       syns  = switches.inject({}) do |h, (f1,f2,_)|
         h[f1] ||= f2
         h[f2] ||= f1
