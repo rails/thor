@@ -22,7 +22,7 @@ class Thor
   
   def self.method_options(opts)
     @method_options = opts.inject({}) do |accum, (k,v)|
-      accum.merge("--" + k.to_s => v.to_s.upcase)
+      accum.merge("--" + k.to_s => v.to_sym)
     end
   end
 

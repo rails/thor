@@ -37,11 +37,11 @@ class Thor
     def formatted_opts
       return "" if opts.nil?
       opts.map do |opt, val|
-        if val == true || val == "BOOLEAN"
+        if val == true || val == :boolean
           "[#{opt}]"
-        elsif val == "REQUIRED"
+        elsif val == :required
           opt + "=" + opt.gsub(/\-/, "").upcase
-        elsif val == "OPTIONAL"
+        elsif val == :optional
           "[" + opt + "=" + opt.gsub(/\-/, "").upcase + "]"
         end
       end.join(" ")
@@ -64,7 +64,7 @@ class Thor
       old_argv = ARGV.dup
       ARGV.replace args
       options = Thor::Options.getopts(*opts.map do |opt, val|
-        [opt, val == true ? Thor::Options::BOOLEAN : Thor::Options.const_get(val)].flatten
+        [opt, val == true ? :boolean : val].flatten
       end)
       ARGV.replace old_argv
       params + [options]

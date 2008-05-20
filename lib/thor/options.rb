@@ -3,14 +3,6 @@
 
 class Thor
   class Options
-
-    REQUIRED  = 0
-    BOOLEAN   = 1
-    OPTIONAL  = 2
-    INCREMENT = 3
-    NEGATABLE = 4
-    NUMERIC   = 5
-
     class Error < StandardError; end
 
     # Takes an array of switches. Each array consists of up to three
@@ -20,14 +12,14 @@ class Thor
     # by the user.
     #
     # The long switch _must_ be provided. The short switch defaults to the
-    # first letter of the short switch. The default type is BOOLEAN.
+    # first letter of the short switch. The default type is :boolean.
     #
     # Example:
     #
     # opts = Thor::Options.getopts(
     #    ["--debug"],
     #    ["--verbose", "-v"],
-    #    ["--level", "-l", NUMERIC]
+    #    ["--level", "-l", :numeric]
     # )
     #
     # See the README file for more information.
@@ -52,13 +44,13 @@ class Thor
       switches.each{ |switch|
         valid.push(switch[0])       # Set valid long switches
 
-        # Set type for long switch, default to BOOLEAN.
-        if switch[1].kind_of?(Fixnum)
+        # Set type for long switch, default to :boolean.
+        if switch[1].kind_of?(Symbol)
           switch[2] = switch[1]
           types[switch[0]] = switch[2]
           switch[1] = switch[0][1..2]
         else
-          switch[2] ||= BOOLEAN
+          switch[2] ||= :boolean
           types[switch[0]] = switch[2]
           switch[1] ||= switch[0][1..2]
         end
@@ -74,7 +66,7 @@ class Thor
           valid.push(char)         # Set valid short switches
         }
 
-        if ARGV.empty? && switch[2] == REQUIRED
+        if ARGV.empty? && switch[2] == :required
           raise Error, "no value provided for required argument '#{switch[0]}'"
         end            
       }
@@ -96,7 +88,7 @@ class Thor
             end
 
             # Grab the next arg if the switch takes a required arg
-            if types[char] == REQUIRED
+            if types[char] == :required
               # Deal with a argument squished up against switch
               if chars[i+1]
                 arg = chars[i+1..-1].join.tr("-","")
@@ -110,7 +102,7 @@ class Thor
                 end
                 ARGV.push(char, arg)
               end
-            elsif types[char] == OPTIONAL
+            elsif types[char] == :optional
               if chars[i+1] && !valid.include?(chars[i+1])
                 arg = chars[i+1..-1].join.tr("-","")
                 ARGV.push(char, arg)
@@ -149,7 +141,7 @@ class Thor
         end
 
         # Required arguments
-        if types[switch] == REQUIRED
+        if types[switch] == :required
           nextval = ARGV[index+1]
 
           # Make sure there's a value for mandatory arguments
@@ -175,7 +167,7 @@ class Thor
         end
 
         # For boolean arguments set the switch's value to true.
-        if types[switch] == BOOLEAN
+        if types[switch] == :boolean
           if hash.has_key?(switch)
             raise Error, "boolean switch already set"
           end
@@ -184,7 +176,7 @@ class Thor
 
         # For increment arguments, set the switch's value to 0, or
         # increment it by one if it already exists.
-        if types[switch] == INCREMENT
+        if types[switch] == :increment
           if hash.has_key?(switch)
             hash[switch] += 1
           else
@@ -194,7 +186,7 @@ class Thor
 
         # For optional argument, there may be an argument.  If so, it
         # cannot be another switch.  If not, it is set to true.
-        if types[switch] == OPTIONAL
+        if types[switch] == :optional
           nextval = ARGV[index+1]
           if valid.include?(nextval)
             hash[switch] = true
