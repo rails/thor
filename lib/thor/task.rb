@@ -7,21 +7,20 @@ class Thor
       new(meth, "A dynamically-generated task", meth.to_s, nil, klass)
     end
 
-    def parse(args)
-      run(*parse_args(args))
+    def parse(obj, args)
+      run(obj, *parse_args(args))
     end
 
-    def run(*params)
-      raise Error, "klass is not defined for #{self.inspect}" unless klass
-      raise NoMethodError, "the `#{meth}' task of #{klass} is private" if
-        (klass.private_instance_methods + klass.protected_instance_methods).include?(meth)
+    def run(obj, *params)
+      raise NoMethodError, "the `#{meth}' task of #{obj.class} is private" if
+        (obj.private_methods + obj.protected_methods).include?(meth)
 
-      klass.new.send(meth, *params)
+      obj.send(meth, *params)
     rescue ArgumentError => e
       raise e unless e.backtrace.first =~ /:in `#{meth}'$/
       raise Error, "`#{meth}' was called incorrectly. Call as `#{formatted_usage}'"
     rescue NoMethodError => e
-      raise e unless e.message =~ /^undefined method `#{meth}' for #<#{klass}:.*>$/
+      raise e unless e.message =~ /^undefined method `#{meth}' for #{obj.inspect}$/
       raise Error, "The #{namespace false} namespace doesn't have a `#{meth}' task"
     end
 

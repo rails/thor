@@ -59,7 +59,7 @@ class Thor
     meth = @map[meth].to_s if @map && @map[meth]
     meth ||= "help"
     
-    tasks[meth].parse args[1..-1]
+    tasks[meth].parse new, args[1..-1]
   rescue Thor::Error => e
     $stderr.puts e.message
   end

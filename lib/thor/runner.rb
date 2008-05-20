@@ -125,7 +125,8 @@ class Thor::Runner < Thor
     super(meth.to_sym, *args) unless meth.include? ?:
 
     initialize_thorfiles(meth)
-    Thor[meth].parse ARGV[1..-1]
+    task = Thor[meth]
+    task.parse task.klass.new, ARGV[1..-1]
   end
   
   private
