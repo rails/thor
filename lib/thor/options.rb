@@ -36,27 +36,7 @@ class Thor
       types = {} # Tracks argument types
       syns  = {} # Tracks long and short arguments, or multiple shorts
 
-      # If a string is passed, split it and convert it to an array of arrays
-      if switches.first.kind_of?(String)
-        switches = switches.join.split
-        switches.map! {|switch| switch = [switch]}
-      end
-
-      # Normalize the switches list
-      switches.each do |switch|
-        # Set type for long switch, default to :boolean.
-        if switch[1].kind_of?(Symbol)
-          switch[2] = switch[1]
-          switch[1] = switch[0][1..2]
-        else
-          switch[2] ||= :boolean
-          switch[1] ||= switch[0][1..2]
-        end
-
-        if args.empty? && switch[2] == :required
-          raise Error, "no value provided for required argument '#{switch[0]}'"
-        end            
-      end
+      switches = normalize_switches switches
 
       valid = switches.flatten.reject {|s| s.is_a?(Symbol)}.to_set
       types = switches.inject({}) do |h, (f1,f2,v)|
@@ -222,6 +202,22 @@ class Thor
       end
 
       hash
+    end
+
+    def self.normalize_switches(switches)
+      # If a string is passed, split it and convert it to an array of arrays
+      if switches.first.kind_of?(String)
+        switches = switches.join.split.map(&method(:Array))
+      end
+
+      switches.map do |switch|
+        # Set type for long switch, default to :boolean.
+        if switch[1].kind_of?(Symbol)
+          [switch[0], switch[0][1..2], switch[1]]
+        else
+          [switch[0], switch[1] || switch[0][1..2], switch[2] || :boolean]
+        end
+      end
     end
 
   end
