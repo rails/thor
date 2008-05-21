@@ -10,7 +10,7 @@ class Thor
     LONG_RE     = /^(--\w+[-\w+]*)?$/
     SHORT_RE    = /^(-\w)$/
     LONG_EQ_RE  = /^(--\w+[-\w+]*)?=(.*?)$|(-\w?)=(.*?)$/
-    SHORT_SQ_RE = /^(-\w)(\S+?)$/
+    SHORT_SQ_RE = /^(-\w)(\S+?)$/ # Allow either -x -v or -xv style for single char args
 
     attr_accessor :args
 
@@ -64,47 +64,25 @@ class Thor
       end
 
       while looking_at_opt?
-        opt = pop
-
-        # Allow either -x -v or -xv style for single char args
-        if SHORT_SQ_RE.match(opt)
+        case pop
+        when SHORT_SQ_RE
           push(opt.split("")[1..-1].map {|s| s = "-#{s}"})
           next
-        end
-
-        if match = LONG_RE.match(opt) || match = SHORT_RE.match(opt)
-          switch = match.captures.first
-        end
-
-        if match = LONG_EQ_RE.match(opt)
-          switch, value = match.captures.compact
-          push(switch, value)
+        when LONG_EQ_RE
+          push($1, $2)
           next
+        when LONG_RE, SHORT_RE
+          switch = $1
         end
 
-        # Make sure that all the switches are valid.  If 'switch' isn't
-        # defined at this point, it means an option was passed without
-        # a preceding switch, e.g. --option foo bar.
-        unless valid.include?(switch)
-          switch ||= opt
-          raise Error, "invalid switch '#{switch}'"
-        end
+        raise Error, "invalid switch '#{switch}'" unless valid.include?(switch)
 
         # Required arguments
         if types[switch] == :required
           nextval = peek
 
-          # Make sure there's a value for mandatory arguments
-          if nextval.nil?
-            err = "no value provided for required argument '#{switch}'"
-            raise Error, err
-          end
-
-          # If there is a value, make sure it's not another switch
-          if valid.include?(nextval)
-            err = "cannot pass switch '#{nextval}' as an argument"
-            raise Error, err
-          end
+          raise Error, "no value provided for required argument '#{switch}'" if nextval.nil?
+          raise Error, "cannot pass switch '#{nextval}' as an argument" if valid.include?(nextval)
 
           # If the same option appears more than once, put the values
           # in array.
@@ -118,32 +96,22 @@ class Thor
 
         # For boolean arguments set the switch's value to true.
         if types[switch] == :boolean
-          if hash.has_key?(switch)
-            raise Error, "boolean switch already set"
-          end
+          raise Error, "boolean switch already set" if hash.has_key?(switch)
           hash[switch] = true
         end
 
-        # For increment arguments, set the switch's value to 0, or
+        # For increment arguments, set the switch's value to one, or
         # increment it by one if it already exists.
         if types[switch] == :increment
-          if hash.has_key?(switch)
-            hash[switch] += 1
-          else
-            hash[switch] = 1
-          end
+          hash[switch] ||= 0
+          hash[switch] += 1
         end
 
         # For optional argument, there may be an argument.  If so, it
         # cannot be another switch.  If not, it is set to true.
         if types[switch] == :optional
           nextval = peek
-          if valid.include?(nextval)
-            hash[switch] = true
-          else
-            hash[switch] = nextval
-            pop
-          end
+          hash[switch] = valid.include?(peek) || pop
         end
       end
 
