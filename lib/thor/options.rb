@@ -63,7 +63,8 @@ class Thor
         h
       end
 
-      @args.each_with_index do |opt, index|
+      until @args.empty?
+        opt = @args.shift
 
         # Allow either -x -v or -xv style for single char args
         if SHORT_SQ_RE.match(opt)
@@ -82,7 +83,7 @@ class Thor
                 @args.push(char, arg)
                 break
               else
-                arg = @args.delete_at(index+1)
+                arg = @args.shift
                 if arg.nil? || valid.include?(arg) # Minor cheat here
                   err = "no value provided for required argument '#{char}'"
                   raise Error, err
@@ -95,8 +96,8 @@ class Thor
                 @args.push(char, arg)
                 break
               elsif
-                if @args[index+1] && !valid.include?(@args[index+1])
-                  arg = @args.delete_at(index+1)
+                if @args.first && !valid.include?(@args.first)
+                  arg = @args.shift
                   @args.push(char, arg)
                 end
               else
@@ -129,7 +130,7 @@ class Thor
 
         # Required arguments
         if types[switch] == :required
-          nextval = @args[index+1]
+          nextval = @args.first
 
           # Make sure there's a value for mandatory arguments
           if nextval.nil?
@@ -150,7 +151,7 @@ class Thor
           else
             hash[switch] = nextval
           end
-          @args.delete_at(index+1)
+          @args.shift
         end
 
         # For boolean arguments set the switch's value to true.
@@ -174,12 +175,12 @@ class Thor
         # For optional argument, there may be an argument.  If so, it
         # cannot be another switch.  If not, it is set to true.
         if types[switch] == :optional
-          nextval = @args[index+1]
+          nextval = @args.first
           if valid.include?(nextval)
             hash[switch] = true
           else
             hash[switch] = nextval
-            @args.delete_at(index+1)
+            @args.shift
           end
         end
       end
