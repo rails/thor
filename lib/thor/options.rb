@@ -63,8 +63,8 @@ class Thor
         h
       end
 
-      until @args.empty?
-        opt = @args.shift
+      until done?
+        opt = pop
 
         # Allow either -x -v or -xv style for single char args
         if SHORT_SQ_RE.match(opt)
@@ -80,31 +80,31 @@ class Thor
               # Deal with a argument squished up against switch
               if chars[i+1]
                 arg = chars[i+1..-1].join.tr("-","")
-                @args.unshift(char, arg)
+                push(char, arg)
                 break
               else
-                arg = @args.shift
+                arg = pop
                 if arg.nil? || valid.include?(arg) # Minor cheat here
                   err = "no value provided for required argument '#{char}'"
                   raise Error, err
                 end
-                @args.unshift(char, arg)
+                push(char, arg)
               end
             elsif types[char] == :optional
               if chars[i+1] && !valid.include?(chars[i+1])
                 arg = chars[i+1..-1].join.tr("-","")
-                @args.unshift(char, arg)
+                push(char, arg)
                 break
               elsif
-                if @args.first && !valid.include?(@args.first)
-                  arg = @args.shift
-                  @args.unshift(char, arg)
+                if peek && !valid.include?(peek)
+                  arg = pop
+                  push(char, arg)
                 end
               else
-                @args.unshift(char)
+                push(char)
               end
             else
-              @args.unshift(char)
+              push(char)
             end
           end
           next
@@ -116,7 +116,7 @@ class Thor
 
         if match = LONG_EQ_RE.match(opt)
           switch, value = match.captures.compact
-          @args.unshift(switch, value)
+          push(switch, value)
           next
         end
 
@@ -130,7 +130,7 @@ class Thor
 
         # Required arguments
         if types[switch] == :required
-          nextval = @args.first
+          nextval = peek
 
           # Make sure there's a value for mandatory arguments
           if nextval.nil?
@@ -151,7 +151,7 @@ class Thor
           else
             hash[switch] = nextval
           end
-          @args.shift
+          pop
         end
 
         # For boolean arguments set the switch's value to true.
@@ -175,12 +175,12 @@ class Thor
         # For optional argument, there may be an argument.  If so, it
         # cannot be another switch.  If not, it is set to true.
         if types[switch] == :optional
-          nextval = @args.first
+          nextval = peek
           if valid.include?(nextval)
             hash[switch] = true
           else
             hash[switch] = nextval
-            @args.shift
+            pop
           end
         end
       end
@@ -189,6 +189,24 @@ class Thor
     end
 
     private
+
+    def peek
+      @args.first
+    end
+
+    def pop
+      arg = peek
+      @args = @args[1..-1]
+      arg
+    end
+
+    def push(*args)
+      @args = args + @args
+    end
+
+    def done?
+      @args.empty?
+    end
 
     def normalize_switches(switches)
       # If a string is passed, split it and convert it to an array of arrays
