@@ -56,7 +56,8 @@ class Thor::Runner < Thor
     FileUtils.touch(yaml_file)
     yaml = thor_yaml
     
-    yaml[as] = {:filename => Digest::MD5.hexdigest(name + as), :location => name, :constants => constants}
+    location = is_uri ? name : File.expand_path(name)
+    yaml[as] = {:filename => Digest::MD5.hexdigest(name + as), :location => location, :constants => constants}
     
     save_yaml(yaml)
     
