@@ -57,10 +57,7 @@ class Thor
     def parse_args(args)
       return args unless opts
       options = Thor::Options.new(args)
-      options.skip_non_opts + [options.getopts(
-        *opts.map do |opt, val|
-          [opt, val == true ? :boolean : val].flatten
-        end)]
+      options.skip_non_opts + [options.getopts(opts)]
     end
   end
 end

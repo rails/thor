@@ -36,30 +36,32 @@ class Thor
     # Example:
     #
     # opts = Thor::Options.new(args).getopts(
-    #    ["--debug"],
-    #    ["--verbose", "-v"],
-    #    ["--level", "-l", :numeric]
+    #    "--debug" => true,
+    #    ["--verbose", "-v"] => true,
+    #    ["--level", "-l"] => :numeric
     # )
     #
     # See the README file for more information.
     #
-    def getopts(*switches)
+    def getopts(switches)
       hash  = {} # Hash returned to user
       valid = Set.new # Tracks valid switches
       types = {} # Tracks argument types
       syns  = {} # Tracks long and short arguments, or multiple shorts
 
-      switches = normalize_switches switches
+      switches = switches.map do |names, type|
+        type = :boolean if type == true
+        names = [names, names[2].chr] if names.is_a?(String)
+        [names, type]
+      end
 
-      valid = switches.flatten.reject {|s| s.is_a?(Symbol)}.to_set
-      types = switches.inject({}) do |h, (f1,f2,v)|
-        h[f1] ||= v
-        h[f2] ||= v
+      valid = switches.map {|s| s.first}.flatten.to_set
+      types = switches.inject({}) do |h, (forms,v)|
+        forms.each {|f| h[f] ||= v}
         h
       end
-      syns  = switches.inject({}) do |h, (f1,f2,_)|
-        h[f1] ||= [f1, f2]
-        h[f2] ||= [f1, f2]
+      syns  = switches.inject({}) do |h, (forms,_)|
+        forms.each {|f| h[f] ||= forms}
         h
       end
 
@@ -136,22 +138,6 @@ class Thor
 
     def looking_at_opt?
       (arg = peek) && [LONG_RE, SHORT_RE, LONG_EQ_RE, SHORT_SQ_RE].any? {|re| arg =~ re}
-    end
-
-    def normalize_switches(switches)
-      # If a string is passed, split it and convert it to an array of arrays
-      if switches.first.kind_of?(String)
-        switches = switches.join.split.map(&method(:Array))
-      end
-
-      switches.map do |switch|
-        # Set type for long switch, default to :boolean.
-        if switch[1].kind_of?(Symbol)
-          [switch[0], switch[0][1..2], switch[1]]
-        else
-          [switch[0], switch[1] || switch[0][1..2], switch[2] || :boolean]
-        end
-      end
     end
 
     def normalize_hash(syns, hash)
