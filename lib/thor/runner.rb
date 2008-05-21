@@ -155,14 +155,17 @@ class Thor::Runner < Thor
     
     if with_modules && !(yaml = thor_yaml).empty?
       max_name = yaml.max {|(xk,xv),(yk,yv)| xk.size <=> yk.size }.first.size
+      modules_label = "Modules"
+      namespaces_label = "Namespaces"
+      column_width = [max_name + 4, modules_label.size + 1].max
       
-      print "%-#{max_name + 4}s" % "Modules"
-      puts "Namespaces"
-      print "%-#{max_name + 4}s" % "-------"
-      puts "----------"
+      print "%-#{column_width}s" % modules_label
+      puts namespaces_label
+      print "%-#{column_width}s" % ("-" * modules_label.size)
+      puts "-" * namespaces_label.size
       
       yaml.each do |name, info|
-        print "%-#{max_name + 4}s" % name
+        print "%-#{column_width}s" % name
         puts info[:constants].map {|c| Thor::Util.constant_to_thor_path(c)}.join(", ")
       end
     
