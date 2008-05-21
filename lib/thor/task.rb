@@ -56,8 +56,8 @@ class Thor
 
     def parse_args(args)
       return args unless opts
-      options = Thor::Options.new(args)
-      options.skip_non_opts + [options.getopts(opts)]
+      options = Thor::Options.new(args, opts)
+      options.skip_non_opts + [options.getopts]
     end
   end
 end

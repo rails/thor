@@ -10,12 +10,28 @@ class Thor
     LONG_RE     = /^(--\w+[-\w+]*)?$/
     SHORT_RE    = /^(-\w)$/
     LONG_EQ_RE  = /^(--\w+[-\w+]*)?=(.*?)$|(-\w?)=(.*?)$/
-    SHORT_SQ_RE = /^(-\w)(\S+?)$/ # Allow either -x -v or -xv style for single char args
+    SHORT_SQ_RE = /^-(\w\S+?)$/ # Allow either -x -v or -xv style for single char args
 
     attr_accessor :args
 
-    def initialize(args)
+    def initialize(args, switches)
       @args = args
+
+      switches = switches.map do |names, type|
+        type = :boolean if type == true
+        names = [names, names[2].chr] if names.is_a?(String)
+        [names, type]
+      end
+
+      @valid = switches.map {|s| s.first}.flatten.to_set
+      @types = switches.inject({}) do |h, (forms,v)|
+        forms.each {|f| h[f] ||= v}
+        h
+      end
+      @syns = switches.inject({}) do |h, (forms,_)|
+        forms.each {|f| h[f] ||= forms}
+        h
+      end
     end
 
     def skip_non_opts
@@ -35,40 +51,19 @@ class Thor
     #
     # Example:
     #
-    # opts = Thor::Options.new(args).getopts(
+    # opts = Thor::Options.new(args,
     #    "--debug" => true,
     #    ["--verbose", "-v"] => true,
     #    ["--level", "-l"] => :numeric
-    # )
+    # ).getopts
     #
-    # See the README file for more information.
-    #
-    def getopts(switches)
-      hash  = {} # Hash returned to user
-      valid = Set.new # Tracks valid switches
-      types = {} # Tracks argument types
-      syns  = {} # Tracks long and short arguments, or multiple shorts
-
-      switches = switches.map do |names, type|
-        type = :boolean if type == true
-        names = [names, names[2].chr] if names.is_a?(String)
-        [names, type]
-      end
-
-      valid = switches.map {|s| s.first}.flatten.to_set
-      types = switches.inject({}) do |h, (forms,v)|
-        forms.each {|f| h[f] ||= v}
-        h
-      end
-      syns  = switches.inject({}) do |h, (forms,_)|
-        forms.each {|f| h[f] ||= forms}
-        h
-      end
+    def getopts
+      hash  = {}
 
       while looking_at_opt?
         case pop
         when SHORT_SQ_RE
-          push(opt.split("")[1..-1].map {|s| s = "-#{s}"})
+          push($1.split("").map {|s| s = "-#{s}"})
           next
         when LONG_EQ_RE
           push($1, $2)
@@ -77,14 +72,14 @@ class Thor
           switch = $1
         end
 
-        raise Error, "invalid switch '#{switch}'" unless valid.include?(switch)
+        raise Error, "in@valid switch '#{switch}'" unless @valid.include?(switch)
 
         # Required arguments
-        if types[switch] == :required
+        if @types[switch] == :required
           nextval = peek
 
           raise Error, "no value provided for required argument '#{switch}'" if nextval.nil?
-          raise Error, "cannot pass switch '#{nextval}' as an argument" if valid.include?(nextval)
+          raise Error, "cannot pass switch '#{nextval}' as an argument" if @valid.include?(nextval)
 
           # If the same option appears more than once, put the values
           # in array.
@@ -97,27 +92,27 @@ class Thor
         end
 
         # For boolean arguments set the switch's value to true.
-        if types[switch] == :boolean
+        if @types[switch] == :boolean
           raise Error, "boolean switch already set" if hash.has_key?(switch)
           hash[switch] = true
         end
 
         # For increment arguments, set the switch's value to one, or
         # increment it by one if it already exists.
-        if types[switch] == :increment
+        if @types[switch] == :increment
           hash[switch] ||= 0
           hash[switch] += 1
         end
 
         # For optional argument, there may be an argument.  If so, it
         # cannot be another switch.  If not, it is set to true.
-        if types[switch] == :optional
+        if @types[switch] == :optional
           nextval = peek
-          hash[switch] = valid.include?(peek) || pop
+          hash[switch] = @valid.include?(peek) || pop
         end
       end
 
-      normalize_hash syns, hash
+      normalize_hash hash
     end
 
     private
@@ -137,10 +132,15 @@ class Thor
     end
 
     def looking_at_opt?
-      (arg = peek) && [LONG_RE, SHORT_RE, LONG_EQ_RE, SHORT_SQ_RE].any? {|re| arg =~ re}
+      case peek
+      when LONG_RE, SHORT_RE, LONG_EQ_RE
+        @valid.include? $1
+      when SHORT_SQ_RE
+        $1.split("").any? {|f| @valid.include? "-#{f}"}
+      end
     end
 
-    def normalize_hash(syns, hash)
+    def normalize_hash(hash)
       # Set synonymous switches to the same value, e.g. if -t is a synonym
       # for --test, and the user passes "--test", then set "-t" to the same
       # value that "--test" was set to.
@@ -148,7 +148,7 @@ class Thor
       # This allows users to refer to the long or short switch and get
       # the same value
       hash.map do |switch, val|
-        syns[switch].map {|key| [key, val]}
+        @syns[switch].map {|key| [key, val]}
       end.inject([]) {|a, v| a + v}.map do |key, value|
         [key.sub(/^-+/, ''), value]
       end.inject({}) {|h, (k,v)| h[k] = v; h}
