@@ -32,6 +32,14 @@ class Thor
     # See the README file for more information.
     #
     def self.getopts(args, *switches)
+      new(args).getopts(*switches)
+    end
+
+    def initialize(args)
+      @args = args
+    end
+
+    def getopts(*switches)
       if switches.empty?
         raise ArgumentError, "no switches provided"
       end
@@ -55,7 +63,7 @@ class Thor
         h
       end
 
-      args.each_with_index do |opt, index|
+      @args.each_with_index do |opt, index|
 
         # Allow either -x -v or -xv style for single char args
         if SHORT_SQ_RE.match(opt)
@@ -71,31 +79,31 @@ class Thor
               # Deal with a argument squished up against switch
               if chars[i+1]
                 arg = chars[i+1..-1].join.tr("-","")
-                args.push(char, arg)
+                @args.push(char, arg)
                 break
               else
-                arg = args.delete_at(index+1)
+                arg = @args.delete_at(index+1)
                 if arg.nil? || valid.include?(arg) # Minor cheat here
                   err = "no value provided for required argument '#{char}'"
                   raise Error, err
                 end
-                args.push(char, arg)
+                @args.push(char, arg)
               end
             elsif types[char] == :optional
               if chars[i+1] && !valid.include?(chars[i+1])
                 arg = chars[i+1..-1].join.tr("-","")
-                args.push(char, arg)
+                @args.push(char, arg)
                 break
               elsif
-                if args[index+1] && !valid.include?(args[index+1])
-                  arg = args.delete_at(index+1)
-                  args.push(char, arg)
+                if @args[index+1] && !valid.include?(@args[index+1])
+                  arg = @args.delete_at(index+1)
+                  @args.push(char, arg)
                 end
               else
-                args.push(char)
+                @args.push(char)
               end
             else
-              args.push(char)
+              @args.push(char)
             end
           end
           next
@@ -107,7 +115,7 @@ class Thor
 
         if match = LONG_EQ_RE.match(opt)
           switch, value = match.captures.compact
-          args.push(switch, value)
+          @args.push(switch, value)
           next
         end
 
@@ -121,7 +129,7 @@ class Thor
 
         # Required arguments
         if types[switch] == :required
-          nextval = args[index+1]
+          nextval = @args[index+1]
 
           # Make sure there's a value for mandatory arguments
           if nextval.nil?
@@ -142,7 +150,7 @@ class Thor
           else
             hash[switch] = nextval
           end
-          args.delete_at(index+1)
+          @args.delete_at(index+1)
         end
 
         # For boolean arguments set the switch's value to true.
@@ -166,12 +174,12 @@ class Thor
         # For optional argument, there may be an argument.  If so, it
         # cannot be another switch.  If not, it is set to true.
         if types[switch] == :optional
-          nextval = args[index+1]
+          nextval = @args[index+1]
           if valid.include?(nextval)
             hash[switch] = true
           else
             hash[switch] = nextval
-            args.delete_at(index+1)
+            @args.delete_at(index+1)
           end
         end
       end
@@ -179,7 +187,9 @@ class Thor
       normalize_hash syns, hash
     end
 
-    def self.normalize_switches(switches)
+    private
+
+    def normalize_switches(switches)
       # If a string is passed, split it and convert it to an array of arrays
       if switches.first.kind_of?(String)
         switches = switches.join.split.map(&method(:Array))
@@ -195,7 +205,7 @@ class Thor
       end
     end
 
-    def self.normalize_hash(syns, hash)
+    def normalize_hash(syns, hash)
       # Set synonymous switches to the same value, e.g. if -t is a synonym
       # for --test, and the user passes "--test", then set "-t" to the same
       # value that "--test" was set to.
