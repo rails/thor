@@ -50,8 +50,8 @@ class Thor
         h
       end
       syns  = switches.inject({}) do |h, (f1,f2,_)|
-        h[f1] ||= f2
-        h[f2] ||= f1
+        h[f1] ||= [f1, f2]
+        h[f2] ||= [f1, f2]
         h
       end
 
@@ -176,32 +176,7 @@ class Thor
         end
       end
 
-      # Set synonymous switches to the same value, e.g. if -t is a synonym
-      # for --test, and the user passes "--test", then set "-t" to the same
-      # value that "--test" was set to.
-      #
-      # This allows users to refer to the long or short switch and get
-      # the same value
-      hash.each do |switch, val|
-        if syns.keys.include?(switch)
-          syns[switch].each do |key|
-            hash[key] = val   
-          end
-        end
-      end
-
-      # Get rid of leading "--" and "-" to make it easier to reference
-      hash.each do |key, value|
-        if key[0,2] == '--'
-          nkey = key.sub('--', '')
-        else
-          nkey = key.sub('-', '')
-        end
-        hash.delete(key)
-        hash[nkey] = value
-      end
-
-      hash
+      normalize_hash syns, hash
     end
 
     def self.normalize_switches(switches)
@@ -218,6 +193,20 @@ class Thor
           [switch[0], switch[1] || switch[0][1..2], switch[2] || :boolean]
         end
       end
+    end
+
+    def self.normalize_hash(syns, hash)
+      # Set synonymous switches to the same value, e.g. if -t is a synonym
+      # for --test, and the user passes "--test", then set "-t" to the same
+      # value that "--test" was set to.
+      #
+      # This allows users to refer to the long or short switch and get
+      # the same value
+      hash.map do |switch, val|
+        syns[switch].map {|key| [key, val]}
+      end.inject([]) {|a, v| a + v}.map do |key, value|
+        [key.sub(/^-+/, ''), value]
+      end.inject({}) {|h, (k,v)| h[k] = v; h}
     end
 
   end
