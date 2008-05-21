@@ -19,7 +19,15 @@ class Thor
 
       switches = switches.map do |names, type|
         type = :boolean if type == true
-        names = [names, names[2].chr] if names.is_a?(String)
+
+        if names.is_a?(String)
+          if names =~ LONG_RE
+            names = [names, "-" + names[2].chr]
+          else
+            names = [names]
+          end
+        end
+
         [names, type]
       end
 
@@ -63,7 +71,7 @@ class Thor
       while looking_at_opt?
         case pop
         when SHORT_SQ_RE
-          push($1.split("").map {|s| s = "-#{s}"})
+          push(*$1.split("").map {|s| s = "-#{s}"})
           next
         when LONG_EQ_RE
           push($1, $2)
@@ -72,23 +80,11 @@ class Thor
           switch = $1
         end
 
-        raise Error, "in@valid switch '#{switch}'" unless @valid.include?(switch)
-
         # Required arguments
         if @types[switch] == :required
-          nextval = peek
-
-          raise Error, "no value provided for required argument '#{switch}'" if nextval.nil?
-          raise Error, "cannot pass switch '#{nextval}' as an argument" if @valid.include?(nextval)
-
-          # If the same option appears more than once, put the values
-          # in array.
-          if hash[switch]
-            hash[switch] = [hash[switch], nextval].flatten
-          else
-            hash[switch] = nextval
-          end
-          pop
+          raise Error, "no value provided for required argument '#{switch}'" if peek.nil?
+          raise Error, "cannot pass switch '#{peek}' as an argument" if @valid.include?(peek)
+          hash[switch] = pop
         end
 
         # For boolean arguments set the switch's value to true.
@@ -107,11 +103,11 @@ class Thor
         # For optional argument, there may be an argument.  If so, it
         # cannot be another switch.  If not, it is set to true.
         if @types[switch] == :optional
-          nextval = peek
-          hash[switch] = @valid.include?(peek) || pop
+          hash[switch] = @valid.include?(peek) || peek.nil? || pop
         end
       end
 
+      check_required_args hash
       normalize_hash hash
     end
 
@@ -123,7 +119,7 @@ class Thor
 
     def pop
       arg = peek
-      @args = @args[1..-1]
+      @args = @args[1..-1] || []
       arg
     end
 
@@ -140,13 +136,19 @@ class Thor
       end
     end
 
+    def check_required_args(hash)
+      @types.select {|k,v| v == :required}.map {|k,v| @syns[k]}.uniq.each do |syns|
+        raise Error, "no value provided for required argument '#{syns.first}'" unless syns.any? {|s| hash[s]}
+      end
+    end
+
+    # Set synonymous switches to the same value, e.g. if -t is a synonym
+    # for --test, and the user passes "--test", then set "-t" to the same
+    # value that "--test" was set to.
+    #
+    # This allows users to refer to the long or short switch and get
+    # the same value
     def normalize_hash(hash)
-      # Set synonymous switches to the same value, e.g. if -t is a synonym
-      # for --test, and the user passes "--test", then set "-t" to the same
-      # value that "--test" was set to.
-      #
-      # This allows users to refer to the long or short switch and get
-      # the same value
       hash.map do |switch, val|
         @syns[switch].map {|key| [key, val]}
       end.inject([]) {|a, v| a + v}.map do |key, value|
