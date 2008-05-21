@@ -12,6 +12,18 @@ class Thor
     LONG_EQ_RE  = /^(--\w+[-\w+]*)?=(.*?)$|(-\w?)=(.*?)$/
     SHORT_SQ_RE = /^(-\w)(\S+?)$/
 
+    attr_accessor :args
+
+    def initialize(args)
+      @args = args
+    end
+
+    def skip_non_opts
+      non_opts = []
+      non_opts << pop until looking_at_opt? || @args.empty?
+      non_opts
+    end
+
     # Takes an array of switches. Each array consists of up to three
     # elements that indicate the name and type of switch. Returns a hash
     # containing each switch name, minus the '-', as a key. The value
@@ -23,7 +35,7 @@ class Thor
     #
     # Example:
     #
-    # opts = Thor::Options.getopts(args,
+    # opts = Thor::Options.new(args).getopts(
     #    ["--debug"],
     #    ["--verbose", "-v"],
     #    ["--level", "-l", :numeric]
@@ -31,19 +43,7 @@ class Thor
     #
     # See the README file for more information.
     #
-    def self.getopts(args, *switches)
-      new(args).getopts(*switches)
-    end
-
-    def initialize(args)
-      @args = args
-    end
-
     def getopts(*switches)
-      if switches.empty?
-        raise ArgumentError, "no switches provided"
-      end
-
       hash  = {} # Hash returned to user
       valid = Set.new # Tracks valid switches
       types = {} # Tracks argument types
@@ -63,7 +63,7 @@ class Thor
         h
       end
 
-      until done?
+      while looking_at_opt?
         opt = pop
 
         # Allow either -x -v or -xv style for single char args
@@ -204,8 +204,8 @@ class Thor
       @args = args + @args
     end
 
-    def done?
-      @args.empty?
+    def looking_at_opt?
+      (arg = peek) && [LONG_RE, SHORT_RE, LONG_EQ_RE, SHORT_SQ_RE].any? {|re| arg =~ re}
     end
 
     def normalize_switches(switches)
