@@ -92,15 +92,15 @@ describe Thor::Runner do
     proc { Thor::Runner.start }.must raise_error(NoMethodError)
   end
 
-#   it "presents tasks in the default namespace with an empty namespace" do
-#     ARGV.replace ["list"]
-#     capture(:stdout) { Thor::Runner.start }.must =~ /^:test +prints 'test'/
-#   end
+  it "presents tasks in the default namespace with an empty namespace" do
+    ARGV.replace ["list"]
+    capture(:stdout) { Thor::Runner.start }.must =~ /^:test +prints 'test'/
+  end
 
-#   it "runs tasks with an empty namespace from the default namespace" do
-#     ARGV.replace [":test"]
-#     capture(:stdout) { Thor::Runner.start }.must == "test\n"
-#   end
+  it "runs tasks with an empty namespace from the default namespace" do
+    ARGV.replace [":test"]
+    capture(:stdout) { Thor::Runner.start }.must == "test\n"
+  end
 end
 
 describe Thor::Runner, " install" do
