@@ -68,45 +68,7 @@ class Thor
 
         # Allow either -x -v or -xv style for single char args
         if SHORT_SQ_RE.match(opt)
-          chars = opt.split("")[1..-1].map {|s| s = "-#{s}"}
-
-          chars.each_with_index do |char, i|
-            unless valid.include?(char)  
-              raise Error, "invalid switch '#{char}'"
-            end
-
-            # Grab the next arg if the switch takes a required arg
-            if types[char] == :required
-              # Deal with a argument squished up against switch
-              if chars[i+1]
-                arg = chars[i+1..-1].join.tr("-","")
-                push(char, arg)
-                break
-              else
-                arg = pop
-                if arg.nil? || valid.include?(arg) # Minor cheat here
-                  err = "no value provided for required argument '#{char}'"
-                  raise Error, err
-                end
-                push(char, arg)
-              end
-            elsif types[char] == :optional
-              if chars[i+1] && !valid.include?(chars[i+1])
-                arg = chars[i+1..-1].join.tr("-","")
-                push(char, arg)
-                break
-              elsif
-                if peek && !valid.include?(peek)
-                  arg = pop
-                  push(char, arg)
-                end
-              else
-                push(char)
-              end
-            else
-              push(char)
-            end
-          end
+          push(opt.split("")[1..-1].map {|s| s = "-#{s}"})
           next
         end
 
