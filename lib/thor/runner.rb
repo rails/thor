@@ -90,7 +90,9 @@ class Thor::Runner < Thor
     raise Error, "Can't find module `#{name}'" if !yaml[name] || !yaml[name][:location]
 
     puts "Updating `#{name}' from #{yaml[name][:location]}"
+    old_filename = yaml[name][:filename] + ".thor"
     install(yaml[name][:location], "as" => name)
+    File.delete(File.join(thor_root, old_filename))
   end
   
   desc "installed", "list the installed Thor modules and tasks (--internal means list the built-in tasks as well)"
