@@ -80,7 +80,7 @@ class Thor
               # Deal with a argument squished up against switch
               if chars[i+1]
                 arg = chars[i+1..-1].join.tr("-","")
-                @args.push(char, arg)
+                @args.unshift(char, arg)
                 break
               else
                 arg = @args.shift
@@ -88,23 +88,23 @@ class Thor
                   err = "no value provided for required argument '#{char}'"
                   raise Error, err
                 end
-                @args.push(char, arg)
+                @args.unshift(char, arg)
               end
             elsif types[char] == :optional
               if chars[i+1] && !valid.include?(chars[i+1])
                 arg = chars[i+1..-1].join.tr("-","")
-                @args.push(char, arg)
+                @args.unshift(char, arg)
                 break
               elsif
                 if @args.first && !valid.include?(@args.first)
                   arg = @args.shift
-                  @args.push(char, arg)
+                  @args.unshift(char, arg)
                 end
               else
-                @args.push(char)
+                @args.unshift(char)
               end
             else
-              @args.push(char)
+              @args.unshift(char)
             end
           end
           next
@@ -116,7 +116,7 @@ class Thor
 
         if match = LONG_EQ_RE.match(opt)
           switch, value = match.captures.compact
-          @args.push(switch, value)
+          @args.unshift(switch, value)
           next
         end
 
