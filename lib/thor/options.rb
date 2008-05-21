@@ -7,6 +7,11 @@ class Thor
   class Options
     class Error < StandardError; end
 
+    LONG_RE     = /^(--\w+[-\w+]*)?$/
+    SHORT_RE    = /^(-\w)$/
+    LONG_EQ_RE  = /^(--\w+[-\w+]*)?=(.*?)$|(-\w?)=(.*?)$/
+    SHORT_SQ_RE = /^(-\w)(\S+?)$/
+
     # Takes an array of switches. Each array consists of up to three
     # elements that indicate the name and type of switch. Returns a hash
     # containing each switch name, minus the '-', as a key. The value
@@ -50,15 +55,10 @@ class Thor
         h
       end
 
-      re_long     = /^(--\w+[-\w+]*)?$/
-      re_short    = /^(-\w)$/
-      re_long_eq  = /^(--\w+[-\w+]*)?=(.*?)$|(-\w?)=(.*?)$/
-      re_short_sq = /^(-\w)(\S+?)$/
-
       args.each_with_index do |opt, index|
 
         # Allow either -x -v or -xv style for single char args
-        if re_short_sq.match(opt)
+        if SHORT_SQ_RE.match(opt)
           chars = opt.split("")[1..-1].map {|s| s = "-#{s}"}
 
           chars.each_with_index do |char, i|
@@ -101,11 +101,11 @@ class Thor
           next
         end
 
-        if match = re_long.match(opt) || match = re_short.match(opt)
+        if match = LONG_RE.match(opt) || match = SHORT_RE.match(opt)
           switch = match.captures.first
         end
 
-        if match = re_long_eq.match(opt)
+        if match = LONG_EQ_RE.match(opt)
           switch, value = match.captures.compact
           args.push(switch, value)
           next
