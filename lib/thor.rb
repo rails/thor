@@ -1,5 +1,5 @@
 $:.unshift File.expand_path(File.dirname(__FILE__))
-require "getopt"
+require "thor/options"
 require "thor/util"
 require "thor/task"
 require "thor/task_hash"
@@ -22,7 +22,7 @@ class Thor
   
   def self.method_options(opts)
     @method_options = opts.inject({}) do |accum, (k,v)|
-      accum.merge("--" + k.to_s => v.to_s.upcase)
+      accum.merge("--" + k.to_s => v.to_sym)
     end
   end
 
@@ -36,6 +36,10 @@ class Thor
   
   def self.tasks
     @tasks ||= TaskHash.new(self)
+  end
+
+  def self.opts
+    (@opts || {}).merge(self == Thor ? {} : superclass.opts)
   end
 
   def self.[](task)
@@ -55,11 +59,15 @@ class Thor
   end
   
   def self.start(args = ARGV)
+    options = Thor::Options.new(args, self.opts)
+    opts = options.getopts
+    args = options.args
+
     meth = args.first
     meth = @map[meth].to_s if @map && @map[meth]
     meth ||= "help"
     
-    tasks[meth].parse args[1..-1]
+    tasks[meth].parse new(opts, *args), args[1..-1]
   rescue Thor::Error => e
     $stderr.puts e.message
   end
@@ -72,6 +80,13 @@ class Thor
 
     def method_added(meth)
       meth = meth.to_s
+
+      if meth == "initialize"
+        @opts = @method_options
+        @method_options = nil
+        return
+      end
+
       return if !public_instance_methods.include?(meth) || !@usage
       register_klass_file self
 
@@ -90,6 +105,10 @@ class Thor
       file_subclasses << klass unless file_subclasses.include?(klass)
       subclasses << klass unless subclasses.include?(klass)
     end
+  end
+
+  def initialize(opts = {}, *args)
+    p opts
   end
   
   map ["-h", "-?", "--help", "-D"] => :help

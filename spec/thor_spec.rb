@@ -87,10 +87,6 @@ describe "thor" do
     MyApp.start(["bar", "one", "two", "--option1", "hello"]).must == ["one", "two", {"option1" => "hello", "o" => "hello"}]
   end
   
-  it "errors out when a required key/value option is not passed" do
-    lambda { MyApp.start(["bar", "one", "two"]) }.must raise_error(Getopt::Long::Error)
-  end
-  
   it "calls a method with an optional key/value param" do
     MyApp.start(["baz", "one", "--option1", "hello"]).must == ["one", {"option1" => "hello", "o" => "hello"}]
   end

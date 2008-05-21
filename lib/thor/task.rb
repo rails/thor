@@ -7,21 +7,20 @@ class Thor
       new(meth, "A dynamically-generated task", meth.to_s, nil, klass)
     end
 
-    def parse(args)
-      run(*parse_args(args))
+    def parse(obj, args)
+      run(obj, *parse_args(args))
     end
 
-    def run(*params)
-      raise Error, "klass is not defined for #{self.inspect}" unless klass
-      raise NoMethodError, "the `#{meth}' task of #{klass} is private" if
-        (klass.private_instance_methods + klass.protected_instance_methods).include?(meth)
+    def run(obj, *params)
+      raise NoMethodError, "the `#{meth}' task of #{obj.class} is private" if
+        (obj.private_methods + obj.protected_methods).include?(meth)
 
-      klass.new.send(meth, *params)
+      obj.send(meth, *params)
     rescue ArgumentError => e
       raise e unless e.backtrace.first =~ /:in `#{meth}'$/
       raise Error, "`#{meth}' was called incorrectly. Call as `#{formatted_usage}'"
     rescue NoMethodError => e
-      raise e unless e.message =~ /^undefined method `#{meth}' for #<#{klass}:.*>$/
+      raise e unless e.message =~ /^undefined method `#{meth}' for #{obj.inspect}$/
       raise Error, "The #{namespace false} namespace doesn't have a `#{meth}' task"
     end
 
@@ -38,11 +37,11 @@ class Thor
     def formatted_opts
       return "" if opts.nil?
       opts.map do |opt, val|
-        if val == true || val == "BOOLEAN"
+        if val == true || val == :boolean
           "[#{opt}]"
-        elsif val == "REQUIRED"
+        elsif val == :required
           opt + "=" + opt.gsub(/\-/, "").upcase
-        elsif val == "OPTIONAL"
+        elsif val == :optional
           "[" + opt + "=" + opt.gsub(/\-/, "").upcase + "]"
         end
       end.join(" ")
@@ -57,18 +56,8 @@ class Thor
 
     def parse_args(args)
       return args unless opts
-
-      args = args.dup
-      params = []
-      params << args.shift until args.empty? || args.first[0] == ?-
-
-      old_argv = ARGV.dup
-      ARGV.replace args
-      options = Getopt::Long.getopts(*opts.map do |opt, val|
-        [opt, val == true ? Getopt::BOOLEAN : Getopt.const_get(val)].flatten
-      end)
-      ARGV.replace old_argv
-      params + [options]
+      options = Thor::Options.new(args, opts)
+      options.skip_non_opts + [options.getopts]
     end
   end
 end
