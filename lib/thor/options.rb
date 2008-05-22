@@ -92,13 +92,6 @@ class Thor
           hash[switch] = true
         end
 
-        # For increment arguments, set the switch's value to one, or
-        # increment it by one if it already exists.
-        if @types[switch] == :increment
-          hash[switch] ||= 0
-          hash[switch] += 1
-        end
-
         # For optional argument, there may be an argument.  If so, it
         # cannot be another switch.  If not, it is set to true.
         if @types[switch] == :optional
