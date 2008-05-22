@@ -139,6 +139,7 @@ describe Thor::Runner do
   describe " update" do
     it "updates existing thor files" do
       @runner.should_receive(:install).with(@original_yaml["random"][:location], {"as" => "random"})
+      File.should_receive(:delete).with(File.join(ENV["HOME"], ".thor", @original_yaml["random"][:filename] + ".thor"))
     
       silence(:stdout) { @runner.update("random") }
     end
