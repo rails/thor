@@ -89,7 +89,6 @@ class Thor
 
         # For boolean arguments set the switch's value to true.
         if @types[switch] == :boolean
-          raise Error, "boolean switch already set" if hash.has_key?(switch)
           hash[switch] = true
         end
 
