@@ -80,21 +80,16 @@ class Thor
           switch = $1
         end
 
-        # Required arguments
-        if @types[switch] == :required
+        case @types[switch]
+        when :required
           raise Error, "no value provided for required argument '#{switch}'" if peek.nil?
           raise Error, "cannot pass switch '#{peek}' as an argument" if @valid.include?(peek)
           hash[switch] = pop
-        end
-
-        # For boolean arguments set the switch's value to true.
-        if @types[switch] == :boolean
+        when :boolean
           hash[switch] = true
-        end
-
-        # For optional argument, there may be an argument.  If so, it
-        # cannot be another switch.  If not, it is set to true.
-        if @types[switch] == :optional
+        when :optional
+          # For optional arguments, there may be an argument.  If so, it
+          # cannot be another switch.  If not, it is set to true.
           hash[switch] = @valid.include?(peek) || peek.nil? || pop
         end
       end
