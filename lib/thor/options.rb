@@ -7,9 +7,9 @@ class Thor
   class Options
     class Error < StandardError; end
 
-    LONG_RE     = /^(--\w+[-\w+]*)?$/
+    LONG_RE     = /^(--\w+[-\w+]*)$/
     SHORT_RE    = /^(-\w)$/
-    LONG_EQ_RE  = /^(--\w+[-\w+]*)?=(.*?)$|(-\w?)=(.*?)$/
+    LONG_EQ_RE  = /^(--\w+[-\w+]*)=(.*?)$|(-\w?)=(.*?)$/
     SHORT_SQ_RE = /^-(\w\S+?)$/ # Allow either -x -v or -xv style for single char args
 
     attr_accessor :args
