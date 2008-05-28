@@ -209,7 +209,7 @@ class Thor::Runner < Thor
     
     # Look for Thorfile or *.thor in the current directory or a parent directory, until the root
     while thorfiles.empty?
-      thorfiles = Dir[*Thor::Runner.globs_for(path)]
+      thorfiles = Thor::Runner.globs_for(path).map {|g| Dir[g]}.flatten
       path = File.dirname(path)
       break if path == "/"
     end
