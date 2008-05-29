@@ -33,7 +33,7 @@ class Thor::Runner < Thor
     print "Do you wish to continue [y/N]? "
     response = Readline.readline
     
-    return unless response =~ /^\s*y/i
+    return false unless response =~ /^\s*y/i
     
     constants = Thor::Util.constants_in_contents(contents)
     
@@ -67,6 +67,8 @@ class Thor::Runner < Thor
     File.open(File.join(thor_root, yaml[as][:filename] + ".thor"), "w") do |file|
       file.puts contents
     end
+    
+    true # Indicate sucess
   end
   
   desc "uninstall NAME", "uninstall a named Thor module"
@@ -91,8 +93,7 @@ class Thor::Runner < Thor
 
     puts "Updating `#{name}' from #{yaml[name][:location]}"
     old_filename = yaml[name][:filename] + ".thor"
-    install(yaml[name][:location], "as" => name)
-    File.delete(File.join(thor_root, old_filename))
+    File.delete(File.join(thor_root, old_filename)) if install(yaml[name][:location], "as" => name)
   end
   
   desc "installed", "list the installed Thor modules and tasks (--internal means list the built-in tasks as well)"
