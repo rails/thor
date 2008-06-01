@@ -15,7 +15,7 @@ class Thor::Runner < Thor
   map "-T" => :list, "-i" => :install, "-u" => :update
   
   desc "install NAME", "install a Thor file into your system tasks, optionally named for future updates"
-  method_options :as => :optional
+  method_options :as => :optional, :relative => :boolean
   def install(name, opts = {})
     initialize_thorfiles
     begin
@@ -33,7 +33,7 @@ class Thor::Runner < Thor
     print "Do you wish to continue [y/N]? "
     response = Readline.readline
     
-    return unless response =~ /^\s*y/i
+    return false unless response =~ /^\s*y/i
     
     constants = Thor::Util.constants_in_contents(contents)
     
@@ -56,7 +56,7 @@ class Thor::Runner < Thor
     FileUtils.touch(yaml_file)
     yaml = thor_yaml
     
-    location = is_uri ? name : File.expand_path(name)
+    location = (opts[:relative] || is_uri) ? name : File.expand_path(name)
     yaml[as] = {:filename => Digest::MD5.hexdigest(name + as), :location => location, :constants => constants}
     
     save_yaml(yaml)
@@ -66,6 +66,8 @@ class Thor::Runner < Thor
     File.open(File.join(thor_root, yaml[as][:filename] + ".thor"), "w") do |file|
       file.puts contents
     end
+    
+    true # Indicate sucess
   end
   
   desc "uninstall NAME", "uninstall a named Thor module"
@@ -89,7 +91,8 @@ class Thor::Runner < Thor
     raise Error, "Can't find module `#{name}'" if !yaml[name] || !yaml[name][:location]
 
     puts "Updating `#{name}' from #{yaml[name][:location]}"
-    install(yaml[name][:location], "as" => name)
+    old_filename = yaml[name][:filename] + ".thor"
+    File.delete(File.join(thor_root, old_filename)) if install(yaml[name][:location], "as" => name)
   end
   
   desc "installed", "list the installed Thor modules and tasks (--internal means list the built-in tasks as well)"
@@ -206,7 +209,7 @@ class Thor::Runner < Thor
     
     # Look for Thorfile or *.thor in the current directory or a parent directory, until the root
     while thorfiles.empty?
-      thorfiles = Dir[*Thor::Runner.globs_for(path)]
+      thorfiles = Thor::Runner.globs_for(path).map {|g| Dir[g]}.flatten
       path = File.dirname(path)
       break if path == "/"
     end
