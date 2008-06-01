@@ -43,6 +43,11 @@ END
     "bang"
   end
   
+  desc "call_myself_with_wrong_arity", "get the right error"
+  def call_myself_with_wrong_arity
+    call_myself_with_wrong_arity(4)
+  end
+  
   def method_missing(meth, *args)
     [meth, args]
   end
@@ -138,5 +143,9 @@ bangs around some
   This is more info!
   Everyone likes more info!
 END
+  end
+  
+  it "raises when an exception happens within the task call" do
+    lambda { MyApp.start(["call_myself_with_wrong_arity"]) }.must raise_error
   end
 end

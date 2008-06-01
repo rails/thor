@@ -17,7 +17,13 @@ class Thor
 
       obj.send(meth, *params)
     rescue ArgumentError => e
-      raise e unless e.backtrace.first =~ /:in `#{meth}'$/
+      # backtrace sans anything in this file
+      backtrace = e.backtrace.reject {|frame| frame =~ /^#{Regexp.escape(__FILE__)}/}
+      # and sans anything that got us here
+      backtrace -= caller
+      raise e unless backtrace.empty?
+
+      # okay, they really did call it wrong
       raise Error, "`#{meth}' was called incorrectly. Call as `#{formatted_usage}'"
     rescue NoMethodError => e
       raise e unless e.message =~ /^undefined method `#{meth}' for #{obj.inspect}$/
