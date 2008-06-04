@@ -132,10 +132,14 @@ class Thor::Runner < Thor
     task = Thor[meth]
     task.parse task.klass.new, ARGV[1..-1]
   end
+
+  def self.thor_root
+    File.join(ENV["HOME"], ".thor")
+  end
   
   private
   def thor_root
-    File.join(ENV["HOME"], ".thor")
+    self.class.thor_root
   end
   
   def thor_yaml
