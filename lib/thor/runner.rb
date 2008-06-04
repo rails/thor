@@ -134,7 +134,7 @@ class Thor::Runner < Thor
   end
 
   def self.thor_root
-    File.join(ENV["HOME"], ".thor")
+    File.join(ENV["HOME"] || ENV["APPDATA"], ".thor")
   end
   
   private
