@@ -98,8 +98,8 @@ class Thor::Runner < Thor
   desc "installed", "list the installed Thor modules and tasks (--internal means list the built-in tasks as well)"
   method_options :internal => :boolean
   def installed(opts = {})
-    Dir["#{ENV["HOME"]}/.thor/**/*.thor"].each do |f|
-      load f unless Thor.subclass_files.keys.include?(File.expand_path(f))
+    Dir["#{thor_root}/**/*.thor"].each do |f|
+      load_thorfile f unless Thor.subclass_files.keys.include?(File.expand_path(f))
     end
 
     klasses = Thor.subclasses
@@ -200,7 +200,15 @@ class Thor::Runner < Thor
   end
 
   def initialize_thorfiles(relevant_to = nil)
-    thorfiles(relevant_to).each {|f| load f unless Thor.subclass_files.keys.include?(File.expand_path(f))}
+    thorfiles(relevant_to).each {|f| load_thorfile f unless Thor.subclass_files.keys.include?(File.expand_path(f))}
+  end
+  
+  def load_thorfile(path)
+    begin
+      load path
+    rescue Object => e
+      $stderr.puts "WARNING: unable to load thorfile #{path.inspect}: #{e.message}"
+    end
   end
   
   def thorfiles(relevant_to = nil)
@@ -217,7 +225,7 @@ class Thor::Runner < Thor
     # We want to load system-wide Thorfiles first
     # so the local Thorfiles will override them.
     (relevant_to ? thorfiles_relevant_to(relevant_to) :
-     Dir["#{ENV["HOME"]}/.thor/**/*.thor"]) + thorfiles
+     Dir["#{thor_root}/**/*.thor"]) + thorfiles
   end
 
   def thorfiles_relevant_to(meth)

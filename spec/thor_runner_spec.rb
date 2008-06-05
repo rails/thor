@@ -167,4 +167,13 @@ describe Thor::Runner do
       stdout.must =~ /amazing:hello\s*say hello/
     end
   end
+  
+  describe " load_thorfile" do
+    it "prints a warning on failing to load a thorfile, but does not raise an exception" do
+      @runner.stub!(:load).and_raise(SyntaxError)
+      
+      capture(:stderr) { @runner.send(:load_thorfile, 'badfile.thor') }.
+        must =~ /unable to load thorfile "badfile.thor"/
+    end
+  end
 end
