@@ -13,7 +13,7 @@ class Thor::TaskHash < Thor::OrderedHash
   end
 
   def [](name)
-    if task = super(name)
+    if task = super(name) || (@klass == Thor && @klass.superclass.tasks[name])
       return task.with_klass(@klass)
     end
 
