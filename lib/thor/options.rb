@@ -65,7 +65,7 @@ class Thor
     #    ["--level", "-l"] => :numeric
     # ).getopts
     #
-    def getopts
+    def getopts(check_required = true)
       hash  = {}
 
       while looking_at_opt?
@@ -94,8 +94,17 @@ class Thor
         end
       end
 
-      check_required_args hash
-      normalize_hash hash
+      hash = normalize_hash hash
+      check_required_args hash if check_required
+      hash
+    end
+
+    def check_required_args(hash)
+      @types.select {|k,v| v == :required}.map {|k,v| @syns[k]}.uniq.each do |syns|
+        unless syns.map {|s| s.gsub(/^-+/, '')}.any? {|s| hash[s]}
+          raise Error, "no value provided for required argument '#{syns.first}'"
+        end
+      end
     end
 
     private
@@ -120,12 +129,6 @@ class Thor
         @valid.include? $1
       when SHORT_SQ_RE
         $1.split("").any? {|f| @valid.include? "-#{f}"}
-      end
-    end
-
-    def check_required_args(hash)
-      @types.select {|k,v| v == :required}.map {|k,v| @syns[k]}.uniq.each do |syns|
-        raise Error, "no value provided for required argument '#{syns.first}'" unless syns.any? {|s| hash[s]}
       end
     end
 

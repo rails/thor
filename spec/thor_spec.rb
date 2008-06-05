@@ -97,6 +97,11 @@ describe "thor" do
     MyApp.start(["baz", "one", "--option1", "hello"]).must ==
       ["one", {"option1" => "hello", "o" => "hello", :option1 => "hello", :o => "hello"}]
   end
+
+  it "allows options at the beginning and end of the arguments" do
+    MyApp.start(["baz", "--option1", "hello", "one"]).must ==
+      ["one", {"option1" => "hello", "o" => "hello", :option1 => "hello", :o => "hello"}]
+  end
   
   it "calls a method with an empty Hash for options if an optional key/value param is not provided" do
     MyApp.start(["baz", "one"]).must == ["one", {}]
