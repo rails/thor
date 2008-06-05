@@ -140,7 +140,7 @@ class Thor
         @syns[switch].map {|key| [key, val]}
       end.inject([]) {|a, v| a + v}.map do |key, value|
         [key.sub(/^-+/, ''), value]
-      end.inject({}) {|h, (k,v)| h[k] = v; h}
+      end.inject({}) {|h, (k,v)| h[k] = v; h[k.to_sym] = v; h}
     end
 
   end

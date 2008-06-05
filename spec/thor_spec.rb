@@ -81,7 +81,7 @@ describe "thor" do
   end
   
   it "calls a method with an optional boolean param when the param is passed" do
-    MyApp.start(["foo", "one", "--force"]).must == ["one", {"force" => true, "f" => true}]
+    MyApp.start(["foo", "one", "--force"]).must == ["one", {"force" => true, "f" => true, :force => true, :f => true}]
   end
   
   it "calls a method with an optional boolean param when the param is not passed" do
@@ -89,11 +89,13 @@ describe "thor" do
   end
   
   it "calls a method with a required key/value param" do
-    MyApp.start(["bar", "one", "two", "--option1", "hello"]).must == ["one", "two", {"option1" => "hello", "o" => "hello"}]
+    MyApp.start(["bar", "one", "two", "--option1", "hello"]).must ==
+      ["one", "two", {"option1" => "hello", "o" => "hello", :option1 => "hello", :o => "hello"}]
   end
   
   it "calls a method with an optional key/value param" do
-    MyApp.start(["baz", "one", "--option1", "hello"]).must == ["one", {"option1" => "hello", "o" => "hello"}]
+    MyApp.start(["baz", "one", "--option1", "hello"]).must ==
+      ["one", {"option1" => "hello", "o" => "hello", :option1 => "hello", :o => "hello"}]
   end
   
   it "calls a method with an empty Hash for options if an optional key/value param is not provided" do

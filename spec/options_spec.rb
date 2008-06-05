@@ -14,15 +14,16 @@ describe Thor::Options do
 
   it "allows multiple aliases for a given switch" do
     Thor::Options.new(["--bar", "12"], {["--foo", "--bar", "--baz"] => :optional}).getopts.must ==
-      {"foo" => "12", "bar" => "12", "baz" => "12"}
+      {"foo" => "12", "bar" => "12", "baz" => "12", :foo => "12", :bar => "12", :baz => "12"}
   end
 
   it "allows custom short names" do
-    Thor::Options.new(["-f", "12"], {"-f" => :optional}).getopts.must == {"f" => "12"}
+    Thor::Options.new(["-f", "12"], {"-f" => :optional}).getopts.must == {"f" => "12", :f => "12"}
   end
 
   it "allows custom short-name aliases" do
-    Thor::Options.new(["-f", "12"], {["--bar", "-f"] => :optional}).getopts.must == {"bar" => "12", "f" => "12"}
+    Thor::Options.new(["-f", "12"], {["--bar", "-f"] => :optional}).getopts.must ==
+      {"bar" => "12", "f" => "12", :bar => "12", :f => "12"}
   end
 
   it "accepts =-format switch assignment" do
@@ -41,6 +42,12 @@ describe Thor::Options do
     opts["foo"].must be_true
     opts["bar"].must be_true
     opts["app"].must == "12"
+  end
+
+  it "makes hash keys available as symbols as well" do
+    opts = Thor::Options.new(["--foo", "12"], "--foo" => :optional).getopts
+    opts[:foo].must == "12"
+    opts[:f].must == "12"
   end
 
   describe " with no arguments" do
@@ -173,7 +180,10 @@ describe Thor::Options do
 
     it "parses the options for #getopts after #skip_non_opts" do
       @options.skip_non_opts
-      @options.getopts.must == {"foo" => "12", "f" => "12", "bar" => true, "b" => true}
+      @options.getopts.must == {
+        "foo" => "12", "f" => "12", "bar" => true, "b" => true,
+        :foo => "12", :f => "12", :bar => true, :b => true,
+      }
     end
 
     it "returns the remaining non-option arguments for #args after #skip_non_opts and #getopts" do
