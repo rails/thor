@@ -26,7 +26,7 @@ class Thor
       # okay, they really did call it wrong
       raise Error, "`#{meth}' was called incorrectly. Call as `#{formatted_usage}'"
     rescue NoMethodError => e
-      raise e unless e.message =~ /^undefined method `#{meth}' for #{obj.inspect}$/
+      raise e unless e.message =~ /^undefined method `#{meth}' for #{Regexp.escape(obj.inspect)}$/
       raise Error, "The #{namespace false} namespace doesn't have a `#{meth}' task"
     end
 
