@@ -37,7 +37,7 @@ class Thor::Runner < Thor
     
     constants = Thor::Util.constants_in_contents(contents)
     
-    name = name =~ /\.thor$/ || is_uri ? name : "#{name}.thor"
+    # name = name =~ /\.thor$/ || is_uri ? name : "#{name}.thor"
     
     as = opts["as"] || begin
       first_line = contents.split("\n")[0]
@@ -63,11 +63,11 @@ class Thor::Runner < Thor
     
     puts "Storing thor file in your system repository"
     
-    File.open(File.join(thor_root, yaml[as][:filename] + ".thor"), "w") do |file|
+    File.open(File.join(thor_root, yaml[as][:filename]), "w") do |file|
       file.puts contents
     end
     
-    true # Indicate sucess
+    yaml[as][:filename] # Indicate sucess
   end
   
   desc "uninstall NAME", "uninstall a named Thor module"
@@ -77,7 +77,7 @@ class Thor::Runner < Thor
     
     puts "Uninstalling #{name}."
     
-    file = File.join(thor_root, "#{yaml[name][:filename]}.thor")
+    file = File.join(thor_root, "#{yaml[name][:filename]}")
     File.delete(file)
     yaml.delete(name)
     save_yaml(yaml)
@@ -91,14 +91,18 @@ class Thor::Runner < Thor
     raise Error, "Can't find module `#{name}'" if !yaml[name] || !yaml[name][:location]
 
     puts "Updating `#{name}' from #{yaml[name][:location]}"
-    old_filename = yaml[name][:filename] + ".thor"
-    File.delete(File.join(thor_root, old_filename)) if install(yaml[name][:location], "as" => name)
+    old_filename = yaml[name][:filename]
+    filename = install(yaml[name][:location], "as" => name)
+    unless filename == old_filename
+      File.delete(File.join(thor_root, old_filename))
+    end
   end
   
   desc "installed", "list the installed Thor modules and tasks (--internal means list the built-in tasks as well)"
   method_options :internal => :boolean
   def installed(opts = {})
-    Dir["#{thor_root}/**/*.thor"].each do |f|
+    Dir["#{thor_root}/**/*"].each do |f|
+      next if f =~ /thor\.yml$/
       load_thorfile f unless Thor.subclass_files.keys.include?(File.expand_path(f))
     end
 
@@ -229,14 +233,14 @@ class Thor::Runner < Thor
     # We want to load system-wide Thorfiles first
     # so the local Thorfiles will override them.
     (relevant_to ? thorfiles_relevant_to(relevant_to) :
-     Dir["#{thor_root}/**/*.thor"]) + thorfiles
+     Dir["#{thor_root}/**/*"]) + thorfiles - ["#{thor_root}/thor.yml"]
   end
 
   def thorfiles_relevant_to(meth)
     klass_str = Thor::Util.to_constant(meth.split(":")[0...-1].join(":"))
     thor_yaml.select do |k, v|
       v[:constants] && v[:constants].include?(klass_str)
-    end.map { |k, v| File.join(thor_root, "#{v[:filename]}.thor") }
+    end.map { |k, v| File.join(thor_root, "#{v[:filename]}") }
   end
 
 end
