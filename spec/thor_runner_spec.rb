@@ -119,7 +119,7 @@ describe Thor::Runner, " install" do
     file = mock("File")
     file.should_receive(:puts)
     
-    File.should_receive(:open).with(File.join(Thor::Runner.thor_root, Digest::MD5.hexdigest("#{File.dirname(__FILE__)}/fixtures/task.thor" + "randomness")) + ".thor", "w")
+    File.should_receive(:open).with(File.join(Thor::Runner.thor_root, Digest::MD5.hexdigest("#{File.dirname(__FILE__)}/fixtures/task.thor" + "randomness")), "w")
     File.should_receive(:open).with(File.join(Thor::Runner.thor_root, "thor.yml"), "w").once.and_yield(file)
     
     silence(:stdout) { Thor::Runner.start }
@@ -139,7 +139,7 @@ describe Thor::Runner do
   describe " update" do
     it "updates existing thor files" do
       @runner.should_receive(:install).with(@original_yaml["random"][:location], {"as" => "random"}).and_return(true)
-      File.should_receive(:delete).with(File.join(Thor::Runner.thor_root, @original_yaml["random"][:filename] + ".thor"))
+      File.should_receive(:delete).with(File.join(Thor::Runner.thor_root, @original_yaml["random"][:filename]))
     
       silence(:stdout) { @runner.update("random") }
     end
@@ -150,7 +150,7 @@ describe Thor::Runner do
     it "uninstalls existing thor modules" do
       @runner.should_receive(:save_yaml)
     
-      File.should_receive(:delete).with(File.join(ENV["HOME"], ".thor", "4a33b894ffce85d7b412fc1b36f88fe0.thor"))
+      File.should_receive(:delete).with(File.join(ENV["HOME"], ".thor", "4a33b894ffce85d7b412fc1b36f88fe0"))
       @original_yaml.should_receive(:delete).with("random")
     
       silence(:stdout) { @runner.uninstall("random") }
