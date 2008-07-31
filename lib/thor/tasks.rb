@@ -13,10 +13,12 @@ class Thor
   
   def self.install_task(spec)
     package_task spec
+
+    null_file = RUBY_PLATFORM =~ /w(in)?32$/ ? "NUL" : "/dev/null"
     
     desc "install", "install the gem"
     define_method :install do
-      old_stderr, $stderr = $stderr.dup, File.open("/dev/null", "w")
+      old_stderr, $stderr = $stderr.dup, File.open(null_file, "w")
       package
       $stderr = old_stderr
       system %{sudo gem install pkg/#{spec.name}-#{spec.version} --no-rdoc --no-ri --no-update-sources}
