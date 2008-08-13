@@ -11,6 +11,8 @@ module Spec::Expectations::ObjectExpectations
 end
 
 Spec::Runner.configure do |config|
+  config.mock_with :rr
+  
   def capture(stream)
     begin
       stream = stream.to_s

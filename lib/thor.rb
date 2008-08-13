@@ -5,6 +5,8 @@ require "thor/task"
 require "thor/task_hash"
 
 class Thor
+  attr_accessor :options
+  
   def self.map(map)
     @map ||= superclass.instance_variable_get("@map") || {}
     map.each do |key, value|

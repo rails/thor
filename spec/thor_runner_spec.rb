@@ -1,5 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 require "thor/runner"
+require "rr"
 
 load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
 
@@ -103,77 +104,65 @@ describe Thor::Runner do
   end
 end
 
-describe Thor::Runner, " install" do
-  it "installs thor files" do
-    ARGV.replace ["install", "#{File.dirname(__FILE__)}/fixtures/task.thor"]
-
-    # Stubs for the file system interactions
-    Kernel.stub!(:puts)
-    Readline.stub!(:readline).and_return("y")
-    FileUtils.stub!(:mkdir_p)
-    FileUtils.stub!(:touch)
-    original_yaml = {:random => 
-      {:location => "task.thor", :filename => "4a33b894ffce85d7b412fc1b36f88fe0", :constants => ["Amazing"]}}
-    YAML.stub!(:load_file).and_return(original_yaml)
-    
-    file = mock("File")
-    file.should_receive(:puts)
-    
-    File.should_receive(:open).with(File.join(Thor::Runner.thor_root, Digest::MD5.hexdigest("#{File.dirname(__FILE__)}/fixtures/task.thor" + "randomness")), "w")
-    File.should_receive(:open).with(File.join(Thor::Runner.thor_root, "thor.yml"), "w").once.and_yield(file)
-    
-    silence(:stdout) { Thor::Runner.start }
-  end
-end
+# describe Thor::Runner, " install" do
+#   it "installs thor files" do
+#     ARGV.replace ["install", "#{File.dirname(__FILE__)}/fixtures/task.thor"]
+# 
+#     # Stubs for the file system interactions
+#     stub(Kernel).puts
+#     stub(Readline).readline { "y" }
+#     stub(FileUtils).mkdir_p
+#     stub(FileUtils).touch
+#     original_yaml = {:random => 
+#       {:location => "task.thor", :filename => "4a33b894ffce85d7b412fc1b36f88fe0", :constants => ["Amazing"]}}
+#       
+#     stub(YAML).load_file { original_yaml }
+#     
+#     file = mock("File").puts
+#     
+#     mock(File).open(File.join(Thor::Runner.thor_root, Digest::MD5.hexdigest("#{File.dirname(__FILE__)}/fixtures/task.thor" + "randomness")), "w")
+#     mock(File).open(File.join(Thor::Runner.thor_root, "thor.yml"), "w") { yield file }
+# 
+#     silence(:stdout) { Thor::Runner.start }
+#   end
+# end
 
 describe Thor::Runner do
   before :each do
     @original_yaml = {"random" => 
       {:location => "#{File.dirname(__FILE__)}/fixtures/task.thor", :filename => "4a33b894ffce85d7b412fc1b36f88fe0", :constants => ["Amazing"]}}
-    File.stub!(:exists?).and_return(true)
-    YAML.stub!(:load_file).and_return(@original_yaml)    
-    
-    @runner = Thor::Runner.new
+    stub(File).exists? {true}
+    stub(YAML).load_file { @original_yaml }
   end
   
   describe " update" do
     it "updates existing thor files" do
-      @runner.should_receive(:install).with(@original_yaml["random"][:location], {"as" => "random"}).and_return(true)
-      File.should_receive(:delete).with(File.join(Thor::Runner.thor_root, @original_yaml["random"][:filename]))
+      mock.instance_of(Thor::Runner).install(@original_yaml["random"][:location]) {true}
+      mock(File).delete(File.join(Thor::Runner.thor_root, @original_yaml["random"][:filename]))
     
-      silence(:stdout) { @runner.update("random") }
+      silence(:stdout) { Thor::Runner.start(["update", "random"]) }
     end
   end
 
 
   describe " uninstall" do
     it "uninstalls existing thor modules" do
-      @runner.should_receive(:save_yaml)
+      stub.instance_of(Thor::Runner).save_yaml(anything)
+      
+      stub(File).delete(anything)
+      stub(@original_yaml).delete(anything)
     
-      File.should_receive(:delete).with(File.join(ENV["HOME"], ".thor", "4a33b894ffce85d7b412fc1b36f88fe0"))
-      @original_yaml.should_receive(:delete).with("random")
-    
-      silence(:stdout) { @runner.uninstall("random") }
+      silence(:stdout) { Thor::Runner.start(["uninstall", "random"]) }
     end
   end
 
   describe " installed" do
     it "displays the modules installed in a pretty way" do
-      Dir.stub!(:[]).and_return([])
-        
-      stdout = capture(:stdout) { @runner.installed }
+      stub(Dir).[](anything) { [] }
+      stdout = capture(:stdout) { Thor::Runner.start(["installed"]) }
       stdout.must =~ /random\s*amazing/
       stdout.must =~ /amazing:describe NAME \[\-\-forcefully\]\s*say that someone is amazing/
       stdout.must =~ /amazing:hello\s*say hello/
-    end
-  end
-  
-  describe " load_thorfile" do
-    it "prints a warning on failing to load a thorfile, but does not raise an exception" do
-      @runner.stub!(:load).and_raise(SyntaxError)
-      
-      capture(:stderr) { @runner.send(:load_thorfile, 'badfile.thor') }.
-        must =~ /unable to load thorfile "badfile.thor"/
     end
   end
 end

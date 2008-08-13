@@ -8,13 +8,15 @@ class Thor
     end
 
     def parse(obj, args)
-      run(obj, *parse_args(args))
+      list, hash = parse_args(args)
+      obj.options = hash
+      run(obj, *list)
     end
 
     def run(obj, *params)
       raise NoMethodError, "the `#{meth}' task of #{obj.class} is private" if
         (obj.private_methods + obj.protected_methods).include?(meth)
-
+      
       obj.send(meth, *params)
     rescue ArgumentError => e
       # backtrace sans anything in this file
@@ -22,11 +24,15 @@ class Thor
       # and sans anything that got us here
       backtrace -= caller
       raise e unless backtrace.empty?
-
+    
       # okay, they really did call it wrong
       raise Error, "`#{meth}' was called incorrectly. Call as `#{formatted_usage}'"
     rescue NoMethodError => e
-      raise e unless e.message =~ /^undefined method `#{meth}' for #{Regexp.escape(obj.inspect)}$/
+      begin
+        raise e unless e.message =~ /^undefined method `#{meth}' for #{Regexp.escape(obj.inspect)}$/
+      rescue
+        raise e
+      end
       raise Error, "The #{namespace false} namespace doesn't have a `#{meth}' task"
     end
 
@@ -61,13 +67,13 @@ class Thor
     protected
 
     def parse_args(args)
-      return args unless opts
+      return [args, {}] unless opts
       options = Thor::Options.new(args, opts)
       hash = options.getopts(false)
       list = options.skip_non_opts
       hash.merge!(options.getopts(false))
       options.check_required_args hash
-      list + [hash]
+      [list, hash]
     end
   end
 end

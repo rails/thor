@@ -16,7 +16,7 @@ class Thor::Runner < Thor
   
   desc "install NAME", "install a Thor file into your system tasks, optionally named for future updates"
   method_options :as => :optional, :relative => :boolean
-  def install(name, opts = {})
+  def install(name)
     initialize_thorfiles
     begin
       contents = open(name).read
@@ -39,7 +39,7 @@ class Thor::Runner < Thor
     
     # name = name =~ /\.thor$/ || is_uri ? name : "#{name}.thor"
     
-    as = opts["as"] || begin
+    as = options["as"] || begin
       first_line = contents.split("\n")[0]
       (match = first_line.match(/\s*#\s*module:\s*([^\n]*)/)) ? match[1].strip : nil
     end
@@ -56,7 +56,7 @@ class Thor::Runner < Thor
     FileUtils.touch(yaml_file)
     yaml = thor_yaml
     
-    location = (opts[:relative] || is_uri) ? name : File.expand_path(name)
+    location = (options[:relative] || is_uri) ? name : File.expand_path(name)
     yaml[as] = {:filename => Digest::MD5.hexdigest(name + as), :location => location, :constants => constants}
     
     save_yaml(yaml)
@@ -92,7 +92,8 @@ class Thor::Runner < Thor
 
     puts "Updating `#{name}' from #{yaml[name][:location]}"
     old_filename = yaml[name][:filename]
-    filename = install(yaml[name][:location], "as" => name)
+    options["as"] = name
+    filename = install(yaml[name][:location])
     unless filename == old_filename
       File.delete(File.join(thor_root, old_filename))
     end
@@ -100,20 +101,20 @@ class Thor::Runner < Thor
   
   desc "installed", "list the installed Thor modules and tasks (--internal means list the built-in tasks as well)"
   method_options :internal => :boolean
-  def installed(opts = {})
+  def installed
     Dir["#{thor_root}/**/*"].each do |f|
       next if f =~ /thor\.yml$/
       load_thorfile f unless Thor.subclass_files.keys.include?(File.expand_path(f))
     end
 
     klasses = Thor.subclasses
-    klasses -= [Thor, Thor::Runner] unless opts['internal']
+    klasses -= [Thor, Thor::Runner] unless options['internal']
     display_klasses(true, klasses)
   end
   
   desc "list [SEARCH]", "list the available thor tasks (--substring means SEARCH can be anywhere in the module)"
   method_options :substring => :boolean
-  def list(search = "", options = {})
+  def list(search = "")
     initialize_thorfiles
     search = ".*#{search}" if options["substring"]
     search = /^#{search}.*/i
