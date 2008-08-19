@@ -52,6 +52,7 @@ class Thor
       cmd << options
       puts cmd if verbose
       system(cmd)
+      exit($?.exitstatus)
     end
   end
   
