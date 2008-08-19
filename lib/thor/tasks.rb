@@ -59,10 +59,13 @@ class Thor
   private
   def self.convert_task_options(opts)
     opts.map do |key, value|
-      if value == true
+      case value
+      when true
         "--#{key}"
-      elsif value.is_a?(Array)
+      when Array
         value.map {|v| "--#{key} #{v.inspect}"}.join(" ")
+      when nil, false
+        ""
       else
         "--#{key} #{value.inspect}"
       end
