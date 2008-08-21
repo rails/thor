@@ -17,20 +17,20 @@ class MyApp < Thor
   
   desc "foo BAR", "do some fooing"
   method_options :force => :boolean
-  def foo(bar, opts)
-    [bar, opts]
+  def foo(bar)
+    [bar, options]
   end
   
   desc "bar BAZ BAT", "do some barring"
   method_options :option1 => :required
-  def bar(baz, bat, opts)
-    [baz, bat, opts]
+  def bar(baz, bat)
+    [baz, bat, options]
   end
   
   desc "baz BAT", "do some bazzing"
   method_options :option1 => :optional
-  def baz(bat, opts)
-    [bat, opts]
+  def baz(bat)
+    [bat, options]
   end
 
   desc "bang FOO", <<END
