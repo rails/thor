@@ -102,7 +102,7 @@ class Thor::Runner < Thor
   desc "installed", "list the installed Thor modules and tasks (--internal means list the built-in tasks as well)"
   method_options :internal => :boolean
   def installed
-    Dir["#{thor_root}/**/*"].each do |f|
+    thor_root_glob.each do |f|
       next if f =~ /thor\.yml$/
       load_thorfile f unless Thor.subclass_files.keys.include?(File.expand_path(f))
     end
@@ -141,10 +141,23 @@ class Thor::Runner < Thor
   def self.thor_root
     File.join(ENV["HOME"] || ENV["APPDATA"], ".thor")
   end
+
+  def self.thor_root_glob
+    # On Windows thor_root will be something like this:
+    #
+    #   C:\Documents and Settings\james\.thor
+    #
+    # If we don't #gsub the \ character, Dir.glob will fail.
+    Dir["#{thor_root.gsub(/\\/, '/')}/**/*"]
+  end
   
   private
   def thor_root
     self.class.thor_root
+  end
+
+  def thor_root_glob
+    self.class.thor_root_glob
   end
   
   def thor_yaml
@@ -234,7 +247,7 @@ class Thor::Runner < Thor
     # We want to load system-wide Thorfiles first
     # so the local Thorfiles will override them.
     (relevant_to ? thorfiles_relevant_to(relevant_to) :
-     Dir["#{thor_root}/**/*"]) + thorfiles - ["#{thor_root}/thor.yml"]
+     thor_root_glob + thorfiles - ["#{thor_root}/thor.yml"]
   end
 
   def thorfiles_relevant_to(meth)
