@@ -192,4 +192,14 @@ describe Thor::Options do
       @options.args == ["-T", "bang"]
     end
   end
+  
+  it "allows optional arguments with default values" do
+    @options = Thor::Options.new(["--branch", "bugfix"], "--branch" => "master")
+    @options.getopts.must == { "branch" => "bugfix", :branch => "bugfix", "b" => "bugfix", :b => "bugfix" }
+  end
+  
+  it "allows optional arguments with default values" do
+    @options = Thor::Options.new([], "--branch" => "master")
+    @options.getopts.must == { "branch" => "master", :branch => "master", "b" => "master", :b => "master" }
+  end
 end

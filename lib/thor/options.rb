@@ -16,9 +16,15 @@ class Thor
 
     def initialize(args, switches)
       @args = args
+      @defaults = {}
 
       switches = switches.map do |names, type|
-        type = :boolean if type == true
+        case type
+        when TrueClass then type = :boolean
+        when String
+          @defaults[names] = type
+          type = :optional
+        end
 
         if names.is_a?(String)
           if names =~ LONG_RE
@@ -66,7 +72,7 @@ class Thor
     # ).getopts
     #
     def getopts(check_required = true)
-      hash  = {}
+      hash = @defaults.dup
 
       while looking_at_opt?
         case pop

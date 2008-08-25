@@ -53,8 +53,9 @@ class Thor
           "[#{opt}]"
         elsif val == :required
           opt + "=" + opt.gsub(/\-/, "").upcase
-        elsif val == :optional
-          "[" + opt + "=" + opt.gsub(/\-/, "").upcase + "]"
+        else
+          sample = val == :optional ? opt.gsub(/\-/, "").upcase : val
+          "[" + opt + "=" + sample + "]"
         end
       end.join(" ")
     end
@@ -71,7 +72,7 @@ class Thor
       options = Thor::Options.new(args, opts)
       hash = options.getopts(false)
       list = options.skip_non_opts
-      hash.merge!(options.getopts(false))
+      hash.update options.getopts(false)
       options.check_required_args hash
       [list, hash]
     end
