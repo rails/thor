@@ -61,9 +61,9 @@ class Thor
   end
   
   def self.start(args = ARGV)
-    options = Thor::Options.new(args, self.opts)
-    opts = options.getopts
-    args = options.args
+    options = Thor::Options.new(self.opts)
+    opts = options.parse(args, false)
+    args = options.trailing_non_opts
 
     meth = args.first
     meth = @map[meth].to_s if @map && @map[meth]
@@ -126,15 +126,14 @@ class Thor
 
       puts task.formatted_usage(namespace)
       puts task.description
-      return
-    end
-
-    puts "Options"
-    puts "-------"
-    self.class.tasks.each do |_, task|
-      format = "%-" + (self.class.maxima.usage + self.class.maxima.opt + 4).to_s + "s"
-      print format % ("#{task.formatted_usage}")      
-      puts  task.description.split("\n").first
+    else
+      puts "Options"
+      puts "-------"
+      self.class.tasks.each do |_, task|
+        format = "%-" + (self.class.maxima.usage + self.class.maxima.opt + 4).to_s + "s"
+        print format % ("#{task.formatted_usage}")      
+        puts  task.description.split("\n").first
+      end
     end
   end
   
