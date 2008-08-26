@@ -25,6 +25,12 @@ class Thor
         def convert_key(key)
           key.kind_of?(Symbol) ? key.to_s : key
         end
+        
+        # Magic predicates. For instance:
+        #   options.force? # => !!options['force']
+        def method_missing(method, *args, &block)
+          method.to_s =~ /^(\w+)\?$/ ? !!self[$1] : super
+        end
     end
 
     NUMERIC     = /(\d*\.\d+|\d+)/

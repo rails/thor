@@ -172,7 +172,7 @@ describe Thor::Options do
   
   describe 'Hash' do
     before(:each) do
-      @hash = Thor::Options::Hash.new 'foo' => 'bar', 'baz' => 'bee'
+      @hash = Thor::Options::Hash.new 'foo' => 'bar', 'baz' => 'bee', 'force' => true
     end
     
     it "has values accessible by either strings or symbols" do
@@ -183,6 +183,12 @@ describe Thor::Options do
     
     it "is immutable" do
       lambda { @hash['foo'] = 'baz' }.must raise_error(TypeError)
+    end
+    
+    it "should handles magic boolean predicates" do
+      @hash.force?.must be_true
+      @hash.foo?.must be_true
+      @hash.nothing?.must be_false
     end
   end
   
