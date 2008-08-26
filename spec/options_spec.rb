@@ -41,8 +41,14 @@ describe Thor::Options do
   it "accepts a switch=<value> assignment" do
     create "--foo" => :required
     parse("--foo=12")["foo"].must == "12"
+    parse("-f=12")["foo"].must == "12"
     parse("--foo=bar=baz")["foo"].must == "bar=baz"
     parse("--foo=sentence with spaces")["foo"].must == "sentence with spaces"
+  end
+  
+  it "accepts a -nXY assignment" do
+    create "--num" => :required
+    parse("-n12")["num"].must == "12"
   end
 
   it "accepts conjoined short switches" do
@@ -177,6 +183,30 @@ describe Thor::Options do
     
     it "is immutable" do
       lambda { @hash['foo'] = 'baz' }.must raise_error(TypeError)
+    end
+  end
+  
+  describe ":numeric type" do
+    before(:each) do
+      create "n" => :numeric, "m" => 5
+    end
+    
+    it "supports numeric defaults" do
+      parse["m"].must == 5
+    end
+    
+    it "converts values to numeric types" do
+      parse("-n", "3", "-m", ".5").must == {"n" => 3, "m" => 0.5}
+    end
+    
+    it "raises error when value isn't numeric" do
+      lambda { parse("-n", "foo") }.must raise_error(Thor::Options::Error,
+        "expected numeric value for 'n'; got \"foo\"")
+    end
+    
+    it "raises error when switch is present without value" do
+      lambda { parse("-n") }.must raise_error(Thor::Options::Error,
+        "no value provided for argument 'n'")
     end
   end
 end

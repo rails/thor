@@ -27,10 +27,12 @@ class Thor
         end
     end
 
+    NUMERIC     = /(\d*\.\d+|\d+)/
     LONG_RE     = /^--(\w+[-\w+]*)$/
     SHORT_RE    = /^-(\w)$/
     EQ_RE       = /^(?:--(\w+[-\w+]*)|-(\w))=(.*)$/
-    SHORT_SQ_RE = /^-(\w{2,})$/ # Allow either -x -v or -xv style for single char args
+    SHORT_SQ_RE = /^-([a-zA-Z]{2,})$/ # Allow either -x -v or -xv style for single char args
+    SHORT_NUM   = /^-(\w)#{NUMERIC}$/
     
     attr_reader :leading_non_opts, :trailing_non_opts
     
@@ -77,6 +79,9 @@ class Thor
         when String
           @defaults[name] = type
           type = :optional
+        when Numeric
+          @defaults[name] = type
+          type = :numeric
         end
         
         mem[name] = type
@@ -106,21 +111,31 @@ class Thor
         when EQ_RE
           unshift $3
           switch = $1 || $2
+        when SHORT_NUM
+          unshift $2
+          switch = $1
         when LONG_RE, SHORT_RE
           switch = $1
         end
         
         switch = normalize_switch(switch)
+        type   = switch_type(switch)
         
-        case switch_type(switch)
+        case type
         when :required
-          raise Error, "no value provided for argument '#{switch}'" if peek.nil?
+          assert_value!(switch)
           raise Error, "cannot pass switch '#{peek}' as an argument" if valid?(peek, true)
           hash[switch] = shift
         when :optional
           hash[switch] = peek.nil? || valid?(peek, true) || shift
         when :boolean
           hash[switch] = true
+        when :numeric
+          assert_value!(switch)
+          unless peek =~ NUMERIC and $& == peek
+            raise Error, "expected numeric value for '#{switch}'; got #{peek.inspect}"
+          end
+          hash[switch] = $&.index('.') ? shift.to_f : shift.to_i
         end
       end
       
@@ -132,6 +147,10 @@ class Thor
     end
 
     private
+    
+    def assert_value!(switch)
+      raise Error, "no value provided for argument '#{switch}'" if peek.nil?
+    end
     
     def undash_leading(str)
       str.sub(/^-{1,2}/, '')
@@ -164,7 +183,7 @@ class Thor
 
     def current_is_option?
       case peek
-      when LONG_RE, SHORT_RE, EQ_RE
+      when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
         valid?($1 || $2)
       when SHORT_SQ_RE
         $1.split('').any? { |f| valid?(f) }
