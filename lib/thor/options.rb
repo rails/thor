@@ -5,12 +5,11 @@ class Thor
   class Options
     class Error < StandardError; end
     
-    # read-only Hash with indifferent access
+    # simple Hash with indifferent access
     class Hash < ::Hash
       def initialize(hash)
         super()
         update hash
-        freeze
       end
       
       def [](key)
@@ -102,7 +101,8 @@ class Thor
 
     def parse(args, skip_leading_non_opts = true)
       @args = args
-      hash = @defaults.dup
+      # start with Thor::Options::Hash pre-filled with defaults
+      hash = Hash.new @defaults
       
       @leading_non_opts = []
       if skip_leading_non_opts
@@ -148,8 +148,8 @@ class Thor
       @trailing_non_opts = @args
 
       check_required! hash
-      # convert to Thor::Options::Hash before returning
-      Hash.new(hash)
+      hash.freeze
+      hash
     end
 
     private

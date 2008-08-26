@@ -71,7 +71,15 @@ describe Thor::Options do
     create "--foo" => :optional
     parse("--foo", "12")[:foo].must == "12"
   end
-
+  
+  it "result is immutable" do
+    create "--foo" => :optional
+    lambda {
+      hash = parse
+      hash['foo'] = 'baz'
+    }.must raise_error(TypeError)
+  end
+  
   describe "with no arguments" do
     it "and no switches returns an empty hash" do
       create({})
@@ -179,10 +187,6 @@ describe Thor::Options do
       @hash['foo'].must == 'bar'
       @hash[:foo].must  == 'bar'
       @hash.values_at(:foo, :baz).must == ['bar', 'bee']
-    end
-    
-    it "is immutable" do
-      lambda { @hash['foo'] = 'baz' }.must raise_error(TypeError)
     end
     
     it "should handles magic boolean predicates" do
