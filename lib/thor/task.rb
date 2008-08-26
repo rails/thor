@@ -45,33 +45,23 @@ class Thor
       new.klass = klass
       new
     end
-
-    def formatted_opts
-      return "" if opts.nil?
-      opts.map do |opt, val|
-        if val == true || val == :boolean
-          "[#{opt}]"
-        elsif val == :required
-          opt + "=" + opt.gsub(/\-/, "").upcase
-        else
-          sample = val == :optional ? opt.gsub(/\-/, "").upcase : val
-          "[" + opt + "=" + sample + "]"
-        end
-      end.join(" ")
+    
+    def opts
+      return super unless super.kind_of? Hash
+      self.opts = Options.new(super)
     end
 
     def formatted_usage(namespace = false)
       (namespace ? self.namespace + ':' : '') + usage +
-        (opts ? " " + formatted_opts : "")
+        (opts ? " " + opts.formatted_usage : "")
     end
 
     protected
 
     def parse_args(args)
       return [args, {}] unless opts
-      options = Thor::Options.new(opts)
-      hash = options.parse(args)
-      list = options.non_opts
+      hash = opts.parse(args)
+      list = opts.non_opts
       [list, hash]
     end
   end

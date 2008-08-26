@@ -33,11 +33,11 @@ class Thor
     end
 
     NUMERIC     = /(\d*\.\d+|\d+)/
-    LONG_RE     = /^--(\w+[-\w+]*)$/
-    SHORT_RE    = /^-(\w)$/
-    EQ_RE       = /^(?:--(\w+[-\w+]*)|-(\w))=(.*)$/
-    SHORT_SQ_RE = /^-([a-zA-Z]{2,})$/ # Allow either -x -v or -xv style for single char args
-    SHORT_NUM   = /^-(\w)#{NUMERIC}$/
+    LONG_RE     = /^(--\w+[-\w+]*)$/
+    SHORT_RE    = /^(-[a-z])$/i
+    EQ_RE       = /^(--\w+[-\w+]*|-[a-z])=(.*)$/i
+    SHORT_SQ_RE = /^-([a-z]{2,})$/i # Allow either -x -v or -xv style for single char args
+    SHORT_NUM   = /^(-[a-z])#{NUMERIC}$/i
     
     attr_reader :leading_non_opts, :trailing_non_opts
     
@@ -69,23 +69,29 @@ class Thor
       @switches = switches.inject({}) do |mem, (name, type)|
         if name.is_a?(Array)
           name, *shorts = name
-          shorts = shorts.map { |short| undash_leading short }
         else
+          name = name.to_s
           shorts = []
         end
-        name = undash_leading name
+        # we need both nice and dasherized form of switch name
+        if name.index('-') == 0
+          nice_name = undasherize name
+        else
+          nice_name = name
+          name = dasherize name
+        end
         # if there are no shortcuts specified, generate one using the first character
-        shorts << name[0,1] if shorts.empty? and name.length > 1
+        shorts << "-" + nice_name[0,1] if shorts.empty? and nice_name.length > 1
         shorts.each { |short| @shorts[short] = name }
         
         # normalize type
         case type
         when TrueClass then type = :boolean
         when String
-          @defaults[name] = type
+          @defaults[nice_name] = type
           type = :optional
         when Numeric
-          @defaults[name] = type
+          @defaults[nice_name] = type
           type = :numeric
         end
         
@@ -93,7 +99,7 @@ class Thor
         mem
       end
       
-      # remove shortcuts that happen to coincide with one of the main switches
+      # remove shortcuts that happen to coincide with any of the main switches
       @shorts.keys.each do |short|
         @shorts.delete(short) if @switches.key?(short)
       end
@@ -114,34 +120,32 @@ class Thor
         when SHORT_SQ_RE
           unshift $1.split('').map { |f| "-#{f}" }
           next
-        when EQ_RE
-          unshift $3
-          switch = $1 || $2
-        when SHORT_NUM
+        when EQ_RE, SHORT_NUM
           unshift $2
           switch = $1
         when LONG_RE, SHORT_RE
           switch = $1
         end
         
-        switch = normalize_switch(switch)
-        type   = switch_type(switch)
+        switch    = normalize_switch(switch)
+        nice_name = undasherize(switch)
+        type      = switch_type(switch)
         
         case type
         when :required
           assert_value!(switch)
-          raise Error, "cannot pass switch '#{peek}' as an argument" if valid?(peek, true)
-          hash[switch] = shift
+          raise Error, "cannot pass switch '#{peek}' as an argument" if valid?(peek)
+          hash[nice_name] = shift
         when :optional
-          hash[switch] = peek.nil? || valid?(peek, true) || shift
+          hash[nice_name] = peek.nil? || valid?(peek) || shift
         when :boolean
-          hash[switch] = true
+          hash[nice_name] = true
         when :numeric
           assert_value!(switch)
           unless peek =~ NUMERIC and $& == peek
             raise Error, "expected numeric value for '#{switch}'; got #{peek.inspect}"
           end
-          hash[switch] = $&.index('.') ? shift.to_f : shift.to_i
+          hash[nice_name] = $&.index('.') ? shift.to_f : shift.to_i
         end
       end
       
@@ -151,6 +155,25 @@ class Thor
       hash.freeze
       hash
     end
+    
+    def formatted_usage
+      return "" if @switches.empty?
+      @switches.map do |opt, type|
+        case type
+        when :boolean
+          "[#{opt}]"
+        when :required
+          opt + "=" + opt.gsub(/\-/, "").upcase
+        else
+          sample = @defaults[undasherize opt]
+          sample ||= case type
+            when :optional then opt.gsub(/\-/, "").upcase
+            when :numeric  then "N"
+            end
+          "[" + opt + "=" + sample + "]"
+        end
+      end.join(" ")
+    end
 
     private
     
@@ -158,8 +181,12 @@ class Thor
       raise Error, "no value provided for argument '#{switch}'" if peek.nil?
     end
     
-    def undash_leading(str)
+    def undasherize(str)
       str.sub(/^-{1,2}/, '')
+    end
+    
+    def dasherize(str)
+      (str.length > 1 ? "--" : "-") + str
     end
     
     def peek
@@ -178,21 +205,16 @@ class Thor
       end
     end
     
-    def valid?(arg, raw = false)
-      raise ArgumentError, "string expected, #{arg.inspect} given" unless arg
-      if raw
-        return false unless LONG_RE =~ arg || SHORT_RE =~ arg
-        arg = $1
-      end
+    def valid?(arg)
       @switches.key?(arg) or @shorts.key?(arg)
     end
 
     def current_is_option?
       case peek
       when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
-        valid?($1 || $2)
+        valid?($1)
       when SHORT_SQ_RE
-        $1.split('').any? { |f| valid?(f) }
+        $1.split('').any? { |f| valid?("-#{f}") }
       end
     end
     
@@ -206,7 +228,7 @@ class Thor
     
     def check_required!(hash)
       for name, type in @switches
-        if type == :required and !hash[name]
+        if type == :required and !hash[undasherize name]
           raise Error, "no value provided for required argument '#{name}'"
         end
       end

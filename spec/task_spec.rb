@@ -2,19 +2,10 @@ require File.dirname(__FILE__) + '/spec_helper'
 require "thor"
 require "thor/task"
 
-describe "thor task" do
-  describe "#formatted_opts" do
-    def create(opts)
-      @task = Thor::Task.new(nil, nil, nil, opts, nil)
-    end
-    
-    def result
-      @task.formatted_opts
-    end
-    
-    it "formats optional args with sample values" do
-      create "--repo" => :optional, "--branch" => "bugfix"
-      result.must == "[--repo=REPO] [--branch=bugfix]"
-    end
+describe Thor::Task do
+  it "#formatted_usage" do
+    opts = { 'foo' => true, :bar => :required }
+    @task = Thor::Task.new(nil, "I can has cheezburger", "can_has", opts, nil)
+    @task.formatted_usage.must == "can_has [--foo] --bar=BAR"
   end
 end

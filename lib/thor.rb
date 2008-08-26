@@ -23,9 +23,7 @@ class Thor
   end
   
   def self.method_options(opts)
-    @method_options = opts.inject({}) do |accum, (k,v)|
-      accum.merge("--" + k.to_s => v)
-    end
+    @method_options = opts
   end
 
   def self.subclass_files
@@ -55,7 +53,7 @@ class Thor
     @maxima ||= begin
       max_usage = tasks.map {|_, t| t.usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
       max_desc  = tasks.map {|_, t| t.description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
-      max_opts  = tasks.map {|_, t| t.formatted_opts}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
+      max_opts  = tasks.map {|_, t| t.opts ? t.opts.formatted_usage : ""}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
       Struct.new(:description, :usage, :opt).new(max_desc, max_usage, max_opts)
     end
   end

@@ -93,7 +93,7 @@ describe Thor::Options do
 
     it "and a required switch raises an error for #getopts" do
       create "--foo" => :required
-      lambda { parse }.must raise_error(Thor::Options::Error, "no value provided for required argument 'foo'")
+      lambda { parse }.must raise_error(Thor::Options::Error, "no value provided for required argument '--foo'")
     end
   end
 
@@ -211,12 +211,23 @@ describe Thor::Options do
     
     it "raises error when value isn't numeric" do
       lambda { parse("-n", "foo") }.must raise_error(Thor::Options::Error,
-        "expected numeric value for 'n'; got \"foo\"")
+        "expected numeric value for '-n'; got \"foo\"")
     end
     
     it "raises error when switch is present without value" do
       lambda { parse("-n") }.must raise_error(Thor::Options::Error,
-        "no value provided for argument 'n'")
+        "no value provided for argument '-n'")
+    end
+  end
+  
+  describe "#formatted_usage" do
+    def usage
+      @opt.formatted_usage
+    end
+    
+    it "formats optional args with sample values" do
+      create "--repo" => :optional, "--branch" => "bugfix"
+      usage.must == "[--repo=REPO] [--branch=bugfix]"
     end
   end
 end
