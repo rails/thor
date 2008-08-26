@@ -170,7 +170,7 @@ class Thor
             when :optional then opt.gsub(/\-/, "").upcase
             when :numeric  then "N"
             end
-          "[" + opt + "=" + sample + "]"
+          "[" + opt + "=" + sample.to_s + "]"
         end
       end.join(" ")
     end
