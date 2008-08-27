@@ -165,7 +165,7 @@ class Thor
         when :required
           opt + "=" + opt.gsub(/\-/, "").upcase
         else
-          sample = @defaults[undasherize opt]
+          sample = @defaults[undasherize(opt)]
           sample ||= case type
             when :optional then opt.gsub(/\-/, "").upcase
             when :numeric  then "N"
@@ -228,7 +228,7 @@ class Thor
     
     def check_required!(hash)
       for name, type in @switches
-        if type == :required and !hash[undasherize name]
+        if type == :required and !hash[undasherize(name)]
           raise Error, "no value provided for required argument '#{name}'"
         end
       end
