@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.description = %q{A gem that maps options to a class}
   s.email = %q{wycats@gmail.com}
   s.executables = ["thor", "rake2thor"]
-  s.extra_rdoc_files = ["README.markdown", "LICENSE", "CHANGELOG.rdoc"]
+  s.extra_rdoc_files = ["README.markdown", "CHANGELOG.rdoc", "LICENSE"]
   s.files = ["README.markdown", "LICENSE", "CHANGELOG.rdoc", "Rakefile", "bin/rake2thor", "bin/thor", "lib/thor", "lib/thor/error.rb", "lib/thor/options.rb", "lib/thor/ordered_hash.rb", "lib/thor/runner.rb", "lib/thor/task.rb", "lib/thor/task_hash.rb", "lib/thor/tasks", "lib/thor/tasks/package.rb", "lib/thor/tasks.rb", "lib/thor/util.rb", "lib/thor.rb"]
   s.has_rdoc = true
   s.homepage = %q{http://yehudakatz.com}
