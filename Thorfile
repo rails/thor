@@ -3,7 +3,7 @@ require 'rubygems/specification'
 require 'thor/tasks'
 
 GEM = "thor"
-GEM_VERSION = "0.9.4"
+GEM_VERSION = "0.9.5"
 AUTHOR = "Yehuda Katz"
 EMAIL = "wycats@gmail.com"
 HOMEPAGE = "http://yehudakatz.com"
@@ -15,7 +15,7 @@ SPEC = Gem::Specification.new do |s|
   s.version = GEM_VERSION
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
-  s.extra_rdoc_files = ["README.markdown", "LICENSE"]
+  s.extra_rdoc_files = ["README.markdown", "LICENSE", "CHANGELOG.rdoc"]
   s.summary = SUMMARY
   s.description = s.summary
   s.author = AUTHOR
@@ -26,7 +26,7 @@ SPEC = Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.bindir = "bin"
   s.executables = %w( thor rake2thor )
-  s.files = %w(LICENSE README.markdown Rakefile) + Dir.glob("{bin,lib,specs}/**/*")
+  s.files = s.extra_rdoc_files + %w(Rakefile) + Dir.glob("{bin,lib,specs}/**/*")
 end
 
 class Default < Thor
@@ -36,8 +36,8 @@ class Default < Thor
     {:exclude => %w(spec /Library /Users task.thor lib/getopt.rb)})
   install_task SPEC
   
-  desc "make_spec", "make a gemspec file"
-  def make_spec
+  desc "gemspec", "make a gemspec file"
+  def gemspec
     File.open("#{GEM}.gemspec", "w") do |file|
       file.puts SPEC.to_ruby
     end    

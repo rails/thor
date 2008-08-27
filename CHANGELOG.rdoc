@@ -1,5 +1,13 @@
-== master
+== TODO
 
+* Change Thor.start to parse ARGV in a single pass
+* Improve spec coverage for Thor::Runner
+* Improve help output to list shorthand switches, too
+* Investigate and fix deep namespacing ("foo:bar:baz") issues
+
+== 0.9.5, released 2008-08-27
+
+* Improve Windows compatibility
 * Update (incorrect) README and task.thor sample file
 * Options hash is now frozen (once returned)
 * Allow magic predicates on options object. For instance: `options.force?`
@@ -12,6 +20,7 @@
 == 0.9.4, released 2008-08-13
 
 * Try to add Windows compatibility.
+* BACKWARDS INCOMPATIBLE: options hash is now accessed as a property in your class and is not passed as last argument anymore
 * Allow options at the beginning of the argument list as well as the end.
 * Make options available with symbol keys in addition to string keys.
 * Allow true to be passed to Thor#method_options to denote a boolean option.

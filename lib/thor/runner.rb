@@ -246,7 +246,7 @@ class Thor::Runner < Thor
 
     # We want to load system-wide Thorfiles first
     # so the local Thorfiles will override them.
-    (relevant_to ? thorfiles_relevant_to(relevant_to) :
+    relevant_to ? thorfiles_relevant_to(relevant_to) :
      thor_root_glob + thorfiles - ["#{thor_root}/thor.yml"]
   end
 
