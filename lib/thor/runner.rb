@@ -176,7 +176,7 @@ class Thor::Runner < Thor
     raise Error, "No Thor tasks available" if klasses.empty?
     
     if with_modules && !(yaml = thor_yaml).empty?
-      max_name = yaml.max {|(xk,xv),(yk,yv)| xk.size <=> yk.size }.first.size
+      max_name = yaml.max {|(xk,xv),(yk,yv)| xk.to_s.size <=> yk.to_s.size }.first.size
       modules_label = "Modules"
       namespaces_label = "Namespaces"
       column_width = [max_name + 4, modules_label.size + 1].max

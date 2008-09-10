@@ -1,5 +1,19 @@
 require 'thor/error'
 
+module ObjectSpace
+  
+  class << self
+
+    # @return <Array[Class]> All the classes in the object space.
+    def classes
+      klasses = []
+      ObjectSpace.each_object(Class) {|o| klasses << o}
+      klasses
+    end
+  end
+  
+end
+
 class Thor
   module Util
     
@@ -22,11 +36,9 @@ class Thor
     end
 
     def self.constants_in_contents(str)
-      klasses = self.constants.dup
-      eval(str)
-      ret = self.constants - klasses
-      ret.each {|k| self.send(:remove_const, k)}
-      ret
+      klasses = ObjectSpace.classes.dup
+      Module.new.class_eval(str)
+      (ObjectSpace.classes - klasses).map {|k| k.to_s.gsub(/#<Module:\w+>::/, '')}
     end
 
     def self.make_constant(str)
