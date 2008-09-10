@@ -38,7 +38,9 @@ class Thor
     def self.constants_in_contents(str)
       klasses = ObjectSpace.classes.dup
       Module.new.class_eval(str)
-      (ObjectSpace.classes - klasses).map {|k| k.to_s.gsub(/#<Module:\w+>::/, '')}
+      klasses = ObjectSpace.classes - klasses
+      klasses = klasses.select {|k| k < Thor }
+      klasses.map! {|k| k.to_s.gsub(/#<Module:\w+>::/, '')}
     end
 
     def self.make_constant(str)

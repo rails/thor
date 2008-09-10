@@ -86,8 +86,9 @@ describe Thor::Util do
 
   describe ".constants_in_contents" do
     it "returns an array of names of constants defined in the string" do
-      list = Thor::Util.constants_in_contents("class Baz; class Bat; end; end")
-      list.must include("Baz::Bat")
+      list = Thor::Util.constants_in_contents("class Foo; class Bar < Thor; end; end; class Baz; class Bat; end; end")
+      list.must include("Foo::Bar")
+      list.must_not include("Baz::Bat")
     end
 
     it "doesn't put the newly-defined constants in the enclosing namespace" do
