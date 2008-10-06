@@ -167,7 +167,7 @@ class Thor
         else
           sample = @defaults[undasherize(opt)]
           sample ||= case type
-            when :optional then opt.gsub(/\-/, "").upcase
+            when :optional then undasherize(opt).gsub(/\-/, "_").upcase
             when :numeric  then "N"
             end
           "[" + opt + "=" + sample.to_s + "]"

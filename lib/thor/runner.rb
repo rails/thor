@@ -113,14 +113,20 @@ class Thor::Runner < Thor
   end
   
   desc "list [SEARCH]", "list the available thor tasks (--substring means SEARCH can be anywhere in the module)"
-  method_options :substring => :boolean
+  method_options :substring => :boolean,
+                 :group => :optional,
+                 :all => :boolean
   def list(search = "")
     initialize_thorfiles
     search = ".*#{search}" if options["substring"]
     search = /^#{search}.*/i
+    group  = options[:group] || 'standard'
     
-    display_klasses(false, Thor.subclasses.select {|k| 
-      Thor::Util.constant_to_thor_path(k.name) =~ search})
+    classes = Thor.subclasses.select do |k| 
+      (options[:all] || k.group_name == group) && 
+      Thor::Util.constant_to_thor_path(k.name) =~ search
+    end
+    display_klasses(false, classes)
   end
 
   # Override Thor#help so we can give info about not-yet-loaded tasks

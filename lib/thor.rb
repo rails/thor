@@ -22,6 +22,14 @@ class Thor
     @usage, @desc = usage, description
   end
   
+  def self.group(name)
+    @group_name = name.to_s
+  end
+  
+  def self.group_name
+    @group_name || 'standard'
+  end
+  
   def self.method_options(opts)
     @method_options = opts
   end

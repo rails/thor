@@ -16,6 +16,16 @@ module MyTasks
       Object.new.raise_no_method_error_please
     end
   end
+  
+  class AdvancedTask < Thor
+    
+    group :advanced
+    
+    desc "zoo", "zip"
+    def zoo
+      "zip"
+    end
+  end  
 end
 
 class Default < Thor
@@ -47,7 +57,7 @@ end
 
 describe Thor do
   it "tracks its subclasses, grouped by the files they come from" do
-    Thor.subclass_files[File.expand_path(__FILE__)].must == [MyTasks::ThorTask, Default, Amazing, ThorTask2]
+    Thor.subclass_files[File.expand_path(__FILE__)].must == [MyTasks::ThorTask, MyTasks::AdvancedTask, Default, Amazing, ThorTask2]
   end
 
   it "tracks a single subclass across multiple files" do
@@ -67,8 +77,22 @@ describe Thor::Runner do
     ARGV.replace ["list"]
     capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
   end
+  
+  it "can filter a list of the available tasks by --group" do
+    ARGV.replace ["list", "--group", "standard"]
+    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
+    capture(:stdout) { Thor::Runner.start }.must_not =~ /my_tasks:advanced_task:zoo +zip/
+    ARGV.replace ["list", "--group", "advanced"]
+    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:advanced_task:zoo +zip/
+  end
+  
+  it "can skip all filters to show all tasks using --all" do
+    ARGV.replace ["list", "--all"]
+    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
+    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:advanced_task:zoo +zip/
+  end
 
-  it "dosn't list superclass tasks in the subclass" do
+  it "doesn't list superclass tasks in the subclass" do
     ARGV.replace ["list"]
     capture(:stdout) { Thor::Runner.start }.must_not =~ /my_tasks:thor_task:help/
   end
