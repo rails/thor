@@ -88,7 +88,7 @@ class Thor
 
     def method_added(meth)
       meth = meth.to_s
-
+      
       if meth == "initialize"
         @opts = @method_options
         @method_options = nil
@@ -98,7 +98,8 @@ class Thor
       return if !public_instance_methods.include?(meth) || !@usage
       register_klass_file self
 
-      tasks[meth] = Task.new(meth, @desc, @usage, @method_options)
+      task_options = @method_options ? self.opts.merge(@method_options || {}) : nil
+      tasks[meth] = Task.new(meth, @desc, @usage, task_options)
 
       @usage, @desc, @method_options = nil
     end

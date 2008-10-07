@@ -58,6 +58,21 @@ END
   end
 end
 
+class GlobalOptionsTasks < Thor
+
+  method_options :force => :boolean, :param => :optional
+  def initialize(opts, *args)
+    super
+  end
+  
+  desc "animal TYPE", "horse around"
+  method_options :other => :optional
+  def animal(type)
+    [type, options]
+  end
+  
+end
+
 describe "thor" do
   it "calls a no-param method when no params are passed" do
     MyApp.start(["zoo"]).must == true
@@ -108,6 +123,14 @@ describe "thor" do
     MyApp.start(["unk", "hello"]).must == [:unk, ["hello"]]
   end
   
+  it "allows global options to be set on the initialize method" do
+    args = ["animal", "bird", "--force", "--param", "feathers", "--other", "tweets"]
+    arg, options = GlobalOptionsTasks.start(args)
+    arg.must == 'bird'
+    options.must == { "force"=>true, "param"=>"feathers", "other"=>"tweets" }
+    GlobalOptionsTasks.opts.must == { :force=>:boolean, :param=>:optional }
+  end
+  
   it "does not call a private method no matter what" do
     lambda { MyApp.start(["what"]) }.must raise_error(NoMethodError, "the `what' task of MyApp is private")
   end
@@ -152,4 +175,5 @@ END
   it "raises when an exception happens within the task call" do
     lambda { MyApp.start(["call_myself_with_wrong_arity"]) }.must raise_error
   end
+  
 end
