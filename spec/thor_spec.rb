@@ -61,7 +61,7 @@ end
 class GlobalOptionsTasks < Thor
 
   method_options :force => :boolean, :param => :optional
-  def initialize(opts, *args)
+  def initialize(*args)
     super
   end
   
