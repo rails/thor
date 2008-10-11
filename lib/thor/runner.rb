@@ -222,9 +222,15 @@ class Thor::Runner < Thor
   
   def display_tasks(klass, max_base, max_left)
     if klass.tasks.values.length > 1
+      
       base = Thor::Util.constant_to_thor_path(klass.name)
       
-      puts "\033[1;34m#{base}\033[0m"
+      if base.to_a.empty?
+        base = 'default' 
+        puts "\033[1;35m#{base}\033[0m"
+      else
+        puts "\033[1;34m#{base}\033[0m"
+      end
       puts "-" * base.length
       
       klass.tasks.each true do |name, task|
