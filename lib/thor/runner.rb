@@ -227,15 +227,16 @@ class Thor::Runner < Thor
       puts "\033[1;34m#{base}\033[0m"
       puts "-" * base.length
       
-      unless klass.opts.empty?
-        puts "global options: #{Options.new(klass.opts)}\n\n"
-      end      
-      
       klass.tasks.each true do |name, task|
         format_string = "%-#{max_left + max_base + 5}s"
         print format_string % task.formatted_usage(true)
         puts task.description
       end
+      
+      unless klass.opts.empty?
+        puts "\nglobal options: #{Options.new(klass.opts)}"
+      end
+      
       puts # add some spacing
     end
   end
