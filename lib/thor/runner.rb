@@ -200,9 +200,6 @@ class Thor::Runner < Thor
       puts
     end
     
-    puts "Tasks"
-    puts "-----"
-    
     # Calculate the largest base class name
     max_base = klasses.max do |x,y| 
       Thor::Util.constant_to_thor_path(x.name).size <=> Thor::Util.constant_to_thor_path(y.name).size
@@ -214,16 +211,32 @@ class Thor::Runner < Thor
     end
     
     max_left = max_left_item.maxima.usage + max_left_item.maxima.opt
-        
-    klasses.each {|k| display_tasks(k, max_base, max_left)}
+    
+    unless klasses.empty?
+      puts # add some spacing
+      klasses.each { |k| display_tasks(k, max_base, max_left); }
+    else
+      puts "\033[1;34mNo Thor tasks available\033[0m"
+    end
   end  
   
   def display_tasks(klass, max_base, max_left)
-    base = Thor::Util.constant_to_thor_path(klass.name)
-    klass.tasks.each true do |name, task|
-      format_string = "%-#{max_left + max_base + 5}s"
-      print format_string % task.formatted_usage(true)
-      puts task.description
+    if klass.tasks.values.length > 1
+      base = Thor::Util.constant_to_thor_path(klass.name)
+      
+      puts "\033[1;34m#{base}\033[0m"
+      puts "-" * base.length
+      
+      unless klass.opts.empty?
+        puts "global options: #{Options.new(klass.opts)}\n\n"
+      end      
+      
+      klass.tasks.each true do |name, task|
+        format_string = "%-#{max_left + max_base + 5}s"
+        print format_string % task.formatted_usage(true)
+        puts task.description
+      end
+      puts # add some spacing
     end
   end
 

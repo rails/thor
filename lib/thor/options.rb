@@ -176,6 +176,8 @@ class Thor
         end
       end.join(" ")
     end
+    
+    alias :to_s :formatted_usage
 
     private
     
