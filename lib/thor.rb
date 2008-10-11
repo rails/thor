@@ -98,12 +98,7 @@ class Thor
       return if !public_instance_methods.include?(meth) || !@usage
       register_klass_file self
 
-      if !self.opts.empty? || @method_options
-        task_options = self.opts.merge(@method_options || {})
-      else
-        task_options = nil
-      end
-      tasks[meth] = Task.new(meth, @desc, @usage, task_options)
+      tasks[meth] = Task.new(meth, @desc, @usage, @method_options)
 
       @usage, @desc, @method_options = nil
     end

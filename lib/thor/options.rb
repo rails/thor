@@ -65,6 +65,8 @@ class Thor
     def initialize(switches)
       @defaults = {}
       @shorts = {}
+      
+      @leading_non_opts, @trailing_non_opts = [], []
 
       @switches = switches.inject({}) do |mem, (name, type)|
         if name.is_a?(Array)

@@ -3,8 +3,15 @@ require 'thor/util'
 
 class Thor
   class Task < Struct.new(:meth, :description, :usage, :opts, :klass)
+    
     def self.dynamic(meth, klass)
       new(meth, "A dynamically-generated task", meth.to_s, nil, klass)
+    end
+    
+    def initialize(*args)
+      # keep the original opts - we need them later on
+      @options = args[3] || {}
+      super
     end
 
     def parse(obj, args)
@@ -48,7 +55,15 @@ class Thor
     
     def opts
       return super unless super.kind_of? Hash
-      self.opts = Options.new(super)
+      @_opts ||= Options.new(super)
+    end
+        
+    def full_opts
+      @_full_opts ||= Options.new((klass.opts || {}).merge(@options))
+    end
+    
+    def options?
+      @options && !@options.empty?
     end
 
     def formatted_usage(namespace = false)
@@ -59,9 +74,9 @@ class Thor
     protected
 
     def parse_args(args)
-      return [args, {}] unless opts
-      hash = opts.parse(args)
-      list = opts.non_opts
+      return [args, {}] unless options?
+      hash = full_opts.parse(args)
+      list = full_opts.non_opts
       [list, hash]
     end
   end
