@@ -92,7 +92,7 @@ class Thor::Runner < Thor
 
     puts "Updating `#{name}' from #{yaml[name][:location]}"
     old_filename = yaml[name][:filename]
-    options["as"] = name
+    self.options = self.options.merge("as" => name)
     filename = install(yaml[name][:location])
     unless filename == old_filename
       File.delete(File.join(thor_root, old_filename))

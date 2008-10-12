@@ -63,7 +63,7 @@ class Thor
     end
     
     def options?
-      @options && !@options.empty?
+      @options.kind_of?(Hash)
     end
 
     def formatted_usage(namespace = false)
