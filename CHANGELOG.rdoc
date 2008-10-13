@@ -5,6 +5,19 @@
 * Improve help output to list shorthand switches, too
 * Investigate and fix deep namespacing ("foo:bar:baz") issues
 
+== 0.9.7, released 2008-10-13
+
+* Setting global method options on the initialize method works as expected:
+  All other tasks will accept these global options in addition to their own.
+* Added 'group' notion to Thor task sets (class Thor); by default all tasks
+  are in the 'standard' group. Running 'thor -T' will only show the standard
+  tasks - adding --all will show all tasks. You can also filter on a specific
+  group using the --group option: thor -T --group advanced
+  
+== 0.9.6, released 2008-09-13
+
+* Generic improvements
+
 == 0.9.5, released 2008-08-27
 
 * Improve Windows compatibility
