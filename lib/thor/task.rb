@@ -63,7 +63,7 @@ class Thor
     end
     
     def options?
-      @options.kind_of?(Hash)
+      @options.kind_of?(Hash) && !@options.empty?
     end
 
     def formatted_usage(namespace = false)
@@ -74,6 +74,7 @@ class Thor
     protected
 
     def parse_args(args)
+      return [[], {}] if args.nil?
       return [args, {}] unless options?
       hash = full_opts.parse(args)
       list = full_opts.non_opts
