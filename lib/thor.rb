@@ -127,7 +127,7 @@ class Thor
       @usage, @desc, @method_options = nil
     end
 
-    def register_klass_file(klass, file = caller[1].split(":")[0])
+    def register_klass_file(klass, file = caller[1].match(/(.*):\d+/)[1])
       unless self == Thor
         superclass.register_klass_file(klass, file)
         return
