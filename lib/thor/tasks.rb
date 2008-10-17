@@ -14,8 +14,8 @@ class Thor
   def self.install_task(spec)
     package_task spec
 
-    null, sudo, gem = RUBY_PLATFORM =~ /w(in)?32$/ ? ['NUL', '', 'gem.bat'] :
-                                                     ['/dev/null', 'sudo', 'gem']
+    null, sudo, gem = RUBY_PLATFORM =~ /mswin|mingw/ ? ['NUL', '', 'gem.bat'] :
+                                                       ['/dev/null', 'sudo', 'gem']
     
     desc "install", "install the gem"
     define_method :install do
