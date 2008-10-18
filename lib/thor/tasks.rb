@@ -43,11 +43,12 @@ class Thor
     
     desc(name, "spec task")
     define_method(name) do
-      cmd = "ruby "
+      require 'rbconfig'
+      cmd = RbConfig::CONFIG['ruby_install_name'] << " "
       if rcov
-        cmd << "-S rcov -o #{rcov_dir} #{rcov_opts} "
+        cmd << "-S #{where('rcov')} -o #{rcov_dir} #{rcov_opts} "
       end
-      cmd << `which spec`.chomp
+      cmd << where('spec')
       cmd << " -- " if rcov
       cmd << " "
       cmd << file_list
@@ -73,5 +74,13 @@ class Thor
         "--#{key} #{value.inspect}"
       end
     end.join(" ")    
-  end  
+  end
+
+  def where(file)
+    ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+      file_with_path = File.join(path, file)
+      next unless File.exist?(file_with_path) && File.executable?(file_with_path)
+      return File.expand_path(file_with_path)
+    end
+  end
 end
