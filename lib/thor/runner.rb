@@ -156,7 +156,23 @@ class Thor::Runner < Thor
   end
 
   def self.thor_root
-    File.join(ENV["HOME"] || ENV["APPDATA"], ".thor")
+    return File.join(ENV["HOME"], '.thor') if ENV["HOME"]
+
+    if ENV["HOMEDRIVE"] && ENV["HOMEPATH"] then
+      return File.join(ENV["HOMEDRIVE"], ENV["HOMEPATH"], '.thor')
+    end
+    
+    return File.join(ENV["APPDATA"], '.thor') if ENV["APPDATA"]
+
+    begin
+      File.expand_path("~")
+    rescue
+      if File::ALT_SEPARATOR then
+        "C:/"
+      else
+        "/"
+      end
+    end
   end
 
   def self.thor_root_glob
