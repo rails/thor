@@ -62,10 +62,6 @@ class Thor
       @_full_opts ||= Options.new((klass.opts || {}).merge(@options))
     end
     
-    def options?
-      @options.kind_of?(Hash) && !@options.empty?
-    end
-
     def formatted_usage(namespace = false)
       (namespace ? self.namespace + ':' : '') + usage +
         (opts ? " " + opts.formatted_usage : "")
@@ -75,7 +71,6 @@ class Thor
 
     def parse_args(args)
       return [[], {}] if args.nil?
-      return [args, {}] unless options?
       hash = full_opts.parse(args)
       list = full_opts.non_opts
       [list, hash]

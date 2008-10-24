@@ -5,6 +5,10 @@
 * Improve help output to list shorthand switches, too
 * Investigate and fix deep namespacing ("foo:bar:baz") issues
 
+== 0.9.8, released 2008-10-20
+
+* Fixed some tiny issues that were introduced lately.
+
 == 0.9.7, released 2008-10-13
 
 * Setting global method options on the initialize method works as expected:

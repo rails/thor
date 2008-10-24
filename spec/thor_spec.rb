@@ -71,6 +71,11 @@ class GlobalOptionsTasks < Thor
     [type, options]
   end
   
+  desc "zoo", "zoo around"
+  def zoo
+    options
+  end
+  
 end
 
 describe "thor" do
@@ -123,7 +128,13 @@ describe "thor" do
     MyApp.start(["unk", "hello"]).must == [:unk, ["hello"]]
   end
   
-  it "allows global options to be set on the initialize method" do
+  it "allows global options to be set" do
+    args = ["zoo", "--force", "--param", "feathers"]
+    options = GlobalOptionsTasks.start(args)
+    options.must == { "force"=>true, "param"=>"feathers" }
+  end
+  
+  it "allows global options to be merged with method options" do
     args = ["animal", "bird", "--force", "--param", "feathers", "--other", "tweets"]
     arg, options = GlobalOptionsTasks.start(args)
     arg.must == 'bird'
