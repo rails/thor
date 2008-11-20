@@ -298,7 +298,7 @@ class Thor::Runner < Thor
     while thorfiles.empty?
       thorfiles = Thor::Runner.globs_for(path).map {|g| Dir[g]}.flatten
       path = File.dirname(path)
-      break if path == "/"
+      break if is_root? path
     end
 
     # We want to load system-wide Thorfiles first
@@ -316,6 +316,10 @@ class Thor::Runner < Thor
     thor_yaml.select do |k, v|
       v[:constants] && v[:constants].include?(klass_str)
     end.map { |k, v| File.join(thor_root, "#{v[:filename]}") }
+  end
+
+  def is_root?(path)
+    path == "/" || path =~ /^[A-Z]:[\/\\]$/i
   end
 
 end
