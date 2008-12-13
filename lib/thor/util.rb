@@ -49,9 +49,9 @@ class Thor
       str.gsub(/:(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
     end
 
-    def self.constants_in_contents(str)
+    def self.constants_in_contents(str, file = __FILE__)
       klasses = ObjectSpace.classes.dup
-      Module.new.class_eval(str)
+      Module.new.class_eval(str, file)
       klasses = ObjectSpace.classes - klasses
       klasses = klasses.select {|k| k < Thor }
       klasses.map! {|k| k.to_s.gsub(/#<Module:\w+>::/, '')}

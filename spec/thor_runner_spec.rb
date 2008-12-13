@@ -28,10 +28,12 @@ module MyTasks
   end  
 end
 
-class Default < Thor
-  desc "test", "prints 'test'"
-  def test
-    puts "test"
+module Thor::Tasks
+  class Default < Thor
+    desc "test", "prints 'test'"
+    def test
+      puts "test"
+    end
   end
 end
 
@@ -57,7 +59,7 @@ end
 
 describe Thor do
   it "tracks its subclasses, grouped by the files they come from" do
-    Thor.subclass_files[File.expand_path(__FILE__)].must == [MyTasks::ThorTask, MyTasks::AdvancedTask, Default, Amazing, ThorTask2]
+    Thor.subclass_files[File.expand_path(__FILE__)].must == [MyTasks::ThorTask, MyTasks::AdvancedTask, Thor::Tasks::Default, Amazing, ThorTask2]
   end
 
   it "tracks a single subclass across multiple files" do

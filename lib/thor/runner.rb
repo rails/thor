@@ -18,8 +18,17 @@ class Thor::Runner < Thor
   method_options :as => :optional, :relative => :boolean
   def install(name)
     initialize_thorfiles
+
+    base = name
+    package = :file
+
     begin
-      contents = open(name).read
+      if File.directory?(File.expand_path(name))
+        base, package = File.join(name, "main.thor"), :directory
+        contents = open(base).read
+      else
+        contents = open(name).read
+      end
     rescue OpenURI::HTTPError
       raise Error, "Error opening URI `#{name}'"
     rescue Errno::ENOENT
@@ -35,9 +44,7 @@ class Thor::Runner < Thor
     
     return false unless response =~ /^\s*y/i
     
-    constants = Thor::Util.constants_in_contents(contents)
-    
-    # name = name =~ /\.thor$/ || is_uri ? name : "#{name}.thor"
+    constants = Thor::Util.constants_in_contents(contents, base)
     
     as = options["as"] || begin
       first_line = contents.split("\n")[0]
@@ -63,8 +70,12 @@ class Thor::Runner < Thor
     
     puts "Storing thor file in your system repository"
     
-    File.open(File.join(thor_root, yaml[as][:filename]), "w") do |file|
-      file.puts "class Thor\n  module Tasks\n#{contents}\n  end\nend"
+    destination = File.join(thor_root, yaml[as][:filename])
+    
+    if package == :file
+      File.open(destination, "w") {|f| f.puts contents }
+    else
+      FileUtils.cp_r(name, destination)
     end
     
     yaml[as][:filename] # Indicate sucess
@@ -78,7 +89,7 @@ class Thor::Runner < Thor
     puts "Uninstalling #{name}."
     
     file = File.join(thor_root, "#{yaml[name][:filename]}")
-    File.delete(file)
+    FileUtils.rm_rf(file)
     yaml.delete(name)
     save_yaml(yaml)
     
@@ -154,7 +165,7 @@ class Thor::Runner < Thor
     #   C:\Documents and Settings\james\.thor
     #
     # If we don't #gsub the \ character, Dir.glob will fail.
-    Dir["#{thor_root.gsub(/\\/, '/')}/**/*"]
+    Dir["#{thor_root.gsub(/\\/, '/')}/*"]
   end
   
   private
@@ -252,8 +263,9 @@ class Thor::Runner < Thor
   end
   
   def load_thorfile(path)
+    txt = File.read(path)
     begin
-      load path
+      Thor::Tasks.class_eval txt, path
     rescue Object => e
       $stderr.puts "WARNING: unable to load thorfile #{path.inspect}: #{e.message}"
     end
@@ -272,8 +284,12 @@ class Thor::Runner < Thor
 
     # We want to load system-wide Thorfiles first
     # so the local Thorfiles will override them.
-    (relevant_to ? thorfiles_relevant_to(relevant_to) :
+    files = (relevant_to ? thorfiles_relevant_to(relevant_to) :
      thor_root_glob) + thorfiles - ["#{thor_root}/thor.yml"]
+     
+    files.map! do |file|
+      File.directory?(file) ? File.join(file, "main.thor") : file
+    end
   end
 
   def thorfiles_relevant_to(meth)
