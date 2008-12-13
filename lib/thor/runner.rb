@@ -64,7 +64,7 @@ class Thor::Runner < Thor
     puts "Storing thor file in your system repository"
     
     File.open(File.join(thor_root, yaml[as][:filename]), "w") do |file|
-      file.puts contents
+      file.puts "class Thor\n  module Tasks\n#{contents}\n  end\nend"
     end
     
     yaml[as][:filename] # Indicate sucess
@@ -121,8 +121,8 @@ class Thor::Runner < Thor
     search = ".*#{search}" if options["substring"]
     search = /^#{search}.*/i
     group  = options[:group] || 'standard'
-    
-    classes = Thor.subclasses.select do |k| 
+
+    classes = Thor.subclasses.select do |k|
       (options[:all] || k.group_name == group) && 
       Thor::Util.constant_to_thor_path(k.name) =~ search
     end

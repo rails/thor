@@ -22,7 +22,7 @@ class Thor
       old_stderr, $stderr = $stderr.dup, File.open(null, "w")
       package
       $stderr = old_stderr
-      system %{#{sudo} #{gem} install pkg/#{spec.name}-#{spec.version} --no-rdoc --no-ri --no-update-sources}
+      system %{#{sudo} #{Gem.ruby} -S #{gem} install pkg/#{spec.name}-#{spec.version} --no-rdoc --no-ri --no-update-sources}
     end
   end
   

@@ -15,10 +15,24 @@ module ObjectSpace
 end
 
 class Thor
+  module Tasks; end
+  
   module Util
     
+    def self.full_const_get(obj, name)
+      list = name.split("::")
+      list.shift if list.first.empty?
+      list.each do |x| 
+        # This is required because const_get tries to look for constants in the 
+        # ancestor chain, but we only want constants that are HERE
+        obj = obj.const_defined?(x) ? obj.const_get(x) : obj.const_missing(x)
+      end
+      obj
+    end
+    
     def self.constant_to_thor_path(str, remove_default = true)
-      str = snake_case(str.to_s).squeeze(":")
+      str = str.to_s.gsub(/^Thor::Tasks::/, "")
+      str = snake_case(str).squeeze(":")
       str.gsub!(/^default/, '') if remove_default
       str
     end
@@ -43,8 +57,12 @@ class Thor
       klasses.map! {|k| k.to_s.gsub(/#<Module:\w+>::/, '')}
     end
 
-    def self.make_constant(str)
-      list = str.split("::").inject(Object) {|obj, x| obj.const_get(x)}
+    def self.make_constant(str, base = [Thor::Tasks, Object])
+      which = base.find do |obj|
+        full_const_get(obj, str) rescue nil
+      end
+      return full_const_get(which, str) if which
+      raise NameError, "uninitialized constant #{str}"
     end
     
     def self.snake_case(str)
