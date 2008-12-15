@@ -165,7 +165,10 @@ class Thor::Runner < Thor
     #   C:\Documents and Settings\james\.thor
     #
     # If we don't #gsub the \ character, Dir.glob will fail.
-    Dir["#{thor_root.gsub(/\\/, '/')}/*"]
+    files = Dir["#{thor_root.gsub(/\\/, '/')}/*"]
+    files.map! do |file|
+      File.directory?(file) ? File.join(file, "main.thor") : file
+    end
   end
   
   private
