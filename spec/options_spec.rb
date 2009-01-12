@@ -18,7 +18,7 @@ describe Thor::Options do
     end
     
     it "doesn't auto-alias switches that have multiple names given" do
-      create ["--foo", "--bar"] => true
+      create ["--foo", "--bar"] => :boolean
       parse("-f")["foo"].must_not be
     end
     
@@ -51,13 +51,13 @@ describe Thor::Options do
     end
     
     it "accepts --[no-]opt variant for booleans, setting false for value" do
-      create "--foo" => :boolean
+      create "--foo" => false
       parse("--foo")["foo"].must == true
       parse("--no-foo")["foo"].must == false
     end
     
     it "will prefer 'no-opt' variant over inverting 'opt' if explicitly set" do
-      create "--no-foo" => :boolean
+      create "--no-foo" => true
       parse("--no-foo")["no-foo"].must == true
     end
     
@@ -112,7 +112,7 @@ describe Thor::Options do
     end
   
     it "and several switches returns an empty hash" do
-      create "--foo" => true, "--bar" => :optional
+      create "--foo" => :boolean, "--bar" => :optional
       parse.must == {}
     end
   
@@ -123,12 +123,10 @@ describe Thor::Options do
   end
   
   it "doesn't set nonexistant switches" do
-    create "--foo" => true, "--bar" => :boolean
+    create "--foo" => :boolean
     parse("--foo")["bar"].must_not be
-    parse("--bar")["foo"].must_not be
     opts = parse
     opts["foo"].must_not be
-    opts["bar"].must_not be
   end
   
   describe " with several optional switches" do

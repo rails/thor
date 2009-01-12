@@ -95,7 +95,12 @@ class Thor
         
         # normalize type
         case type
-        when TrueClass then type = :boolean
+        when TrueClass
+          @defaults[nice_name] = true
+          type = :boolean
+        when FalseClass
+          @defaults[nice_name] = false
+          type = :boolean
         when String
           @defaults[nice_name] = type
           type = :optional
