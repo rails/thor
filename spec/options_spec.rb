@@ -16,24 +16,24 @@ describe Thor::Options do
       create "--foo" => true
       parse("-f")["foo"].must be_true
     end
-
+    
     it "doesn't auto-alias switches that have multiple names given" do
       create ["--foo", "--bar"] => true
       parse("-f")["foo"].must_not be
     end
-
+    
     it "allows multiple aliases for a given switch" do
       create ["--foo", "--bar", "--baz"] => :optional
       parse("--foo", "12")["foo"].must == "12"
       parse("--bar", "12")["foo"].must == "12"
       parse("--baz", "12")["foo"].must == "12"
     end
-
+    
     it "allows custom short names" do
       create "-f" => :optional
       parse("-f", "12").must == {"f" => "12"}
     end
-
+    
     it "allows custom short-name aliases" do
       create ["--bar", "-f"] => :optional
       parse("-f", "12").must == {"bar" => "12"}
@@ -49,6 +49,18 @@ describe Thor::Options do
       parse("-f", "1").must == {"f" => "1"}
       parse("--f", "1").must == {}
     end
+    
+    it "accepts --[no-]opt variant for booleans, setting false for value" do
+      create "--foo" => :boolean
+      parse("--foo")["foo"].must == true
+      parse("--no-foo")["foo"].must == false
+    end
+    
+    it "will prefer 'no-opt' variant over inverting 'opt' if explicitly set" do
+      create "--no-foo" => :boolean
+      parse("--no-foo")["no-foo"].must == true
+    end
+    
   end
   
   it "accepts a switch=<value> assignment" do
@@ -63,7 +75,7 @@ describe Thor::Options do
     create "--num" => :required
     parse("-n12")["num"].must == "12"
   end
-
+  
   it "accepts conjoined short switches" do
     create "--foo" => true, "--bar" => true, "--app" => true
     opts = parse "-fba"
@@ -71,7 +83,7 @@ describe Thor::Options do
     opts["bar"].must be_true
     opts["app"].must be_true
   end
-
+  
   it "accepts conjoined short switches with argument" do
     create "--foo" => true, "--bar" => true, "--app" => :required
     opts = parse "-fba", "12"
@@ -79,7 +91,7 @@ describe Thor::Options do
     opts["bar"].must be_true
     opts["app"].must == "12"
   end
-
+  
   it "makes hash keys available as symbols as well" do
     create "--foo" => :optional
     parse("--foo", "12")[:foo].must == "12"
@@ -98,18 +110,18 @@ describe Thor::Options do
       create({})
       parse.must == {}
     end
-
+  
     it "and several switches returns an empty hash" do
       create "--foo" => true, "--bar" => :optional
       parse.must == {}
     end
-
+  
     it "and a required switch raises an error" do
       create "--foo" => :required
       lambda { parse }.must raise_error(Thor::Options::Error, "no value provided for required argument '--foo'")
     end
   end
-
+  
   it "doesn't set nonexistant switches" do
     create "--foo" => true, "--bar" => :boolean
     parse("--foo")["bar"].must_not be
@@ -118,55 +130,55 @@ describe Thor::Options do
     opts["foo"].must_not be
     opts["bar"].must_not be
   end
-
+  
   describe " with several optional switches" do
     before :each do
       create "--foo" => :optional, "--bar" => :optional
     end
-
+  
     it "sets switches without arguments to true" do
       parse("--foo")["foo"].must be_true
       parse("--bar")["bar"].must be_true
     end
-
+  
     it "doesn't set nonexistant switches" do
       parse("--foo")["bar"].must_not be
       parse("--bar")["foo"].must_not be
     end
-
+  
     it "sets switches with arguments to their arguments" do
       parse("--foo", "12")["foo"].must == "12"
       parse("--bar", "12")["bar"].must == "12"
     end
-
+  
     it "assumes something that could be either a switch or an argument is a switch" do
       parse("--foo", "--bar")["foo"].must be_true
     end
-
+  
     it "overwrites earlier values with later values" do
       parse("--foo", "--foo", "12")["foo"].must == "12"
       parse("--foo", "12", "--foo", "13")["foo"].must == "13"
     end
   end
-
+  
   describe " with one required and one optional switch" do
     before :each do
       create "--foo" => :required, "--bar" => :optional
     end
-
+  
     it "raises an error if the required switch has no argument" do
       lambda { parse("--foo") }.must raise_error(Thor::Options::Error)
     end
-
+  
     it "raises an error if the required switch isn't given" do
       lambda { parse("--bar") }.must raise_error(Thor::Options::Error)
     end
-
+  
     it "raises an error if a switch name is given as the argument to the required switch" do
       lambda { parse("--foo", "--bar") }.must raise_error(Thor::Options::Error, "cannot pass switch '--bar' as an argument")
     end
   end
-
+  
   it "extracts non-option arguments" do
     create "--foo" => :required, "--bar" => true
     parse("foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang").must == {
@@ -185,7 +197,7 @@ describe Thor::Options do
     it "must get the specified value" do
       parse("--branch", "bugfix").must == { "branch" => "bugfix" }
     end
-
+  
     it "must get the default value when not specified" do
       parse.must == { "branch" => "master" }
     end

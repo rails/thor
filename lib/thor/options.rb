@@ -148,7 +148,12 @@ class Thor
         when :optional
           hash[nice_name] = peek.nil? || valid?(peek) || shift
         when :boolean
-          hash[nice_name] = true
+          if !@switches.key?(switch) && nice_name =~ /^no-(\w+)$/
+            hash[$1] = false
+          else
+            hash[nice_name] = true
+          end
+          
         when :numeric
           assert_value!(switch)
           unless peek =~ NUMERIC and $& == peek
@@ -217,7 +222,11 @@ class Thor
     end
     
     def valid?(arg)
-      @switches.key?(arg) or @shorts.key?(arg)
+      if arg.to_s =~ /^--no-(\w+)$/
+        @switches.key?(arg) or (@switches["--#{$1}"] == :boolean)
+      else
+        @switches.key?(arg) or @shorts.key?(arg)
+      end
     end
 
     def current_is_option?
@@ -234,7 +243,11 @@ class Thor
     end
     
     def switch_type(switch)
-      @switches[switch]
+      if switch =~ /^--no-(\w+)$/
+        @switches[switch] || @switches["--#{$1}"]
+      else
+        @switches[switch]
+      end
     end
     
     def check_required!(hash)
