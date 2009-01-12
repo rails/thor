@@ -37,8 +37,8 @@ class Thor
     @group_name || 'standard'
   end
   
-  def self.method_options(opts)
-    @method_options = opts
+  def self.method_options(opts={})
+    @method_options = (@method_options || {}).merge(opts)
   end
 
   def self.subclass_files
