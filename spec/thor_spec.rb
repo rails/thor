@@ -48,6 +48,14 @@ END
     call_myself_with_wrong_arity(4)
   end
   
+  default_task :example_default_task
+  
+  desc "example_default_task", "example!"
+  def example_default_task
+    "default task"
+  end
+  
+  
   def method_missing(meth, *args)
     [meth, args]
   end
@@ -146,6 +154,10 @@ describe "thor" do
     lambda { MyApp.start(["what"]) }.must raise_error(NoMethodError, "the `what' task of MyApp is private")
   end
   
+  it "invokes the default task if no command is specified" do
+    MyApp.start([]).must =~ /default/
+  end
+  
   it "provides useful help info for a simple method" do
     capture(:stdout) { MyApp.start(["help"]) }.must =~ /zoo +zoo around/
   end
@@ -185,6 +197,10 @@ END
   
   it "raises when an exception happens within the task call" do
     lambda { MyApp.start(["call_myself_with_wrong_arity"]) }.must raise_error
+  end
+  
+  it "invokes the named command regardless of the command line options with invoke()" do
+    MyApp.invoke(:baz, ["one"]).must == ["one", {}]
   end
   
 end
