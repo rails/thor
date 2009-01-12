@@ -24,7 +24,7 @@ class Thor
       raise NoMethodError, "the `#{meth}' task of #{obj.class} is private" if
         (obj.private_methods + obj.protected_methods).include?(meth)
       
-      obj.send(meth, *params)
+      obj.invoke(meth, *params)
     rescue ArgumentError => e
       # backtrace sans anything in this file
       backtrace = e.backtrace.reject {|frame| frame =~ /^#{Regexp.escape(__FILE__)}/}

@@ -74,6 +74,7 @@ class Thor
   end
   
   def self.start(args = ARGV)
+    
     options = Thor::Options.new(self.opts)
     opts = options.parse(args, false)
     args = options.trailing_non_opts
@@ -81,6 +82,7 @@ class Thor
     meth = args.first
     meth = @map[meth].to_s if @map && @map[meth]
     meth ||= default_task
+    meth = meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
     
     tasks[meth].parse new(opts, *args), args[1..-1]
   rescue Thor::Error => e
@@ -90,18 +92,18 @@ class Thor
   # Invokes a specific task.  You can use this method instead of start() 
   # to run a thor task if you know the specific task you want to invoke.
   def self.invoke(task_name=nil, args = ARGV)
-    options = Thor::Options.new(self.opts)
-    opts = options.parse(args, false)
-    args = options.trailing_non_opts
-
-    meth = (task_name || default_task).to_s
-    meth = @map[meth].to_s if @map && @map[meth]
-
-    tasks[meth].parse new(opts, *args), args
-  rescue Thor::Error => e
-    $stderr.puts e.message
+    args = args.dup
+    args.unshift(task_name || default_task)
+    start(args)
   end
 
+  # Main entry point method that should actually invoke the method.  You
+  # can override this to provide some class-wide processing.  The default
+  # implementation simply invokes the named method
+  def invoke(meth, *args)
+    send meth, *args
+  end
+  
   class << self
     protected
     def inherited(klass)
