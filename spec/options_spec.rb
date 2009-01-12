@@ -207,6 +207,16 @@ describe Thor::Options do
       @hash.foo?.must be_true
       @hash.nothing?.must be_false
     end
+    
+    it "should map methods to keys: hash.foo => hash[:foo]" do
+      @hash.foo.must == @hash['foo']
+    end
+    
+    it "should map setters to keys: hash.foo=bar => hash[:foo] => bar" do
+      @hash.foo = :bar2
+      @hash.foo.must == :bar2
+    end
+    
   end
   
   describe ":numeric type" do
