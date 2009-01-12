@@ -37,7 +37,7 @@ class Thor
     @group_name || 'standard'
   end
   
-  def self.method_options(opts={})
+  def self.method_options(opts)
     @method_options = (@method_options || {}).merge(opts)
   end
 
@@ -101,7 +101,7 @@ class Thor
   # can override this to provide some class-wide processing.  The default
   # implementation simply invokes the named method
   def invoke(meth, *args)
-    send meth, *args
+    self.send(meth, *args)
   end
   
   class << self

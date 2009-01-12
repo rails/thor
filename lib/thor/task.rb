@@ -26,12 +26,16 @@ class Thor
       
       obj.invoke(meth, *params)
     rescue ArgumentError => e
+      
       # backtrace sans anything in this file
       backtrace = e.backtrace.reject {|frame| frame =~ /^#{Regexp.escape(__FILE__)}/}
+      # also nix anything in thor.rb
+      backtrace = backtrace.reject { |frame| frame =~ /\/thor.rb/ }
+      
       # and sans anything that got us here
       backtrace -= caller
       raise e unless backtrace.empty?
-    
+      
       # okay, they really did call it wrong
       raise Error, "`#{meth}' was called incorrectly. Call as `#{formatted_usage}'"
     rescue NoMethodError => e
