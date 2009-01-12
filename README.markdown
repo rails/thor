@@ -48,8 +48,8 @@ Types for `method_options`
 <dl>
   <dt><code>:boolean</code></dt>
     <dd>true if the option is passed</dd>
-  <dt><code>true</code></dt>
-    <dd>same as <code>:boolean</code></dd>
+  <dt><code>true or false</code></dt>
+    <dd>same as <code>:boolean</code>, but fall back to given boolean as default value</dd>
   <dt><code>:required</code></dt>
     <dd>the value for this option MUST be provided</dd>
   <dt><code>:optional</code></dt>
