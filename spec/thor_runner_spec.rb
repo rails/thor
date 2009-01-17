@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require File.dirname(__FILE__) + "/spec_helper"
 require "thor/runner"
 require "rr"
 
@@ -18,7 +18,6 @@ module MyTasks
   end
   
   class AdvancedTask < Thor
-    
     group :advanced
     
     desc "zoo", "zip"
@@ -155,37 +154,48 @@ end
 
 describe Thor::Runner do
   before :each do
-    @original_yaml = {"random" => 
-      {:location => "#{File.dirname(__FILE__)}/fixtures/task.thor", :filename => "4a33b894ffce85d7b412fc1b36f88fe0", :constants => ["Amazing"]}}
-    stub(File).exists? {true}
+    @original_yaml = {
+      "random" => {
+        :location  => "#{File.dirname(__FILE__)}/fixtures/task.thor",
+        :filename  => "4a33b894ffce85d7b412fc1b36f88fe0",
+        :constants => ["Amazing"]
+      }
+    }
+
+    stub(File).exists? { true }
     stub(YAML).load_file { @original_yaml }
   end
   
-  describe " update" do
+  describe "update" do
     it "updates existing thor files" do
-      mock.instance_of(Thor::Runner).install(@original_yaml["random"][:location]) {true}
+      mock.instance_of(Thor::Runner).install(@original_yaml["random"][:location]) { true }
       mock(File).delete(File.join(Thor::Runner.thor_root, @original_yaml["random"][:filename]))
     
       silence(:stdout) { Thor::Runner.start(["update", "random"]) }
     end
   end
 
-
-  describe " uninstall" do
-    it "uninstalls existing thor modules" do
+  describe "uninstall" do
+    before(:each) do
       stub.instance_of(Thor::Runner).save_yaml(anything)
       
       stub(File).delete(anything)
       stub(@original_yaml).delete(anything)
-    
+    end
+
+    it "uninstalls existing thor modules" do
       silence(:stdout) { Thor::Runner.start(["uninstall", "random"]) }
     end
   end
 
-  describe " installed" do
-    it "displays the modules installed in a pretty way" do
+  describe "installed" do
+    before(:each) do
       stub(Dir).[](anything) { [] }
+    end
+
+    it "displays the modules installed in a pretty way" do
       stdout = capture(:stdout) { Thor::Runner.start(["installed"]) }
+
       stdout.must =~ /random\s*amazing/
       stdout.must =~ /amazing:describe NAME \[\-\-forcefully\]\s*say that someone is amazing/
       stdout.must =~ /amazing:hello\s*say hello/
