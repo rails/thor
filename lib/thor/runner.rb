@@ -1,4 +1,4 @@
-require 'thor'
+require "thor"
 require "thor/util"
 require "open-uri"
 require "fileutils"
@@ -7,19 +7,28 @@ require "digest/md5"
 require "readline"
 
 class Thor::Runner < Thor
-  
   def self.globs_for(path)
-    ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
+    [
+      "#{path}/Thorfile",
+      "#{path}/*.thor",
+      "#{path}/tasks/*.thor",
+      "#{path}/lib/tasks/*.thor"
+    ]
   end
 
-  map "-T" => :list, "-i" => :install, "-u" => :update
+  # Mappings for default tasks
+  map "-T" => :list,
+      "-i" => :install,
+      "-u" => :update
   
-  desc "install NAME", "install a Thor file into your system tasks, optionally named for future updates"
-  method_options :as => :optional, :relative => :boolean
+  desc "install NAME",
+       "install a Thor file into your system tasks, optionally named for future updates"
+  method_options :as       => :optional,
+                 :relative => :boolean
   def install(name)
     initialize_thorfiles
 
-    base = name
+    base    = name
     package = :file
 
     begin
@@ -57,14 +66,18 @@ class Thor::Runner < Thor
       as = name if as.empty?
     end
     
-    FileUtils.mkdir_p thor_root
+    FileUtils.mkdir_p(thor_root)
     
     yaml_file = File.join(thor_root, "thor.yml")
     FileUtils.touch(yaml_file)
     yaml = thor_yaml
     
     location = (options[:relative] || is_uri) ? name : File.expand_path(name)
-    yaml[as] = {:filename => Digest::MD5.hexdigest(name + as), :location => location, :constants => constants}
+
+    yaml[as] = {
+      :filename => Digest::MD5.hexdigest(name + as),
+      :location => location, :constants => constants
+    }
     
     save_yaml(yaml)
     
@@ -73,7 +86,7 @@ class Thor::Runner < Thor
     destination = File.join(thor_root, yaml[as][:filename])
     
     if package == :file
-      File.open(destination, "w") {|f| f.puts contents }
+      File.open(destination, "w") { |f| f.puts contents }
     else
       FileUtils.cp_r(name, destination)
     end
@@ -81,7 +94,8 @@ class Thor::Runner < Thor
     yaml[as][:filename] # Indicate sucess
   end
   
-  desc "uninstall NAME", "uninstall a named Thor module"
+  desc "uninstall NAME",
+       "uninstall a named Thor module"
   def uninstall(name)
     yaml = thor_yaml
     raise Error, "Can't find module `#{name}'" unless yaml[name]
@@ -96,7 +110,8 @@ class Thor::Runner < Thor
     puts "Done."
   end
   
-  desc "update NAME", "update a Thor file from its original location"
+  desc "update NAME",
+       "update a Thor file from its original location"
   def update(name)
     yaml = thor_yaml
     raise Error, "Can't find module `#{name}'" if !yaml[name] || !yaml[name][:location]
@@ -104,34 +119,36 @@ class Thor::Runner < Thor
     puts "Updating `#{name}' from #{yaml[name][:location]}"
     old_filename = yaml[name][:filename]
     self.options = self.options.merge("as" => name)
-    filename = install(yaml[name][:location])
+    filename     = install(yaml[name][:location])
     unless filename == old_filename
       File.delete(File.join(thor_root, old_filename))
     end
   end
   
-  desc "installed", "list the installed Thor modules and tasks (--internal means list the built-in tasks as well)"
+  desc "installed",
+       "list the installed Thor modules and tasks (--internal means list the built-in tasks as well)"
   method_options :internal => :boolean
   def installed
     thor_root_glob.each do |f|
       next if f =~ /thor\.yml$/
-      load_thorfile f unless Thor.subclass_files.keys.include?(File.expand_path(f))
+      load_thorfile(f) unless Thor.subclass_files.keys.include?(File.expand_path(f))
     end
 
     klasses = Thor.subclasses
-    klasses -= [Thor, Thor::Runner] unless options['internal']
+    klasses -= [Thor, Thor::Runner] unless options["internal"]
     display_klasses(true, klasses)
   end
   
-  desc "list [SEARCH]", "list the available thor tasks (--substring means SEARCH can be anywhere in the module)"
+  desc "list [SEARCH]",
+       "list the available thor tasks (--substring means SEARCH can be anywhere in the module)"
   method_options :substring => :boolean,
-                 :group => :optional,
-                 :all => :boolean
-  def list(search = "")
+                 :group     => :optional,
+                 :all       => :boolean
+  def list(search="")
     initialize_thorfiles
     search = ".*#{search}" if options["substring"]
     search = /^#{search}.*/i
-    group  = options[:group] || 'standard'
+    group  = options[:group] || "standard"
 
     classes = Thor.subclasses.select do |k|
       (options[:all] || k.group_name == group) && 
@@ -148,11 +165,11 @@ class Thor::Runner < Thor
     
   def method_missing(meth, *args)
     meth = meth.to_s
-    super(meth.to_sym, *args) unless meth.include? ?:
+    super(meth.to_sym, *args) unless meth.include?(?:)
 
     initialize_thorfiles(meth)
     task = Thor[meth]
-    task.parse task.klass.new, ARGV[1..-1]
+    task.parse(task.klass.new, ARGV[1..-1])
   end
 
   def self.thor_root
@@ -172,6 +189,7 @@ class Thor::Runner < Thor
   end
   
   private
+
   def thor_root
     self.class.thor_root
   end
@@ -182,7 +200,7 @@ class Thor::Runner < Thor
   
   def thor_yaml
     yaml_file = File.join(thor_root, "thor.yml")
-    yaml = YAML.load_file(yaml_file) if File.exists?(yaml_file)
+    yaml      = YAML.load_file(yaml_file) if File.exists?(yaml_file)
     yaml || {}
   end
   
@@ -197,9 +215,9 @@ class Thor::Runner < Thor
     
     if with_modules && !(yaml = thor_yaml).empty?
       max_name = yaml.max {|(xk,xv),(yk,yv)| xk.to_s.size <=> yk.to_s.size }.first.size
-      modules_label = "Modules"
+      modules_label    = "Modules"
       namespaces_label = "Namespaces"
-      column_width = [max_name + 4, modules_label.size + 1].max
+      column_width     = [max_name + 4, modules_label.size + 1].max
       
       print "%-#{column_width}s" % modules_label
       puts namespaces_label
@@ -245,6 +263,7 @@ class Thor::Runner < Thor
       else
         puts "\033[1;34m#{base}\033[0m"
       end
+
       puts "-" * base.length
       
       klass.tasks.each true do |name, task|
@@ -262,31 +281,34 @@ class Thor::Runner < Thor
   end
 
   def initialize_thorfiles(relevant_to = nil)
-    thorfiles(relevant_to).each {|f| load_thorfile f unless Thor.subclass_files.keys.include?(File.expand_path(f))}
+    thorfiles(relevant_to).each do |f|
+      load_thorfile(f) unless Thor.subclass_files.keys.include?(File.expand_path(f))
+    end
   end
   
   def load_thorfile(path)
     txt = File.read(path)
     begin
-      Thor::Tasks.class_eval txt, path
+      Thor::Tasks.class_eval(txt, path)
     rescue Object => e
       $stderr.puts "WARNING: unable to load thorfile #{path.inspect}: #{e.message}"
     end
   end
   
-  def thorfiles(relevant_to = nil)
-    path = Dir.pwd
+  def thorfiles(relevant_to=nil)
+    path      = Dir.pwd
     thorfiles = []
     
-    # Look for Thorfile or *.thor in the current directory or a parent directory, until the root
+    # Look for Thorfile or *.thor in the current directory or a parent directory, 
+    # until the root
     while thorfiles.empty?
-      thorfiles = Thor::Runner.globs_for(path).map {|g| Dir[g]}.flatten
-      path = File.dirname(path)
+      thorfiles = Thor::Runner.globs_for(path).map { |g| Dir[g] }.flatten
+      path      = File.dirname(path)
       break if path == "/"
     end
 
-    # We want to load system-wide Thorfiles first
-    # so the local Thorfiles will override them.
+    # We want to load system-wide Thorfiles first so the local Thorfiles will 
+    # override them.
     files = (relevant_to ? thorfiles_relevant_to(relevant_to) :
      thor_root_glob) + thorfiles - ["#{thor_root}/thor.yml"]
      
@@ -301,5 +323,4 @@ class Thor::Runner < Thor
       v[:constants] && v[:constants].include?(klass_str)
     end.map { |k, v| File.join(thor_root, "#{v[:filename]}") }
   end
-
 end
