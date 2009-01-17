@@ -2,6 +2,16 @@ require File.dirname(__FILE__) + '/spec_helper'
 require "thor/util"
 
 describe Thor::Util do
+  describe ".constant_to_thor_path" do
+    it "knows how to convert class names into thor names" do
+      Thor::Util.constant_to_thor_path("FooBar::BarBaz::BazBat").must == "foo_bar:bar_baz:baz_bat"
+    end
+    
+    it "knows how to convert a thor name to a constant" do
+      Thor::Util.constant_from_thor_path("my_tasks:thor_task").must == MyTasks::ThorTask
+    end
+  end
+  
   describe ".snake_case" do
     it "preserves no-cap strings" do
       Thor::Util.snake_case("foo").must == "foo"
