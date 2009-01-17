@@ -5,6 +5,7 @@ require "fileutils"
 require "yaml"
 require "digest/md5"
 require "readline"
+require "pathname"
 
 class Thor::Runner < Thor
   def self.globs_for(path)
@@ -295,22 +296,39 @@ class Thor::Runner < Thor
     end
   end
   
+  # Finds Thorfiles by traversing from your current directory down to the root
+  # directory of your system. If at any time we find a Thor file, we stop.
+  #
+  # ==== Example
+  # If we start at /Users/wycats/dev/thor ...
+  #
+  # 1. /Users/wycats/dev/thor
+  # 2. /Users/wycats/dev
+  # 3. /Users/wycats <-- we find a Thorfile here, so we stop
+  #
+  # Suppose we start at c:\Documents and Settings\james\dev\thor ...
+  #
+  # 1. c:\Documents and Settings\james\dev\thor
+  # 2. c:\Documents and Settings\james\dev
+  # 3. c:\Documents and Settings\james
+  # 4. c:\Documents and Settings
+  # 5. c:\ <-- no Thorfiles found!
   def thorfiles(relevant_to=nil)
-    path      = Dir.pwd
     thorfiles = []
-    
-    # Look for Thorfile or *.thor in the current directory or a parent directory, 
-    # until the root
-    while thorfiles.empty?
-      thorfiles = Thor::Runner.globs_for(path).map { |g| Dir[g] }.flatten
-      path      = File.dirname(path)
-      break if path == "/"
+
+    # This may seem a little odd at first. Suppose you're working on a Rails 
+    # project and you traverse into the "app" directory. Because of the below 
+    # you can execute "thor -T" and see any tasks you might have in the root 
+    # directory of your Rails project.
+    Pathname.pwd.ascend do |path|
+      thorfile = Thor::Runner.globs_for(path).map { |g| Dir[g] }.flatten
+      next if thorfiles.empty?
     end
 
     # We want to load system-wide Thorfiles first so the local Thorfiles will 
     # override them.
-    files = (relevant_to ? thorfiles_relevant_to(relevant_to) :
-     thor_root_glob) + thorfiles - ["#{thor_root}/thor.yml"]
+    files  = (relevant_to ? thorfiles_relevant_to(relevant_to) : thor_root_glob)
+    files += thorfiles - ["#{thor_root}/thor.yml"]
      
     files.map! do |file|
       File.directory?(file) ? File.join(file, "main.thor") : file
