@@ -29,23 +29,21 @@ class Thor::Runner < Thor
   def install(name)
     initialize_thorfiles
 
-    base    = name
-    package = :file
-
+    # If a directory name is provided as the argument, look for a 'main.thor' 
+    # task in said directory.
     begin
       if File.directory?(File.expand_path(name))
         base, package = File.join(name, "main.thor"), :directory
-        contents = open(base).read
+        contents      = open(base).read
       else
-        contents = open(name).read
+        base, package = name, :file
+        contents      = open(name).read
       end
     rescue OpenURI::HTTPError
       raise Error, "Error opening URI `#{name}'"
     rescue Errno::ENOENT
       raise Error, "Error opening file `#{name}'"
     end
-    
-    is_uri = File.exist?(name) ? false : true
     
     puts "Your Thorfile contains: "
     puts contents
@@ -54,37 +52,31 @@ class Thor::Runner < Thor
     
     return false unless response =~ /^\s*y/i
     
-    constants = Thor::Util.constants_in_contents(contents, base)
-    
     as = options["as"] || begin
       first_line = contents.split("\n")[0]
       (match = first_line.match(/\s*#\s*module:\s*([^\n]*)/)) ? match[1].strip : nil
     end
         
-    if !as
+    unless as
       print "Please specify a name for #{name} in the system repository [#{name}]: "
       as = Readline.readline
       as = name if as.empty?
     end
     
     FileUtils.mkdir_p(thor_root)
+    FileUtils.touch(File.join(thor_root, "thor.yml"))
     
-    yaml_file = File.join(thor_root, "thor.yml")
-    FileUtils.touch(yaml_file)
-    yaml = thor_yaml
-    
-    location = (options[:relative] || is_uri) ? name : File.expand_path(name)
-
-    yaml[as] = {
-      :filename => Digest::MD5.hexdigest(name + as),
-      :location => location, :constants => constants
+    thor_yaml[as] = {
+      :filename  => Digest::MD5.hexdigest(name + as),
+      :location  => (options[:relative] || File.exists?(name)) ? name : File.expand_path(name),
+      :constants => Thor::Util.constants_in_contents(contents, base)
     }
     
-    save_yaml(yaml)
+    save_yaml(thor_yaml)
     
     puts "Storing thor file in your system repository"
     
-    destination = File.join(thor_root, yaml[as][:filename])
+    destination = File.join(thor_root, thor_yaml[as][:filename])
     
     if package == :file
       File.open(destination, "w") { |f| f.puts contents }
@@ -92,7 +84,7 @@ class Thor::Runner < Thor
       FileUtils.cp_r(name, destination)
     end
     
-    yaml[as][:filename] # Indicate sucess
+    thor_yaml[as][:filename] # Indicate sucess
   end
   
   desc "uninstall NAME",
