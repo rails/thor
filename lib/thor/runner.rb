@@ -66,6 +66,9 @@ class Thor::Runner < Thor
     FileUtils.mkdir_p(thor_root)
     FileUtils.touch(File.join(thor_root, "thor.yml"))
     
+    yaml_file = File.join(thor_root, "thor.yml")
+    FileUtils.touch(yaml_file)
+    
     thor_yaml[as] = {
       :filename  => Digest::MD5.hexdigest(name + as),
       :location  => (options[:relative] || File.exists?(name)) ? name : File.expand_path(name),
