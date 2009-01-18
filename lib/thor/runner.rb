@@ -93,15 +93,14 @@ class Thor::Runner < Thor
   desc "uninstall NAME",
        "uninstall a named Thor module"
   def uninstall(name)
-    yaml = thor_yaml
-    raise Error, "Can't find module `#{name}'" unless yaml[name]
+    raise Error, "Can't find module `#{name}'" unless thor_yaml[name]
     
     puts "Uninstalling #{name}."
     
-    file = File.join(thor_root, "#{yaml[name][:filename]}")
-    FileUtils.rm_rf(file)
-    yaml.delete(name)
-    save_yaml(yaml)
+    FileUtils.rm_rf(File.join(thor_root, "#{thor_yaml[name][:filename]}"))
+
+    thor_yaml.delete(name)
+    save_yaml(thor_yaml)
     
     puts "Done."
   end
@@ -109,13 +108,12 @@ class Thor::Runner < Thor
   desc "update NAME",
        "update a Thor file from its original location"
   def update(name)
-    yaml = thor_yaml
-    raise Error, "Can't find module `#{name}'" if !yaml[name] || !yaml[name][:location]
+    raise Error, "Can't find module `#{name}'" if !thor_yaml[name] || !thor_yaml[name][:location]
 
-    puts "Updating `#{name}' from #{yaml[name][:location]}"
-    old_filename = yaml[name][:filename]
+    puts "Updating `#{name}' from #{thor_yaml[name][:location]}"
+    old_filename = thor_yaml[name][:filename]
     self.options = self.options.merge("as" => name)
-    filename     = install(yaml[name][:location])
+    filename     = install(thor_yaml[name][:location])
     unless filename == old_filename
       File.delete(File.join(thor_root, old_filename))
     end
@@ -195,22 +193,24 @@ class Thor::Runner < Thor
   end
   
   def thor_yaml
-    yaml_file = File.join(thor_root, "thor.yml")
-    yaml      = YAML.load_file(yaml_file) if File.exists?(yaml_file)
-    yaml || {}
+    @y ||= begin
+      yaml_file = File.join(thor_root, "thor.yml")
+      yaml      = YAML.load_file(yaml_file) if File.exists?(yaml_file)
+      yaml || {}
+    end
   end
   
   def save_yaml(yaml)
     yaml_file = File.join(thor_root, "thor.yml")
-    File.open(yaml_file, "w") {|f| f.puts yaml.to_yaml }
+    File.open(yaml_file, "w") { |f| f.puts yaml.to_yaml }
   end
   
   def display_klasses(with_modules = false, klasses = Thor.subclasses)
     klasses -= [Thor, Thor::Runner] unless with_modules
     raise Error, "No Thor tasks available" if klasses.empty?
     
-    if with_modules && !(yaml = thor_yaml).empty?
-      max_name = yaml.max {|(xk,xv),(yk,yv)| xk.to_s.size <=> yk.to_s.size }.first.size
+    if with_modules && !thor_yaml.empty?
+      max_name = thor_yaml.max { |(xk, xv), (yk, yv)| xk.to_s.size <=> yk.to_s.size }.first.size
       modules_label    = "Modules"
       namespaces_label = "Namespaces"
       column_width     = [max_name + 4, modules_label.size + 1].max
@@ -220,9 +220,9 @@ class Thor::Runner < Thor
       print "%-#{column_width}s" % ("-" * modules_label.size)
       puts "-" * namespaces_label.size
       
-      yaml.each do |name, info|
+      thor_yaml.each do |name, info|
         print "%-#{column_width}s" % name
-        puts info[:constants].map {|c| Thor::Util.constant_to_thor_path(c)}.join(", ")
+        puts info[:constants].map { |c| Thor::Util.constant_to_thor_path(c) }.join(", ")
       end
     
       puts
