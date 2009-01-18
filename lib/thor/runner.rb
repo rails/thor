@@ -45,8 +45,6 @@ class Thor::Runner < Thor
       raise Error, "Error opening file `#{name}'"
     end
     
-    is_uri = File.exist?(name) ? false : true
-    
     puts "Your Thorfile contains: "
     puts contents
     print "Do you wish to continue [y/N]? "
@@ -73,11 +71,10 @@ class Thor::Runner < Thor
     FileUtils.touch(yaml_file)
     yaml = thor_yaml
     
-    location = (options[:relative] || is_uri) ? name : File.expand_path(name)
-
     yaml[as] = {
-      :filename => Digest::MD5.hexdigest(name + as),
-      :location => location, :constants => constants
+      :filename  => Digest::MD5.hexdigest(name + as),
+      :location  => (options[:relative] || File.exists?(name)) ? name : File.expand_path(name),
+      :constants => constants
     }
     
     save_yaml(yaml)
