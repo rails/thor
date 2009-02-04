@@ -2,6 +2,10 @@
 
 require 'rubygems'
 require 'ruby2ruby'
+require 'parse_tree'
+if Ruby2Ruby::VERSION >= "1.2.0"
+  require 'parse_tree_extensions'
+end
 require 'rake'
 
 input  = ARGV[0] || 'Rakefile'
