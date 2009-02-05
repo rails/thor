@@ -9,23 +9,13 @@ require "pathname"
 
 class Thor::Runner < Thor
   def self.globs_for(path)
-    [
-      "#{path}/Thorfile",
-      "#{path}/*.thor",
-      "#{path}/tasks/*.thor",
-      "#{path}/lib/tasks/*.thor"
-    ]
+    ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
   end
 
-  # Mappings for default tasks
-  map "-T" => :list,
-      "-i" => :install,
-      "-u" => :update
+  map "-T" => :list, "-i" => :install, "-u" => :update
   
-  desc "install NAME",
-       "install a Thor file into your system tasks, optionally named for future updates"
-  method_options :as       => :optional,
-                 :relative => :boolean
+  desc "install NAME", "install a Thor file into your system tasks, optionally named for future updates"
+  method_options :as => :optional, :relative => :boolean
   def install(name)
     initialize_thorfiles
 
@@ -90,8 +80,7 @@ class Thor::Runner < Thor
     thor_yaml[as][:filename] # Indicate sucess
   end
   
-  desc "uninstall NAME",
-       "uninstall a named Thor module"
+  desc "uninstall NAME", "uninstall a named Thor module"
   def uninstall(name)
     raise Error, "Can't find module `#{name}'" unless thor_yaml[name]
     
@@ -105,8 +94,7 @@ class Thor::Runner < Thor
     puts "Done."
   end
   
-  desc "update NAME",
-       "update a Thor file from its original location"
+  desc "update NAME", "update a Thor file from its original location"
   def update(name)
     raise Error, "Can't find module `#{name}'" if !thor_yaml[name] || !thor_yaml[name][:location]
 
@@ -119,8 +107,7 @@ class Thor::Runner < Thor
     end
   end
   
-  desc "installed",
-       "list the installed Thor modules and tasks (--internal means list the built-in tasks as well)"
+  desc "installed", "list the installed Thor modules and tasks (--internal means list the built-in tasks as well)"
   method_options :internal => :boolean
   def installed
     thor_root_glob.each do |f|
@@ -167,7 +154,23 @@ class Thor::Runner < Thor
   end
 
   def self.thor_root
-    File.join(ENV["HOME"] || ENV["APPDATA"], ".thor")
+    return File.join(ENV["HOME"], '.thor') if ENV["HOME"]
+
+    if ENV["HOMEDRIVE"] && ENV["HOMEPATH"] then
+      return File.join(ENV["HOMEDRIVE"], ENV["HOMEPATH"], '.thor')
+    end
+    
+    return File.join(ENV["APPDATA"], '.thor') if ENV["APPDATA"]
+
+    begin
+      File.expand_path("~")
+    rescue
+      if File::ALT_SEPARATOR then
+        "C:/"
+      else
+        "/"
+      end
+    end
   end
 
   def self.thor_root_glob
