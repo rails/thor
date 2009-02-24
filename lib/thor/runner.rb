@@ -319,8 +319,8 @@ class Thor::Runner < Thor
     # you can execute "thor -T" and see any tasks you might have in the root 
     # directory of your Rails project.
     Pathname.pwd.ascend do |path|
-      thorfile = Thor::Runner.globs_for(path).map { |g| Dir[g] }.flatten
-      next if thorfiles.empty?
+      thorfiles = Thor::Runner.globs_for(path).map { |g| Dir[g] }.flatten
+      break unless thorfiles.empty?
     end
 
     # We want to load system-wide Thorfiles first so the local Thorfiles will 
