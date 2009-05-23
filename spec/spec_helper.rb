@@ -2,8 +2,15 @@ $TESTING=true
 $:.push File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'stringio'
+require 'rubygems'
 
-module Spec::Expectations::ObjectExpectations
+undefinable = if defined?(Spec::Expectations::ObjectExpectations) # rspec <= 1.2.0
+  Spec::Expectations::ObjectExpectations
+else
+  Kernel
+end
+
+undefinable.module_eval do
   alias_method :must, :should
   alias_method :must_not, :should_not
   undef_method :should
