@@ -1,7 +1,7 @@
-require 'thor/ordered_hash'
+require 'thor/core_ext/ordered_hash'
 require 'thor/task'
 
-class Thor::TaskHash < Thor::OrderedHash
+class Thor::TaskHash < Thor::CoreExt::OrderedHash
   def initialize(klass)
     super()
     @klass = klass

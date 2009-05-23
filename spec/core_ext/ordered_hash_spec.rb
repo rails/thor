@@ -1,12 +1,12 @@
-require File.dirname(__FILE__) + '/spec_helper'
-require "thor/ordered_hash"
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'thor/core_ext/ordered_hash'
 
-describe Thor::OrderedHash do
-  describe " without any items" do
-    before :each do
-      @hash = Thor::OrderedHash.new
-    end
+describe Thor::CoreExt::OrderedHash do
+  before :each do
+    @hash = Thor::CoreExt::OrderedHash.new
+  end
 
+  describe "without any items" do
     it "returns nil for an undefined key" do
       @hash["foo"].must be_nil
     end
@@ -20,9 +20,8 @@ describe Thor::OrderedHash do
     end
   end
 
-  describe " with several items" do
+  describe "with several items" do
     before :each do
-      @hash = Thor::OrderedHash.new
       @hash[:foo] = "Foo!"
       @hash[:bar] = "Bar!"
       @hash[:baz] = "Baz!"
@@ -67,7 +66,7 @@ describe Thor::OrderedHash do
     end
 
     it "should append another ordered hash while preserving ordering" do
-      other_hash = Thor::OrderedHash.new
+      other_hash = Thor::CoreExt::OrderedHash.new
       other_hash[1] = "one"
       other_hash[2] = "two"
       other_hash[3] = "three"
@@ -76,7 +75,7 @@ describe Thor::OrderedHash do
     end
 
     it "shouldn't overwrite hash keys with matching appended keys" do
-      other_hash = Thor::OrderedHash.new
+      other_hash = Thor::CoreExt::OrderedHash.new
       other_hash[:bar] = "bar"
       (@hash + other_hash)[:bar].must == "Bar!"
     end
