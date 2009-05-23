@@ -5,7 +5,8 @@ class Thor
   class Options
     class Error < StandardError; end
     
-    # simple Hash with indifferent access
+    # Simple Hash with indifferent access
+    # TODO Can we get rid of this just by symbolizing keys?
     class Hash < ::Hash
       def initialize(hash)
         super()
