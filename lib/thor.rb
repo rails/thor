@@ -6,16 +6,35 @@ require "thor/task_hash"
 
 class Thor
   attr_accessor :options
-  
+
+  # Sets the default task when thor is executed without an explicit task to be called.
+  #
+  # ==== Parameters
+  # meth<Symbol>:: name of the defaut task
+  #
   def self.default_task(meth=nil)
     unless meth.nil?
       @default_task = (meth == :none) ? 'help' : meth.to_s
     end
     @default_task ||= (self == Thor ? 'help' : superclass.default_task)
   end
-    
+
+  # Maps an input to a task. If you define:
+  #
+  #   map "-T" => "list"
+  #
+  # Running:
+  #
+  #   thor -T
+  #
+  # Will invoke the list task.
+  #
+  # ==== Parameters
+  # Hash[String|Array => Symbol]:: Maps the string or the string in the array to the given task.
+  #
   def self.map(map)
     @map ||= superclass.instance_variable_get("@map") || {}
+
     map.each do |key, value|
       if key.respond_to?(:each)
         key.each {|subkey| @map[subkey] = value}
@@ -25,34 +44,79 @@ class Thor
     end
   end
 
+  # Defines the usage and the description of the next task.
+  #
+  # ==== Parameters
+  # usage<String>
+  # description<String>
+  #
   def self.desc(usage, description)
     @usage, @desc = usage, description
   end
-  
+
+  # Defines the group. This is used when thor list is invoked so you can specify
+  # that only tasks from a pre-defined group will be shown. Defaults to standard.
+  #
+  # ==== Parameters
+  # name<String|Symbol>
+  #
   def self.group(name)
     @group_name = name.to_s
   end
   
+  # Returns the group name.
+  #
+  # ==== Returns
+  # String
+  #
   def self.group_name
     @group_name || 'standard'
   end
   
+  # Declares the options for the next task to be declaread.
+  #
+  # ==== Parameters
+  # Hash[Symbol => Symbol]:: The hash key is the name of the option and the value
+  # is the type of the option. Can be :optional, :required, :boolean or :numeric.
+  #
   def self.method_options(opts)
     @method_options = (@method_options || {}).merge(opts)
   end
 
+  # Returns the files where the subclasses are maintained.
+  #
+  # ==== Returns
+  # Hash[path<String> => Class]
+  #
   def self.subclass_files
     @subclass_files ||= Hash.new {|h,k| h[k] = []}
   end
-  
+
+  # Returns the subclasses. Subclasses are dynamically added to the array when
+  # a class inherits from the Thor class.
+  #
+  # ==== Returns
+  # Array[Class]
+  #
   def self.subclasses
     @subclasses ||= []
   end
-  
+
+  # Returns the tasks for this Thor class in an ordered hash.
+  #
+  # ==== Returns
+  # TaskHash:: An ordered hash with this class tasks.
+  #
   def self.tasks
     @tasks ||= TaskHash.new(self)
   end
 
+  # Returns the options for this Thor class. Those option are declared by calling
+  # method_options before calling initialize.
+  #
+  # ==== Returns
+  # Hash[Symbol => Symbol]
+  #
   def self.opts
     (@opts || {}).merge(self == Thor ? {} : superclass.opts)
   end
