@@ -1,6 +1,49 @@
 require 'thor/core_ext/hash_with_indifferent_access'
 
 class Thor
+  # TODO Remove stub type when refactoring finishes
+  class Option < Struct.new(:name, :description, :required, :type, :default, :aliases, :stub_type)
+    VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
+
+    def self.parse(key, value)
+      if key.is_a?(Array)
+        name, *aliases = key
+      else
+        name, aliases = key, []
+      end
+
+      name    = name.to_s
+      default = value
+
+      type = case value
+        when Symbol
+          default  = nil
+          required = (value == :required)
+          value if VALID_TYPES.include?(value)
+        when TrueClass, FalseClass
+          :boolean
+        when Numeric
+          :numeric
+        when Hash
+          :hash
+        when Array
+          :array
+      end
+
+      required ||= false
+      type     ||= :string
+
+      stub_type = if required
+        :required
+      elsif type == :string
+        :optional
+      else
+        type
+      end
+
+      self.new(name.to_s, nil, required, type, default, aliases, stub_type)
+    end
+  end
 
   # This is a modified version of Daniel Berger's Getopt::Long class,
   # licensed under Ruby's license.
@@ -45,40 +88,23 @@ class Thor
       @leading_non_opts, @trailing_non_opts = [], []
 
       @switches = switches.inject({}) do |mem, (name, type)|
-        if name.is_a?(Array)
-          name, *shorts = name
+        option = Thor::Option.parse(name, type)
+
+        # We need both human and dasherized (--name) form of switch name
+        if option.name.index('-') == 0
+          arg_name, human_name = option.name, undasherize(option.name)
         else
-          name = name.to_s
-          shorts = []
+          arg_name, human_name = dasherize(option.name), option.name
         end
-        # we need both nice and dasherized form of switch name
-        if name.index('-') == 0
-          nice_name = undasherize name
-        else
-          nice_name = name
-          name = dasherize name
-        end
-        # if there are no shortcuts specified, generate one using the first character
-        shorts << "-" + nice_name[0,1] if shorts.empty? and nice_name.length > 1
-        shorts.each { |short| @shorts[short] = name }
-        
-        # normalize type
-        case type
-        when TrueClass
-          @defaults[nice_name] = true
-          type = :boolean
-        when FalseClass
-          @defaults[nice_name] = false
-          type = :boolean
-        when String
-          @defaults[nice_name] = type
-          type = :optional
-        when Numeric
-          @defaults[nice_name] = type
-          type = :numeric
-        end
-        
-        mem[name] = type
+
+        @defaults[human_name] = option.default unless option.default.nil?
+
+        # If there are no shortcuts specified, generate one using the first character
+        shorts = option.aliases.dup
+        shorts << "-" + human_name[0,1] if shorts.empty? and human_name.length > 1
+        shorts.each { |short| @shorts[short] = arg_name }
+
+        mem[arg_name] = option.stub_type
         mem
       end
       
@@ -94,7 +120,7 @@ class Thor
       # Start hash with indifferent access pre-filled with defaults
       hash = Thor::CoreExt::HashWithIndifferentAccess.new @defaults
 
-      @leading_non_opts = []
+      @leading_non_opts = [ ]
       if skip_leading_non_opts
         @leading_non_opts << shift until current_is_option? || @args.empty?
       end
@@ -135,6 +161,10 @@ class Thor
             raise Error, "expected numeric value for '#{switch}'; got #{peek.inspect}"
           end
           hash[nice_name] = $&.index('.') ? shift.to_f : shift.to_i
+        when :hash
+          assert_value!(switch)
+          raise Error, "cannot pass switch '#{peek}' as an argument" if valid?(peek)
+          hash[nice_name] = parse_hash(shift)
         end
       end
       
@@ -202,6 +232,17 @@ class Thor
       else
         @switches.key?(arg) or @shorts.key?(arg)
       end
+    end
+
+    def parse_hash(arg)
+      hash = {}
+
+      arg.split(/\s/).each do |key_value|
+        key, value = key_value.split(':')
+        hash[key] = value
+      end
+
+      hash
     end
 
     def current_is_option?

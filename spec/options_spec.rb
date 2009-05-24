@@ -201,6 +201,24 @@ describe Thor::Options do
     end
   end
   
+  describe ":hash type" do
+    before(:each) do
+      create "--attributes" => :hash
+    end
+
+    it "accepts a switch=<value> assignment" do
+      parse("--attributes=name:string age:integer")["attributes"].must == {"name" => "string", "age" => "integer"}
+    end
+
+    it "accepts a switch <value> assignment" do
+      parse("--attributes", "name:string age:integer")["attributes"].must == {"name" => "string", "age" => "integer"}
+    end
+
+    it "must not mix values with other switches" do
+      parse("--attributes", "name:string age:integer", "--baz", "cool")["attributes"].must == {"name" => "string", "age" => "integer"}
+    end
+  end
+  
   describe ":numeric type" do
     before(:each) do
       create "n" => :numeric, "m" => 5
