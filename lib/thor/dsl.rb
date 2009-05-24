@@ -9,6 +9,7 @@ class Thor
   # is where you should look at.
   #
   module DSL
+
     # Sets the default task when thor is executed without an explicit task to be called.
     #
     # ==== Parameters
@@ -111,6 +112,18 @@ class Thor
     #
     def tasks
       @tasks ||= Thor::TaskHash.new(self)
+    end
+
+    # A shortcut to retrieve a specific task from this Thor class.
+    #
+    # ==== Parameters
+    # name<Symbol>:: the name of the task to be retrieved
+    #
+    # ==== Returns
+    # Thor::Task
+    #
+    def [](task)
+      tasks[task]
     end
 
     # Returns the options for this Thor class. Those option are declared by calling

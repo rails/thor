@@ -65,8 +65,11 @@ class Thor
     end
 
     def formatted_usage(namespace = false)
-      (namespace ? self.namespace + ':' : '') + usage +
-        (opts ? " " + opts.formatted_usage : "")
+      formatted = ''
+      formatted << "#{self.namespace}:" if namespace
+      formatted << usage
+      formatted << " #{opts.formatted_usage}" if opts
+      formatted
     end
 
     protected

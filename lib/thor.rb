@@ -5,15 +5,6 @@ class Thor
   extend Thor::DSL
   attr_accessor :options
 
-  # TODO Remove this from Thor and move to Thor::Runner or utils.
-  #
-  def self.[](task)
-    namespaces = task.split(":")
-    klass = Thor::Util.constant_from_thor_path(namespaces[0...-1].join(":"))
-    raise Error, "`#{klass}' is not a Thor class" unless klass <= Thor
-    klass.tasks[namespaces.last]
-  end
-
   # Main entry point method that should actually invoke the method. You
   # can override this to provide some class-wide processing. The default
   # implementation simply invokes the named method.
