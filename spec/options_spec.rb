@@ -179,6 +179,7 @@ describe Thor::Options do
   
   it "extracts non-option arguments" do
     create "--foo" => :required, "--bar" => true
+
     parse("foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang").must == {
       "foo" => "12", "bar" => true
     }

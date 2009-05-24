@@ -1,10 +1,39 @@
 require 'thor/core_ext/hash_with_indifferent_access'
 
 class Thor
-  # TODO Remove stub type when refactoring finishes
-  class Option < Struct.new(:name, :description, :required, :type, :default, :aliases, :stub_type)
+  class Option < Struct.new(:name, :description, :required, :type, :default, :aliases)
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
+    # This parse quick options given as method_options. It makes several
+    # assumptions you can be more specific using the option method.
+    #
+    #   method_options :foo => "bar"
+    #   #=> Option foo with default value bar
+    #
+    #   method_options [:foo, :baz] => "bar"
+    #   #=> Option foo with default value bar and alias :baz
+    #
+    #   method_options :foo => :required
+    #   #=> Required option foo without default value
+    #
+    #   method_options :foo => :optional
+    #   #=> Optional foo without default value
+    #
+    #   method_options :foo => 2
+    #   #=> Option foo with default value 2 and type numeric
+    #
+    #   method_options :foo => :numeric
+    #   #=> Option foo without default value and type numeric
+    #
+    #   method_options :foo => true
+    #   #=> Option foo with default value true and type boolean
+    #
+    # The valid types are :boolean, :numeric, :hash, :array and :string. If none
+    # is given a default type is assumed. This default type accepts arguments as
+    # string (--foo=value) or booleans (just --foo).
+    #
+    # By default all options are optional, unless :required is given.
+    # 
     def self.parse(key, value)
       if key.is_a?(Array)
         name, *aliases = key
@@ -18,30 +47,39 @@ class Thor
       type = case value
         when Symbol
           default  = nil
-          required = (value == :required)
-          value if VALID_TYPES.include?(value)
+
+          if VALID_TYPES.include?(value)
+            value
+          elsif required = (value == :required)
+            :string
+          end
         when TrueClass, FalseClass
           :boolean
         when Numeric
           :numeric
-        when Hash
-          :hash
-        when Array
-          :array
+        when Hash, Array, String
+          value.class.name.downcase.to_sym
       end
 
       required ||= false
-      type     ||= :string
+      type     ||= :default
 
-      stub_type = if required
-        :required
-      elsif type == :string
-        :optional
-      else
-        type
-      end
+      self.new(name.to_s, nil, required, type, default, aliases)
+    end
 
-      self.new(name.to_s, nil, required, type, default, aliases, stub_type)
+    def required?
+      required
+    end
+
+    def optional?
+      !required
+    end
+
+    # Returns true if this type requires an argument to be given. Just :default
+    # and :boolean does not require an argument.
+    #
+    def argument_required?
+      [ :numeric, :hash, :array, :string ].include?(type)
     end
   end
 
@@ -104,7 +142,7 @@ class Thor
         shorts << "-" + human_name[0,1] if shorts.empty? and human_name.length > 1
         shorts.each { |short| @shorts[short] = arg_name }
 
-        mem[arg_name] = option.stub_type
+        mem[arg_name] = option
         mem
       end
       
@@ -120,159 +158,193 @@ class Thor
       # Start hash with indifferent access pre-filled with defaults
       hash = Thor::CoreExt::HashWithIndifferentAccess.new @defaults
 
-      @leading_non_opts = [ ]
+      @leading_non_opts = []
       if skip_leading_non_opts
-        @leading_non_opts << shift until current_is_option? || @args.empty?
+        @leading_non_opts << shift until current_is_switch? || @args.empty?
       end
 
-      while current_is_option?
+      while current_is_switch?
         case shift
-        when SHORT_SQ_RE
-          unshift $1.split('').map { |f| "-#{f}" }
-          next
-        when EQ_RE, SHORT_NUM
-          unshift $2
-          switch = $1
-        when LONG_RE, SHORT_RE
-          switch = $1
+          when SHORT_SQ_RE
+            unshift($1.split('').map { |f| "-#{f}" })
+            next
+          when EQ_RE, SHORT_NUM
+            unshift($2)
+            switch = $1
+          when LONG_RE, SHORT_RE
+            switch = $1
         end
-        
-        switch    = normalize_switch(switch)
-        nice_name = undasherize(switch)
-        type      = switch_type(switch)
-        
-        case type
-        when :required
-          assert_value!(switch)
-          raise Error, "cannot pass switch '#{peek}' as an argument" if valid?(peek)
-          hash[nice_name] = shift
-        when :optional
-          hash[nice_name] = peek.nil? || valid?(peek) || shift
-        when :boolean
-          if !@switches.key?(switch) && nice_name =~ /^no-(\w+)$/
-            hash[$1] = false
-          else
-            hash[nice_name] = true
-          end
-          
-        when :numeric
-          assert_value!(switch)
-          unless peek =~ NUMERIC and $& == peek
-            raise Error, "expected numeric value for '#{switch}'; got #{peek.inspect}"
-          end
-          hash[nice_name] = $&.index('.') ? shift.to_f : shift.to_i
-        when :hash
-          assert_value!(switch)
-          raise Error, "cannot pass switch '#{peek}' as an argument" if valid?(peek)
-          hash[nice_name] = parse_hash(shift)
+
+        switch     = normalize_switch(switch)
+        human_name = undasherize(switch)
+        option     = switch_option(switch)
+
+        next unless option
+
+        if option.argument_required?
+          raise Error, "no value provided for argument '#{switch}'"  if peek.nil?
+          raise Error, "cannot pass switch '#{peek}' as an argument" if switch?(peek)
+        end
+
+        case option.type
+          when :default
+            hash[human_name] = peek.nil? || peek.to_s =~ /^-/ || shift
+          when :string
+            hash[human_name] = shift
+          when :boolean
+            if !@switches.key?(switch) && human_name =~ /^no-(\w+)$/
+              hash[$1] = false
+            else
+              hash[human_name] = true
+            end
+          when :numeric
+            unless peek =~ NUMERIC and $& == peek
+              raise Error, "expected numeric value for '#{switch}'; got #{peek.inspect}"
+            end
+            hash[human_name] = $&.index('.') ? shift.to_f : shift.to_i
+          when :hash
+            hash[human_name] = parse_hash(shift)
+          # TODO when :array
         end
       end
-      
+
       @trailing_non_opts = @args
 
-      check_required! hash
+      check_required!(hash)
       hash.freeze
       hash
     end
     
     def formatted_usage
       return "" if @switches.empty?
-      @switches.map do |opt, type|
-        case type
-        when :boolean
-          "[#{opt}]"
-        when :required
-          opt + "=" + opt.gsub(/\-/, "").upcase
-        else
-          sample = @defaults[undasherize(opt)]
-          sample ||= case type
-            when :optional then undasherize(opt).gsub(/\-/, "_").upcase
-            when :numeric  then "N"
+
+      # TODO Use switch description when available
+      @switches.map do |key, option|
+        sample = case option.type
+          when :boolean
+            nil
+          when :string, :default
+            option.default || key.gsub(/\-/, "").upcase
+          when :numeric
+            option.default || "N"
+          when :hash
+            # TODO Spec me
+            if option.default
+              option.default.inject([]) do |mem, (key, value)|
+                mem << "#{key}:#{value.gsub(/\s/, '_')}"
+                mem
+              end.join(' ')
+            else
+              "first_key:first_value second_key:second_value"
             end
-          "[" + opt + "=" + sample.to_s + "]"
+          when :array
+            # TODO Spec me
+            if option.default
+              option.default.inspect
+            else
+              "[1,2,3]"
+            end
+        end
+
+        sample = if sample
+          "#{key}=#{sample}"
+        else
+          key
+        end
+
+        if option.required?
+          sample
+        else
+          "[#{sample}]"
         end
       end.join(" ")
     end
-    
     alias :to_s :formatted_usage
 
     private
-    
-    def assert_value!(switch)
-      raise Error, "no value provided for argument '#{switch}'" if peek.nil?
-    end
-    
-    def undasherize(str)
-      str.sub(/^-{1,2}/, '')
-    end
-    
-    def dasherize(str)
-      (str.length > 1 ? "--" : "-") + str
-    end
-    
-    def peek
-      @args.first
-    end
 
-    def shift
-      @args.shift
-    end
-
-    def unshift(arg)
-      unless arg.kind_of?(Array)
-        @args.unshift(arg)
-      else
-        @args = arg + @args
-      end
-    end
-    
-    def valid?(arg)
-      if arg.to_s =~ /^--no-(\w+)$/
-        @switches.key?(arg) or (@switches["--#{$1}"] == :boolean)
-      else
-        @switches.key?(arg) or @shorts.key?(arg)
-      end
-    end
-
-    def parse_hash(arg)
-      hash = {}
-
-      arg.split(/\s/).each do |key_value|
-        key, value = key_value.split(':')
-        hash[key] = value
+      def undasherize(str)
+        str.sub(/^-{1,2}/, '')
       end
 
-      hash
-    end
+      def dasherize(str)
+        (str.length > 1 ? "--" : "-") + str
+      end
 
-    def current_is_option?
-      case peek
-      when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
-        valid?($1)
-      when SHORT_SQ_RE
-        $1.split('').any? { |f| valid?("-#{f}") }
+      def peek
+        @args.first
       end
-    end
-    
-    def normalize_switch(switch)
-      @shorts.key?(switch) ? @shorts[switch] : switch
-    end
-    
-    def switch_type(switch)
-      if switch =~ /^--no-(\w+)$/
-        @switches[switch] || @switches["--#{$1}"]
-      else
-        @switches[switch]
+
+      def shift
+        @args.shift
       end
-    end
-    
-    def check_required!(hash)
-      for name, type in @switches
-        if type == :required and !hash[undasherize(name)]
-          raise Error, "no value provided for required argument '#{name}'"
+
+      def unshift(arg)
+        unless arg.kind_of?(Array)
+          @args.unshift(arg)
+        else
+          @args = arg + @args
         end
       end
-    end
-    
+
+      # Returns true if the current peek is a switch.
+      #
+      def current_is_switch?
+        case peek
+          when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
+            switch?($1)
+          when SHORT_SQ_RE
+            $1.split('').any? { |f| switch?("-#{f}") }
+        end
+      end
+
+      # Check if the given argument matches with a switch.
+      #
+      def switch?(arg)
+        switch_option(arg) || @shorts.key?(arg)
+      end
+
+      # Returns the option object for the given switch.
+      #
+      def switch_option(arg)
+        if arg =~ /^--no-(\w+)$/
+          @switches[arg] || @switches["--#{$1}"]
+        else
+          @switches[arg]
+        end
+      end
+
+      # Check if the given argument is actually a shortcut.
+      #
+      def normalize_switch(arg)
+        @shorts.key?(arg) ? @shorts[arg] : arg
+      end
+
+      # Receives a string in the following format:
+      #
+      #   name:string age:integer
+      #
+      # And returns it as a hash:
+      #
+      #   { "name" => "string", "age" => "integer" }
+      #
+      def parse_hash(arg)
+        arg.split(/\s/).inject({}) do |hash, key_value|
+          key, value = key_value.split(':')
+          hash[key] = value
+          hash
+        end
+      end
+
+      # Receives a hash and check if all required switches were set.
+      #
+      def check_required!(hash)
+        @switches.each do |name, option|
+          if option.required? && hash[undasherize(name)].nil?
+            raise Error, "no value provided for required argument '#{name}'"
+          end
+        end
+      end
+
   end
 end
