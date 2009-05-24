@@ -16,10 +16,14 @@ class Thor
     # meth<Symbol>:: name of the defaut task
     #
     def default_task(meth=nil)
-      unless meth.nil?
-        @default_task = (meth == :none) ? 'help' : meth.to_s
+      case meth
+        when :none
+          @default_task = 'help'
+        when nil
+          @default_task ||= (self == Thor ? 'help' : superclass.default_task)
+        else
+          @default_task = meth.to_s
       end
-      @default_task ||= (self == Thor ? 'help' : superclass.default_task)
     end
 
     # Maps an input to a task. If you define:
@@ -83,7 +87,8 @@ class Thor
     # is the type of the option. Can be :optional, :required, :boolean or :numeric.
     #
     def method_options(opts)
-      @method_options = (@method_options || {}).merge(opts)
+      @method_options ||= {}
+      @method_options.merge!(opts)
     end
 
     # Returns the files where the subclasses are maintained.
@@ -132,8 +137,10 @@ class Thor
     # ==== Returns
     # Hash[Symbol => Symbol]
     #
+    # TODO Spec that superclass options can be overwritten.
     def opts
-      (@opts || {}).merge(self == Thor ? {} : superclass.opts)
+      options = (self == Thor ? {} : superclass.opts)
+      options.merge(@opts || {})
     end
 
     def maxima

@@ -4,7 +4,7 @@ require "thor"
 class MyApp < Thor
   
   map "-T" => :animal, ["-f", "--foo"] => :foo
-  
+
   desc "zoo", "zoo around"
   def zoo
     true
