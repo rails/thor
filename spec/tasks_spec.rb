@@ -1,6 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require "thor"
-require "thor/tasks"
+require 'thor/tasks'
 
 # bleh. testing private methods?
 class << Thor

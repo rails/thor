@@ -70,7 +70,7 @@ class Thor
     #      ["--level", "-l"] => :numeric
     #   ).parse(args)
     #
-    def initialize(switches)
+    def initialize(switches={})
       @defaults = {}
       @shorts = {}
       

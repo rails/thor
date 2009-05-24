@@ -1,5 +1,6 @@
+# We have to load both spec_helper and thor using expand_path to ensure that
+# none is loaded twice along specs.
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require "thor"
 
 class MyApp < Thor
   

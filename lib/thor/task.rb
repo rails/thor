@@ -2,16 +2,10 @@ require 'thor/error'
 require 'thor/util'
 
 class Thor
-  class Task < Struct.new(:meth, :description, :usage, :opts, :klass)
+  class Task < Struct.new(:meth, :description, :usage, :options, :klass)
 
     def self.dynamic(meth, klass)
       new(meth, "A dynamically-generated task", meth.to_s, nil, klass)
-    end
-
-    def initialize(*args)
-      # keep the original opts - we need them later on
-      @options = args[3] || {}
-      super
     end
 
     def parse(obj, args)
@@ -21,31 +15,29 @@ class Thor
     end
 
     def run(obj, *params)
-      raise NoMethodError, "the `#{meth}' task of #{obj.class} is private" if
-        (obj.private_methods + obj.protected_methods).include?(meth)
+      raise NoMethodError, "the `#{meth}' task of #{obj.class} is private" unless public_method?(obj, meth)
 
       obj.invoke(meth, *params)
     rescue ArgumentError => e
-      # backtrace sans anything in this file
-      backtrace = e.backtrace.reject {|frame| frame =~ /^#{Regexp.escape(__FILE__)}/}
-      # also nix anything in thor.rb
-      backtrace = backtrace.reject { |frame| frame =~ /\/thor.rb/ }
+      backtrace = sans_backtrace(e.backtrace, caller)
 
-      # and sans anything that got us here
-      backtrace -= caller
-      raise e unless backtrace.empty?
-
-      # okay, they really did call it wrong
-      raise Error, "`#{meth}' was called incorrectly. Call as `#{formatted_usage}'"
+      # If backtrace is empty, they called Thor wrongly. Otherwise re-raise the
+      # original error.
+      #
+      if backtrace.empty?
+        raise Error, "`#{meth}' was called incorrectly. Call as `#{formatted_usage}'"
+      else
+        raise e
+      end
     rescue NoMethodError => e
       if e.message =~ /^undefined method `#{meth}' for #{Regexp.escape(obj.inspect)}$/
-        raise Error, "The #{namespace false} namespace doesn't have a `#{meth}' task"
+        raise Error, "The #{namespace(false)} namespace doesn't have a `#{meth}' task"
       else
         raise e
       end
     end
 
-    def namespace(remove_default = true)
+    def namespace(remove_default=true)
       Thor::Util.constant_to_thor_path(klass, remove_default)
     end
 
@@ -55,20 +47,19 @@ class Thor
       new
     end
 
+    # Merge the options given on task creation with the klass options and
+    # returns as a Options object.
+    #
     def opts
-      return super unless super.kind_of? Hash
-      @_opts ||= Options.new(super)
-    end
-
-    def full_opts
-      @_full_opts ||= Options.new((klass.opts || {}).merge(@options))
+      @opts ||= Options.new((klass.opts || {}).merge(options || {}))
     end
 
     def formatted_usage(namespace = false)
       formatted = ''
       formatted << "#{self.namespace}:" if namespace
       formatted << usage
-      formatted << " #{opts.formatted_usage}" if opts
+      formatted << " #{opts.formatted_usage}"
+      formatted.strip!
       formatted
     end
 
@@ -76,9 +67,22 @@ class Thor
 
       def parse_args(args)
         return [[], {}] if args.nil?
-        hash = full_opts.parse(args)
-        list = full_opts.non_opts
+        hash = opts.parse(args)
+        list = opts.non_opts
         [list, hash]
       end
+
+      def public_method?(obj, meth)
+        !(obj.private_methods + obj.protected_methods).include?(meth)
+      end
+
+      # Clean everything that comes from the Thor gempath and remove the caller.
+      #
+      def sans_backtrace(backtrace, caller)
+        dirname = /^#{Regexp.escape(File.dirname(__FILE__))}/
+        saned  = backtrace.reject { |frame| frame =~ dirname }
+        saned -= caller
+      end
+
   end
 end

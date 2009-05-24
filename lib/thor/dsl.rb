@@ -152,24 +152,28 @@ class Thor
       end
     end
 
-    def start(args = ARGV)
-      options = Thor::Options.new(self.opts)
-      opts = options.parse(args, false)
-      args = options.trailing_non_opts
+    # Parse the options given and extract the task to be called from it. If no
+    # method can be extracted from args the default task is invoked.
+    #
+    def start(args=ARGV)
+      opts    = Thor::Options.new
+      options = opts.parse(args, false)
+      args    = opts.trailing_non_opts
 
       meth = args.first
       meth = @map[meth].to_s if @map && @map[meth]
       meth ||= default_task
       meth = meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
 
-      tasks[meth].parse new(opts, *args), args[1..-1]
+      tasks[meth].parse new(options, *args), args[1..-1]
     rescue Thor::Error => e
       $stderr.puts e.message
     end
 
-    # Invokes a specific task.  You can use this method instead of start() 
+    # Invokes a specific task. You can use this method instead of start() to
     # to run a thor task if you know the specific task you want to invoke.
-    def invoke(task_name=nil, args = ARGV)
+    #
+    def invoke(task_name=nil, args=ARGV)
       args = args.dup
       args.unshift(task_name || default_task)
       start(args)

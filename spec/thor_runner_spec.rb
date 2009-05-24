@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
-require "thor/runner"
-require "rr"
+require 'thor/runner'
+require 'rr'
 
 load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
 
