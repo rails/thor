@@ -137,7 +137,6 @@ class Thor
     # ==== Returns
     # Hash[Symbol => Symbol]
     #
-    # TODO Spec that superclass options can be overwritten.
     def opts
       options = (self == Thor ? {} : superclass.opts)
       options.merge(@opts || {})

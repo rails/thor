@@ -1,5 +1,3 @@
-# We have to load both spec_helper and thor using expand_path to ensure that
-# none is loaded twice along specs.
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 class MyApp < Thor
@@ -69,7 +67,7 @@ end
 
 class GlobalOptionsTasks < Thor
 
-  method_options :force => :boolean, :param => :optional
+  method_options :force => :boolean, :param => :numeric
   def initialize(*args)
     super
   end
@@ -81,10 +79,17 @@ class GlobalOptionsTasks < Thor
   end
   
   desc "zoo", "zoo around"
+  method_options :param => :required
   def zoo
     options
   end
-  
+end
+
+class ChildGlobalOptionsTasks < GlobalOptionsTasks
+  method_options :force => :optional, :param => :required
+  def initialize(*args)
+    super
+  end
 end
 
 describe "thor" do
@@ -138,19 +143,26 @@ describe "thor" do
   end
   
   it "allows global options to be set" do
+    GlobalOptionsTasks.opts.must == { :force=>:boolean, :param=>:numeric }
+  end
+
+  it "allows child global options to overwritte parent global options" do
+    ChildGlobalOptionsTasks.opts.must == { :force=>:optional, :param=>:required }
+  end
+
+  it "allows global options to be overwritten" do
     args = ["zoo", "--force", "--param", "feathers"]
     options = GlobalOptionsTasks.start(args)
     options.must == { "force"=>true, "param"=>"feathers" }
   end
   
   it "allows global options to be merged with method options" do
-    args = ["animal", "bird", "--force", "--param", "feathers", "--other", "tweets"]
+    args = ["animal", "bird", "--force", "--param", "1.0", "--other", "tweets"]
     arg, options = GlobalOptionsTasks.start(args)
     arg.must == 'bird'
-    options.must == { "force"=>true, "param"=>"feathers", "other"=>"tweets" }
-    GlobalOptionsTasks.opts.must == { :force=>:boolean, :param=>:optional }
+    options.must == { "force"=>true, "param"=>1.0, "other"=>"tweets" }
   end
-  
+
   it "does not call a private method no matter what" do
     lambda { MyApp.start(["what"]) }.must raise_error(NoMethodError, "the `what' task of MyApp is private")
   end
