@@ -201,34 +201,6 @@ describe Thor::Options do
     end
   end
   
-  describe 'Hash' do
-    before(:each) do
-      @hash = Thor::Options::Hash.new 'foo' => 'bar', 'baz' => 'bee', 'force' => true
-    end
-    
-    it "has values accessible by either strings or symbols" do
-      @hash['foo'].must == 'bar'
-      @hash[:foo].must  == 'bar'
-      @hash.values_at(:foo, :baz).must == ['bar', 'bee']
-    end
-    
-    it "should handles magic boolean predicates" do
-      @hash.force?.must be_true
-      @hash.foo?.must be_true
-      @hash.nothing?.must be_false
-    end
-    
-    it "should map methods to keys: hash.foo => hash[:foo]" do
-      @hash.foo.must == @hash['foo']
-    end
-    
-    it "should map setters to keys: hash.foo=bar => hash[:foo] => bar" do
-      @hash.foo = :bar2
-      @hash.foo.must == :bar2
-    end
-    
-  end
-  
   describe ":numeric type" do
     before(:each) do
       create "n" => :numeric, "m" => 5

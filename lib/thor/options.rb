@@ -1,44 +1,12 @@
-# This is a modified version of Daniel Berger's Getopt::Long class,
-# licensed under Ruby's license.
+require 'thor/core_ext/hash_with_indifferent_access'
 
 class Thor
+
+  # This is a modified version of Daniel Berger's Getopt::Long class,
+  # licensed under Ruby's license.
+  #
   class Options
     class Error < StandardError; end
-    
-    # Simple Hash with indifferent access
-    # TODO Can we get rid of this just by symbolizing keys?
-    class Hash < ::Hash
-      def initialize(hash)
-        super()
-        update hash
-      end
-      
-      def [](key)
-        super convert_key(key)
-      end
-      
-      def values_at(*indices)
-        indices.collect { |key| self[convert_key(key)] }
-      end
-      
-      protected
-        def convert_key(key)
-          key.kind_of?(Symbol) ? key.to_s : key
-        end
-        
-        # Magic predicates. For instance:
-        #   options.force? # => !!options['force']
-        def method_missing(method, *args, &block)
-          method = method.to_s
-          if method =~ /^(\w+)=$/ 
-            self[$1] = args.first
-          elsif method =~ /^(\w+)\?$/
-            !!self[$1]
-          else 
-            self[method]
-          end
-        end
-    end
 
     NUMERIC     = /(\d*\.\d+|\d+)/
     LONG_RE     = /^(--\w+[-\w+]*)$/
@@ -46,9 +14,9 @@ class Thor
     EQ_RE       = /^(--\w+[-\w+]*|-[a-z])=(.*)$/i
     SHORT_SQ_RE = /^-([a-z]{2,})$/i # Allow either -x -v or -xv style for single char args
     SHORT_NUM   = /^(-[a-z])#{NUMERIC}$/i
-    
+
     attr_reader :leading_non_opts, :trailing_non_opts
-    
+
     def non_opts
       leading_non_opts + trailing_non_opts
     end
@@ -122,9 +90,10 @@ class Thor
 
     def parse(args, skip_leading_non_opts = true)
       @args = args
-      # start with Thor::Options::Hash pre-filled with defaults
-      hash = Hash.new @defaults
-      
+
+      # Start hash with indifferent access pre-filled with defaults
+      hash = Thor::CoreExt::HashWithIndifferentAccess.new @defaults
+
       @leading_non_opts = []
       if skip_leading_non_opts
         @leading_non_opts << shift until current_is_option? || @args.empty?
