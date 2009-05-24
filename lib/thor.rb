@@ -21,19 +21,16 @@ class Thor
 
       def method_added(meth)
         meth = meth.to_s
-        
+
         if meth == "initialize"
           @opts = @method_options
           @method_options = nil
           return
         end
 
-        return if !public_instance_methods.include?(meth) || !@usage
-        register_klass_file self
-
-        tasks[meth] = Task.new(meth, @desc, @usage, @method_options)
-
-        @usage, @desc, @method_options = nil
+        return unless valid_task?(meth)
+        register_klass_file(self)
+        create_task(meth)
       end
 
       def register_klass_file(klass, file = caller[1].match(/(.*):\d+/)[1])

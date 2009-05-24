@@ -86,10 +86,7 @@ class GlobalOptionsTasks < Thor
 end
 
 class ChildGlobalOptionsTasks < GlobalOptionsTasks
-  method_options :force => :optional, :param => :required
-  def initialize(*args)
-    super
-  end
+  default_options :force => :optional, :param => :required
 end
 
 describe "thor" do

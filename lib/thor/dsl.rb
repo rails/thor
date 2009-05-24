@@ -142,6 +142,25 @@ class Thor
       options.merge(@opts || {})
     end
 
+    # Sets the default options for this class. It can be done in two ways:
+    #
+    # 1) Calling method_options before an initializer
+    #
+    #   method_options :force => true
+    #   def initialize(*args)
+    #
+    # 2) Calling default_options
+    #
+    #   default_options :force => true
+    #
+    # ==== Parameters
+    # Hash[Symbol => Symbol]:: The hash has the same syntax as method_options hash.
+    #
+    def default_options(opts={})
+      @opts ||= {}
+      @opts.merge!(opts)
+    end
+
     def maxima
       @maxima ||= begin
         max_usage = tasks.map {|_, t| t.usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
@@ -149,6 +168,15 @@ class Thor
         max_opts  = tasks.map {|_, t| t.opts ? t.opts.formatted_usage : ""}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
         Struct.new(:description, :usage, :opt).new(max_desc, max_usage, max_opts)
       end
+    end
+
+    def valid_task?(meth)
+      public_instance_methods.include?(meth) && @usage
+    end
+
+    def create_task(meth)
+      tasks[meth] = Task.new(meth, @desc, @usage, @method_options)
+      @usage, @desc, @method_options = nil
     end
 
     # Parse the options given and extract the task to be called from it. If no
