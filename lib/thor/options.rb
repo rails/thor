@@ -5,7 +5,7 @@ class Thor
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
     # This parse quick options given as method_options. It makes several
-    # assumptions you can be more specific using the option method.
+    # assumptions, but you can be more specific using the option method.
     #
     #   method_options :foo => "bar"
     #   #=> Option foo with default value bar
@@ -81,6 +81,63 @@ class Thor
     def argument_required?
       [ :numeric, :hash, :array, :string ].include?(type)
     end
+
+    def switch_name
+      @switch_name ||= dasherized? ? name : dasherize(name)
+    end
+
+    def human_name
+      @human_name ||= dasherized? ? undasherize(name) : name
+    end
+
+    def dasherized?
+      name.index('-') == 0
+    end
+
+    def undasherize(str)
+      str.sub(/^-{1,2}/, '')
+    end
+
+    def dasherize(str)
+      (str.length > 1 ? "--" : "-") + str
+    end
+
+    # If this option has a default value, format it to be shown to the user.
+    #
+    def formatted_default
+      return unless default
+
+      case type
+        when :boolean
+          nil
+        when :string, :default, :numeric
+          default
+        when :hash
+          default.inject([]) do |mem, (key, value)|
+            mem << "#{key}:#{value}".gsub(/\s/, '_')
+            mem
+          end.join(' ')
+        when :array
+          default.inspect
+      end
+    end
+
+    # Show how this value should be supplied by the user.
+    #
+    def formatted_value
+      case type
+        when :boolean
+          nil
+        when :string, :default
+          human_name.upcase
+        when :numeric
+          "N"
+        when :hash
+          "key:value"
+        when :array
+          "[a,b,3]"
+      end
+    end
   end
 
   # This is a modified version of Daniel Berger's Getopt::Long class,
@@ -122,43 +179,32 @@ class Thor
     def initialize(switches={})
       @defaults = {}
       @shorts = {}
-      
+
       @leading_non_opts, @trailing_non_opts = [], []
 
       @switches = switches.inject({}) do |mem, (name, type)|
         option = Thor::Option.parse(name, type)
 
-        # We need both human and dasherized (--name) form of switch name
-        if option.name.index('-') == 0
-          arg_name, human_name = option.name, undasherize(option.name)
-        else
-          arg_name, human_name = dasherize(option.name), option.name
-        end
-
-        @defaults[human_name] = option.default unless option.default.nil?
+        @defaults[option.human_name] = option.default unless option.default.nil?
 
         # If there are no shortcuts specified, generate one using the first character
         shorts = option.aliases.dup
-        shorts << "-" + human_name[0,1] if shorts.empty? and human_name.length > 1
-        shorts.each { |short| @shorts[short] = arg_name }
+        shorts << "-" + option.human_name[0,1] if shorts.empty? and option.human_name.length > 1
+        shorts.each { |short| @shorts[short] ||= option.switch_name }
 
-        mem[arg_name] = option
+        mem[option.switch_name] = option
         mem
       end
-      
-      # remove shortcuts that happen to coincide with any of the main switches
-      @shorts.keys.each do |short|
-        @shorts.delete(short) if @switches.key?(short)
-      end
+
+      remove_duplicated_shortcuts!
     end
 
-    def parse(args, skip_leading_non_opts = true)
+    def parse(args, skip_leading_non_opts=true)
       @args = args
 
       # Start hash with indifferent access pre-filled with defaults
-      hash = Thor::CoreExt::HashWithIndifferentAccess.new @defaults
+      hash = Thor::CoreExt::HashWithIndifferentAccess.new(@defaults)
 
-      @leading_non_opts = []
       if skip_leading_non_opts
         @leading_non_opts << shift until current_is_switch? || @args.empty?
       end
@@ -176,8 +222,8 @@ class Thor
         end
 
         switch     = normalize_switch(switch)
-        human_name = undasherize(switch)
         option     = switch_option(switch)
+        human_name = option.human_name
 
         next unless option
 
@@ -192,23 +238,21 @@ class Thor
           when :string
             hash[human_name] = shift
           when :boolean
-            if !@switches.key?(switch) && human_name =~ /^no-(\w+)$/
+            if !@switches.key?(switch) && switch =~ /^--no-(\w+)$/
               hash[$1] = false
             else
               hash[human_name] = true
             end
           when :numeric
-            unless peek =~ NUMERIC and $& == peek
-              raise Error, "expected numeric value for '#{switch}'; got #{peek.inspect}"
-            end
-            hash[human_name] = $&.index('.') ? shift.to_f : shift.to_i
+            hash[human_name] = parse_numeric(switch, shift)
           when :hash
             hash[human_name] = parse_hash(shift)
-          # TODO when :array
+          when :array
+            hash[human_name] = parse_array(shift)
         end
       end
 
-      @trailing_non_opts = @args
+      @trailing_non_opts += @args
 
       check_required!(hash)
       hash.freeze
@@ -220,31 +264,7 @@ class Thor
 
       # TODO Use switch description when available
       @switches.map do |key, option|
-        sample = case option.type
-          when :boolean
-            nil
-          when :string, :default
-            option.default || key.gsub(/\-/, "").upcase
-          when :numeric
-            option.default || "N"
-          when :hash
-            # TODO Spec me
-            if option.default
-              option.default.inject([]) do |mem, (key, value)|
-                mem << "#{key}:#{value.gsub(/\s/, '_')}"
-                mem
-              end.join(' ')
-            else
-              "first_key:first_value second_key:second_value"
-            end
-          when :array
-            # TODO Spec me
-            if option.default
-              option.default.inspect
-            else
-              "[1,2,3]"
-            end
-        end
+        sample = option.formatted_default || option.formatted_value
 
         sample = if sample
           "#{key}=#{sample}"
@@ -262,14 +282,6 @@ class Thor
     alias :to_s :formatted_usage
 
     private
-
-      def undasherize(str)
-        str.sub(/^-{1,2}/, '')
-      end
-
-      def dasherize(str)
-        (str.length > 1 ? "--" : "-") + str
-      end
 
       def peek
         @args.first
@@ -322,7 +334,7 @@ class Thor
 
       # Receives a string in the following format:
       #
-      #   name:string age:integer
+      #   "name:string age:integer"
       #
       # And returns it as a hash:
       #
@@ -336,13 +348,45 @@ class Thor
         end
       end
 
+      # Receives a string in the following format:
+      #
+      #   "[a, b, c]"
+      #
+      # And returns it as an array:
+      #
+      #   ["a", "b", "c"]
+      #
+      def parse_array(arg)
+        array = arg.gsub(/(^\[)|(\]$)/, '').split(',')
+        array.each { |item| item.strip! }
+        array
+      end
+
+      # Receives a string, check if it's in a numeric format and return a Float
+      # or Integer. Otherwise raises an error.
+      #
+      def parse_numeric(switch, arg)
+        unless arg =~ NUMERIC && $& == arg
+          raise Error, "expected numeric value for '#{switch}'; got #{arg.inspect}"
+        end
+        $&.index('.') ? arg.to_f : arg.to_i
+      end
+
       # Receives a hash and check if all required switches were set.
       #
       def check_required!(hash)
         @switches.each do |name, option|
-          if option.required? && hash[undasherize(name)].nil?
+          if option.required? && hash[option.human_name].nil?
             raise Error, "no value provided for required argument '#{name}'"
           end
+        end
+      end
+
+      # Remove shortcuts that happen to coincide with any of the main switches
+      #
+      def remove_duplicated_shortcuts!
+        @shorts.keys.each do |short|
+          @shorts.delete(short) if @switches.key?(short)
         end
       end
 

@@ -5,12 +5,20 @@ describe Thor::Options do
   def create(opts)
     @opt = Thor::Options.new(opts)
   end
-  
+
   def parse(*args)
     @non_opts = []
     @opt.parse(args.flatten)
   end
-  
+
+  def usage
+    @opt.formatted_usage
+  end
+
+  def sorted_usage
+    usage.split(" ").sort.join(" ")
+  end
+
   describe "naming" do
     it "automatically aliases long switches with their first letter" do
       create "--foo" => true
@@ -159,7 +167,7 @@ describe Thor::Options do
     end
   end
   
-  describe " with one required and one optional switch" do
+  describe "with one required and one optional switch" do
     before :each do
       create "--foo" => :required, "--bar" => :optional
     end
@@ -218,8 +226,44 @@ describe Thor::Options do
     it "must not mix values with other switches" do
       parse("--attributes", "name:string age:integer", "--baz", "cool")["attributes"].must == {"name" => "string", "age" => "integer"}
     end
+
+    it "outputs formatted usage" do
+      usage.first.must == "[--attributes=key:value]"
+    end
+
+    it "outputs default value as formatted usage" do
+      create "--attributes" => { :my_key => "my value" }
+      usage.first.must == "[--attributes=my_key:my_value]"
+    end
   end
-  
+
+  describe ":array type" do
+    before(:each) do
+      create "--attributes" => :array
+    end
+
+    it "accepts a switch=<value> assignment" do
+      parse("--attributes=[a,b,c]")["attributes"].must == ["a", "b", "c"]
+    end
+
+    it "accepts a switch <value> assignment" do
+      parse("--attributes", "[a,b,c]")["attributes"].must == ["a", "b", "c"]
+    end
+
+    it "must not mix values with other switches" do
+      parse("--attributes", "[a,b,c]", "--baz", "cool")["attributes"].must == ["a", "b", "c"]
+    end
+
+    it "outputs formatted usage" do
+      usage.first.must == "[--attributes=[a,b,3]]"
+    end
+
+    it "outputs default value as formatted usage" do
+      create "--attributes" => [1,2,3,:a,:c]
+      usage.first.must == "[--attributes=[1, 2, 3, :a, :c]]"
+    end
+  end
+
   describe ":numeric type" do
     before(:each) do
       create "n" => :numeric, "m" => 5
@@ -243,20 +287,16 @@ describe Thor::Options do
         "no value provided for argument '-n'")
     end
   end
-  
+
   describe "#formatted_usage" do
-    def usage
-      @opt.formatted_usage.split(" ").sort
-    end
-    
     it "outputs optional args with sample values" do
       create "--repo" => :optional, "--branch" => "bugfix", "-n" => 6
-      usage.must == %w([--branch=bugfix] [--repo=REPO] [-n=6])
+      sorted_usage.must == "[--branch=bugfix] [--repo=REPO] [-n=6]"
     end
     
     it "outputs numeric args with 'N' as sample value" do
       create "--iter" => :numeric
-      usage.must == ["[--iter=N]"]
+      usage.must == "[--iter=N]"
     end
   end
 end
