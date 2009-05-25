@@ -98,15 +98,6 @@ describe "thor" do
     MyApp.start(["animal", "fish"]).must == ["fish"]
   end
   
-  it "calls the alias of a method if one is provided via .map" do
-    MyApp.start(["-T", "fish"]).must == ["fish"]
-  end
-
-  it "calls the alias of a method if several are provided via .map" do
-    MyApp.start(["-f", "fish"]).must == ["fish", {}]
-    MyApp.start(["--foo", "fish"]).must == ["fish", {}]
-  end
-  
   it "raises an error if a required param is not provided" do
     capture(:stderr) { MyApp.start(["animal"]) }.must =~ /`animal' was called incorrectly\. Call as `animal TYPE'/
   end
@@ -138,73 +129,11 @@ describe "thor" do
   it "calls method_missing if an unknown method is passed in" do
     MyApp.start(["unk", "hello"]).must == [:unk, ["hello"]]
   end
-  
-  it "allows global options to be set" do
-    GlobalOptionsTasks.opts.must == { :force=>:boolean, :param=>:numeric }
-  end
-
-  it "allows child global options to overwritte parent global options" do
-    ChildGlobalOptionsTasks.opts.must == { :force=>:optional, :param=>:required }
-  end
-
-  it "allows global options to be overwritten" do
-    args = ["zoo", "--force", "--param", "feathers"]
-    options = GlobalOptionsTasks.start(args)
-    options.must == { "force"=>true, "param"=>"feathers" }
-  end
-  
-  it "allows global options to be merged with method options" do
-    args = ["animal", "bird", "--force", "--param", "1.0", "--other", "tweets"]
-    arg, options = GlobalOptionsTasks.start(args)
-    arg.must == 'bird'
-    options.must == { "force"=>true, "param"=>1.0, "other"=>"tweets" }
-  end
 
   it "does not call a private method no matter what" do
     lambda { MyApp.start(["what"]) }.must raise_error(NoMethodError, "the `what' task of MyApp is private")
   end
-  
-  it "invokes the default task if no command is specified" do
-    MyApp.start([]).must =~ /default/
-  end
-  
-  it "provides useful help info for a simple method" do
-    capture(:stdout) { MyApp.start(["help"]) }.must =~ /zoo +zoo around/
-  end
-  
-  it "provides useful help info for a method with one param" do
-    capture(:stdout) { MyApp.start(["help"]) }.must =~ /animal TYPE +horse around/
-  end  
-  
-  it "provides useful help info for a method with boolean options" do
-    capture(:stdout) { MyApp.start(["help"]) }.must =~ /foo BAR \[\-\-force\] +do some fooing/
-  end
-  
-  it "provides useful help info for a method with required options" do
-    capture(:stdout) { MyApp.start(["help"]) }.must =~ /bar BAZ BAT \-\-option1=OPTION1 +do some barring/
-  end
-  
-  it "provides useful help info for a method with optional options" do
-    capture(:stdout) { MyApp.start(["help"]) }.must =~ /baz BAT \[\-\-option1=OPTION1\] +do some bazzing/
-  end
 
-  it "provides useful help info for the help method itself" do
-    capture(:stdout) { MyApp.start(["help"]) }.must =~ /help \[TASK\] +describe available tasks/
-  end
-
-  it "provides one line of help info per task when talking about all tasks" do
-    capture(:stdout) { MyApp.start(["help"]) }.must =~ /bang FOO \[--fup\] +bangs around some/
-  end
-
-  it "provides full help info when talking about a specific task" do
-    capture(:stdout) { MyApp.start(["help", "bang"]) }.must == <<END
-bang FOO [--fup]
-bangs around some
-  This is more info!
-  Everyone likes more info!
-END
-  end
-  
   it "raises when an exception happens within the task call" do
     lambda { MyApp.start(["call_myself_with_wrong_arity"]) }.must raise_error
   end

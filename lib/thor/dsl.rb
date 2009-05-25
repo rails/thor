@@ -70,16 +70,16 @@ class Thor
     def group(name)
       @group_name = name.to_s
     end
-    
+
     # Returns the group name.
     #
     # ==== Returns
     # String
     #
     def group_name
-      @group_name || 'standard'
+      @group_name ||= superclass.instance_variable_get('@group_name') || 'standard'
     end
-    
+
     # Declares the options for the next task to be declaread.
     #
     # ==== Parameters
