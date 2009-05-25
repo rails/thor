@@ -13,7 +13,7 @@ class Thor::Generator < Thor
       args    = opts.trailing_non_opts
 
       generator = new(options, *args)
-      tasks     = self.tasks.values.reject { |task| task.meth == 'help' }
+      tasks     = self.all_tasks.values.reject { |task| task.meth == 'help' }
       tasks.map { |task| task.parse(generator, args) }
     rescue Thor::Error => e
       $stderr.puts e.message

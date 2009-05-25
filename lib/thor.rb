@@ -59,7 +59,7 @@ class Thor
         task = self.class[task]
         namespace = true
       else
-        task = self.class.tasks[task]
+        task = self.class[task]
       end
 
       puts task.formatted_usage(namespace)
@@ -67,7 +67,7 @@ class Thor
     else
       puts "Options"
       puts "-------"
-      self.class.tasks.each do |_, task|
+      self.class.all_tasks.each do |_, task|
         format = "%-" + (self.class.maxima.usage + self.class.maxima.opt + 4).to_s + "s"
         print format % ("#{task.formatted_usage}")
         puts  task.description.split("\n").first

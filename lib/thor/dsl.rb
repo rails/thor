@@ -110,13 +110,22 @@ class Thor
       @subclasses ||= []
     end
 
-    # Returns the tasks for this Thor class in an ordered hash.
+    # Returns the tasks for this Thor class.
     #
     # ==== Returns
     # TaskHash:: An ordered hash with this class tasks.
     #
     def tasks
-      @tasks ||= Thor::TaskHash.new(self)
+      @tasks ||= {}
+    end
+
+    # Returns the tasks for this Thor class and all ancestors. The result is
+    # not cached because tasks can be added.
+    # 
+    def all_tasks
+      all = (self == Thor ? {} : superclass.all_tasks).merge(tasks)
+      all.each{|k, v| all[k] = v.with_klass(self) }
+      all
     end
 
     # A shortcut to retrieve a specific task from this Thor class.
@@ -127,8 +136,12 @@ class Thor
     # ==== Returns
     # Thor::Task
     #
-    def [](task)
-      tasks[task]
+    def [](name)
+      if task = all_tasks[name.to_s]
+        task.with_klass(self)
+      else
+        Task.dynamic(name, self)
+      end
     end
 
     # Returns the options for this Thor class. Those option are declared by calling
@@ -163,9 +176,9 @@ class Thor
 
     def maxima
       @maxima ||= begin
-        max_usage = tasks.map {|_, t| t.usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
-        max_desc  = tasks.map {|_, t| t.description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
-        max_opts  = tasks.map {|_, t| t.opts ? t.opts.formatted_usage : ""}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
+        max_usage = all_tasks.map {|_, t| t.usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
+        max_desc  = all_tasks.map {|_, t| t.description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
+        max_opts  = all_tasks.map {|_, t| t.opts ? t.opts.formatted_usage : ""}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
         Struct.new(:description, :usage, :opt).new(max_desc, max_usage, max_opts)
       end
     end
@@ -192,7 +205,7 @@ class Thor
       meth ||= default_task
       meth = meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
 
-      tasks[meth].parse new(options, *args), args[1..-1]
+      self[meth].parse new(options, *args), args[1..-1]
     rescue Thor::Error => e
       $stderr.puts e.message
     end

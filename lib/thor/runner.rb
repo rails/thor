@@ -54,7 +54,7 @@ class Thor::Runner < Thor
     namespaces = task.split(":")
     klass = Thor::Util.constant_from_thor_path(namespaces[0...-1].join(":"))
     raise Error, "`#{klass}' is not a Thor class" unless klass <= Thor
-    klass.tasks[namespaces.last]
+    klass.all_tasks[namespaces.last]
   end
 
   def self.globs_for(path)

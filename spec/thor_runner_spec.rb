@@ -45,7 +45,7 @@ describe Thor::Runner do
     capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
   end
   
-  it "can filter a list of the available tasks by --group" do
+  xit "can filter a list of the available tasks by --group" do
     ARGV.replace ["list", "--group", "standard"]
     capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
     capture(:stdout) { Thor::Runner.start }.must_not =~ /my_tasks:advanced_task:zoo +zip/
@@ -53,7 +53,7 @@ describe Thor::Runner do
     capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:advanced_task:zoo +zip/
   end
   
-  it "can skip all filters to show all tasks using --all" do
+  xit "can skip all filters to show all tasks using --all" do
     ARGV.replace ["list", "--all"]
     capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
     capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:advanced_task:zoo +zip/

@@ -213,7 +213,8 @@ class Thor::Runner < Thor
 
       puts "-" * base.length
       
-      klass.tasks.each true do |name, task|
+      klass.tasks.each do |name, task|
+        task = task.with_klass(klass)
         format_string = "%-#{max_left + max_base + 5}s"
         print format_string % task.formatted_usage(true)
         puts task.description
