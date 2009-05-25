@@ -8,12 +8,12 @@ class MyApp < Thor
   def zoo
     true
   end
-  
+
   desc "animal TYPE", "horse around"
   def animal(type)
     [type]
   end
-  
+
   desc "foo BAR", "do some fooing"
   method_options :force => :boolean
   def foo(bar)
@@ -141,9 +141,4 @@ describe "thor" do
   it "invokes the named command regardless of the command line options with invoke()" do
     MyApp.invoke(:baz, ["one"]).must == ["one", {}]
   end
-
-  it "retrieves an specific task through a shortcut" do
-    MyApp[:baz].class.must == Thor::Task
-  end
-  
 end

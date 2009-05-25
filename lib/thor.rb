@@ -16,7 +16,7 @@ class Thor
   class << self
     protected
       def inherited(klass)
-        register_klass_file klass
+        register_klass_file(klass)
       end
 
       def method_added(meth)
@@ -34,14 +34,16 @@ class Thor
       end
 
       def register_klass_file(klass, file = caller[1].match(/(.*):\d+/)[1])
+        subclasses << klass unless subclasses.include?(klass)
+
         unless self == Thor
           superclass.register_klass_file(klass, file)
           return
         end
 
+        # Subclasses files are tracked just on the superclass, not on subclasses.
         file_subclasses = subclass_files[File.expand_path(file)]
         file_subclasses << klass unless file_subclasses.include?(klass)
-        subclasses << klass unless subclasses.include?(klass)
       end
   end
 

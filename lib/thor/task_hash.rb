@@ -13,10 +13,14 @@ class Thor::TaskHash < Thor::CoreExt::OrderedHash
   end
 
   def [](name)
-    if task = super(name) || (@klass == Thor && @klass.superclass.tasks[name])
-      return task.with_klass(@klass)
-    end
+    name = name.to_s
 
-    Thor::Task.dynamic(name, @klass)
+    if task = super(name)
+      task.with_klass(@klass)
+    elsif @klass != Thor && task = @klass.superclass.tasks[name]
+      task.with_klass(@klass)
+    else
+      Thor::Task.dynamic(name, @klass)
+    end
   end
 end

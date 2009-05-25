@@ -175,7 +175,7 @@ class Thor
     end
 
     def create_task(meth)
-      tasks[meth] = Task.new(meth, @desc, @usage, @method_options)
+      tasks[meth.to_s] = Task.new(meth, @desc, @usage, @method_options)
       @usage, @desc, @method_options = nil
     end
 

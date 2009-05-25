@@ -2,8 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
 require 'thor/runner'
 require 'rr'
 
-load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
-
 module MyTasks
   class ThorTask < Thor
     desc "foo", "bar"
@@ -36,31 +34,9 @@ module Thor::Tasks
   end
 end
 
-class Amazing
-  desc "hello", "say hello"
-  def hello
-    puts "Hello"
-  end
-end
+
 
 class ThorTask2 < Thor
-end
-
-describe Thor do
-  it "tracks its subclasses, grouped by the files they come from" do
-    Thor.subclass_files[File.expand_path(__FILE__)].must == [MyTasks::ThorTask, MyTasks::AdvancedTask, Thor::Tasks::Default, Amazing, ThorTask2]
-  end
-
-  it "tracks a single subclass across multiple files" do
-    thorfile = File.join(File.dirname(__FILE__), "fixtures", "task.thor")
-    Thor.subclass_files[File.expand_path(thorfile)].must include(Amazing)
-    Thor.subclass_files[File.expand_path(__FILE__)].must include(Amazing)
-  end
-  
-  it "tracks its subclasses in an Array" do
-    Thor.subclasses.must include(MyTasks::ThorTask)
-    Thor.subclasses.must include(ThorTask2)
-  end
 end
 
 describe Thor::Runner do

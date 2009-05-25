@@ -51,8 +51,17 @@ class MyChildScript < MyScript
   end
 end
 
-class MyGrandChildScript < MyChildScript
-  default_options :force => :optional, :param => :required
+module Scripts
+  class MyGrandChildScript < MyChildScript
+    default_options :force => :optional, :param => :required
+  end
+end
+
+class Amazing
+  desc "hello", "say hello"
+  def hello
+    puts "Hello"
+  end
 end
 
 describe Thor::DSL do
@@ -126,8 +135,7 @@ END
     end
 
     it "defaults to standard if no group name is given" do
-      klass = Class.new(Thor)
-      klass.group_name.must == "standard"
+      Amazing.group_name.must == "standard"
     end
   end
 
@@ -152,7 +160,38 @@ END
 
   describe "#default_options" do
     it "sets default options overwriting superclass definitions" do
-      MyGrandChildScript.opts.must == { :force=>:optional, :param=>:required }
+      Scripts::MyGrandChildScript.opts.must == { :force=>:optional, :param=>:required }
+    end
+  end
+
+  describe "#subclasses" do
+    it "tracks its subclasses in an Array" do
+      Thor.subclasses.must include(MyScript)
+      Thor.subclasses.must include(MyChildScript)
+      Thor.subclasses.must include(Scripts::MyGrandChildScript)
+
+      MyChildScript.subclasses.must include(Scripts::MyGrandChildScript)
+      MyChildScript.subclasses.must_not include(MyScript)
+    end
+  end
+
+  describe "#subclass_files" do
+    it "returns tracked subclasses, grouped by the files they come from" do
+      Thor.subclass_files[File.expand_path(__FILE__)].must == [ MyScript, MyChildScript, Scripts::MyGrandChildScript, Amazing ]
+    end
+
+    it "tracks a single subclass across multiple files" do
+      thorfile = File.join(File.dirname(__FILE__), "fixtures", "task.thor")
+      Thor.subclass_files[File.expand_path(thorfile)].must include(Amazing)
+      Thor.subclass_files[File.expand_path(__FILE__)].must include(Amazing)
+    end
+  end
+
+  describe "#[]" do
+    it "retrieves an specific task object" do
+      MyScript[:foo].class.must == Thor::Task
+      MyChildScript[:foo].class.must == Thor::Task
+      Scripts::MyGrandChildScript[:foo].class.must == Thor::Task
     end
   end
 end

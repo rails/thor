@@ -2,6 +2,7 @@ $TESTING=true
 
 $:.push File.join(File.dirname(__FILE__), '..', 'lib')
 require File.expand_path(File.dirname(__FILE__) + '/../lib/thor')
+load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
 
 require 'stringio'
 require 'rubygems'
