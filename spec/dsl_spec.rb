@@ -193,5 +193,10 @@ END
       MyChildScript[:foo].class.must == Thor::Task
       Scripts::MyGrandChildScript[:foo].class.must == Thor::Task
     end
+
+    it "returns a dynamic task to allow method missing invocation" do
+      MyScript[:none].class.must == Thor::Task
+      MyScript[:none].description =~ /dynamic/
+    end
   end
 end

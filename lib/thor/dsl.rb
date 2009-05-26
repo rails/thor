@@ -1,7 +1,6 @@
 require 'thor/options'
 require 'thor/util'
 require 'thor/task'
-require 'thor/task_hash'
 
 class Thor
 
@@ -39,8 +38,8 @@ class Thor
     # ==== Parameters
     # Hash[String|Array => Symbol]:: Maps the string or the string in the array to the given task.
     #
-    def map(map)
-      @map ||= superclass.instance_variable_get("@map") || {}
+    def map(map={})
+      @map ||= from_superclass(:map, {})
 
       map.each do |key, value|
         if key.respond_to?(:each)
@@ -49,6 +48,8 @@ class Thor
           @map[key] = value
         end
       end
+
+      @map
     end
 
     # Defines the usage and the description of the next task.
@@ -77,7 +78,7 @@ class Thor
     # String
     #
     def group_name
-      @group_name ||= superclass.instance_variable_get('@group_name') || 'standard'
+      @group_name ||= from_superclass(:group_name, 'standard')
     end
 
     # Declares the options for the next task to be declaread.
@@ -115,6 +116,7 @@ class Thor
     # ==== Returns
     # TaskHash:: An ordered hash with this class tasks.
     #
+    # TODO Use an ordered hash to preserve the order tasks are added
     def tasks
       @tasks ||= {}
     end
@@ -123,7 +125,7 @@ class Thor
     # not cached because tasks can be added.
     # 
     def all_tasks
-      all = (self == Thor ? {} : superclass.all_tasks).merge(tasks)
+      all = from_superclass(:all_tasks, {}).merge(tasks)
       all.each{|k, v| all[k] = v.with_klass(self) }
       all
     end
@@ -151,8 +153,7 @@ class Thor
     # Hash[Symbol => Symbol]
     #
     def opts
-      options = (self == Thor ? {} : superclass.opts)
-      options.merge(@opts || {})
+      from_superclass(:opts, {}).merge(@opts || {})
     end
 
     # Sets the default options for this class. It can be done in two ways:
@@ -218,5 +219,12 @@ class Thor
       args.unshift(task_name || default_task)
       start(args)
     end
+
+    protected
+
+      def from_superclass(method, default=nil)
+        self == Thor ? default : superclass.send(method)
+      end
+
   end
 end
