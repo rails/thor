@@ -5,6 +5,9 @@ require 'thor/core_ext/ordered_hash'
 
 class Thor
 
+  class Maxima < Struct.new(:description, :usage, :options)
+  end
+
   # Holds class method for Thor class. If you want to create Thor tasks, this
   # is where you should look at.
   #
@@ -114,7 +117,7 @@ class Thor
       # Hash[path<String> => Class]
       #
       def subclass_files
-        @subclass_files ||= Hash.new {|h,k| h[k] = []}
+        @subclass_files ||= Hash.new{ |h,k| h[k] = [] }
       end
 
       # Returns the subclasses. Subclasses are dynamically added to the array when
@@ -136,7 +139,8 @@ class Thor
         @tasks ||= from_superclass(:tasks, Thor::CoreExt::OrderedHash.new)
       end
 
-      # A shortcut to retrieve a specific task from this Thor class.
+      # Retrieve a specific task from this Thor class. If the desired Task cannot
+      # be found, returns a dynamic Thor::Task that will map to the given name.
       #
       # ==== Parameters
       # name<Symbol>:: the name of the task to be retrieved
@@ -145,7 +149,7 @@ class Thor
       # Thor::Task
       #
       def [](name)
-        tasks[name.to_s]
+        tasks[name.to_s] || Thor::Task.dynamic(name)
       end
 
       # Returns and sets the default options for this class. It can be done in
@@ -178,10 +182,13 @@ class Thor
 
       def maxima
         @maxima ||= begin
-          max_usage = tasks.map {|_, t| t.usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
-          max_desc  = tasks.map {|_, t| t.description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
-          max_opts  = tasks.map {|_, t| t.full_options(self).formatted_usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
-          Struct.new(:description, :usage, :opt).new(max_desc, max_usage, max_opts)
+          compare = lambda { |x,y| x.to_s.size <=> y.to_s.size }
+
+          max_usage = tasks.map{ |_, t| t.usage }.max(&compare).size
+          max_desc  = tasks.map{ |_, t| t.description }.max(&compare).size
+          max_opts  = tasks.map{ |_, t| t.full_options(self).formatted_usage }.max(&compare).size
+
+          Thor::Maxima.new(max_desc, max_usage, max_opts)
         end
       end
 

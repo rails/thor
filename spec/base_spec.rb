@@ -225,7 +225,7 @@ END
       Scripts::MyGrandChildScript[:foo].class.must == Thor::Task
     end
 
-    xit "returns a dynamic task to allow method missing invocation" do
+    it "returns a dynamic task to allow method missing invocation" do
       MyScript[:none].class.must == Thor::Task
       MyScript[:none].description =~ /dynamic/
     end
@@ -291,7 +291,7 @@ END
     it "returns the maximum length for usage, description and options" do
       MyScript.maxima.description.must == 64
       MyScript.maxima.usage.must       == 28
-      MyScript.maxima.opt.must         == 19
+      MyScript.maxima.options.must     == 19
     end
   end
 end
