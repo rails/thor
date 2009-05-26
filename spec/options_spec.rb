@@ -3,11 +3,14 @@ require 'thor/options'
 
 describe Thor::Options do
   def create(opts)
+    opts.each do |key, value|
+      opts[key] = Thor::Option.parse(key, value)
+    end
+
     @opt = Thor::Options.new(opts)
   end
 
   def parse(*args)
-    @non_opts = []
     @opt.parse(args.flatten)
   end
 

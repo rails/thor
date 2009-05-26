@@ -45,9 +45,7 @@ class Thor
 
       @leading_non_opts, @trailing_non_opts = [], []
 
-      @switches = switches.inject({}) do |mem, (name, type)|
-        option = Thor::Option.parse(name, type)
-
+      @switches = switches.inject({}) do |mem, (name, option)|
         @defaults[option.human_name] = option.default unless option.default.nil?
 
         # If there are no shortcuts specified, generate one using the first character

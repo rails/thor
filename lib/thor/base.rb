@@ -96,9 +96,16 @@ class Thor
       # Hash[Symbol => Symbol]:: The hash key is the name of the option and the value
       # is the type of the option. Can be :optional, :required, :boolean or :numeric.
       #
-      def method_options(opts)
-        @method_options ||= {}
-        @method_options.merge!(opts)
+      def method_options(options)
+        @method_options ||= Thor::CoreExt::OrderedHash.new
+
+        if options
+          options.each do |key, value|
+            @method_options[key] = Thor::Option.parse(key, value)
+          end
+        end
+
+        @method_options
       end
 
       # Returns the files where the subclasses are maintained.
@@ -126,7 +133,7 @@ class Thor
       # TaskHash:: An ordered hash with this class tasks.
       #
       def tasks
-        @tasks ||= from_superclass(:tasks, Thor::CoreExt::OrderedHash.new).dup
+        @tasks ||= from_superclass(:tasks, Thor::CoreExt::OrderedHash.new)
       end
       alias :all_tasks :tasks
 
@@ -158,8 +165,14 @@ class Thor
       # Hash[Symbol => Symbol]:: The hash has the same syntax as method_options hash.
       #
       def default_options(options=nil)
-        @default_options ||= from_superclass(:default_options, {}).dup
-        @default_options.merge!(options) if options
+        @default_options ||= from_superclass(:default_options, Thor::CoreExt::OrderedHash.new)
+
+        if options
+          options.each do |key, value|
+            @default_options[key] = Thor::Option.parse(key, value)
+          end
+        end
+
         @default_options
       end
       alias :opts :default_options
@@ -205,7 +218,7 @@ class Thor
       protected
 
         def from_superclass(method, default=nil)
-          self == Thor ? default : superclass.send(method)
+          self == Thor ? default : superclass.send(method).dup
         end
 
         # Receives a task name (can be nil), and try to get a map from it.
@@ -241,7 +254,7 @@ class Thor
           meth = meth.to_s
 
           if meth == "initialize"
-            default_options(@method_options)
+            default_options.merge!(@method_options)
             @method_options = nil
             return
           end

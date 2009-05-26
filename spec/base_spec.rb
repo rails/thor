@@ -168,7 +168,9 @@ END
 
   describe "#method_options" do
     it "sets default options if called before an initializer" do
-      MyChildScript.opts.must == { :force => :boolean, :param => :numeric }
+      options = MyChildScript.default_options
+      options[:force].type.must == :boolean
+      options[:param].type.must == :numeric
     end
 
     it "overwrites default options if called on the method scope" do
@@ -187,7 +189,9 @@ END
 
   describe "#default_options" do
     it "sets default options overwriting superclass definitions" do
-      Scripts::MyGrandChildScript.opts.must == { :force=>:optional, :param=>:required }
+      options = Scripts::MyGrandChildScript.default_options
+      options[:force].must be_optional
+      options[:param].must be_required
     end
   end
 

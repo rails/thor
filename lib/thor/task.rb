@@ -9,13 +9,13 @@ class Thor
     end
 
     def opts(klass=nil)
-      klass_opts = if klass && klass.respond_to?(:default_options)
-        klass.default_options
+      merged_options = if klass && klass.respond_to?(:default_options)
+        klass.default_options.merge(options || {})
       else
-        {}
+        options || {}
       end
 
-      Options.new(klass_opts.merge(options || {}))
+      Options.new(merged_options)
     end
 
     def formatted_usage(klass=nil, use_namespace=true)
