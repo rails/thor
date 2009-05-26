@@ -30,6 +30,33 @@ END
   def example_default_task
     "default task"
   end
+
+  desc "bar BAZ BAT", "do some barring"
+  method_options :option1 => :required
+  def bar(baz, bat)
+    [baz, bat, options]
+  end
+
+  desc "baz BAT", "do some bazzing"
+  method_options :option1 => :optional
+  def baz(bat)
+    [bat, options]
+  end
+
+  desc "call_myself_with_wrong_arity", "get the right error"
+  def call_myself_with_wrong_arity
+    call_myself_with_wrong_arity(4)
+  end
+
+  def method_missing(meth, *args)
+    [meth, args]
+  end
+
+  private
+
+    desc "what", "what"
+    def what
+    end
 end
 
 class MyChildScript < MyScript
@@ -64,7 +91,7 @@ class Amazing
   end
 end
 
-describe Thor::DSL do
+describe Thor::Base do
   describe "#default_task" do
     it "sets a default task" do
       MyScript.default_task.must == "example_default_task"
@@ -197,6 +224,62 @@ END
     xit "returns a dynamic task to allow method missing invocation" do
       MyScript[:none].class.must == Thor::Task
       MyScript[:none].description =~ /dynamic/
+    end
+  end
+
+  describe "#start" do
+    it "calls a no-param method when no params are passed" do
+      MyScript.start(["zoo"]).must == true
+    end
+    
+    it "calls a single-param method when a single param is passed" do
+      MyScript.start(["animal", "fish"]).must == ["fish"]
+    end
+    
+    xit "raises an error if a required param is not provided" do
+      capture(:stderr) { MyScript.start(["animal"]) }.must =~ /`animal' was called incorrectly\. Call as `animal TYPE'/
+    end
+    
+    it "calls a method with an optional boolean param when the param is passed" do
+      MyScript.start(["foo", "one", "--force"]).must == ["one", {"force" => true}]
+    end
+    
+    it "calls a method with an optional boolean param when the param is not passed" do
+      MyScript.start(["foo", "one"]).must == ["one", {}]
+    end
+    
+    it "calls a method with a required key/value param" do
+      MyScript.start(["bar", "one", "two", "--option1", "hello"]).must == ["one", "two", {"option1" => "hello"}]
+    end
+    
+    it "calls a method with an optional key/value param" do
+      MyScript.start(["baz", "one", "--option1", "hello"]).must == ["one", {"option1" => "hello"}]
+    end
+
+    it "allows options at the beginning and end of the arguments" do
+      MyScript.start(["baz", "--option1", "hello", "one"]).must == ["one", {"option1" => "hello"}]
+    end
+    
+    it "calls a method with an empty Hash for options if an optional key/value param is not provided" do
+      MyScript.start(["baz", "one"]).must == ["one", {}]
+    end
+    
+    it "calls method_missing if an unknown method is passed in" do
+      MyScript.start(["unk", "hello"]).must == [:unk, ["hello"]]
+    end
+
+    xit "does not call a private method no matter what" do
+      lambda { MyScript.start(["what"]) }.must raise_error(NoMethodError, "the `what' task of MyApp is private")
+    end
+
+    it "raises when an exception happens within the task call" do
+      lambda { MyScript.start(["call_myself_with_wrong_arity"]) }.must raise_error
+    end
+  end
+
+  describe "#invoke" do
+    it "invokes the named command regardless of the command line options with invoke()" do
+      MyScript.invoke(:animal, ["fish"]).must == ["fish"]
     end
   end
 end
