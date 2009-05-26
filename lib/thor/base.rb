@@ -1,6 +1,7 @@
 require 'thor/options'
 require 'thor/util'
 require 'thor/task'
+require 'thor/core_ext/ordered_hash'
 
 class Thor
 
@@ -125,7 +126,7 @@ class Thor
       # TaskHash:: An ordered hash with this class tasks.
       #
       def tasks
-        @tasks ||= from_superclass(:tasks, {}).dup
+        @tasks ||= from_superclass(:tasks, Thor::CoreExt::OrderedHash.new).dup
       end
       alias :all_tasks :tasks
 
