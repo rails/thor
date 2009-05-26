@@ -7,7 +7,7 @@ describe Thor::Util do
       Thor::Util.constant_to_thor_path("FooBar::BarBaz::BazBat").must == "foo_bar:bar_baz:baz_bat"
     end
     
-    it "knows how to convert a thor name to a constant" do
+    xit "knows how to convert a thor name to a constant" do
       Thor::Util.constant_from_thor_path("my_tasks:thor_task").must == MyTasks::ThorTask
     end
   end

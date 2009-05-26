@@ -1,35 +1,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Thor::Task do
-  def task_with_mock(options={})
-    @klass = Class.new
-    stub(@klass).opts { {} }
-    Thor::Task.new(:method, "I can has cheezburger", "can_has", options, @klass)
+  def task(options={})
+    @task ||= Thor::Task.new("I can has cheezburger", "can_has", options)
   end
 
   describe "#formatted_usage" do
     it "shows usage with options" do
-      @task = task_with_mock('foo' => true, :bar => :required)
-      @task.formatted_usage.must == "can_has [--foo] --bar=BAR"
+      task('foo' => true, :bar => :required).formatted_usage.must == "can_has [--foo] --bar=BAR"
     end
 
-    it "should include class options" do
-      @task = task_with_mock('foo' => true)
-      stub(@klass).opts{ { :bar => :required } }
-      @task.formatted_usage.must == "can_has [--foo] --bar=BAR"
+    it "includes class options if a class is given" do
+      klass = mock!.opts{{ :bar => :required }}.subject
+      task('foo' => true).formatted_usage(klass, false).must == "can_has [--foo] --bar=BAR"
     end
-  end
 
-  describe "#parse" do
-    it "parses given arguments and calls the given klass" do
-      @task = task_with_mock('foo' => true)
-      stub(@klass).opts{ { :bar => :required } }
-
-      obj = Object.new
-      mock(obj).options = { "foo"=>true, "bar"=>"AWESOME" }
-      mock(obj).invoke(:method, "bla")
-
-      @task.parse(obj, ["bla", "--foo", "--bar=AWESOME"])
-    end
+    it "includes namespace"
+    
   end
 end

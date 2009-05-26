@@ -24,8 +24,14 @@ class Thor::Generator < Thor
     end
 
     def create_task(meth)
-      tasks[meth] = Thor::Task.new(meth, @desc, @usage, @method_options)
+      tasks[meth] = Thor::Task.new(@desc, @usage, @method_options)
     end
+
+    protected
+
+      def from_superclass(method, default=nil)
+        self == Thor::Generator ? default : superclass.send(method)
+      end
 
   end
 end

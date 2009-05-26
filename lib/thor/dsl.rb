@@ -116,19 +116,10 @@ class Thor
     # ==== Returns
     # TaskHash:: An ordered hash with this class tasks.
     #
-    # TODO Use an ordered hash to preserve the order tasks are added
     def tasks
-      @tasks ||= {}
+      @tasks ||= from_superclass(:tasks, {}).dup
     end
-
-    # Returns the tasks for this Thor class and all ancestors. The result is
-    # not cached because tasks can be added.
-    # 
-    def all_tasks
-      all = from_superclass(:all_tasks, {}).merge(tasks)
-      all.each{|k, v| all[k] = v.with_klass(self) }
-      all
-    end
+    alias :all_tasks :tasks
 
     # A shortcut to retrieve a specific task from this Thor class.
     #
@@ -139,11 +130,7 @@ class Thor
     # Thor::Task
     #
     def [](name)
-      if task = all_tasks[name.to_s]
-        task.with_klass(self)
-      else
-        Task.dynamic(name, self)
-      end
+      tasks[name.to_s]
     end
 
     # Returns the options for this Thor class. Those option are declared by calling
@@ -179,7 +166,7 @@ class Thor
       @maxima ||= begin
         max_usage = all_tasks.map {|_, t| t.usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
         max_desc  = all_tasks.map {|_, t| t.description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
-        max_opts  = all_tasks.map {|_, t| t.opts ? t.opts.formatted_usage : ""}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
+        max_opts  = all_tasks.map {|_, t| t.opts ? t.opts(self).formatted_usage : ""}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
         Struct.new(:description, :usage, :opt).new(max_desc, max_usage, max_opts)
       end
     end
@@ -189,7 +176,7 @@ class Thor
     end
 
     def create_task(meth)
-      tasks[meth.to_s] = Task.new(meth, @desc, @usage, @method_options)
+      tasks[meth.to_s] = Task.new(@desc, @usage, @method_options)
       @usage, @desc, @method_options = nil
     end
 
@@ -201,12 +188,22 @@ class Thor
       options = opts.parse(args, false)
       args    = opts.trailing_non_opts
 
-      meth = args.first
+      meth = args.shift
       meth = @map[meth].to_s if @map && @map[meth]
       meth ||= default_task
       meth = meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
 
-      self[meth].parse new(options, *args), args[1..-1]
+      task = self.tasks[meth]
+      options = self.opts || {}
+      options.merge!(task.options || {}) if task
+
+      opts = Thor::Options.new(options)
+      options = opts.parse(args)
+      args    = opts.non_opts
+
+      object = new(options, *args)
+      object.options = options
+      object.send(meth, *args)
     rescue Thor::Error => e
       $stderr.puts e.message
     end
