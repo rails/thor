@@ -22,4 +22,6 @@ describe Thor::Task do
     it "includes namespace"
     
   end
+  
+  it "runs a task"
 end

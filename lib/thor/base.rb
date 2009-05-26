@@ -183,10 +183,10 @@ class Thor
 
       def maxima
         @maxima ||= begin
-          compare = lambda { |x,y| x.to_s.size <=> y.to_s.size }
+          compare = lambda { |x,y| x.size <=> y.size }
 
-          max_usage = tasks.map{ |_, t| t.usage }.max(&compare).size
-          max_desc  = tasks.map{ |_, t| t.description }.max(&compare).size
+          max_usage = tasks.map{ |_, t| t.usage.to_s }.max(&compare).size
+          max_desc  = tasks.map{ |_, t| t.description.to_s }.max(&compare).size
           max_opts  = tasks.map{ |_, t| t.full_options(self).formatted_usage }.max(&compare).size
 
           Thor::Maxima.new(max_desc, max_usage, max_opts)

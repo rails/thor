@@ -61,7 +61,7 @@ class Thor
     def formatted_usage(klass=nil, use_namespace=true)
       formatted = ''
       formatted << "#{namespace(klass)}:" if klass && use_namespace
-      formatted << usage
+      formatted << usage.to_s
       formatted << " #{full_options(klass).formatted_usage}"
       formatted.strip!
       formatted
