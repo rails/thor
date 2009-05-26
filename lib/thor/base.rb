@@ -14,6 +14,7 @@ class Thor
     end
 
     module ClassMethods
+
       # Sets the default task when thor is executed without an explicit task to be called.
       #
       # ==== Parameters
@@ -140,17 +141,8 @@ class Thor
         tasks[name.to_s]
       end
 
-      # Returns the options for this Thor class. Those option are declared by calling
-      # method_options before calling initialize.
-      #
-      # ==== Returns
-      # Hash[Symbol => Symbol]
-      #
-      def opts
-        from_superclass(:opts, {}).merge(@opts || {})
-      end
-
-      # Sets the default options for this class. It can be done in two ways:
+      # Returns and sets the default options for this class. It can be done in
+      # two ways:
       #
       # 1) Calling method_options before an initializer
       #
@@ -164,10 +156,12 @@ class Thor
       # ==== Parameters
       # Hash[Symbol => Symbol]:: The hash has the same syntax as method_options hash.
       #
-      def default_options(opts={})
-        @opts ||= {}
-        @opts.merge!(opts)
+      def default_options(options=nil)
+        @default_options ||= from_superclass(:default_options, {}).dup
+        @default_options.merge!(options) if options
+        @default_options
       end
+      alias :opts :default_options
 
       def maxima
         @maxima ||= begin
@@ -183,7 +177,7 @@ class Thor
       end
 
       def create_task(meth)
-        tasks[meth.to_s] = Task.new(@desc, @usage, @method_options)
+        tasks[meth.to_s] = Task.new(meth, @desc, @usage, @method_options)
         @usage, @desc, @method_options = nil
       end
 
@@ -229,7 +223,7 @@ class Thor
         def options_for_task(meth, args)
           task = self.tasks[meth]
           options = self.opts || {}
-          options.merge!(task.options || {}) if task
+          options = options.merge(task.options || {}) if task
 
           opts = Thor::Options.new(options)
           options = opts.parse(args)
@@ -246,7 +240,7 @@ class Thor
           meth = meth.to_s
 
           if meth == "initialize"
-            @opts = @method_options
+            default_options(@method_options)
             @method_options = nil
             return
           end

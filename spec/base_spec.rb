@@ -282,4 +282,12 @@ END
       MyScript.invoke(:animal, ["fish"]).must == ["fish"]
     end
   end
+
+  describe "#maxima" do
+    it "returns the maximum length for usage, description and options" do
+      MyScript.maxima.description.must == 64
+      MyScript.maxima.usage.must       == 28
+      MyScript.maxima.opt.must         == 19
+    end
+  end
 end

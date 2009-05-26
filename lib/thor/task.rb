@@ -2,15 +2,15 @@ require 'thor/error'
 require 'thor/util'
 
 class Thor
-  class Task < Struct.new(:description, :usage, :options)
+  class Task < Struct.new(:name, :description, :usage, :options)
 
     def namespace(klass, remove_default=true)
       Thor::Util.constant_to_thor_path(klass, remove_default)
     end
 
     def opts(klass=nil)
-      klass_opts = if klass && klass.respond_to?(:opts)
-        klass.opts
+      klass_opts = if klass && klass.respond_to?(:default_options)
+        klass.default_options
       else
         {}
       end
