@@ -235,15 +235,15 @@ END
     it "calls a no-param method when no params are passed" do
       MyScript.start(["zoo"]).must == true
     end
-    
+
     it "calls a single-param method when a single param is passed" do
       MyScript.start(["animal", "fish"]).must == ["fish"]
     end
-    
-    xit "raises an error if a required param is not provided" do
-      capture(:stderr) { MyScript.start(["animal"]) }.must =~ /`animal' was called incorrectly\. Call as `animal TYPE'/
+
+    it "raises an error if a required param is not provided" do
+      capture(:stderr) { MyScript.start(["animal"]) }.must =~ /`animal' was called incorrectly\. Call as `my_script:animal TYPE'/
     end
-    
+
     it "calls a method with an optional boolean param when the param is passed" do
       MyScript.start(["foo", "one", "--force"]).must == ["one", {"force" => true}]
     end
@@ -267,13 +267,13 @@ END
     it "calls a method with an empty Hash for options if an optional key/value param is not provided" do
       MyScript.start(["baz", "one"]).must == ["one", {}]
     end
-    
+
     it "calls method_missing if an unknown method is passed in" do
       MyScript.start(["unk", "hello"]).must == [:unk, ["hello"]]
     end
 
-    xit "does not call a private method no matter what" do
-      lambda { MyScript.start(["what"]) }.must raise_error(NoMethodError, "the `what' task of MyApp is private")
+    it "does not call a private method no matter what" do
+      lambda { MyScript.start(["what"]) }.must raise_error(NoMethodError, "the `what' task of MyScript is private")
     end
 
     it "raises when an exception happens within the task call" do

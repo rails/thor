@@ -15,21 +15,27 @@ class Thor
     # checks if the method is not private and check if the user invoked the
     # task properly.
     #
-    def run(target, *args)
+    def run(klass, args)
       begin
-        raise NoMethodError, "the `#{name}' task of #{target.class} is private" unless public_method?(target)
-        target.invoke(name, *args)
+        raise NoMethodError, "the `#{name}' task of #{klass} is private" unless public_method?(klass)
+
+        raw_options = klass.default_options.merge(self.options || {})
+        opts        = Thor::Options.new(raw_options)
+        options     = opts.parse(args)
+        args        = opts.non_opts
+
+        klass.new(options, *args).invoke(name, *args)
       rescue ArgumentError => e
         backtrace = sans_backtrace(e.backtrace, caller)
 
         if backtrace.empty?
-          raise Error, "`#{name}' was called incorrectly. Call as `#{formatted_usage}'"
+          raise Error, "`#{name}' was called incorrectly. Call as `#{formatted_usage(klass)}'"
         else
           raise e
         end
       rescue NoMethodError => e
-        if e.message =~ /^undefined method `#{name}' for #{Regexp.escape(target.inspect)}$/
-          raise Error, "The #{namespace(target.class, false)} namespace doesn't have a `#{name}' task"
+        if e.message =~ /^undefined method `#{name}' for #{Regexp.escape(klass.name)}$/
+          raise Error, "The #{namespace(klass)} namespace doesn't have a `#{name}' task"
         else
           raise e
         end
@@ -71,8 +77,8 @@ class Thor
 
       # Given a target, checks if this class name is not a private/protected method.
       #
-      def public_method?(target)
-        !(target.private_methods + target.protected_methods).include?(name)
+      def public_method?(klass)
+        !(klass.private_instance_methods + klass.protected_instance_methods).include?(name)
       end
 
       # Clean everything that comes from the Thor gempath and remove the caller.

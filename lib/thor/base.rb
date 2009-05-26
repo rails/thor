@@ -178,6 +178,7 @@ class Thor
 
         @default_options
       end
+      # TODO Remove this alias
       alias :opts :default_options
 
       def maxima
@@ -206,8 +207,7 @@ class Thor
       #
       def start(args=ARGV)
         meth = normalize_task_name(args.shift)
-        args, options = options_for_task(meth, args)
-        new(options, *args).invoke(meth, *args)
+        self[meth].run(self, args)
       rescue Thor::Error => e
         $stderr.puts e.message
       end
@@ -234,22 +234,6 @@ class Thor
           mapping = map[meth.to_s]
           meth = mapping || meth || default_task
           meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
-        end
-
-        # Receives a task name and return the arguments and options for it.
-        # This method is responsable for merging the class options with tasks
-        # specific options.
-        #
-        def options_for_task(meth, args)
-          task = self.tasks[meth]
-          options = self.opts || {}
-          options = options.merge(task.options || {}) if task
-
-          opts = Thor::Options.new(options)
-          options = opts.parse(args)
-          args    = opts.non_opts
-
-          return [ args, options ]
         end
 
         def inherited(klass)
