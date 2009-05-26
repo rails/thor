@@ -14,8 +14,8 @@ class Thor::Runner < Thor
     super(meth.to_sym, *args) unless meth.include?(?:)
 
     initialize_thorfiles(meth)
-    task = self.class.task_from_thor_class(meth)
-    task.parse(task.klass.new, ARGV[1..-1])
+    klass, task = self.class.task_from_thor_class(meth)
+    klass[task].run(klass, ARGV[1..-1])
   end
 
   def self.thor_root
@@ -54,7 +54,7 @@ class Thor::Runner < Thor
     namespaces = task.split(":")
     klass = Thor::Util.constant_from_thor_path(namespaces[0...-1].join(":"))
     raise Error, "`#{klass}' is not a Thor class" unless klass <= Thor
-    klass.all_tasks[namespaces.last]
+    return klass, namespaces.last
   end
 
   def self.globs_for(path)

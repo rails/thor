@@ -112,6 +112,7 @@ class Thor::Runner < Thor
 
     klasses = Thor.subclasses
     klasses -= [Thor, Thor::Runner] unless options["internal"]
+
     display_klasses(true, klasses)
   end
   
@@ -130,6 +131,7 @@ class Thor::Runner < Thor
       (options[:all] || k.group_name == group) && 
       Thor::Util.constant_to_thor_path(k.name) =~ search
     end
+
     display_klasses(false, classes)
   end
 
@@ -159,51 +161,51 @@ class Thor::Runner < Thor
   def display_klasses(with_modules = false, klasses = Thor.subclasses)
     klasses -= [Thor, Thor::Runner] unless with_modules
     raise Error, "No Thor tasks available" if klasses.empty?
-    
+
     if with_modules && !thor_yaml.empty?
       max_name = thor_yaml.max { |(xk, xv), (yk, yv)| xk.to_s.size <=> yk.to_s.size }.first.size
       modules_label    = "Modules"
       namespaces_label = "Namespaces"
       column_width     = [max_name + 4, modules_label.size + 1].max
-      
+
       print "%-#{column_width}s" % modules_label
       puts namespaces_label
       print "%-#{column_width}s" % ("-" * modules_label.size)
       puts "-" * namespaces_label.size
-      
+
       thor_yaml.each do |name, info|
         print "%-#{column_width}s" % name
         puts info[:constants].map { |c| Thor::Util.constant_to_thor_path(c) }.join(", ")
       end
-    
+
       puts
     end
-    
+
     # Calculate the largest base class name
     max_base = klasses.max do |x,y| 
       Thor::Util.constant_to_thor_path(x.name).size <=> Thor::Util.constant_to_thor_path(y.name).size
     end.name.size
-    
+
     # Calculate the size of the largest option description
     max_left_item = klasses.max do |x,y| 
-      (x.maxima.usage + x.maxima.opt).to_i <=> (y.maxima.usage + y.maxima.opt).to_i
+      (x.maxima.usage + x.maxima.options).to_i <=> (y.maxima.usage + y.maxima.options).to_i
     end
-    
-    max_left = max_left_item.maxima.usage + max_left_item.maxima.opt
-    
+
+    max_left = max_left_item.maxima.usage + max_left_item.maxima.options
+
     unless klasses.empty?
       puts # add some spacing
       klasses.each { |k| display_tasks(k, max_base, max_left); }
     else
       puts "\033[1;34mNo Thor tasks available\033[0m"
     end
-  end  
-  
+  end
+
   def display_tasks(klass, max_base, max_left)
     if klass.tasks.values.length > 1
-      
+
       base = Thor::Util.constant_to_thor_path(klass.name)
-      
+
       if base.to_a.empty?
         base = 'default' 
         puts "\033[1;35m#{base}\033[0m"
@@ -212,16 +214,15 @@ class Thor::Runner < Thor
       end
 
       puts "-" * base.length
-      
+
       klass.tasks.each do |name, task|
-        task = task.with_klass(klass)
         format_string = "%-#{max_left + max_base + 5}s"
-        print format_string % task.formatted_usage(true)
+        print format_string % task.formatted_usage(klass, true)
         puts task.description
       end
-      
+
       unless klass.opts.empty?
-        puts "\nglobal options: #{Options.new(klass.opts)}"
+        puts "\nglobal options: #{Options.new(klass.default_options)}"
       end
 
       puts # add some spacing

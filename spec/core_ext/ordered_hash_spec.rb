@@ -41,6 +41,12 @@ describe Thor::CoreExt::OrderedHash do
       new_hash.values.must == ["Foo!", "Bar!", "Bang!", "Bop!", "Bat!"]
     end
 
+    it "does not set next and prev value on borders" do
+      new_hash = @hash.clone
+      new_hash.instance_variable_get("@first").prev.must be_nil
+      new_hash.instance_variable_get("@last").next.must be_nil
+    end
+
     it "returns nil for an undefined key" do
       @hash[:boom].must be_nil
     end

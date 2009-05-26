@@ -27,7 +27,7 @@ class Thor #:nodoc:
 
         array.each_with_index do |node, i|
           node.next = array[i + 1]
-          node.prev = array[i - 1]
+          node.prev = array[i - 1] if i > 0
         end
 
         @first = array.first
@@ -93,6 +93,10 @@ class Thor #:nodoc:
           self[key] = value
         end
         self
+      end
+
+      def empty?
+        @hash.empty?
       end
 
       def to_a
