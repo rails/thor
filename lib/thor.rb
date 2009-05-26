@@ -47,7 +47,8 @@ class Thor
       end
   end
 
-  def initialize(opts = {}, *args)
+  def initialize(options={}, *args)
+    @options = options
   end
 
   map ["-h", "-?", "--help", "-D"] => :help

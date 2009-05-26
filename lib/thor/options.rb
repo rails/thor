@@ -68,6 +68,7 @@ class Thor
       # Start hash with indifferent access pre-filled with defaults
       hash = Thor::CoreExt::HashWithIndifferentAccess.new(@defaults)
 
+      @leading_non_opts = []
       if skip_leading_non_opts
         @leading_non_opts << shift until current_is_switch? || @args.empty?
       end
@@ -115,7 +116,7 @@ class Thor
         end
       end
 
-      @trailing_non_opts += @args
+      @trailing_non_opts = @args
 
       check_required!(hash)
       hash.freeze

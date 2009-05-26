@@ -38,14 +38,16 @@ class Thor
     # ==== Parameters
     # Hash[String|Array => Symbol]:: Maps the string or the string in the array to the given task.
     #
-    def map(map={})
+    def map(mappings=nil)
       @map ||= from_superclass(:map, {})
 
-      map.each do |key, value|
-        if key.respond_to?(:each)
-          key.each {|subkey| @map[subkey] = value}
-        else
-          @map[key] = value
+      if mappings
+        mappings.each do |key, value|
+          if key.respond_to?(:each)
+            key.each {|subkey| @map[subkey] = value}
+          else
+            @map[key] = value
+          end
         end
       end
 
@@ -184,26 +186,9 @@ class Thor
     # method can be extracted from args the default task is invoked.
     #
     def start(args=ARGV)
-      opts    = Thor::Options.new
-      options = opts.parse(args, false)
-      args    = opts.trailing_non_opts
-
-      meth = args.shift
-      meth = @map[meth].to_s if @map && @map[meth]
-      meth ||= default_task
-      meth = meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
-
-      task = self.tasks[meth]
-      options = self.opts || {}
-      options.merge!(task.options || {}) if task
-
-      opts = Thor::Options.new(options)
-      options = opts.parse(args)
-      args    = opts.non_opts
-
-      object = new(options, *args)
-      object.options = options
-      object.send(meth, *args)
+      meth = normalize_task_name(args.shift)
+      args, options = options_for_task(meth, args)
+      new(options, *args).invoke(meth, *args)
     rescue Thor::Error => e
       $stderr.puts e.message
     end
@@ -221,6 +206,31 @@ class Thor
 
       def from_superclass(method, default=nil)
         self == Thor ? default : superclass.send(method)
+      end
+
+      # Receives a task name (can be nil), and try to get a map from it.
+      # If a map can't be found use the sent name or the default task.
+      #
+      def normalize_task_name(meth)
+        mapping = map[meth.to_s]
+        meth = mapping || meth || default_task
+        meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
+      end
+
+      # Receives a task name and return the arguments and options for it.
+      # This method is responsable for merging the class options with tasks
+      # specific options.
+      #
+      def options_for_task(meth, args)
+        task = self.tasks[meth]
+        options = self.opts || {}
+        options.merge!(task.options || {}) if task
+
+        opts = Thor::Options.new(options)
+        options = opts.parse(args)
+        args    = opts.non_opts
+
+        return [ args, options ]
       end
 
   end
