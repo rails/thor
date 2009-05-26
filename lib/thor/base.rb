@@ -135,7 +135,6 @@ class Thor
       def tasks
         @tasks ||= from_superclass(:tasks, Thor::CoreExt::OrderedHash.new)
       end
-      alias :all_tasks :tasks
 
       # A shortcut to retrieve a specific task from this Thor class.
       #
@@ -179,9 +178,9 @@ class Thor
 
       def maxima
         @maxima ||= begin
-          max_usage = all_tasks.map {|_, t| t.usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
-          max_desc  = all_tasks.map {|_, t| t.description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
-          max_opts  = all_tasks.map {|_, t| t.full_options(self).formatted_usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
+          max_usage = tasks.map {|_, t| t.usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
+          max_desc  = tasks.map {|_, t| t.description}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
+          max_opts  = tasks.map {|_, t| t.full_options(self).formatted_usage}.max {|x,y| x.to_s.size <=> y.to_s.size}.size
           Struct.new(:description, :usage, :opt).new(max_desc, max_usage, max_opts)
         end
       end

@@ -22,7 +22,7 @@ class Thor
     else
       puts "Options"
       puts "-------"
-      self.class.all_tasks.each do |_, task|
+      self.class.tasks.each do |_, task|
         format = "%-" + (self.class.maxima.usage + self.class.maxima.opt + 4).to_s + "s"
         print format % ("#{task.formatted_usage(self, false)}")
         puts  task.description.split("\n").first
