@@ -80,12 +80,19 @@ class Thor #:nodoc:
         self.map { |k, v| v }
       end
 
-      def +(other)
+      def merge(other)
         new = clone
         other.each do |key, value|
-          new[key] = value unless self[key]
+          new[key] = value
         end
         new
+      end
+
+      def merge!(other)
+        other.each do |key, value|
+          self[key] = value
+        end
+        self
       end
 
       def to_a

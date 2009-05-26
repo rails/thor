@@ -86,14 +86,21 @@ describe Thor::CoreExt::OrderedHash do
       other_hash[1] = "one"
       other_hash[2] = "two"
       other_hash[3] = "three"
-      (@hash + other_hash).values.must ==
-        ["Foo!", "Bar!", "Baz!", "Bop!", "Bat!", "one", "two", "three"]
+      @hash.merge(other_hash).values.must == ["Foo!", "Bar!", "Baz!", "Bop!", "Bat!", "one", "two", "three"]
     end
 
     it "overwrites hash keys with matching appended keys" do
       other_hash = Thor::CoreExt::OrderedHash.new
       other_hash[:bar] = "bar"
-      (@hash + other_hash)[:bar].must == "Bar!"
+      @hash.merge(other_hash)[:bar].must == "bar"
+      @hash[:bar].must == "Bar!"
+    end
+
+    it "changes itself on merge!" do
+      other_hash = Thor::CoreExt::OrderedHash.new
+      other_hash[:bar] = "bar"
+      @hash.merge!(other_hash)
+      @hash[:bar].must == "bar"
     end
 
     it "converts to an array" do
