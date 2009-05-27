@@ -34,7 +34,8 @@ class Thor
 
     module ClassMethods
 
-      # Adds an argument (a required option) to the task.
+      # Adds an argument (a required option) to the task. If you give :for as
+      # option, it will replace the argument of a given task already defined.
       #
       # ==== Parameters
       # name<Symbol>:: The name of the argument.
@@ -43,11 +44,18 @@ class Thor
       #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
       #
       def argument(name, options={})
-        options_scope[name] = Thor::Option.new(name, options[:description], true, options[:type],
-                                                     nil, options[:aliases])
+        scope = if options[:for]
+          find_and_refresh_task(options[:for]).options
+        else
+          options_scope
+        end
+
+        scope[name] = Thor::Option.new(name, options[:description], true, options[:type],
+                                       nil, options[:aliases])
       end
 
-      # Adds an option (which is not required) to the task.
+      # Adds an option (which is not required) to the task. If you give :for as
+      # option, it will replace the argument of a given task already defined.
       #
       # ==== Parameters
       # name<Symbol>:: The name of the argument.
@@ -56,8 +64,14 @@ class Thor
       #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
       #
       def option(name, options={})
-        options_scope[name] = Thor::Option.new(name, options[:description], false, options[:type],
-                                                     options[:default], options[:aliases])
+        scope = if options[:for]
+          find_and_refresh_task(options[:for]).options
+        else
+          options_scope
+        end
+
+        scope[name] = Thor::Option.new(name, options[:description], false, options[:type],
+                                       options[:default], options[:aliases])
       end
 
       # Defines the group. This is used when thor list is invoked so you can specify
@@ -207,6 +221,20 @@ class Thor
       end
 
       protected
+
+        # Finds a task with the given name. If the task belongs to the current
+        # class, just return it, otherwise dup it and add the fresh copy to the
+        # current task hash.
+        #
+        def find_and_refresh_task(name)
+          task = if task = tasks[name.to_s]
+            task
+          elsif task = all_tasks[name.to_s]
+            tasks[name.to_s] = task.clone
+          else
+            raise ArgumentError, "You supplied :for => #{name.inspect}, but the task #{name.inspect} could not be found."
+          end
+        end
 
         # Everytime someone inherits from a Thor class, register the klass
         # and file into baseclass.

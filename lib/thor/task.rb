@@ -8,6 +8,13 @@ class Thor
       new(name, "A dynamically-generated task", name.to_s, nil)
     end
 
+    # Dup the options hash on clone or copy.
+    #
+    def initialize_copy(other)
+      super(other)
+      self.options = other.options.dup if other.options
+    end
+
     # Invokes the task name in the given parent with the given args. It also
     # checks if the method is not private and check if the user invoked the
     # task properly.

@@ -18,12 +18,12 @@ class Thor
       end
 
       def create_task(meth)
-        tasks[meth.to_s] = Thor::Task.new(meth, @desc, @usage, @method_options)
+        tasks[meth.to_s] = Thor::Task.new(meth, @desc, @usage, method_options)
         @usage, @desc, @method_options = nil
       end
 
       def initialize_added
-        default_options.merge!(@method_options)
+        default_options.merge!(method_options)
         @method_options = nil
       end
   end

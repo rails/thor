@@ -21,6 +21,24 @@ describe Thor::Base do
         MyScript.start(["bar", "bla", "bla"])
       }.must raise_error(Thor::Options::Error, "no value provided for required arguments '--option1'")
     end
+
+    describe "when :for is supplied" do
+      it "updates an already defined task" do
+        args = ["bar", "bla", "bla", "--option1=cool", "--new_option=verified", "--param=nice"]
+        arg1, arg2, options = Scripts::MyGrandChildScript.start(args)
+        options[:new_option].must == "verified"
+      end
+
+      describe "and the updated task is on the parent class" do
+        it "adds a task to the tasks list if the updated task is on the parent class" do
+          Scripts::MyGrandChildScript.tasks["bar"].must_not be_nil
+        end
+
+        it "clones the parent task" do
+          Scripts::MyGrandChildScript.tasks["bar"].must_not == MyChildScript.tasks["bar"]
+        end
+      end
+    end
   end
 
   describe "#option" do
@@ -28,6 +46,13 @@ describe Thor::Base do
       args = ["foo", "bar", "--force"]
       arg, options = MyScript.start(args)
       options.must == { "force" => true }
+    end
+
+    describe "when :for is supplied" do
+      it "updates an already defined task" do
+        args, options = MyChildScript.start(["animal", "horse", "--other=fish"])
+        options[:other].must == "fish"
+      end
     end
   end
 

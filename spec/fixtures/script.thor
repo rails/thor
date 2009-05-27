@@ -72,10 +72,10 @@ class MyChildScript < MyScript
   end
 
   desc "animal TYPE", "horse around"
-  method_options :other => :optional
   def animal(type)
     [type, options]
   end
+  option :other, :type => :string, :for => :animal
 
   desc "boom", "explodes everything"
   def boom
@@ -87,5 +87,6 @@ end
 module Scripts
   class MyGrandChildScript < MyChildScript
     default_options :force => :optional, :param => :required
+    argument :new_option, :type => :string, :for => :bar
   end
 end

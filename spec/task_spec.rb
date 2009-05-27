@@ -33,4 +33,12 @@ describe Thor::Task do
       Thor::Task.dynamic('task').options.must be_nil
     end
   end
+
+  describe "#clone" do
+    it "clones options hash" do
+      new_task = task(:foo => true, :bar => :required).clone
+      new_task.options.delete(:foo)
+      task.options[:foo].must_not be_nil
+    end
+  end
 end

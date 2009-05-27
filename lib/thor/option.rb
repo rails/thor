@@ -1,6 +1,6 @@
 class Thor
   class Option
-    attr_accessor :name, :description, :required, :type, :default, :aliases
+    attr_reader :name, :description, :required, :type, :default, :aliases
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
