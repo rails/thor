@@ -32,10 +32,12 @@ class Thor::Generator
     #
     def start(args=ARGV)
       opts    = Thor::Options.new
-      options = opts.parse(args, false)
-      args    = opts.trailing_non_opts
+      options = opts.parse(args)
+      args    = opts.non_opts
 
-      all_tasks.values.map { |task| task.run(self, args) }
+      instance = new(options, *args)
+
+      all_tasks.values.map { |task| instance.send(task.name, *args) }
     rescue Thor::Error => e
       $stderr.puts e.message
     end

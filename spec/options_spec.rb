@@ -104,7 +104,7 @@ describe Thor::Options do
   
     it "and a required switch raises an error" do
       create "--foo" => :required
-      lambda { parse }.must raise_error(Thor::Options::Error, "no value provided for required argument '--foo'")
+      lambda { parse }.must raise_error(Thor::Options::Error, "no value provided for required arguments '--foo'")
     end
   end
 
@@ -140,8 +140,6 @@ describe Thor::Options do
       "foo" => "12", "bar" => true
     }
 
-    @opt.leading_non_opts.must == ["foo", "bar", "--baz"]
-    @opt.trailing_non_opts.must == ["-T", "bang"]
     @opt.non_opts.must == ["foo", "bar", "--baz", "-T", "bang"]
   end
   

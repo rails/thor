@@ -19,7 +19,7 @@ describe Thor::Base do
     it "ignores default option" do
       lambda {
         MyScript.start(["bar", "bla", "bla"])
-      }.must raise_error(Thor::Options::Error, "no value provided for required argument '--option1'")
+      }.must raise_error(Thor::Options::Error, "no value provided for required arguments '--option1'")
     end
   end
 
