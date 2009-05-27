@@ -244,18 +244,22 @@ END
       capture(:stderr) { MyScript.start(["animal"]) }.must =~ /`animal' was called incorrectly\. Call as `my_script:animal TYPE'/
     end
 
+    it "raises an error if the invoked task does not exist" do
+      capture(:stderr) { Amazing.start(["animal"]) }.must =~ /The amazing namespace doesn't have a `animal' task/
+    end
+
     it "calls a method with an optional boolean param when the param is passed" do
       MyScript.start(["foo", "one", "--force"]).must == ["one", {"force" => true}]
     end
-    
+
     it "calls a method with an optional boolean param when the param is not passed" do
       MyScript.start(["foo", "one"]).must == ["one", {}]
     end
-    
+
     it "calls a method with a required key/value param" do
       MyScript.start(["bar", "one", "two", "--option1", "hello"]).must == ["one", "two", {"option1" => "hello"}]
     end
-    
+
     it "calls a method with an optional key/value param" do
       MyScript.start(["baz", "one", "--option1", "hello"]).must == ["one", {"option1" => "hello"}]
     end
@@ -263,7 +267,7 @@ END
     it "allows options at the beginning and end of the arguments" do
       MyScript.start(["baz", "--option1", "hello", "one"]).must == ["one", {"option1" => "hello"}]
     end
-    
+
     it "calls a method with an empty Hash for options if an optional key/value param is not provided" do
       MyScript.start(["baz", "one"]).must == ["one", {}]
     end

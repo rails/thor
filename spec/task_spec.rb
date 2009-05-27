@@ -19,9 +19,18 @@ describe Thor::Task do
       task('foo' => true).formatted_usage(klass, false).must == "can_has [--foo] --bar=BAR"
     end
 
-    it "includes namespace"
-    
+    it "includes namespace within usage" do
+      stub(String).default_options{{ :bar => Thor::Option.parse(:bar, :required) }}
+      task.formatted_usage(String, true).must == "string:can_has --bar=BAR"
+    end
   end
-  
-  it "runs a task"
+
+  describe "#dynamic" do
+    it "creates a dynamic task with the given name" do
+      Thor::Task.dynamic('task').name.must == 'task'
+      Thor::Task.dynamic('task').description.must == 'A dynamically-generated task'
+      Thor::Task.dynamic('task').usage.must == 'task'
+      Thor::Task.dynamic('task').options.must be_nil
+    end
+  end
 end
