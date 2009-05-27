@@ -77,6 +77,31 @@ describe Thor::Base do
     end
   end
 
+  describe "#tasks" do
+    it "returns a list with all tasks defined in this class" do
+      MyChildScript.new.must respond_to("animal")
+      MyChildScript.tasks.keys.must include("animal")
+    end
+  end
+
+  describe "#all_tasks" do
+    it "returns a list with all tasks defined in this class plus superclasses" do
+      MyChildScript.new.must respond_to("foo")
+      MyChildScript.all_tasks.keys.must include("foo")
+    end
+  end
+
+  describe "#remove_task" do
+    it "removes the task from its tasks hash" do
+      MyChildScript.tasks.keys.must_not include("bar")
+      MyChildScript.tasks.keys.must_not include("boom")
+    end
+
+    it "undefines the method if desired" do
+      MyChildScript.new.must_not respond_to("boom")
+    end
+  end
+
   describe "#[]" do
     it "retrieves an specific task object" do
       MyScript[:foo].class.must == Thor::Task

@@ -113,10 +113,29 @@ class Thor
       # OrderedHash
       #
       def all_tasks
-        @all_tasks ||= begin
-          all = tasks
-          all = superclass.all_tasks.merge(tasks) unless self == baseclass
-          all
+        @all_tasks ||= from_superclass(:all_tasks, Thor::CoreExt::OrderedHash.new)
+        @all_tasks.merge(tasks)
+      end
+
+      # Remove a given task from this Thor class. This is usually done if you 
+      # are inheriting from another class and don't want it to be available
+      # anymore.
+      #
+      # By default it only remove the mapping to the task. But you can supply
+      # :undefine => true to undefine the method from the class as well.
+      #
+      # ==== Parameters
+      # name<Symbol|String>:: The name of the task to be removed
+      # options<Hash>:: You can give :undefine => true if you want tasks the method
+      #                 to be undefined from the class as well.
+      #
+      def remove_task(*names)
+        options = names.last.is_a?(Hash) ? names.pop : {}
+
+        names.each do |name|
+          tasks.delete(name.to_s)
+          all_tasks.delete(name.to_s)
+          undef_method name if options[:undefine]
         end
       end
 

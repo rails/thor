@@ -58,6 +58,8 @@ END
 end
 
 class MyChildScript < MyScript
+  remove_task :bar
+
   method_options :force => :boolean, :param => :numeric
   def initialize(*args)
     super
@@ -74,6 +76,12 @@ class MyChildScript < MyScript
   def animal(type)
     [type, options]
   end
+
+  desc "boom", "explodes everything"
+  def boom
+  end
+
+  remove_task :boom, :undefine => true
 end
 
 module Scripts
