@@ -1,24 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require "thor/util"
-require 'thor/ordered_hash'
-
-module MyTasks
-  class ThorTask < Thor
-  end
-end
 
 describe Thor::Util do
-  describe ".constant_to_thor_path" do
-    it "knows how to convert class names into thor names" do
-      Thor::Util.constant_to_thor_path("FooBar::BarBaz::BazBat").must == "foo_bar:bar_baz:baz_bat"
-    end
-
-    it "knows how to convert a thor name to a constant" do
-      Thor::Util.constant_from_thor_path("my_tasks:thor_task").must == MyTasks::ThorTask
-    end
-  end
-
-  describe ".snake_case" do
+  describe "#snake_case" do
     it "preserves no-cap strings" do
       Thor::Util.snake_case("foo").must == "foo"
       Thor::Util.snake_case("foo_bar").must == "foo_bar"
@@ -43,7 +26,7 @@ describe Thor::Util do
     end
   end
 
-  describe ".constant_to_thor_path" do
+  describe "#constant_to_thor_path" do
     it "replaces constant nesting with task namespacing" do
       Thor::Util.constant_to_thor_path("Foo::Bar::Baz").must == "foo:bar:baz"
     end
@@ -58,12 +41,12 @@ describe Thor::Util do
     end
 
     it "accepts class and module objects" do
-      Thor::Util.constant_to_thor_path(Thor::OrderedHash).must == "thor:ordered_hash"
+      Thor::Util.constant_to_thor_path(Thor::CoreExt::OrderedHash).must == "thor:core_ext:ordered_hash"
       Thor::Util.constant_to_thor_path(Thor::Util).must == "thor:util"
     end
   end
 
-  describe ".to_constant" do
+  describe "#to_constant" do
     it "returns 'Default' if no name is given" do
       Thor::Util.to_constant("").must == "Default"
     end
@@ -82,7 +65,7 @@ describe Thor::Util do
     end
   end
 
-  describe ".make_constant" do
+  describe "#make_constant" do
     it "returns the constant given by the string" do
       Thor::Util.make_constant("Object").must == Object
     end
@@ -92,14 +75,13 @@ describe Thor::Util do
     end
   end
 
-  describe ".constant_from_thor_path" do
+  describe "#constant_from_thor_path" do
     it "returns the named constant" do
-      require 'thor/ordered_hash'
-      Thor::Util.constant_from_thor_path('thor:ordered_hash').must == Thor::OrderedHash
+      Thor::Util.constant_from_thor_path('thor:core_ext:ordered_hash').must == Thor::CoreExt::OrderedHash
     end
   end
 
-  describe ".constants_in_contents" do
+  describe "#constants_in_contents" do
     it "returns an array of names of constants defined in the string" do
       list = Thor::Util.constants_in_contents("class Foo; class Bar < Thor; end; end; class Baz; class Bat; end; end")
       list.must include("Foo::Bar")

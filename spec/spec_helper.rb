@@ -1,11 +1,14 @@
 $TESTING=true
 
-$:.push File.join(File.dirname(__FILE__), '..', 'lib')
-require File.expand_path(File.dirname(__FILE__) + '/../lib/thor')
-load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
+$:.push File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
 
+require 'thor'
 require 'stringio'
 require 'rubygems'
+
+# Load fixtures
+load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
+load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
 
 undefinable = if defined?(Spec::Expectations::ObjectExpectations) # rspec <= 1.2.0
   Spec::Expectations::ObjectExpectations
@@ -22,7 +25,7 @@ end
 
 Spec::Runner.configure do |config|
   config.mock_with :rr
-  
+
   def capture(stream)
     begin
       stream = stream.to_s
@@ -35,6 +38,6 @@ Spec::Runner.configure do |config|
 
     result
   end
-  
+
   alias silence capture
 end

@@ -1,6 +1,3 @@
-require 'thor/error'
-require 'thor/util'
-
 class Thor
   class Task < Struct.new(:name, :description, :usage, :options)
 

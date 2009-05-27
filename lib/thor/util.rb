@@ -1,9 +1,5 @@
-require 'thor/error'
-
 module ObjectSpace
-  
   class << self
-
     # @return <Array[Class]> All the classes in the object space.
     def classes
       klasses = []
@@ -11,14 +7,12 @@ module ObjectSpace
       klasses
     end
   end
-  
 end
 
 class Thor
   module Tasks; end
-  
+
   module Util
-    
     def self.full_const_get(obj, name)
       list = name.split("::")
       list.shift if list.first.empty?
@@ -29,7 +23,7 @@ class Thor
       end
       obj
     end
-    
+
     def self.constant_to_thor_path(str, remove_default = true)
       str = str.to_s.gsub(/^Thor::Tasks::/, "")
       str = snake_case(str).squeeze(":")
@@ -64,12 +58,11 @@ class Thor
       return full_const_get(which, str) if which
       raise NameError, "uninitialized constant #{str}"
     end
-    
+
     def self.snake_case(str)
       return str.downcase if str =~ /^[A-Z_]+$/
       str.gsub(/\B[A-Z]/, '_\&').squeeze('_') =~ /_*(.*)/
       return $+.downcase
-    end  
-    
+    end
   end
 end

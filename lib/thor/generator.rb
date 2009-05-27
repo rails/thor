@@ -1,4 +1,4 @@
-require 'thor/base'
+require File.join(File.dirname(__FILE__), 'base')
 
 class Thor::Generator
   # Implement the hooks required by Thor::Base.

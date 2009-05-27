@@ -1,7 +1,11 @@
-require 'thor/options'
-require 'thor/util'
-require 'thor/task'
+$:.unshift File.expand_path(File.join(File.dirname(__FILE__), '..'))
+
 require 'thor/core_ext/ordered_hash'
+require 'thor/error'
+require 'thor/option'
+require 'thor/options'
+require 'thor/task'
+require 'thor/util'
 
 class Thor
 

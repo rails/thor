@@ -1,5 +1,4 @@
-$:.unshift File.expand_path(File.dirname(__FILE__))
-require 'thor/base'
+require File.join(File.dirname(__FILE__), 'thor', 'base')
 
 class Thor
   # Implement the hooks required by Thor::Base.
