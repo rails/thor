@@ -10,7 +10,7 @@ describe Thor::Option do
     @option ||= Thor::Option.new(name, description, required, type, default, aliases)
   end
 
-  describe "parse" do
+  describe "#parse" do
 
     describe "with value as a symbol" do
       describe "and symbol is a valid type" do
@@ -135,6 +135,16 @@ describe Thor::Option do
     parse(:foo, :optional).must be_optional
   end
 
+  it "can't be boolean and required" do
+    option(:task, nil, true, :boolean).must_not be_required
+    option(:task, nil, true, :boolean).must be_optional
+  end
+
+  it "can't be required and have a default value" do
+    option(:task, nil, true, :string, "bla").must be_required
+    option(:task, nil, true, :string, "bla").default.must be_nil
+  end
+
   it "requires an argument when type is a string, array, hash or numeric" do
     [:string, :array, :hash, :numeric].each do |type|
       parse(:foo, type).argument_required?.must be_true
@@ -163,7 +173,7 @@ describe Thor::Option do
     option("--foo").human_name.must == "foo"
   end
 
-  describe "formatted default" do
+  describe "#formatted_default" do
     describe "and default is nil" do
       it "must be nil" do
         parse(:foo, :bar).formatted_default.must be_nil
@@ -202,7 +212,7 @@ describe Thor::Option do
     end
   end
 
-  describe "formatted value" do
+  describe "#formatted_value" do
     describe "when type is a string" do
       it "returns the human name upcased" do
         parse(:foo, :string).formatted_value.must == "FOO"

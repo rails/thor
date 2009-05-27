@@ -166,9 +166,10 @@ class Thor
       # Otherwise used them as required values.
       #
       def parse_non_options(hash, assign_leading)
-        until current_is_switch? || @args.empty?
+        until @args.empty? || current_is_switch?
           if assign_leading && !@required.empty?
-            hash[@required.shift.human_name] = shift
+            option = @required.shift
+            parse_option(option.switch_name, option, hash)
           else
             @non_opts << shift
           end
@@ -176,7 +177,8 @@ class Thor
       end
 
       # Receives switch, option and the current values hash and assign the next
-      # value to it.
+      # value to it. The :default and :boolean options are not used when parsing
+      # non options values.
       #
       def parse_option(switch, option, hash)
         human_name = option.human_name
@@ -184,40 +186,44 @@ class Thor
         case option.type
           when :default
             hash[human_name] = peek.nil? || peek.to_s =~ /^-/ || shift
-          when :string
-            hash[human_name] = shift
           when :boolean
             if !@switches.key?(switch) && switch =~ /^--no-(\w+)$/
               hash[$1] = false
             else
               hash[human_name] = true
             end
+          when :string
+            hash[human_name] = shift
           when :numeric
-            hash[human_name] = parse_numeric(switch, shift)
+            hash[human_name] = parse_numeric(switch)
           when :hash
-            hash[human_name] = parse_hash(shift)
+            hash[human_name] = parse_hash
           when :array
-            hash[human_name] = parse_array(shift)
+            hash[human_name] = parse_array
         end
       end
 
-      # Receives a string in the following format:
+      # Runs through the argument hash getting string that contains ":" and
+      # mark it as a hash:
       #
-      #   "name:string age:integer"
+      #   [ "name:string", "age:integer" ]
       #
-      # And returns it as a hash:
+      # Becomes:
       #
       #   { "name" => "string", "age" => "integer" }
       #
-      def parse_hash(arg)
-        arg.split(/\s/).inject({}) do |hash, key_value|
-          key, value = key_value.split(':')
+      def parse_hash
+        hash = {}
+
+        while peek && peek.include?(":")
+          key, value = shift.split(':')
           hash[key] = value
-          hash
         end
+
+        hash
       end
 
-      # Receives a string in the following format:
+      # Get strings in the following format:
       #
       #   "[a, b, c]"
       #
@@ -225,20 +231,20 @@ class Thor
       #
       #   ["a", "b", "c"]
       #
-      def parse_array(arg)
-        array = arg.gsub(/(^\[)|(\]$)/, '').split(',')
+      def parse_array
+        array = shift.gsub(/(^\[)|(\]$)/, '').split(',')
         array.each { |item| item.strip! }
         array
       end
 
-      # Receives a string, check if it's in a numeric format and return a Float
-      # or Integer. Otherwise raises an error.
+      # Check if the peel is numeric ofrmat and return a Float or Integer.
+      # Otherwise raises an error.
       #
-      def parse_numeric(switch, arg)
-        unless arg =~ NUMERIC && $& == arg
-          raise Error, "expected numeric value for '#{switch}'; got #{arg.inspect}"
+      def parse_numeric(switch)
+        unless peek =~ NUMERIC && $& == peek
+          raise Error, "expected numeric value for '#{switch}'; got #{peek.inspect}"
         end
-        $&.index('.') ? arg.to_f : arg.to_i
+        $&.index('.') ? shift.to_f : shift.to_i
       end
 
       # Raises an error if the option requires an argument but it's not present.

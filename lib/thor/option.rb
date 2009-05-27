@@ -9,10 +9,20 @@ class Thor
 
       @name        = name.to_s
       @description = description
-      @required    = required || false
-      @type        = type || :default
-      @default     = default
+      @type        = (type || :default).to_sym
       @aliases     = [*aliases].compact
+
+      @required = if @type == :boolean
+        false
+      else
+        required || false
+      end
+
+      @default = if @required
+        nil
+      else
+        default
+      end
     end
 
     # This parse quick options given as method_options. It makes several
