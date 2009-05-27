@@ -191,8 +191,6 @@ class Thor
 
         @default_options
       end
-      # TODO Remove this alias
-      alias :opts :default_options
 
       def maxima
         @maxima ||= begin
