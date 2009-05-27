@@ -1,16 +1,32 @@
-require 'thor'
+require 'thor/base'
 
 class Thor::Generator
+  # Implement the hooks required by Thor::Base.
+  #
+  class << self
+    protected
+      def baseclass
+        Thor::Generator
+      end
+
+      def options_scope
+        default_options
+      end
+
+      def valid_task?(meth)
+        public_instance_methods.include?(meth)
+      end
+
+      def create_task(meth)
+        tasks[meth.to_s] = Thor::Task.new(meth, nil, nil, nil)
+      end
+  end
+
   include Thor::Base
 
+  # Implement specific Thor::Generator logic.
+  #
   class << self
-    undef_method :default_task, :map, :method_options
-
-    # Sets the baseclass to Thor. This is where the tasks lookup finishes.
-    #
-    def baseclass
-      Thor::Generator
-    end
 
     # Start in generators works differently. It invokes all tasks inside the class.
     #
@@ -22,14 +38,6 @@ class Thor::Generator
       all_tasks.values.map { |task| task.run(self, args) }
     rescue Thor::Error => e
       $stderr.puts e.message
-    end
-
-    def valid_task?(meth)
-      public_instance_methods.include?(meth)
-    end
-
-    def create_task(meth)
-      tasks[meth.to_s] = Thor::Task.new(meth.to_s, nil, nil, nil)
     end
 
   end

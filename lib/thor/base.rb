@@ -8,32 +8,27 @@ class Thor
   class Maxima < Struct.new(:description, :usage, :options)
   end
 
-  # Holds class method for Thor class. If you want to create Thor tasks, this
-  # is where you should look at.
-  #
   module Base
 
     def self.included(base)
       base.extend ClassMethods
     end
 
-    module ClassMethods
+    attr_accessor :options
 
-      # Sets the default task when thor is executed without an explicit task to be called.
-      #
-      # ==== Parameters
-      # meth<Symbol>:: name of the defaut task
-      #
-      def default_task(meth=nil)
-        case meth
-          when :none
-            @default_task = 'help'
-          when nil
-            @default_task ||= from_superclass(:default_task, 'help')
-          else
-            @default_task = meth.to_s
-        end
-      end
+    # Initialize the class by setting options accessor.
+    #
+    def initialize(options={}, *args)
+      @options = options
+    end
+
+    # Main entry point method that actually invoke the task.
+    #
+    def invoke(meth, *args)
+      self.send(meth, *args)
+    end
+
+    module ClassMethods
 
       # Adds an argument (a required option) to the task.
       #
@@ -44,8 +39,8 @@ class Thor
       #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
       #
       def argument(name, options={})
-        option = Thor::Option.new(name, options[:description], true, options[:type], nil, options[:aliases])
-        add_new_option(name, option)
+        options_scope[name] = Thor::Option.new(name, options[:description], true, options[:type],
+                                                     nil, options[:aliases])
       end
 
       # Adds an option (which is not required) to the task.
@@ -57,48 +52,8 @@ class Thor
       #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
       #
       def option(name, options={})
-        option = Thor::Option.new(name, options[:description], false, options[:type],
-                                  options[:default], options[:aliases])
-        add_new_option(name, option)
-      end
-
-      # Maps an input to a task. If you define:
-      #
-      #   map "-T" => "list"
-      #
-      # Running:
-      #
-      #   thor -T
-      #
-      # Will invoke the list task.
-      #
-      # ==== Parameters
-      # Hash[String|Array => Symbol]:: Maps the string or the string in the array to the given task.
-      #
-      def map(mappings=nil)
-        @map ||= from_superclass(:map, {})
-
-        if mappings
-          mappings.each do |key, value|
-            if key.respond_to?(:each)
-              key.each {|subkey| @map[subkey] = value}
-            else
-              @map[key] = value
-            end
-          end
-        end
-
-        @map
-      end
-
-      # Defines the usage and the description of the next task.
-      #
-      # ==== Parameters
-      # usage<String>
-      # description<String>
-      #
-      def desc(usage, description)
-        @usage, @desc = usage, description
+        options_scope[name] = Thor::Option.new(name, options[:description], false, options[:type],
+                                                     options[:default], options[:aliases])
       end
 
       # Defines the group. This is used when thor list is invoked so you can specify
@@ -118,24 +73,6 @@ class Thor
       #
       def group_name
         @group_name ||= from_superclass(:group_name, 'standard')
-      end
-
-      # Declares the options for the next task to be declaread.
-      #
-      # ==== Parameters
-      # Hash[Symbol => Symbol]:: The hash key is the name of the option and the value
-      # is the type of the option. Can be :optional, :required, :boolean or :numeric.
-      #
-      def method_options(options=nil)
-        @method_options ||= Thor::CoreExt::OrderedHash.new
-
-        if options
-          options.each do |key, value|
-            @method_options[key] = Thor::Option.parse(key, value)
-          end
-        end
-
-        @method_options
       end
 
       # Returns the files where the subclasses are maintained.
@@ -180,16 +117,16 @@ class Thor
       end
 
       # Retrieve a specific task from this Thor class. If the desired Task cannot
-      # be found, returns a dynamic Thor::Task that will map to the given name.
+      # be found, returns a dynamic Thor::Task that will map to the given method.
       #
       # ==== Parameters
-      # name<Symbol>:: the name of the task to be retrieved
+      # meth<Symbol>:: the name of the task to be retrieved
       #
       # ==== Returns
       # Task
       #
-      def [](name)
-        all_tasks[name.to_s] || Thor::Task.dynamic(name)
+      def [](meth)
+        all_tasks[meth.to_s] || Thor::Task.dynamic(meth)
       end
 
       # Returns and sets the default options for this class. It can be done in
@@ -219,6 +156,11 @@ class Thor
         @default_options
       end
 
+      # Returns the maxima for this Thor class and all subclasses
+      #
+      # ==== Returns
+      # maxima<Struct @description @usage @options>
+      #
       def maxima
         @maxima ||= begin
           compare = lambda { |x,y| x.size <=> y.size }
@@ -231,15 +173,6 @@ class Thor
         end
       end
 
-      def valid_task?(meth)
-        public_instance_methods.include?(meth) && @usage
-      end
-
-      def create_task(meth)
-        tasks[meth.to_s] = Task.new(meth, @desc, @usage, @method_options)
-        @usage, @desc, @method_options = nil
-      end
-
       # Parse the options given and extract the task to be called from it. If no
       # method can be extracted from args the default task is invoked.
       #
@@ -250,40 +183,23 @@ class Thor
         $stderr.puts e.message
       end
 
-      # Invokes a specific task. You can use this method instead of start() to
-      # to run a thor task if you know the specific task you want to invoke.
-      #
-      def invoke(task_name=nil, args=ARGV)
-        args = args.dup
-        args.unshift(task_name || default_task)
-        start(args)
-      end
-
       protected
 
-        def from_superclass(method, default=nil)
-          self == baseclass ? default : superclass.send(method).dup
-        end
-
-        # Receives a task name (can be nil), and try to get a map from it.
-        # If a map can't be found use the sent name or the default task.
+        # Everytime someone inherits from a Thor class, register the klass
+        # and file into baseclass.
         #
-        def normalize_task_name(meth)
-          mapping = map[meth.to_s]
-          meth = mapping || meth || default_task
-          meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
-        end
-
         def inherited(klass)
           register_klass_file(klass)
         end
 
+        # Fire this callback whenever a method is added. Added methods are
+        # tracked as tasks if the requirements set by valid_task? are valid.
+        #
         def method_added(meth)
           meth = meth.to_s
 
           if meth == "initialize"
-            default_options.merge!(@method_options)
-            @method_options = nil
+            initialize_added
             return
           end
 
@@ -292,7 +208,10 @@ class Thor
           create_task(meth)
         end
 
-        def register_klass_file(klass, file = caller[1].match(/(.*):\d+/)[1])
+        # Register the klass file by tracking the class in the base class and
+        # the file where the class was defined.
+        #
+        def register_klass_file(klass, file=caller[1].match(/(.*):\d+/)[1])
           subclasses << klass unless subclasses.include?(klass)
 
           unless self == baseclass
@@ -300,26 +219,39 @@ class Thor
             return
           end
 
-          # Subclasses files are tracked just on the superclass, not on subclasses.
           file_subclasses = subclass_files[File.expand_path(file)]
           file_subclasses << klass unless file_subclasses.include?(klass)
         end
 
-        def add_new_option(name, option)
-          method_options[name] = option
+        def from_superclass(method, default=nil)
+          self == baseclass ? default : superclass.send(method).dup
         end
-    end
 
-    # Main entry point method that should actually invoke the method. You
-    # can override this to provide some class-wide processing. The default
-    # implementation simply invokes the named method.
-    #
-    def invoke(meth, *args)
-      self.send(meth, *args)
-    end
+        # SIGNATURE: Sets the baseclass to Thor. This is where the superclass
+        # lookup finishes.
+        def baseclass #:nodoc:
+        end
 
-    def initialize(options={}, *args)
-      @options = options
+        # SIGNATURE: This method is called argument and option are called to
+        # ensure options are added to the write scope (class or method scope).
+        def options_scope #:nodoc:
+        end
+
+        # SIGNATURE: Defines if a given method is a valid_task?. This method is
+        # called everytime a new method is added to the class.
+        def valid_task?(meth) #:nodoc:
+        end
+
+        # SIGNATURE: Creates a new task if valid_task? is true. This method is
+        # called everytime a new method is added to the class.
+        def create_task(meth) #:nodoc:
+        end
+
+        # SIGNATURE: Defines behavior when the initialize method is added to the
+        # class.
+        def initialize_added #:nodoc:
+        end
+
     end
 
   end
