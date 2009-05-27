@@ -64,6 +64,24 @@ class Thor #:nodoc:
         value
       end
 
+      def delete(key)
+        if node = @hash[key]
+          prev_node = node.prev
+          next_node = node.next
+
+          next_node.prev = prev_node if next_node
+          prev_node.next = next_node if prev_node
+
+          @first = next_node if @first == node
+          @last = prev_node  if @last  == node
+
+          value = node.value
+        end
+
+        @hash[key] = nil
+        value
+      end
+
       def each
         return unless @first
         yield [@first.key, @first.value]

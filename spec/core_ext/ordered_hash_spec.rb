@@ -15,8 +15,13 @@ describe Thor::CoreExt::OrderedHash do
       @hash.each { fail }
     end
 
-    it "has an empty values list" do
+    it "has an empty key and values list" do
+      @hash.keys.must be_empty
       @hash.values.must be_empty
+    end
+
+    it "must be empty" do
+      @hash.must be_empty
     end
   end
 
@@ -115,6 +120,25 @@ describe Thor::CoreExt::OrderedHash do
 
     it "converts to a string" do
       @hash.to_s.must == @hash.to_a.inspect
+    end
+
+    it "must not be empty" do
+      @hash.must_not be_empty
+    end
+
+    it "deletes values from hash" do
+      @hash.delete(:baz).must == "Baz!"
+      @hash.values.must == ["Foo!", "Bar!", "Bop!", "Bat!"]
+
+      @hash.delete(:foo).must == "Foo!"
+      @hash.values.must == ["Bar!", "Bop!", "Bat!"]
+
+      @hash.delete(:bat).must == "Bat!"
+      @hash.values.must == ["Bar!", "Bop!"]
+    end
+
+    it "returns nil if the value to be deleted can't be found" do
+      @hash.delete(:nothing).must be_nil
     end
   end
 end
