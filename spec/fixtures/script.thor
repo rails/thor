@@ -76,6 +76,7 @@ class MyChildScript < MyScript
     [type, options]
   end
   option :other, :type => :string, :for => :animal
+  desc "animal KIND", "fish around", :for => :animal
 
   desc "boom", "explodes everything"
   def boom

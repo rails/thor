@@ -59,6 +59,12 @@ do some fooing
   Everyone likes more info!
 END
     end
+
+    describe "when :for is supplied" do
+      it "overwrites a previous defined task" do
+        capture(:stdout) { MyChildScript.start(["help"]) }.must =~ /animal KIND \[\-\-other=OTHER\] +fish around/
+      end
+    end
   end
 
   describe "#method_options" do

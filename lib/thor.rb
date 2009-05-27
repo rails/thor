@@ -56,8 +56,14 @@ class Thor
     # usage<String>
     # description<String>
     #
-    def desc(usage, description)
-      @usage, @desc = usage, description
+    def desc(usage, description, options={})
+      if options[:for]
+        task = find_and_refresh_task(options[:for])
+        task.usage = usage             if usage
+        task.description = description if description
+      else
+        @usage, @desc = usage, description
+      end
     end
 
     # Maps an input to a task. If you define:
