@@ -12,9 +12,8 @@ class Thor::Generator < Thor
       options = opts.parse(args, false)
       args    = opts.trailing_non_opts
 
-      generator = new(options, *args)
-      tasks     = self.all_tasks.values.reject { |task| task.meth == 'help' }
-      tasks.map { |task| task.parse(generator, args) }
+      tasks     = self.all_tasks.values.reject { |task| task.name == 'help' }
+      tasks.map { |task| task.run(self, args) }
     rescue Thor::Error => e
       $stderr.puts e.message
     end
@@ -24,7 +23,7 @@ class Thor::Generator < Thor
     end
 
     def create_task(meth)
-      tasks[meth] = Thor::Task.new(@desc, @usage, @method_options)
+      tasks[meth.to_s] = Thor::Task.new(meth.to_s, @desc, @usage, @method_options)
     end
 
     protected

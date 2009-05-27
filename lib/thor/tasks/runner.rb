@@ -202,8 +202,7 @@ class Thor::Runner < Thor
   end
 
   def display_tasks(klass, max_base, max_left)
-    if klass.tasks.values.length > 1
-
+    if klass.tasks.values.length > 0
       base = Thor::Util.constant_to_thor_path(klass.name)
 
       if base.to_a.empty?

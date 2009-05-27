@@ -44,19 +44,20 @@ describe Thor::Runner do
     ARGV.replace ["list"]
     capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
   end
-  
-  xit "can filter a list of the available tasks by --group" do
+
+  it "can filter a list of the available tasks by --group" do
     ARGV.replace ["list", "--group", "standard"]
     capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
     capture(:stdout) { Thor::Runner.start }.must_not =~ /my_tasks:advanced_task:zoo +zip/
     ARGV.replace ["list", "--group", "advanced"]
     capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:advanced_task:zoo +zip/
   end
-  
-  xit "can skip all filters to show all tasks using --all" do
+
+  it "can skip all filters to show all tasks using --all" do
     ARGV.replace ["list", "--all"]
-    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
-    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:advanced_task:zoo +zip/
+    content = capture(:stdout) { Thor::Runner.start }
+    content.must =~ /my_tasks:thor_task:foo +bar/
+    content.must =~ /my_tasks:advanced_task:zoo +zip/
   end
 
   it "doesn't list superclass tasks in the subclass" do

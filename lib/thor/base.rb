@@ -133,10 +133,23 @@ class Thor
       # Returns the tasks for this Thor class.
       #
       # ==== Returns
-      # TaskHash:: An ordered hash with this class tasks.
+      # OrderedHash:: An ordered hash with this class tasks.
       #
       def tasks
-        @tasks ||= from_superclass(:tasks, Thor::CoreExt::OrderedHash.new)
+        @tasks ||= Thor::CoreExt::OrderedHash.new
+      end
+
+      # Returns the tasks for this Thor class and all subclasses.
+      #
+      # ==== Returns
+      # OrderedHash
+      #
+      def all_tasks
+        @all_tasks ||= begin
+          all = tasks
+          all = superclass.all_tasks.merge(tasks) unless self == Thor
+          all
+        end
       end
 
       # Retrieve a specific task from this Thor class. If the desired Task cannot
@@ -146,10 +159,10 @@ class Thor
       # name<Symbol>:: the name of the task to be retrieved
       #
       # ==== Returns
-      # Thor::Task
+      # Task
       #
       def [](name)
-        tasks[name.to_s] || Thor::Task.dynamic(name)
+        all_tasks[name.to_s] || Thor::Task.dynamic(name)
       end
 
       # Returns and sets the default options for this class. It can be done in
@@ -185,9 +198,9 @@ class Thor
         @maxima ||= begin
           compare = lambda { |x,y| x.size <=> y.size }
 
-          max_usage = tasks.map{ |_, t| t.usage.to_s }.max(&compare).size
-          max_desc  = tasks.map{ |_, t| t.description.to_s }.max(&compare).size
-          max_opts  = tasks.map{ |_, t| t.full_options(self).formatted_usage }.max(&compare).size
+          max_usage = all_tasks.map{ |_, t| t.usage.to_s }.max(&compare).size
+          max_desc  = all_tasks.map{ |_, t| t.description.to_s }.max(&compare).size
+          max_opts  = all_tasks.map{ |_, t| t.full_options(self).formatted_usage }.max(&compare).size
 
           Thor::Maxima.new(max_desc, max_usage, max_opts)
         end

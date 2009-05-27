@@ -16,15 +16,16 @@ class Thor
     # task properly.
     #
     def run(klass, args)
+      raise NoMethodError, "the `#{name}' task of #{klass} is private" unless public_method?(klass)
+
+      raw_options = klass.default_options.merge(self.options || {})
+      opts        = Thor::Options.new(raw_options)
+      options     = opts.parse(args)
+      args        = opts.non_opts
+      instance    = klass.new(options, *args)
+
       begin
-        raise NoMethodError, "the `#{name}' task of #{klass} is private" unless public_method?(klass)
-
-        raw_options = klass.default_options.merge(self.options || {})
-        opts        = Thor::Options.new(raw_options)
-        options     = opts.parse(args)
-        args        = opts.non_opts
-
-        klass.new(options, *args).invoke(name, *args)
+        instance.invoke(name, *args)
       rescue ArgumentError => e
         backtrace = sans_backtrace(e.backtrace, caller)
 
@@ -34,7 +35,7 @@ class Thor
           raise e
         end
       rescue NoMethodError => e
-        if e.message =~ /^undefined method `#{name}' for #{Regexp.escape(klass.name)}$/
+        if e.message =~ /^undefined method `#{name}' for #{Regexp.escape(instance.inspect)}$/
           raise Error, "The #{namespace(klass)} namespace doesn't have a `#{name}' task"
         else
           raise e

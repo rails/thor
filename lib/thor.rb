@@ -10,19 +10,15 @@ class Thor
   desc "help [TASK]", "describe available tasks or one specific task"
   def help(task = nil)
     if task
-      if task.include? ?:
-        task = self.class[task]
-        namespace = true
-      else
-        task = self.class[task]
-      end
+      task = self.class.tasks[task]
+      namespace = task.include?(?:)
 
       puts task.formatted_usage(self, namespace)
       puts task.description
     else
       puts "Options"
       puts "-------"
-      self.class.tasks.each do |_, task|
+      self.class.all_tasks.each do |_, task|
         format = "%-" + (self.class.maxima.usage + self.class.maxima.options + 4).to_s + "s"
         print format % ("#{task.formatted_usage(self, false)}")
         puts  task.description.split("\n").first

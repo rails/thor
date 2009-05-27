@@ -19,7 +19,7 @@ end
 
 describe Thor::Generator do
 
-  xit "invokes all the tasks under the generator" do
+  it "invokes all the tasks under the generator" do
     MyScaffold.start([]).must == [ 1, 2, 3 ]
   end
   

@@ -1,17 +1,23 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 require "thor/util"
+require 'thor/ordered_hash'
+
+module MyTasks
+  class ThorTask < Thor
+  end
+end
 
 describe Thor::Util do
   describe ".constant_to_thor_path" do
     it "knows how to convert class names into thor names" do
       Thor::Util.constant_to_thor_path("FooBar::BarBaz::BazBat").must == "foo_bar:bar_baz:baz_bat"
     end
-    
-    xit "knows how to convert a thor name to a constant" do
+
+    it "knows how to convert a thor name to a constant" do
       Thor::Util.constant_from_thor_path("my_tasks:thor_task").must == MyTasks::ThorTask
     end
   end
-  
+
   describe ".snake_case" do
     it "preserves no-cap strings" do
       Thor::Util.snake_case("foo").must == "foo"
@@ -52,7 +58,6 @@ describe Thor::Util do
     end
 
     it "accepts class and module objects" do
-      require 'thor/ordered_hash'
       Thor::Util.constant_to_thor_path(Thor::OrderedHash).must == "thor:ordered_hash"
       Thor::Util.constant_to_thor_path(Thor::Util).must == "thor:util"
     end
