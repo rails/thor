@@ -1,9 +1,16 @@
 require 'thor'
 
-class Thor::Generator < Thor
-  class << self
+class Thor::Generator
+  include Thor::Base
 
+  class << self
     undef_method :default_task, :map, :method_options
+
+    # Sets the baseclass to Thor. This is where the tasks lookup finishes.
+    #
+    def baseclass
+      Thor::Generator
+    end
 
     # Start in generators works differently. It invokes all tasks inside the class.
     #
@@ -12,8 +19,7 @@ class Thor::Generator < Thor
       options = opts.parse(args, false)
       args    = opts.trailing_non_opts
 
-      tasks     = self.all_tasks.values.reject { |task| task.name == 'help' }
-      tasks.map { |task| task.run(self, args) }
+      all_tasks.values.map { |task| task.run(self, args) }
     rescue Thor::Error => e
       $stderr.puts e.message
     end
@@ -23,14 +29,8 @@ class Thor::Generator < Thor
     end
 
     def create_task(meth)
-      tasks[meth.to_s] = Thor::Task.new(meth.to_s, @desc, @usage, @method_options)
+      tasks[meth.to_s] = Thor::Task.new(meth.to_s, nil, nil, nil)
     end
-
-    protected
-
-      def from_superclass(method, default=nil)
-        self == Thor::Generator ? default : superclass.send(method)
-      end
 
   end
 end

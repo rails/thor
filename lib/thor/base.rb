@@ -29,10 +29,37 @@ class Thor
           when :none
             @default_task = 'help'
           when nil
-            @default_task ||= (self == Thor ? 'help' : superclass.default_task)
+            @default_task ||= from_superclass(:default_task, 'help')
           else
             @default_task = meth.to_s
         end
+      end
+
+      # Adds an argument (a required option) to the task.
+      #
+      # ==== Parameters
+      # name<Symbol>:: The name of the argument.
+      # options<Hash>:: The description, type and aliases for this option.
+      #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
+      #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
+      #
+      def argument(name, options={})
+        option = Thor::Option.new(name, options[:description], true, options[:type], nil, options[:aliases])
+        add_new_option(name, option)
+      end
+
+      # Adds an option (which is not required) to the task.
+      #
+      # ==== Parameters
+      # name<Symbol>:: The name of the argument.
+      # options<Hash>:: The description, type, default value and aliases for this option.
+      #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
+      #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
+      #
+      def option(name, options={})
+        option = Thor::Option.new(name, options[:description], false, options[:type],
+                                  options[:default], options[:aliases])
+        add_new_option(name, option)
       end
 
       # Maps an input to a task. If you define:
@@ -99,7 +126,7 @@ class Thor
       # Hash[Symbol => Symbol]:: The hash key is the name of the option and the value
       # is the type of the option. Can be :optional, :required, :boolean or :numeric.
       #
-      def method_options(options)
+      def method_options(options=nil)
         @method_options ||= Thor::CoreExt::OrderedHash.new
 
         if options
@@ -147,7 +174,7 @@ class Thor
       def all_tasks
         @all_tasks ||= begin
           all = tasks
-          all = superclass.all_tasks.merge(tasks) unless self == Thor
+          all = superclass.all_tasks.merge(tasks) unless self == baseclass
           all
         end
       end
@@ -235,7 +262,7 @@ class Thor
       protected
 
         def from_superclass(method, default=nil)
-          self == Thor ? default : superclass.send(method).dup
+          self == baseclass ? default : superclass.send(method).dup
         end
 
         # Receives a task name (can be nil), and try to get a map from it.
@@ -268,7 +295,7 @@ class Thor
         def register_klass_file(klass, file = caller[1].match(/(.*):\d+/)[1])
           subclasses << klass unless subclasses.include?(klass)
 
-          unless self == Thor
+          unless self == baseclass
             superclass.register_klass_file(klass, file)
             return
           end
@@ -276,6 +303,10 @@ class Thor
           # Subclasses files are tracked just on the superclass, not on subclasses.
           file_subclasses = subclass_files[File.expand_path(file)]
           file_subclasses << klass unless file_subclasses.include?(klass)
+        end
+
+        def add_new_option(name, option)
+          method_options[name] = option
         end
     end
 

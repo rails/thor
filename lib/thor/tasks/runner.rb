@@ -25,9 +25,9 @@ class Thor::Runner < Thor
         contents      = open(name).read
       end
     rescue OpenURI::HTTPError
-      raise Error, "Error opening URI `#{name}'"
+      raise Error, "Error opening URI '#{name}'"
     rescue Errno::ENOENT
-      raise Error, "Error opening file `#{name}'"
+      raise Error, "Error opening file '#{name}'"
     end
     
     puts "Your Thorfile contains: "
@@ -77,7 +77,7 @@ class Thor::Runner < Thor
   
   desc "uninstall NAME", "uninstall a named Thor module"
   def uninstall(name)
-    raise Error, "Can't find module `#{name}'" unless thor_yaml[name]
+    raise Error, "Can't find module '#{name}'" unless thor_yaml[name]
     
     puts "Uninstalling #{name}."
     
@@ -91,9 +91,9 @@ class Thor::Runner < Thor
   
   desc "update NAME", "update a Thor file from its original location"
   def update(name)
-    raise Error, "Can't find module `#{name}'" if !thor_yaml[name] || !thor_yaml[name][:location]
+    raise Error, "Can't find module '#{name}'" if !thor_yaml[name] || !thor_yaml[name][:location]
 
-    puts "Updating `#{name}' from #{thor_yaml[name][:location]}"
+    puts "Updating '#{name}' from #{thor_yaml[name][:location]}"
     old_filename = thor_yaml[name][:filename]
     self.options = self.options.merge("as" => name)
     filename     = install(thor_yaml[name][:location])

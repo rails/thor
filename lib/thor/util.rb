@@ -41,7 +41,7 @@ class Thor
       make_constant(to_constant(str))
     rescue NameError => e
       raise e unless e.message =~ /^uninitialized constant (.*)$/
-      raise Error, "There was no available namespace `#{str}'."
+      raise Error, "There was no available namespace '#{str}'."
     end
 
     def self.to_constant(str)

@@ -72,12 +72,12 @@ describe Thor::Runner do
   
   it "prints an error if a toplevel thor task is not found" do
     ARGV.replace ["hello"]
-    capture(:stderr) { Thor::Runner.start }.must =~ /The thor:runner namespace doesn't have a `hello' task/
+    capture(:stderr) { Thor::Runner.start }.must =~ /The thor:runner namespace doesn't have a 'hello' task/
   end
   
   it "prints an error if the namespace could not be found" do
     ARGV.replace ["hello:goodbye"]
-    capture(:stderr) { Thor::Runner.start }.must =~ /There was no available namespace `hello'/
+    capture(:stderr) { Thor::Runner.start }.must =~ /There was no available namespace 'hello'/
   end  
   
   it "does not swallow NoMethodErrors that occur inside the called method" do

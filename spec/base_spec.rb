@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'thor/options'
 
 class MyScript < Thor
   group :script
@@ -21,7 +22,7 @@ do some fooing
   This is more info!
   Everyone likes more info!
 END
-  method_options :force => :boolean
+  option :force, :type => :boolean, :description => "Very cool"
   def foo(bar)
     [bar, options]
   end
@@ -32,7 +33,7 @@ END
   end
 
   desc "bar BAZ BAT", "do some barring"
-  method_options :option1 => :required
+  argument :option1, :type => :string, :default => "boom"
   def bar(baz, bat)
     [baz, bat, options]
   end
@@ -241,11 +242,11 @@ END
     end
 
     it "raises an error if a required param is not provided" do
-      capture(:stderr) { MyScript.start(["animal"]) }.must =~ /`animal' was called incorrectly\. Call as `my_script:animal TYPE'/
+      capture(:stderr) { MyScript.start(["animal"]) }.must =~ /'animal' was called incorrectly\. Call as 'my_script:animal TYPE'/
     end
 
     it "raises an error if the invoked task does not exist" do
-      capture(:stderr) { Amazing.start(["animal"]) }.must =~ /The amazing namespace doesn't have a `animal' task/
+      capture(:stderr) { Amazing.start(["animal"]) }.must =~ /The amazing namespace doesn't have a 'animal' task/
     end
 
     it "calls a method with an optional boolean param when the param is passed" do
@@ -277,7 +278,7 @@ END
     end
 
     it "does not call a private method no matter what" do
-      lambda { MyScript.start(["what"]) }.must raise_error(NoMethodError, "the `what' task of MyScript is private")
+      lambda { MyScript.start(["what"]) }.must raise_error(NoMethodError, "the 'what' task of MyScript is private")
     end
 
     it "raises when an exception happens within the task call" do
@@ -296,6 +297,28 @@ END
       MyScript.maxima.description.must == 64
       MyScript.maxima.usage.must       == 28
       MyScript.maxima.options.must     == 19
+    end
+  end
+
+  describe "#option" do
+    it "sets options to the next method to be invoked" do
+      args = ["foo", "bar", "--force"]
+      arg, options = MyScript.start(args)
+      options.must == { "force" => true }
+    end
+  end
+
+  describe "#argument" do
+    it "sets options to the next method to be invoked" do
+      args = ["bar", "bla", "bla", "--option1", "cool"]
+      arg1, arg2, options = MyScript.start(args)
+      options.must == { "option1" => "cool" }
+    end
+
+    it "ignores default option" do
+      lambda {
+        MyScript.start(["bar", "bla", "bla"])
+      }.must raise_error(Thor::Options::Error, "no value provided for required argument '--option1'")
     end
   end
 end

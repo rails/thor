@@ -5,6 +5,14 @@ class Thor
   include Thor::Base
   attr_accessor :options
 
+  class << self
+    # Sets the baseclass to Thor. This is where the superclass lookup finishes.
+    #
+    def baseclass
+      Thor
+    end
+  end
+
   map ["-h", "-?", "--help", "-D"] => :help
 
   desc "help [TASK]", "describe available tasks or one specific task"

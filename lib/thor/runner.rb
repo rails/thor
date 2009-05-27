@@ -53,7 +53,7 @@ class Thor::Runner < Thor
   def self.task_from_thor_class(task)
     namespaces = task.split(":")
     klass = Thor::Util.constant_from_thor_path(namespaces[0...-1].join(":"))
-    raise Error, "`#{klass}' is not a Thor class" unless klass <= Thor
+    raise Error, "'#{klass}' is not a Thor class" unless klass <= Thor
     return klass, namespaces.last
   end
 
