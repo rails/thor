@@ -20,10 +20,8 @@ class Thor
 
     attr_accessor :options
 
-    # Initialize the class by setting options accessor.
-    #
     def initialize(options={}, *args)
-      @options = options
+      self.options = options
     end
 
     # Main entry point method that actually invoke the task.
@@ -185,12 +183,40 @@ class Thor
         end
       end
 
+      # All methods defined inside the given block are not added as tasks.
+      #
+      # So you can do:
+      #
+      #   class MyScript < Thor
+      #     no_tasks do
+      #       def this_is_not_a_task
+      #       end
+      #     end
+      #   end
+      #
+      # You can also add the method and remove it from the task list:
+      #
+      #   class MyScript < Thor
+      #     def this_is_not_a_task
+      #     end
+      #     remove_task :this_is_not_a_task
+      #   end
+      #
+      def no_tasks
+        @no_tasks = true
+        yield
+        @no_tasks = false
+      end
+
       # Parse the options given and extract the task to be called from it. If no
       # method can be extracted from args the default task is invoked.
       #
       def start(args=ARGV)
         meth = normalize_task_name(args.shift)
-        self[meth].run(self, args)
+        task = self[meth]
+        args, options = task.parse(self, args)
+        instance = new(options, *args)
+        task.run(instance, args)
       rescue Thor::Error => e
         $stderr.puts e.message
       end
@@ -198,9 +224,9 @@ class Thor
       # Invokes a specific task. You can use this method instead of start() to
       # to run a thor task if you know the specific task you want to invoke.
       #
-      def invoke(task_name=nil, args=ARGV)
+      def invoke(task_name, args=ARGV)
         args = args.dup
-        args.unshift(task_name || default_task)
+        args.unshift(task_name)
         start(args)
       end
 
@@ -238,7 +264,7 @@ class Thor
             return
           end
 
-          return unless valid_task?(meth)
+          return if @no_tasks || !valid_task?(meth)
           register_klass_file(self)
           create_task(meth)
         end

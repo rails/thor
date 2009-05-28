@@ -15,18 +15,22 @@ class Thor
       self.options = other.options.dup if other.options
     end
 
-    # Invokes the task name in the given parent with the given args. It also
-    # checks if the method is not private and check if the user invoked the
-    # task properly.
-    #
-    def run(klass, args)
-      raise NoMethodError, "the '#{name}' task of #{klass} is private" unless public_method?(klass)
-
+    def parse(klass, args)
       raw_options = klass.default_options.merge(self.options || {})
       opts        = Thor::Options.new(raw_options)
       options     = opts.parse(args)
       args        = opts.non_opts
-      instance    = klass.new(options, *args)
+
+      return args, options
+    end
+
+    # Invokes the task name in the given parent with the given args. It also
+    # checks if the method is not private and check if the user invoked the
+    # task properly.
+    #
+    def run(instance, args=[])
+      klass = instance.class
+      raise NoMethodError, "the '#{name}' task of #{klass} is private" unless public_method?(klass)
 
       begin
         instance.invoke(name, *args)

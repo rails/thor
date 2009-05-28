@@ -10,7 +10,7 @@ class Thor
       end
 
       def valid_task?(meth)
-        public_instance_methods.include?(meth) && @usage
+        public_instance_methods.include?(meth) && @usage && @desc
       end
 
       def create_task(meth)

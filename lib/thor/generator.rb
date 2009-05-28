@@ -34,7 +34,7 @@ class Thor::Generator
     #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
     #
     def argument(name, options={})
-      attr_accessor name
+      no_tasks { attr_accessor name }
       default_options[name] = Thor::Option.new(name, options[:description], true, options[:type],
                                                nil, options[:aliases])
     end
@@ -49,13 +49,16 @@ class Thor::Generator
     # Start in generators works differently. It invokes all tasks inside the class.
     #
     def start(args=ARGV)
-      opts    = Thor::Options.new
-      options = opts.parse(args)
-      args    = opts.non_opts
+      opts     = Thor::Options.new(self.default_options)
+      options  = opts.parse(args, true) # Send true to assign leading options
+      args     = opts.non_opts
 
       instance = new(options, *args)
+      opts.required.each do |key, value|
+        instance.send(:"#{key}=", value)
+      end
 
-      all_tasks.values.map { |task| instance.send(task.name, *args) }
+      all_tasks.values.map { |task| task.run(instance) }
     rescue Thor::Error => e
       $stderr.puts e.message
     end

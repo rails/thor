@@ -15,7 +15,7 @@ class Thor
     SHORT_SQ_RE = /^-([a-z]{2,})$/i # Allow either -x -v or -xv style for single char args
     SHORT_NUM   = /^(-[a-z])#{NUMERIC}$/i
 
-    attr_reader :non_opts
+    attr_reader :non_opts, :required
 
     # Takes an array of switches. Each array consists of up to three
     # elements that indicate the name and type of switch. Returns a hash
@@ -35,11 +35,11 @@ class Thor
     #   ).parse(args)
     #
     def initialize(switches={})
-      @defaults, @shorts = {}, {}
-      @required, @non_opts = [], []
+      @defaults, @shorts, @required = {}, {}, {}
+      @non_assigned_required, @non_opts = [], []
 
       @switches = switches.values.inject({}) do |mem, option|
-        @required << option                           if option.required?
+        @non_assigned_required << option              if option.required?
         @defaults[option.human_name] = option.default unless option.default.nil?
 
         # If there are no shortcuts specified, generate one using the first character
@@ -54,13 +54,13 @@ class Thor
       remove_duplicated_shortcuts!
     end
 
-    def parse(args, assign_leading=false)
+    def parse(args, assign_required=false)
       @args, @non_opts = args, []
 
       # Start hash with indifferent access pre-filled with defaults
       hash = Thor::CoreExt::HashWithIndifferentAccess.new(@defaults)
 
-      parse_non_options(hash, assign_leading)
+      parse_non_options(hash, assign_required)
 
       while current_is_switch?
         case shift
@@ -86,6 +86,7 @@ class Thor
       @non_opts += @args
 
       check_validity!
+      assign_required_from_hash(hash) if assign_required
       hash.freeze
       hash
     end
@@ -165,10 +166,10 @@ class Thor
       # If assign_leading is false, add non options to the non_opts array.
       # Otherwise used them as required values.
       #
-      def parse_non_options(hash, assign_leading)
+      def parse_non_options(hash, assign_required)
         until @args.empty? || current_is_switch?
-          if assign_leading && !@required.empty?
-            option = @required.shift
+          if assign_required && !@non_assigned_required.empty?
+            option = @non_assigned_required.shift
             parse_option(option.switch_name, option, hash)
           else
             @non_opts << shift
@@ -255,8 +256,9 @@ class Thor
       # Raises an error if the option requires an argument but it's not present.
       #
       def check_requirement!(switch, option)
+        @non_assigned_required.delete(option)
+
         if option.argument_required?
-          @required.delete(option)
           raise Error, "no value provided for argument '#{switch}'"  if peek.nil?
           raise Error, "cannot pass switch '#{peek}' as an argument" if switch?(peek)
         end
@@ -265,9 +267,18 @@ class Thor
       # Raises an error if @required array is not empty after parsing.
       #
       def check_validity!
-        unless @required.empty?
-          switch_names = @required.map{ |o| o.switch_name }.join(', ')
+        unless @non_assigned_required.empty?
+          switch_names = @non_assigned_required.map{ |o| o.switch_name }.join(', ')
           raise Error, "no value provided for required arguments '#{switch_names}'" 
+        end
+      end
+
+      # Assign all leading options to the required hash.
+      #
+      def assign_required_from_hash(hash)
+        @switches.values.each do |option|
+          next unless option.required?
+          @required[option.human_name] = hash.delete(option.human_name)
         end
       end
 

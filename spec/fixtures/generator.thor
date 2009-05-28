@@ -1,15 +1,27 @@
-class MyScaffold < Thor::Generator
-  option :third, :type => :numeric
+class MyCounter < Thor::Generator
+  argument :first,  :type => :numeric
+  argument :second, :type => :numeric
+  option :third,    :type => :numeric
 
   def one
-    1
+    first
   end
 
   def two
-    2
+    second
   end
 
   def three
-    3
+    options[:third]
+  end
+end
+
+class BrokenCounter < MyCounter
+  def one
+    options[:first]
+  end
+
+  def fourth
+    respond_to?(:three)
   end
 end

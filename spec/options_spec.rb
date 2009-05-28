@@ -14,8 +14,9 @@ describe Thor::Options do
     @opt.parse(args.flatten)
   end
 
-  def parse_leading(*args)
-    @opt.parse(args.flatten, true)
+  def parse_required(*args)
+    hash = @opt.parse(args.flatten, true)
+    return hash, @opt.required
   end
 
   def usage
@@ -164,7 +165,8 @@ describe Thor::Options do
         ordered_hash[:attributes] = Thor::Option.new(:attributes, nil, true, :hash, nil, [])
 
         create ordered_hash
-        parse_leading("User", "name:string", "age:integer").must == {"class_name"=>"User", "attributes"=>{"name"=>"string", "age"=>"integer"}}
+        options, required = parse_required("User", "name:string", "age:integer")
+        required.must == { "class_name"=>"User", "attributes" => { "name"=>"string", "age"=>"integer" } }
       end
 
       it "parses leading attributes and just then parse optionals" do
@@ -173,16 +175,31 @@ describe Thor::Options do
         ordered_hash[:unit] = Thor::Option.new(:unit, nil, false, :string, "days", [])
 
         create ordered_hash
-        parse_leading("3.0", "--unit", "months").must == {"interval" => 3.0, "unit" => "months"}
+        options, required = parse_required("3.0", "--unit", "months")
+        required.must == {"interval" => 3.0}
+        options.must == {"unit" => "months"}
       end
 
-      it "does not assign leading attributes to optinals" do
+      it "does not assign leading attributes to optionals" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
         ordered_hash[:interval] = Thor::Option.new(:interval, nil, true, :numeric, nil, [])
         ordered_hash[:unit] = Thor::Option.new(:unit, nil, false, :string, "days", [])
 
         create ordered_hash
-        parse_leading("3.0", "months").must == {"interval" => 3.0, "unit" => "days"}
+        options, required = parse_required("3.0", "months")
+        required.must == {"interval" => 3.0}
+        options.must == {"unit" => "days"}
+      end
+
+      it "assigns switches to required" do
+        ordered_hash = Thor::CoreExt::OrderedHash.new
+        ordered_hash[:interval] = Thor::Option.new(:interval, nil, true, :numeric, nil, [])
+        ordered_hash[:unit] = Thor::Option.new(:unit, nil, false, :string, "days", [])
+
+        create ordered_hash
+        options, required = parse_required("--unit", "months", "--interval", "3.0")
+        required.must == {"interval" => 3.0}
+        options.must == {"unit" => "months"}
       end
     end
   end
