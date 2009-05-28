@@ -59,7 +59,7 @@ class Thor::Generator
       end
 
       all_tasks.values.map { |task| task.run(instance) }
-    rescue Thor::Error => e
+    rescue Thor::Error, Thor::Options::Error => e
       $stderr.puts e.message
     end
 

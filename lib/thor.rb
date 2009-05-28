@@ -124,6 +124,19 @@ class Thor
       @method_options
     end
 
+    # Parse the options given and extract the task to be called from it. If no
+    # method can be extracted from args the default task is invoked.
+    #
+    def start(args=ARGV)
+      meth = normalize_task_name(args.shift)
+      task = self[meth]
+      args, options = task.parse(self, args)
+      instance = new(options, *args)
+      task.run(instance, args)
+    rescue Thor::Error, Thor::Options::Error => e
+      $stderr.puts e.message
+    end
+
     protected
 
       # Receives a task name (can be nil), and try to get a map from it.

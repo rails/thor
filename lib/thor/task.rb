@@ -15,6 +15,9 @@ class Thor
       self.options = other.options.dup if other.options
     end
 
+    # Parse the given arguments using the given klass options and this current
+    # task options.
+    #
     def parse(klass, args)
       raw_options = klass.default_options.merge(self.options || {})
       opts        = Thor::Options.new(raw_options)

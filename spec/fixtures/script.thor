@@ -10,6 +10,12 @@ class MyScript < Thor
   end
 
   desc "animal TYPE", "horse around"
+
+  no_tasks do
+    def this_is_not_a_task
+    end
+  end
+
   def animal(type)
     [type]
   end

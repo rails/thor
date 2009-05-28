@@ -208,19 +208,6 @@ class Thor
         @no_tasks = false
       end
 
-      # Parse the options given and extract the task to be called from it. If no
-      # method can be extracted from args the default task is invoked.
-      #
-      def start(args=ARGV)
-        meth = normalize_task_name(args.shift)
-        task = self[meth]
-        args, options = task.parse(self, args)
-        instance = new(options, *args)
-        task.run(instance, args)
-      rescue Thor::Error => e
-        $stderr.puts e.message
-      end
-
       # Invokes a specific task. You can use this method instead of start() to
       # to run a thor task if you know the specific task you want to invoke.
       #

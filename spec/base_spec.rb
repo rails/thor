@@ -9,35 +9,10 @@ class Amazing
 end
 
 describe Thor::Base do
-
-  describe "#option" do
-    it "sets options to the next method to be invoked" do
-      args = ["foo", "bar", "--force"]
-      arg, options = MyScript.start(args)
-      options.must == { "force" => true }
-    end
-
-    describe "when :for is supplied" do
-      it "updates an already defined task" do
-        args, options = MyChildScript.start(["animal", "horse", "--other=fish"])
-        options[:other].must == "fish"
-      end
-
-      describe "and the target is on the parent class" do
-        it "updates an already defined task" do
-          args = ["bar", "bla", "bla", "--option1=cool", "--new_option=verified", "--param=nice"]
-          arg1, arg2, options = Scripts::MyGrandChildScript.start(args)
-          options[:new_option].must == "verified"
-        end
-
-        it "adds a task to the tasks list if the updated task is on the parent class" do
-          Scripts::MyGrandChildScript.tasks["bar"].must_not be_nil
-        end
-
-        it "clones the parent task" do
-          Scripts::MyGrandChildScript.tasks["bar"].must_not == MyChildScript.tasks["bar"]
-        end
-      end
+  describe "#no_tasks" do
+    it "avoids methods being added as tasks" do
+      MyScript.tasks.keys.must include("animal")
+      MyScript.tasks.keys.must_not include("this_is_not_a_task")
     end
   end
 
