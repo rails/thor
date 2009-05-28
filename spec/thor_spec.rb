@@ -144,17 +144,7 @@ END
 
   describe "#invoke" do
     it "invokes the named command regardless of the command line options with invoke()" do
-      stub(MyScript).warn
       MyScript.invoke(:animal, ["fish"]).must == ["fish"]
-    end
-
-    it "must be deprecated" do
-      stub(MyScript).warn(/MyScript\#invoke is deprecated. You can retrieve an specific task with MyScript\[\] and then run it/)
-      MyScript.invoke(:animal, ["fish"]).must == ["fish"]
-    end
-
-    it "has the same result as invoking [].run" do
-      MyScript[:animal].run(MyScript, ["fish"]).must == ["fish"]
     end
   end
 end

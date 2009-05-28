@@ -220,6 +220,15 @@ class Thor
         $stderr.puts e.message
       end
 
+      # Invokes a specific task. You can use this method instead of start() to
+      # to run a thor task if you know the specific task you want to invoke.
+      #
+      def invoke(task_name=nil, args=ARGV)
+        args = args.dup
+        args.unshift(task_name || default_task)
+        start(args)
+      end
+
       protected
 
         # Finds a task with the given name. If the task belongs to the current

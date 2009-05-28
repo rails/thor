@@ -113,19 +113,6 @@ class Thor
       @method_options
     end
 
-    # Invokes a specific task. Currently is deprecated you can get the same
-    # behavior by retrieving a task with [] and running it:
-    #
-    #   MyApp[task].run(MyApp, ARGV)
-    #
-    def invoke(task_name=nil, args=ARGV)
-      warn "#{self.name}#invoke is deprecated. You can retrieve an specific task with #{self.name}[] and then run it. Called from: #{caller[0]}"
-
-      args = args.dup
-      args.unshift(task_name || default_task)
-      start(args)
-    end
-
     protected
 
       # Receives a task name (can be nil), and try to get a map from it.
