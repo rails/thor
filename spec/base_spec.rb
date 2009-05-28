@@ -16,6 +16,12 @@ describe Thor::Base do
     end
   end
 
+  describe "#namespace" do
+    it "returns this class namespace" do
+      Scripts::MyGrandChildScript.namespace.must == "scripts:my_grand_child_script"
+    end
+  end
+
   describe "#group" do
     it "sets a group name" do
       MyScript.group_name.must == "script"

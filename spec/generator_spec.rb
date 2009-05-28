@@ -39,9 +39,7 @@ describe Thor::Generator do
     end
 
     it "raises an error when a generator task expects arguments" do
-      pending do
-        lambda { WhinyGenerator.start }.must raise_error
-      end
+      lambda { WhinyGenerator.start }.must raise_error
     end
   end
 end

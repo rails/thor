@@ -24,7 +24,8 @@ class Thor
       self.options = options
     end
 
-    # Main entry point method that actually invoke the task.
+    # Main entry point method that actually invoke the task. Currently
+    # overwritten both by Thor and Thor::Generator.
     #
     def invoke(meth, *args)
       self.send(meth, *args)
@@ -206,6 +207,12 @@ class Thor
         @no_tasks = true
         yield
         @no_tasks = false
+      end
+
+      # Retrieves the namespace for this class.
+      #
+      def namespace
+        Thor::Util.constant_to_thor_path(self, false)
       end
 
       # Invokes a specific task. You can use this method instead of start() to

@@ -1,6 +1,19 @@
 require File.join(File.dirname(__FILE__), 'base')
 
 class Thor::Generator
+
+  # Invokes a task.
+  #
+  # ==== Errors
+  # ArgumentError:: raised if the arity of the called task is different from 0.
+  # NoMethodError:: raised if the method being invoked does not exist.
+  #
+  def invoke(meth, *args)
+    arity = self.method(meth).arity
+    raise ArgumentError, "Tasks in generators must not accept any argument, but #{meth} has arity #{arity}." if arity != 0
+    super(meth)
+  end
+
   # Implement the hooks required by Thor::Base.
   #
   class << self

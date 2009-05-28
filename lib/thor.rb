@@ -1,6 +1,32 @@
 require File.join(File.dirname(__FILE__), 'thor', 'base')
 
 class Thor
+
+  # Invokes a task.
+  #
+  # ==== Errors
+  # Thor::Error:: A Thor error is raised if the user called an undefined task
+  #               or called an exisisting task wrongly.
+  #
+  def invoke(meth, *args)
+    super
+  rescue ArgumentError => e
+    backtrace = sans_backtrace(e.backtrace, caller)
+
+    if backtrace.empty?
+      task = self.class[meth]
+      raise Error, "'#{meth}' was called incorrectly. Call as '#{task.formatted_usage(self.class)}'"
+    else
+      raise e
+    end
+  rescue NoMethodError => e
+    if e.message =~ /^undefined method `#{meth}' for #{Regexp.escape(self.inspect)}$/
+      raise Error, "The #{self.class.namespace} namespace doesn't have a '#{meth}' task"
+    else
+      raise e
+    end
+  end
+
   # Implement the hooks required by Thor::Base.
   #
   class << self
@@ -170,4 +196,15 @@ class Thor
       end
     end
   end
+
+  protected
+
+    # Clean everything that comes from the Thor gempath and remove the caller.
+    #
+    def sans_backtrace(backtrace, caller)
+      dirname = /^#{Regexp.escape(File.dirname(__FILE__))}/
+      saned  = backtrace.reject { |frame| frame =~ dirname }
+      saned -= caller
+    end
+
 end

@@ -20,8 +20,9 @@ describe Thor::Task do
     end
 
     it "includes namespace within usage" do
-      stub(String).default_options{{ :bar => Thor::Option.parse(:bar, :required) }}
-      task.formatted_usage(String, true).must == "string:can_has --bar=BAR"
+      stub(Object).default_options{{ :bar => Thor::Option.parse(:bar, :required) }}
+      stub(Object).namespace{ "string" }
+      task.formatted_usage(Object, true).must == "string:can_has --bar=BAR"
     end
   end
 
@@ -39,6 +40,57 @@ describe Thor::Task do
       new_task = task(:foo => true, :bar => :required).clone
       new_task.options.delete(:foo)
       task.options[:foo].must_not be_nil
+    end
+  end
+
+  describe "#run" do
+    it "runs a task by invoking it in the given instance" do
+      mock = mock!.invoke(:task, 1, 2, 3).subject
+      task.run(mock, [1, 2, 3])
+    end
+
+    it "raises an error if the method to be invoked is private" do
+      mock = mock!.private_methods{ [ "task" ] }.subject
+      lambda {
+        task.run(mock)
+      }.must raise_error(NoMethodError, "the 'task' task of Object is private")
+    end
+  end
+
+  describe "#parse" do
+    it "parses arguments and options using task options declaration" do
+      stub(Object).default_options{ { } }
+      task('foo' => true, :bar => :required)
+      args, options = task.parse(Object, ["--bar", "cool", "--foo"])
+
+      args.must == []
+      options.must == {"bar" => "cool", "foo" => true}
+    end
+
+    it "parses arguments and options using class default options" do
+      stub(Object).default_options{{ :bar => Thor::Option.parse(:bar, :required),
+                                     :foo => Thor::Option.parse(:foo, true) }}
+      args, options = task.parse(Object, ["--bar", "cool", "--foo", "left"])
+
+      args.must == ["left"]
+      options.must == {"bar" => "cool", "foo" => true}
+    end
+
+    it "parses arguments and options using class and task options" do
+      stub(Object).default_options{{ :bar => Thor::Option.parse(:bar, :required) }}
+      args, options = task(:foo => true).parse(Object, ["--bar", "cool", "--foo", "left"])
+
+      args.must == ["left"]
+      options.must == {"bar" => "cool", "foo" => true}
+    end
+
+    it "parses arguments and options using tasks options with higher priority than class options" do
+      stub(Object).default_options{{ :bar => Thor::Option.parse(:bar, :required),
+                                     :foo => Thor::Option.parse(:foo, :string) }}
+      args, options = task(:foo => true).parse(Object, ["--bar", "cool", "--foo"])
+
+      args.must == []
+      options.must == {"bar" => "cool", "foo" => true}
     end
   end
 end

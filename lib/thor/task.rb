@@ -27,31 +27,12 @@ class Thor
       return args, options
     end
 
-    # Invokes the task name in the given parent with the given args. It also
-    # checks if the method is not private and check if the user invoked the
-    # task properly.
+    # Invokes the task name in the given parent with the given args. A task does
+    # not invoke private methods and this is the only validation done here.
     #
     def run(instance, args=[])
-      klass = instance.class
-      raise NoMethodError, "the '#{name}' task of #{klass} is private" unless public_method?(klass)
-
-      begin
-        instance.invoke(name, *args)
-      rescue ArgumentError => e
-        backtrace = sans_backtrace(e.backtrace, caller)
-
-        if backtrace.empty?
-          raise Error, "'#{name}' was called incorrectly. Call as '#{formatted_usage(klass)}'"
-        else
-          raise e
-        end
-      rescue NoMethodError => e
-        if e.message =~ /^undefined method `#{name}' for #{Regexp.escape(instance.inspect)}$/
-          raise Error, "The #{namespace(klass)} namespace doesn't have a '#{name}' task"
-        else
-          raise e
-        end
-      end
+      raise NoMethodError, "the '#{name}' task of #{instance.class} is private" unless public_method?(instance)
+      instance.invoke(name, *args)
     end
 
     # Get the full options for this task. If a klass is given, the klass default
@@ -70,35 +51,23 @@ class Thor
     # Returns the formatted usage. If a klass is given, the klass default options
     # are merged with the task options providinf a full description.
     #
+    # By default it removes the default namespace (TODO is this a good assumption?)
+    #
     def formatted_usage(klass=nil, use_namespace=true)
       formatted = ''
-      formatted << "#{namespace(klass)}:" if klass && use_namespace
+      formatted << "#{klass.namespace.gsub(/^default/,'')}:" if klass && use_namespace
       formatted << usage.to_s
       formatted << " #{full_options(klass).formatted_usage}"
       formatted.strip!
       formatted
     end
 
-    # Retrieves the namespace for a given class.
-    #
-    def namespace(klass, remove_default=true)
-      Thor::Util.constant_to_thor_path(klass, remove_default)
-    end
-
     protected
 
       # Given a target, checks if this class name is not a private/protected method.
       #
-      def public_method?(klass)
-        !(klass.private_instance_methods + klass.protected_instance_methods).include?(name)
-      end
-
-      # Clean everything that comes from the Thor gempath and remove the caller.
-      #
-      def sans_backtrace(backtrace, caller)
-        dirname = /^#{Regexp.escape(File.dirname(__FILE__))}/
-        saned  = backtrace.reject { |frame| frame =~ dirname }
-        saned -= caller
+      def public_method?(instance)
+        !(instance.private_methods + instance.protected_methods).include?(name.to_s)
       end
 
   end
