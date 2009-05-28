@@ -9,10 +9,6 @@ class Thor
         Thor
       end
 
-      def options_scope
-        method_options
-      end
-
       def valid_task?(meth)
         public_instance_methods.include?(meth) && @usage
       end
@@ -33,6 +29,21 @@ class Thor
   # Implement specific Thor methods.
   #
   class << self
+
+    # Overwrites option to provide :for functionality. So if you want to redefine
+    # an specific option for a previous declared task, you can do:
+    #
+    #   option :force, :type => :boolean, :default => true, :for => :previous_task
+    #
+    def option(name, options={})
+      scope = if options[:for]
+        find_and_refresh_task(options[:for]).options
+      else
+        method_options
+      end
+
+      super(name, options, scope)
+    end
 
     # Sets the default task when thor is executed without an explicit task to be called.
     #

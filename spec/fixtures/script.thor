@@ -30,7 +30,7 @@ END
   end
 
   desc "bar BAZ BAT", "do some barring"
-  argument :option1, :type => :string, :default => "boom"
+  option :option1, :type => :string, :default => "boom"
   def bar(baz, bat)
     [baz, bat, options]
   end
@@ -88,6 +88,6 @@ end
 module Scripts
   class MyGrandChildScript < MyChildScript
     default_options :force => :optional, :param => :required
-    argument :new_option, :type => :string, :for => :bar
+    option :new_option, :type => :string, :for => :bar
   end
 end

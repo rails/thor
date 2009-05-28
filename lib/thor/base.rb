@@ -34,28 +34,9 @@ class Thor
 
     module ClassMethods
 
-      # Adds an argument (a required option) to the task. If you give :for as
-      # option, it will replace the argument of a given task already defined.
-      #
-      # ==== Parameters
-      # name<Symbol>:: The name of the argument.
-      # options<Hash>:: The description, type and aliases for this option.
-      #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
-      #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
-      #
-      def argument(name, options={})
-        scope = if options[:for]
-          find_and_refresh_task(options[:for]).options
-        else
-          options_scope
-        end
-
-        scope[name] = Thor::Option.new(name, options[:description], true, options[:type],
-                                       nil, options[:aliases])
-      end
-
-      # Adds an option (which is not required) to the task. If you give :for as
-      # option, it will replace the argument of a given task already defined.
+      # Adds an option (which is not required). In Thor classes it adds an option
+      # to the next task declaread. On Thor::Generator it adds an option generator
+      # wise (since generators does not have method wise options).
       #
       # ==== Parameters
       # name<Symbol>:: The name of the argument.
@@ -63,13 +44,7 @@ class Thor
       #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
       #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
       #
-      def option(name, options={})
-        scope = if options[:for]
-          find_and_refresh_task(options[:for]).options
-        else
-          options_scope
-        end
-
+      def option(name, options={}, scope=nil)
         scope[name] = Thor::Option.new(name, options[:description], false, options[:type],
                                        options[:default], options[:aliases])
       end
@@ -290,11 +265,6 @@ class Thor
         # SIGNATURE: Sets the baseclass to Thor. This is where the superclass
         # lookup finishes.
         def baseclass #:nodoc:
-        end
-
-        # SIGNATURE: This method is called argument and option are called to
-        # ensure options are added to the write scope (class or method scope).
-        def options_scope #:nodoc:
         end
 
         # SIGNATURE: Defines if a given method is a valid_task?. This method is
