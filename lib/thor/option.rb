@@ -2,7 +2,7 @@ class Thor
   class Option
     attr_reader :name, :description, :required, :type, :default, :aliases
 
-    VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
+    VALID_TYPES = [:boolean, :numeric, :hash, :array, :string, :default]
 
     def initialize(name, description, required, type, default, aliases)
       raise ArgumentError, "Option name can't be nil." if name.nil?
@@ -136,7 +136,7 @@ class Thor
             mem
           end.join(' ')
         when :array
-          default.inspect
+          default.join(" ")
       end
     end
 
@@ -153,7 +153,7 @@ class Thor
         when :hash
           "key:value"
         when :array
-          "[a,b,3]"
+          "one two three"
       end
     end
 

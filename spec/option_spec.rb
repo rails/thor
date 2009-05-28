@@ -194,7 +194,7 @@ describe Thor::Option do
 
     describe "when type is an array" do
       it "returns the inspected array" do
-        parse(:foo, [1,2,3]).formatted_default.must == "[1, 2, 3]"
+        parse(:foo, [1,2,3]).formatted_default.must == "1 2 3"
       end
     end
 
@@ -227,7 +227,7 @@ describe Thor::Option do
 
     describe "when type is an array" do
       it "returns a generic array" do
-        parse(:foo, :array).formatted_value.must == "[a,b,3]"
+        parse(:foo, :array).formatted_value.must == "one two three"
       end
     end
 

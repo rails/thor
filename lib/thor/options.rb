@@ -203,7 +203,7 @@ class Thor
         end
       end
 
-      # Runs through the argument hash getting string that contains ":" and
+      # Runs through the argument array getting strings that contains ":" and
       # mark it as a hash:
       #
       #   [ "name:string", "age:integer" ]
@@ -215,7 +215,7 @@ class Thor
       def parse_hash
         hash = {}
 
-        while peek && peek.include?(":")
+        while peek && peek !~ /^\-/
           key, value = shift.split(':')
           hash[key] = value
         end
@@ -223,17 +223,22 @@ class Thor
         hash
       end
 
-      # Get strings in the following format:
+      # Runs through the argument array getting all strings until no string is
+      # found or a switch is found.
       #
-      #   "[a, b, c]"
+      #   ["a", "b", "c"]
       #
       # And returns it as an array:
       #
       #   ["a", "b", "c"]
       #
       def parse_array
-        array = shift.gsub(/(^\[)|(\]$)/, '').split(',')
-        array.each { |item| item.strip! }
+        array = []
+
+        while peek && peek !~ /^\-/
+          array << shift
+        end
+
         array
       end
 

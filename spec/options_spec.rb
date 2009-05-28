@@ -257,19 +257,19 @@ describe Thor::Options do
       end
 
       it "accepts a switch=<value> assignment" do
-        parse("--attributes=[a,b,c]")["attributes"].must == ["a", "b", "c"]
+        parse("--attributes=a", "b", "c")["attributes"].must == ["a", "b", "c"]
       end
 
       it "accepts a switch <value> assignment" do
-        parse("--attributes", "[a,b,c]")["attributes"].must == ["a", "b", "c"]
+        parse("--attributes", "a", "b", "c")["attributes"].must == ["a", "b", "c"]
       end
 
       it "must not mix values with other switches" do
-        parse("--attributes", "[a,b,c]", "--baz", "cool")["attributes"].must == ["a", "b", "c"]
+        parse("--attributes", "a", "b", "c", "--baz", "cool")["attributes"].must == ["a", "b", "c"]
       end
 
       it "outputs formatted usage" do
-        usage.first.must == "[--attributes=[a,b,3]]"
+        usage.first.must == "[--attributes=one two three]"
       end
     end
 
