@@ -220,8 +220,8 @@ class Thor::Runner < Thor
         puts task.description
       end
 
-      unless klass.default_options.empty?
-        puts "\nglobal options: #{Options.new(klass.default_options)}"
+      unless klass.class_options.empty?
+        puts "\nglobal options: #{Options.new(klass.class_options)}"
       end
 
       puts # add some spacing

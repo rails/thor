@@ -1,7 +1,7 @@
 class MyCounter < Thor::Generator
-  argument :first,  :type => :numeric
-  argument :second, :type => :numeric, :default => 2 # default is ignored
-  option :third,    :type => :numeric
+  argument :first,     :type => :numeric
+  argument :second,    :type => :numeric, :default => 2 # default is ignored
+  class_option :third, :type => :numeric
 
   def one
     first
@@ -17,7 +17,7 @@ class MyCounter < Thor::Generator
 end
 
 class BrokenCounter < MyCounter
-  option :fail, :type => :boolean, :default => false
+  class_option :fail, :type => :boolean, :default => false
 
   def one
     options[:first]

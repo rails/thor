@@ -45,7 +45,7 @@ class Thor
       end
 
       def initialize_added
-        default_options.merge!(method_options)
+        class_options.merge!(method_options)
         @method_options = nil
       end
   end
@@ -55,21 +55,6 @@ class Thor
   # Implement specific Thor methods.
   #
   class << self
-
-    # Overwrites option to provide :for functionality. So if you want to redefine
-    # an specific option for a previous declared task, you can do:
-    #
-    #   option :force, :type => :boolean, :default => true, :for => :previous_task
-    #
-    def option(name, options={})
-      scope = if options[:for]
-        find_and_refresh_task(options[:for]).options
-      else
-        method_options
-      end
-
-      super(name, options, scope)
-    end
 
     # Sets the default task when thor is executed without an explicit task to be called.
     #
@@ -132,22 +117,44 @@ class Thor
       @map
     end
 
-    # Declares the options for the next task to be declaread.
+    # Declares the options for the next task to be declared.
     #
     # ==== Parameters
-    # Hash[Symbol => Symbol]:: The hash key is the name of the option and the value
+    # Hash[Symbol => Object]:: The hash key is the name of the option and the value
     # is the type of the option. Can be :optional, :required, :boolean or :numeric.
     #
     def method_options(options=nil)
       @method_options ||= Thor::CoreExt::OrderedHash.new
+      build_options(options, @method_options) if options
+      @method_options
+    end
 
-      if options
-        options.each do |key, value|
-          @method_options[key] = Thor::Option.parse(key, value)
-        end
+    # Adds an option to the set of class options. If :for is given as option,
+    # it allows you to change the options from a previous defined task.
+    #
+    #   def previous_task
+    #     # magic
+    #   end
+    #
+    #   method_option :foo => :bar, :for => :previous_task
+    #
+    #   def next_task
+    #   end
+    #
+    # ==== Parameters
+    # name<Symbol>:: The name of the argument.
+    # options<Hash>:: The description, type, default value and aliases for this option.
+    #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
+    #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
+    #
+    def method_option(name, options)
+      scope = if options[:for]
+        find_and_refresh_task(options[:for]).options
+      else
+        method_options
       end
 
-      @method_options
+      build_option(name, options, scope)
     end
 
     # Parse the options given and extract the task to be called from it. If no

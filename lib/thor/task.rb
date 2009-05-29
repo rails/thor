@@ -19,7 +19,7 @@ class Thor
     # task options.
     #
     def parse(klass, args)
-      raw_options = klass.default_options.merge(self.options || {})
+      raw_options = klass.class_options.merge(self.options || {})
       opts        = Thor::Options.new(raw_options)
       options     = opts.parse(args)
       args        = opts.non_opts
@@ -39,8 +39,8 @@ class Thor
     # options are merged with the task options.
     #
     def full_options(klass=nil)
-      merged_options = if klass && klass.respond_to?(:default_options)
-        klass.default_options.merge(options || {})
+      merged_options = if klass && klass.respond_to?(:class_options)
+        klass.class_options.merge(options || {})
       else
         options || {}
       end

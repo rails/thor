@@ -25,7 +25,7 @@ do some fooing
   This is more info!
   Everyone likes more info!
 END
-  option :force, :type => :boolean, :description => "Very cool"
+  method_option :force, :type => :boolean, :description => "Very cool"
   def foo(bar)
     [bar, options]
   end
@@ -36,7 +36,7 @@ END
   end
 
   desc "bar BAZ BAT", "do some barring"
-  option :option1, :type => :string, :default => "boom"
+  method_option :option1, :type => :string, :default => "boom"
   def bar(baz, bat)
     [baz, bat, options]
   end
@@ -81,7 +81,7 @@ class MyChildScript < MyScript
   def animal(type)
     [type, options]
   end
-  option :other, :type => :string, :for => :animal
+  method_option :other, :type => :string, :for => :animal
   desc "animal KIND", "fish around", :for => :animal
 
   desc "boom", "explodes everything"
@@ -93,7 +93,7 @@ end
 
 module Scripts
   class MyGrandChildScript < MyChildScript
-    default_options :force => :optional, :param => :required
-    option :new_option, :type => :string, :for => :bar
+    class_options :force => :optional, :param => :required
+    method_option :new_option, :type => :string, :for => :bar
   end
 end

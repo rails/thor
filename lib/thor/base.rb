@@ -33,9 +33,36 @@ class Thor
 
     module ClassMethods
 
-      # Adds an option (which is not required). In Thor classes it adds an option
-      # to the next task declaread. On Thor::Generator it adds an option generator
-      # wise (since generators does not have method wise options).
+      # Adds an argument to the class and creates an attr_accessor for it.
+      #
+      # ==== Parameters
+      # name<Symbol>:: The name of the argument.
+      # options<Hash>:: The description, type and aliases for this option.
+      #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
+      #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
+      #
+      def argument(name, options={})
+        no_tasks { attr_accessor name }
+        class_options[name] = Thor::Option.new(name, options[:description], true, options[:type],
+                                               nil, options[:aliases])
+      end
+
+      # Adds a bunch of options to the set of class options.
+      #
+      #   class_options :foo => :optional, :bar => :required, :baz => :string
+      #
+      # If you prefer more detailed declaration, check class_option.
+      #
+      # ==== Parameters
+      # Hash[Symbol => Object]
+      #
+      def class_options(options=nil)
+        @class_options ||= from_superclass(:class_options, Thor::CoreExt::OrderedHash.new)
+        build_options(options, @class_options) if options
+        @class_options
+      end
+
+      # Adds an option to the set of class options
       #
       # ==== Parameters
       # name<Symbol>:: The name of the argument.
@@ -43,9 +70,8 @@ class Thor
       #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
       #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
       #
-      def option(name, options={}, scope=nil)
-        scope[name] = Thor::Option.new(name, options[:description], false, options[:type],
-                                       options[:default], options[:aliases])
+      def class_option(name, options)
+        build_option(name, options, class_options)
       end
 
       # Defines the group. This is used when thor list is invoked so you can specify
@@ -140,33 +166,6 @@ class Thor
         all_tasks[meth.to_s] || Thor::Task.dynamic(meth)
       end
 
-      # Returns and sets the default options for this class. It can be done in
-      # two ways:
-      #
-      # 1) Calling method_options before an initializer
-      #
-      #   method_options :force => true
-      #   def initialize(*args)
-      #
-      # 2) Calling default_options
-      #
-      #   default_options :force => true
-      #
-      # ==== Parameters
-      # Hash[Symbol => Symbol]:: The hash has the same syntax as method_options hash.
-      #
-      def default_options(options=nil)
-        @default_options ||= from_superclass(:default_options, Thor::CoreExt::OrderedHash.new)
-
-        if options
-          options.each do |key, value|
-            @default_options[key] = Thor::Option.parse(key, value)
-          end
-        end
-
-        @default_options
-      end
-
       # Returns the maxima for this Thor class and all subclasses
       #
       # ==== Returns
@@ -225,6 +224,33 @@ class Thor
       end
 
       protected
+
+        # Build an option and adds it to the given scope.
+        #
+        # ==== Parameters
+        # name<Symbol>:: The name of the argument.
+        # options<Hash>:: The description, type, default value and aliases for this option.
+        #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
+        #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
+        #
+        def build_option(name, options, scope)
+          scope[name] = Thor::Option.new(name, options[:description], false, options[:type],
+                                         options[:default], options[:aliases])
+        end
+
+        # Receives a hash of options, parse them and add to the scope. This is a
+        # fast way to set a bunch of options:
+        #
+        #   build_options :foo => :optional, :bar => :required, :baz => :string
+        #
+        # ==== Parameters
+        # Hash[Symbol => Object]
+        #
+        def build_options(options, scope)
+          options.each do |key, value|
+            scope[key] = Thor::Option.parse(key, value)
+          end
+        end
 
         # Finds a task with the given name. If the task belongs to the current
         # class, just return it, otherwise dup it and add the fresh copy to the

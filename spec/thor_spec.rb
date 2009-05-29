@@ -100,7 +100,7 @@ END
 
   describe "#method_options" do
     it "sets default options if called before an initializer" do
-      options = MyChildScript.default_options
+      options = MyChildScript.class_options
       options[:force].type.must == :boolean
       options[:param].type.must == :numeric
     end

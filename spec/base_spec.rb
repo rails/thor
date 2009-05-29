@@ -38,7 +38,7 @@ describe Thor::Base do
 
   describe "#default_options" do
     it "sets default options overwriting superclass definitions" do
-      options = Scripts::MyGrandChildScript.default_options
+      options = Scripts::MyGrandChildScript.class_options
       options[:force].must be_optional
       options[:param].must be_required
     end

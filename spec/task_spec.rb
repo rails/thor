@@ -15,12 +15,12 @@ describe Thor::Task do
     end
 
     it "includes class options if a class is given" do
-      klass = mock!.default_options{{ :bar => Thor::Option.parse(:bar, :required) }}.subject
+      klass = mock!.class_options{{ :bar => Thor::Option.parse(:bar, :required) }}.subject
       task('foo' => true).formatted_usage(klass, false).must == "can_has [--foo] --bar=BAR"
     end
 
     it "includes namespace within usage" do
-      stub(Object).default_options{{ :bar => Thor::Option.parse(:bar, :required) }}
+      stub(Object).class_options{{ :bar => Thor::Option.parse(:bar, :required) }}
       stub(Object).namespace{ "string" }
       task.formatted_usage(Object, true).must == "string:can_has --bar=BAR"
     end
@@ -59,7 +59,7 @@ describe Thor::Task do
 
   describe "#parse" do
     it "parses arguments and options using task options declaration" do
-      stub(Object).default_options{ { } }
+      stub(Object).class_options{ { } }
       task('foo' => true, :bar => :required)
       args, options = task.parse(Object, ["--bar", "cool", "--foo"])
 
@@ -68,7 +68,7 @@ describe Thor::Task do
     end
 
     it "parses arguments and options using class default options" do
-      stub(Object).default_options{{ :bar => Thor::Option.parse(:bar, :required),
+      stub(Object).class_options{{ :bar => Thor::Option.parse(:bar, :required),
                                      :foo => Thor::Option.parse(:foo, true) }}
       args, options = task.parse(Object, ["--bar", "cool", "--foo", "left"])
 
@@ -77,7 +77,7 @@ describe Thor::Task do
     end
 
     it "parses arguments and options using class and task options" do
-      stub(Object).default_options{{ :bar => Thor::Option.parse(:bar, :required) }}
+      stub(Object).class_options{{ :bar => Thor::Option.parse(:bar, :required) }}
       args, options = task(:foo => true).parse(Object, ["--bar", "cool", "--foo", "left"])
 
       args.must == ["left"]
@@ -85,7 +85,7 @@ describe Thor::Task do
     end
 
     it "parses arguments and options using tasks options with higher priority than class options" do
-      stub(Object).default_options{{ :bar => Thor::Option.parse(:bar, :required),
+      stub(Object).class_options{{ :bar => Thor::Option.parse(:bar, :required),
                                      :foo => Thor::Option.parse(:foo, :string) }}
       args, options = task(:foo => true).parse(Object, ["--bar", "cool", "--foo"])
 
