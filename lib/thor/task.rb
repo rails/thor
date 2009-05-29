@@ -22,7 +22,7 @@ class Thor
       raw_options = klass.class_options.merge(self.options || {})
       opts        = Thor::Options.new(raw_options)
       options     = opts.parse(args)
-      args        = opts.non_opts
+      args        = opts.trailing
 
       return args, options
     end

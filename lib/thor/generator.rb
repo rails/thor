@@ -41,11 +41,11 @@ class Thor::Generator
     #
     def start(args=ARGV)
       opts     = Thor::Options.new(self.class_options)
-      options  = opts.parse(args, true) # Send true to assign leading options
-      args     = opts.non_opts
+      options  = opts.parse(args)
+      args     = opts.trailing
 
       instance = new(options, *args)
-      opts.required.each do |key, value|
+      opts.arguments.each do |key, value|
         instance.send(:"#{key}=", value)
       end
 

@@ -14,11 +14,6 @@ describe Thor::Options do
     @opt.parse(args.flatten)
   end
 
-  def parse_required(*args)
-    hash = @opt.parse(args.flatten, true)
-    return hash, @opt.required
-  end
-
   def usage
     @opt.formatted_usage
   end
@@ -70,7 +65,7 @@ describe Thor::Options do
       opts["bar"].must be_true
       opts["app"].must be_true
     end
-    
+
     it "accepts conjoined short switches with argument" do
       create "--foo" => true, "--bar" => true, "--app" => :required
       opts = parse "-fba", "12"
@@ -97,12 +92,12 @@ describe Thor::Options do
         create({})
         parse.must == {}
       end
-    
+
       it "and several switches returns an empty hash" do
         create "--foo" => :boolean, "--bar" => :optional
         parse.must == {}
       end
-    
+
       it "and a required switch raises an error" do
         create "--foo" => :required
         lambda { parse }.must raise_error(Thor::Options::Error, "no value provided for required arguments '--foo'")
@@ -141,10 +136,10 @@ describe Thor::Options do
         "foo" => "12", "bar" => true
       }
 
-      @opt.non_opts.must == ["foo", "bar", "--baz", "-T", "bang"]
+      @opt.trailing.must == ["foo", "bar", "--baz", "-T", "bang"]
     end
 
-    describe "arguments with default values" do
+    describe "options with default values" do
       before(:each) do
         create "--branch" => "master"
       end
@@ -158,48 +153,52 @@ describe Thor::Options do
       end
     end
 
-    describe "when assign leading is true" do
-      it "parses leading attributes and assign them" do
+    describe "with leading arguments" do
+      it "parses leading arguments and assign them" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
-        ordered_hash[:class_name] = Thor::Option.new(:class_name, nil, true, :string, nil, [])
-        ordered_hash[:attributes] = Thor::Option.new(:attributes, nil, true, :hash, nil, [])
+        ordered_hash[:class_name] = Thor::Argument.new(:class_name, nil, :string, [])
+        ordered_hash[:attributes] = Thor::Argument.new(:attributes, nil, :hash, [])
 
         create ordered_hash
-        options, required = parse_required("User", "name:string", "age:integer")
-        required.must == { "class_name"=>"User", "attributes" => { "name"=>"string", "age"=>"integer" } }
+        parse("User", "name:string", "age:integer")
+
+        @opt.arguments.must == { "class_name"=>"User", "attributes" => { "name"=>"string", "age"=>"integer" } }
       end
 
-      it "parses leading attributes and just then parse optionals" do
+      it "parses leading arguments and just then parse optionals" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
-        ordered_hash[:interval] = Thor::Option.new(:interval, nil, true, :numeric, nil, [])
-        ordered_hash[:unit] = Thor::Option.new(:unit, nil, false, :string, "days", [])
+        ordered_hash[:interval] = Thor::Argument.new(:interval, nil, :numeric, [])
+        ordered_hash[:unit]     = Thor::Option.new(:unit, nil, false, :string, "days", [])
 
         create ordered_hash
-        options, required = parse_required("3.0", "--unit", "months")
-        required.must == {"interval" => 3.0}
-        options.must == {"unit" => "months"}
+        parse("3.0", "--unit", "months")
+
+        @opt.arguments.must == {"interval" => 3.0}
+        @opt.options.must == {"unit" => "months"}
       end
 
-      it "does not assign leading attributes to optionals" do
+      it "does not assign leading arguments to optionals" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
-        ordered_hash[:interval] = Thor::Option.new(:interval, nil, true, :numeric, nil, [])
-        ordered_hash[:unit] = Thor::Option.new(:unit, nil, false, :string, "days", [])
+        ordered_hash[:interval] = Thor::Argument.new(:interval, nil, :numeric, [])
+        ordered_hash[:unit]     = Thor::Option.new(:unit, nil, false, :string, "days", [])
 
         create ordered_hash
-        options, required = parse_required("3.0", "months")
-        required.must == {"interval" => 3.0}
-        options.must == {"unit" => "days"}
+        parse("3.0", "months")
+
+        @opt.arguments.must == {"interval" => 3.0}
+        @opt.options.must == {"unit" => "days"}
       end
 
-      it "assigns switches to required" do
+      it "assigns switches to arguments" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
-        ordered_hash[:interval] = Thor::Option.new(:interval, nil, true, :numeric, nil, [])
-        ordered_hash[:unit] = Thor::Option.new(:unit, nil, false, :string, "days", [])
+        ordered_hash[:interval] = Thor::Argument.new(:interval, nil, :numeric, [])
+        ordered_hash[:unit]     = Thor::Option.new(:unit, nil, false, :string, "days", [])
 
         create ordered_hash
-        options, required = parse_required("--unit", "months", "--interval", "3.0")
-        required.must == {"interval" => 3.0}
-        options.must == {"unit" => "months"}
+        parse("--unit", "months", "--interval", "3.0")
+
+        @opt.arguments.must == {"interval" => 3.0}
+        @opt.options.must == {"unit" => "months"}
       end
     end
   end
