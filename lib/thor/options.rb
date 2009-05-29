@@ -60,30 +60,35 @@ class Thor
       # Start hash with indifferent access pre-filled with defaults
       hash = Thor::CoreExt::HashWithIndifferentAccess.new(@defaults)
 
-      parse_non_options(hash, assign_required)
+      while peek
+        if current_is_switch?
+          case shift
+            when SHORT_SQ_RE
+              unshift($1.split('').map { |f| "-#{f}" })
+              next
+            when EQ_RE, SHORT_NUM
+              unshift($2)
+              switch = $1
+            when LONG_RE, SHORT_RE
+              switch = $1
+          end
 
-      while current_is_switch?
-        case shift
-          when SHORT_SQ_RE
-            unshift($1.split('').map { |f| "-#{f}" })
-            next
-          when EQ_RE, SHORT_NUM
-            unshift($2)
-            switch = $1
-          when LONG_RE, SHORT_RE
-            switch = $1
+          switch = normalize_switch(switch)
+          option = switch_option(switch)
+
+          next unless option
+
+          check_requirement!(switch, option)
+          parse_option(switch, option, hash)
+        else
+          if assign_required && !@non_assigned_required.empty?
+            option = @non_assigned_required.shift
+            parse_option(option.switch_name, option, hash)
+          else
+            @non_opts << shift
+          end
         end
-
-        switch     = normalize_switch(switch)
-        option     = switch_option(switch)
-
-        next unless option
-
-        check_requirement!(switch, option)
-        parse_option(switch, option, hash)
       end
-
-      @non_opts += @args
 
       check_validity!
       assign_required_from_hash(hash) if assign_required
@@ -161,20 +166,6 @@ class Thor
       #
       def normalize_switch(arg)
         @shorts.key?(arg) ? @shorts[arg] : arg
-      end
-
-      # If assign_leading is false, add non options to the non_opts array.
-      # Otherwise used them as required values.
-      #
-      def parse_non_options(hash, assign_required)
-        until @args.empty? || current_is_switch?
-          if assign_required && !@non_assigned_required.empty?
-            option = @non_assigned_required.shift
-            parse_option(option.switch_name, option, hash)
-          else
-            @non_opts << shift
-          end
-        end
       end
 
       # Receives switch, option and the current values hash and assign the next
