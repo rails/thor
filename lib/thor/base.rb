@@ -35,16 +35,26 @@ class Thor
 
       # Adds an argument to the class and creates an attr_accessor for it.
       #
+      # The difference between arguments and options are that, the first is
+      # always required and can be retrieved from the command line in two ways:
+      #
+      #   thor task NAME
+      #
+      # Or:
+      #
+      #   thor task --name=NAME
+      #
+      # Options are retrieved only in the second format, doesn't matter if they
+      # are required or not. Besides, arguments cannot have type :default or :boolean.
+      #
       # ==== Parameters
       # name<Symbol>:: The name of the argument.
-      # options<Hash>:: The description, type and aliases for this option.
-      #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
-      #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
+      # options<Hash>:: The description, type and aliases for this argument.
+      #                 The type can be :string, :numeric, :hash or :array. If none is given string is assumed.
       #
       def argument(name, options={})
         no_tasks { attr_accessor name }
-        class_options[name] = Thor::Option.new(name, options[:description], true, options[:type],
-                                               nil, options[:aliases])
+        class_options[name] = Thor::Argument.new(name, options[:description], options[:type], options[:aliases])
       end
 
       # Adds a bunch of options to the set of class options.
@@ -234,7 +244,7 @@ class Thor
         #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
         #
         def build_option(name, options, scope)
-          scope[name] = Thor::Option.new(name, options[:description], false, options[:type],
+          scope[name] = Thor::Option.new(name, options[:description], options[:required], options[:type],
                                          options[:default], options[:aliases])
         end
 

@@ -135,25 +135,15 @@ describe Thor::Option do
     parse(:foo, :optional).must be_optional
   end
 
-  it "can't be boolean and required" do
-    option(:task, nil, true, :boolean).must_not be_required
-    option(:task, nil, true, :boolean).must be_optional
-  end
-
-  it "can't be required and have a default value" do
-    option(:task, nil, true, :string, "bla").must be_required
-    option(:task, nil, true, :string, "bla").default.must be_nil
-  end
-
-  it "requires an argument when type is a string, array, hash or numeric" do
+  it "requires an input when type is a string, array, hash or numeric" do
     [:string, :array, :hash, :numeric].each do |type|
-      parse(:foo, type).argument_required?.must be_true
+      parse(:foo, type).input_required?.must be_true
     end
   end
 
-  it "does not require an argument when type is default or boolean" do
+  it "does not require an input when type is default or boolean" do
     [:default, :boolean].each do |type|
-      parse(:foo, type).argument_required?.must be_false
+      parse(:foo, type).input_required?.must be_false
     end
   end
 
@@ -161,6 +151,22 @@ describe Thor::Option do
     lambda {
       option(nil)
     }.must raise_error(ArgumentError, "Option name can't be nil.")
+  end
+
+  it "raises an error if a default value is provided when required" do
+    lambda {
+      option(:task, nil, true, :string, "bla")
+    }.must raise_error(ArgumentError, "Option cannot be required and have default values.")
+  end
+
+  it "raises an error if type is unknown" do
+    lambda {
+      option(:task, nil, true, :unknown)
+    }.must raise_error(ArgumentError, "Type :unknown is not valid for options.")
+  end
+
+  it "is not an argument" do
+    option(:task).must_not be_argument
   end
 
   it "returns the switch name" do
@@ -242,5 +248,26 @@ describe Thor::Option do
         parse(:foo, :boolean).formatted_value.must be_nil
       end
     end
+  end
+end
+describe Thor::Argument do
+  def argument(name, description=nil, type=:string, aliases=[])
+    @option ||= Thor::Argument.new(name, description, type, aliases)
+  end
+
+  it "raises an error if name is not supplied" do
+    lambda {
+      argument(nil)
+    }.must raise_error(ArgumentError, "Argument name can't be nil.")
+  end
+
+  it "raises an error if type is unknown" do
+    lambda {
+      argument(:task, nil, :unknown)
+    }.must raise_error(ArgumentError, "Type :unknown is not valid for arguments.")
+  end
+
+  it "is an argument" do
+    argument(:task).must be_argument
   end
 end

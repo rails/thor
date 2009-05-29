@@ -249,7 +249,7 @@ class Thor
       def check_requirement!(switch, option)
         @non_assigned_required.delete(option)
 
-        if option.argument_required?
+        if option.input_required?
           raise Error, "no value provided for argument '#{switch}'"  if peek.nil?
           raise Error, "cannot pass switch '#{peek}' as an argument" if switch?(peek)
         end

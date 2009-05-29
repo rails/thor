@@ -4,49 +4,41 @@ class Thor
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string, :default]
 
-    def initialize(name, description, required, type, default, aliases)
-      raise ArgumentError, "Option name can't be nil." if name.nil?
+    def initialize(name, description=nil, required=nil, type=nil, default=nil, aliases=nil)
+      raise ArgumentError, "Option name can't be nil."                          if name.nil?
+      raise ArgumentError, "Option cannot be required and have default values." if required && !default.nil?
+      raise ArgumentError, "Type :#{type} is not valid for options."            if type && !VALID_TYPES.include?(type.to_sym)
 
       @name        = name.to_s
       @description = description
+      @required    = required || false
       @type        = (type || :default).to_sym
+      @default     = default
       @aliases     = [*aliases].compact
-
-      @required = if @type == :boolean
-        false
-      else
-        required || false
-      end
-
-      @default = if @required
-        nil
-      else
-        default
-      end
     end
 
     # This parse quick options given as method_options. It makes several
     # assumptions, but you can be more specific using the option method.
     #
-    #   method_options :foo => "bar"
+    #   parse :foo => "bar"
     #   #=> Option foo with default value bar
     #
-    #   method_options [:foo, :baz] => "bar"
+    #   parse [:foo, :baz] => "bar"
     #   #=> Option foo with default value bar and alias :baz
     #
-    #   method_options :foo => :required
+    #   parse :foo => :required
     #   #=> Required option foo without default value
     #
-    #   method_options :foo => :optional
+    #   parse :foo => :optional
     #   #=> Optional foo without default value
     #
-    #   method_options :foo => 2
+    #   parse :foo => 2
     #   #=> Option foo with default value 2 and type numeric
     #
-    #   method_options :foo => :numeric
+    #   parse :foo => :numeric
     #   #=> Option foo without default value and type numeric
     #
-    #   method_options :foo => true
+    #   parse :foo => true
     #   #=> Option foo with default value true and type boolean
     #
     # The valid types are :boolean, :numeric, :hash, :array and :string. If none
@@ -85,6 +77,10 @@ class Thor
       self.new(name.to_s, nil, required, type, default, aliases)
     end
 
+    def argument?
+      false
+    end
+
     def required?
       required
     end
@@ -96,7 +92,7 @@ class Thor
     # Returns true if this type requires an argument to be given. Just :default
     # and :boolean does not require an argument.
     #
-    def argument_required?
+    def input_required?
       [ :numeric, :hash, :array, :string ].include?(type)
     end
 
@@ -156,6 +152,23 @@ class Thor
           "one two three"
       end
     end
+  end
 
+  # Argument is a subset of  options. It support less types, are always required
+  # and does not have default values.
+  #
+  class Argument < Option
+    VALID_TYPES = [:numeric, :hash, :array, :string]
+
+    def initialize(name, description=nil, type=nil, aliases=nil)
+      raise ArgumentError, "Argument name can't be nil."               if name.nil?
+      raise ArgumentError, "Type :#{type} is not valid for arguments." if type && !VALID_TYPES.include?(type.to_sym)
+
+      super(name, description, true, type || :string, nil, aliases)
+    end
+
+    def argument?
+      true
+    end
   end
 end
