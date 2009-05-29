@@ -139,6 +139,7 @@ class Thor
     #   method_option :foo => :bar, :for => :previous_task
     #
     #   def next_task
+    #     # magic
     #   end
     #
     # ==== Parameters
@@ -163,8 +164,7 @@ class Thor
     def start(args=ARGV)
       meth = normalize_task_name(args.shift)
       task = self[meth]
-      args, options = task.parse(self, args)
-      instance = new(options, *args)
+      instance, args = setup(args, task.options)
       task.run(instance, args)
     rescue Thor::Error, Thor::Options::Error => e
       $stderr.puts e.message

@@ -235,6 +235,24 @@ class Thor
 
       protected
 
+        # Setup this thor class using the given arguments and extra options. This
+        # holds the initialization process common to all Thor classes.
+        #
+        def setup(args, extra_options=nil)
+          options = self.class_options
+          options = options.merge(extra_options) if extra_options
+
+          opts = Thor::Options.new(options)
+          opts.parse(args)
+
+          instance = new(opts.options)
+          opts.arguments.each do |key, value|
+            instance.send(:"#{key}=", value)
+          end
+
+          return instance, opts.trailing
+        end
+
         # Build an option and adds it to the given scope.
         #
         # ==== Parameters

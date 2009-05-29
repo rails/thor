@@ -154,7 +154,7 @@ class Thor
     end
   end
 
-  # Argument is a subset of  options. It support less types, are always required
+  # Argument is a subset of option. It support less types, are always required
   # and does not have default values.
   #
   class Argument < Option

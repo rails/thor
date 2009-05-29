@@ -15,18 +15,6 @@ class Thor
       self.options = other.options.dup if other.options
     end
 
-    # Parse the given arguments using the given klass options and this current
-    # task options.
-    #
-    def parse(klass, args)
-      raw_options = klass.class_options.merge(self.options || {})
-      opts        = Thor::Options.new(raw_options)
-      options     = opts.parse(args)
-      args        = opts.trailing
-
-      return args, options
-    end
-
     # Invokes the task name in the given parent with the given args. A task does
     # not invoke private methods and this is the only validation done here.
     #

@@ -56,41 +56,4 @@ describe Thor::Task do
       }.must raise_error(NoMethodError, "the 'task' task of Object is private")
     end
   end
-
-  describe "#parse" do
-    it "parses arguments and options using task options declaration" do
-      stub(Object).class_options{ { } }
-      task('foo' => true, :bar => :required)
-      args, options = task.parse(Object, ["--bar", "cool", "--foo"])
-
-      args.must == []
-      options.must == {"bar" => "cool", "foo" => true}
-    end
-
-    it "parses arguments and options using class default options" do
-      stub(Object).class_options{{ :bar => Thor::Option.parse(:bar, :required),
-                                     :foo => Thor::Option.parse(:foo, true) }}
-      args, options = task.parse(Object, ["--bar", "cool", "--foo", "left"])
-
-      args.must == ["left"]
-      options.must == {"bar" => "cool", "foo" => true}
-    end
-
-    it "parses arguments and options using class and task options" do
-      stub(Object).class_options{{ :bar => Thor::Option.parse(:bar, :required) }}
-      args, options = task(:foo => true).parse(Object, ["--bar", "cool", "--foo", "left"])
-
-      args.must == ["left"]
-      options.must == {"bar" => "cool", "foo" => true}
-    end
-
-    it "parses arguments and options using tasks options with higher priority than class options" do
-      stub(Object).class_options{{ :bar => Thor::Option.parse(:bar, :required),
-                                     :foo => Thor::Option.parse(:foo, :string) }}
-      args, options = task(:foo => true).parse(Object, ["--bar", "cool", "--foo"])
-
-      args.must == []
-      options.must == {"bar" => "cool", "foo" => true}
-    end
-  end
 end

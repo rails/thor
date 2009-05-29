@@ -40,15 +40,7 @@ class Thor::Generator
     # Start in generators works differently. It invokes all tasks inside the class.
     #
     def start(args=ARGV)
-      opts     = Thor::Options.new(self.class_options)
-      options  = opts.parse(args)
-      args     = opts.trailing
-
-      instance = new(options, *args)
-      opts.arguments.each do |key, value|
-        instance.send(:"#{key}=", value)
-      end
-
+      instance, trailing = setup(args)
       all_tasks.values.map { |task| task.run(instance) }
     rescue Thor::Error, Thor::Options::Error => e
       $stderr.puts e.message
