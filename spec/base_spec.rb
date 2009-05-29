@@ -19,6 +19,7 @@ describe Thor::Base do
   describe "#argument" do
     it "sets a value as required and creates an accessor for it" do
       MyCounter.start(["1", "2", "--third", "3"])[0].must == 1
+      Scripts::MyGrandChildScript.start(["zoo", "my_special_param", "--param=normal_param"]).must == "my_special_param"
     end
 
     it "does not set a value in the options hash" do
@@ -40,7 +41,6 @@ describe Thor::Base do
     it "sets default options overwriting superclass definitions" do
       options = Scripts::MyGrandChildScript.class_options
       options[:force].must be_optional
-      options[:param].must be_required
     end
   end
 
@@ -130,7 +130,7 @@ describe Thor::Base do
     it "returns the maximum length for usage, description and options" do
       MyScript.maxima.description.must == 64
       MyScript.maxima.usage.must       == 28
-      MyScript.maxima.options.must     == 19
+      MyScript.maxima.options.must     == 9
     end
   end
 end

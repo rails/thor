@@ -32,19 +32,7 @@ END
 
   desc "example_default_task", "example!"
   def example_default_task
-    "default task"
-  end
-
-  desc "bar BAZ BAT", "do some barring"
-  method_option :option1, :type => :string, :default => "boom"
-  def bar(baz, bat)
-    [baz, bat, options]
-  end
-
-  desc "baz BAT", "do some bazzing"
-  method_options :option1 => :optional
-  def baz(bat)
-    [bat, options]
+    options.empty? ? "default task" : options
   end
 
   desc "call_myself_with_wrong_arity", "get the right error"
@@ -93,8 +81,12 @@ end
 
 module Scripts
   class MyGrandChildScript < MyChildScript
-    argument :param, :type => :string
+    argument :accessor, :type => :string
     class_options :force => :optional
-    method_option :new_option, :type => :string, :for => :bar
+    method_option :new_option, :type => :string, :for => :example_default_task
+
+    def zoo
+      self.accessor
+    end
   end
 end

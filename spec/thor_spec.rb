@@ -16,17 +16,17 @@ describe Thor do
 
       describe "and the target is on the parent class" do
         it "updates an already defined task" do
-          args = ["bar", "bla", "bla", "--option1=cool", "--new_option=verified", "--param=nice"]
-          arg1, arg2, options = Scripts::MyGrandChildScript.start(args)
+          args = ["example_default_task", "my_param", "--new_option=verified"]
+          options = Scripts::MyGrandChildScript.start(args)
           options[:new_option].must == "verified"
         end
 
         it "adds a task to the tasks list if the updated task is on the parent class" do
-          Scripts::MyGrandChildScript.tasks["bar"].must_not be_nil
+          Scripts::MyGrandChildScript.tasks["example_default_task"].must_not be_nil
         end
 
         it "clones the parent task" do
-          Scripts::MyGrandChildScript.tasks["bar"].must_not == MyChildScript.tasks["bar"]
+          Scripts::MyGrandChildScript.tasks["example_default_task"].must_not == MyChildScript.tasks["example_default_task"]
         end
       end
     end
@@ -134,30 +134,6 @@ END
 
     it "raises an error if the invoked task does not exist" do
       capture(:stderr) { Amazing.start(["animal"]) }.must =~ /The amazing namespace doesn't have a 'animal' task/
-    end
-
-    it "calls a method with an optional boolean param when the param is passed" do
-      MyScript.start(["foo", "one", "--force"]).must == ["one", {"force" => true}]
-    end
-
-    it "calls a method with an optional boolean param when the param is not passed" do
-      MyScript.start(["foo", "one"]).must == ["one", {}]
-    end
-
-    it "calls a method with a required key/value param" do
-      MyScript.start(["bar", "one", "two", "--option1", "hello"]).must == ["one", "two", {"option1" => "hello"}]
-    end
-
-    it "calls a method with an optional key/value param" do
-      MyScript.start(["baz", "one", "--option1", "hello"]).must == ["one", {"option1" => "hello"}]
-    end
-
-    it "allows options at the beginning and end of the arguments" do
-      MyScript.start(["baz", "--option1", "hello", "one"]).must == ["one", {"option1" => "hello"}]
-    end
-
-    it "calls a method with an empty Hash for options if an optional key/value param is not provided" do
-      MyScript.start(["baz", "one"]).must == ["one", {}]
     end
 
     it "calls method_missing if an unknown method is passed in" do
