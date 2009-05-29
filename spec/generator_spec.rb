@@ -1,26 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Thor::Generator do
-  describe "#argument" do
-    it "sets a value as required and creates an accessor for it" do
-      MyCounter.start(["1", "2", "--third", "3"])[0].must == 1
-    end
-
-    it "does not set a value in the options hash" do
-      BrokenCounter.start(["1", "2", "--third", "3"])[0].must be_nil
-    end
-  end
-
-  describe "#option" do
-    it "sets options generator wise" do
-      MyCounter.start(["1", "2", "--third", "3"])[2].must == 3
-    end
-
-    it "does not create an acessor for it" do
-      BrokenCounter.start(["1", "2", "--third", "3"])[3].must be_false
-    end
-  end
-
   describe "#start" do
     it "invokes all the tasks under the generator" do
       MyCounter.start(["1", "2", "--third", "3"]).must == [ 1, 2, 3 ]

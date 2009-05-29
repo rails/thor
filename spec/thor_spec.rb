@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Thor do
-  describe "#option" do
+  describe "#method_option" do
     it "sets options to the next method to be invoked" do
       args = ["foo", "bar", "--force"]
       arg, options = MyScript.start(args)

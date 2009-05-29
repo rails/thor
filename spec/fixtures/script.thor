@@ -93,7 +93,8 @@ end
 
 module Scripts
   class MyGrandChildScript < MyChildScript
-    class_options :force => :optional, :param => :required
+    argument :param, :type => :string
+    class_options :force => :optional
     method_option :new_option, :type => :string, :for => :bar
   end
 end

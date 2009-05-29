@@ -16,6 +16,34 @@ describe Thor::Base do
     end
   end
 
+  describe "#argument" do
+    it "sets a value as required and creates an accessor for it" do
+      MyCounter.start(["1", "2", "--third", "3"])[0].must == 1
+    end
+
+    it "does not set a value in the options hash" do
+      BrokenCounter.start(["1", "2", "--third", "3"])[0].must be_nil
+    end
+  end
+
+  describe "#class_option" do
+    it "sets options class wise" do
+      MyCounter.start(["1", "2", "--third", "3"])[2].must == 3
+    end
+
+    it "does not create an acessor for it" do
+      BrokenCounter.start(["1", "2", "--third", "3"])[3].must be_false
+    end
+  end
+
+  describe "#class_options" do
+    it "sets default options overwriting superclass definitions" do
+      options = Scripts::MyGrandChildScript.class_options
+      options[:force].must be_optional
+      options[:param].must be_required
+    end
+  end
+
   describe "#namespace" do
     it "returns this class namespace" do
       Scripts::MyGrandChildScript.namespace.must == "scripts:my_grand_child_script"
@@ -33,14 +61,6 @@ describe Thor::Base do
 
     it "defaults to standard if no group name is given" do
       Amazing.group_name.must == "standard"
-    end
-  end
-
-  describe "#default_options" do
-    it "sets default options overwriting superclass definitions" do
-      options = Scripts::MyGrandChildScript.class_options
-      options[:force].must be_optional
-      options[:param].must be_required
     end
   end
 

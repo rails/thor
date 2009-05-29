@@ -82,8 +82,11 @@ class Thor
 
           check_requirement!(switch, option)
 
-          scope = option.argument? ? @arguments : @options
-          parse_option(switch, option, scope)
+          if option.argument?
+            parse_argument(switch, option)
+          else
+            parse_option(switch, option, @options)
+          end
         else
           unless @non_assigned_arguments.empty?
             option = @non_assigned_arguments.shift
@@ -171,9 +174,23 @@ class Thor
         @shorts.key?(arg) ? @shorts[arg] : arg
       end
 
+      # Parse the argument. If the argument was already assigned, get the current
+      # value, parse the new one and put the old one back on the pile.
+      #
+      def parse_argument(switch, option)
+        unless @non_assigned_arguments.include?(option)
+          value = @arguments[option.human_name]
+          parse_option(switch, option, @arguments)
+          unshift(value)
+        else
+          @non_assigned_arguments.delete(option)
+          parse_option(switch, option, @arguments)
+        end
+      end
+
       # Receives switch, option and the current values hash and assign the next
-      # value to it. The :default and :boolean options are not used when parsing
-      # non options values.
+      # value to it. At the end, remove the option from the array where non
+      # assigned requireds are kept.
       #
       def parse_option(switch, option, hash)
         human_name = option.human_name
@@ -249,7 +266,7 @@ class Thor
         $&.index('.') ? shift.to_f : shift.to_i
       end
 
-      # Raises an error if the option requires an argument but it's not present.
+      # Raises an error if the option requires an input but it's not present.
       #
       def check_requirement!(switch, option)
         if option.input_required?

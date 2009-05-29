@@ -200,6 +200,18 @@ describe Thor::Options do
         @opt.arguments.must == {"interval" => 3.0}
         @opt.options.must == {"unit" => "months"}
       end
+
+      it "puts arguments back on the pile if they are later supplied as a switch" do
+        ordered_hash = Thor::CoreExt::OrderedHash.new
+        ordered_hash[:interval] = Thor::Argument.new(:interval, nil, :numeric, [])
+        ordered_hash[:unit]     = Thor::Option.new(:unit, nil, false, :string, "days", [])
+
+        create ordered_hash
+        parse("1.0", "--unit", "months", "--interval", "3.0")
+
+        @opt.arguments.must == {"interval" => 3.0}
+        @opt.options.must == {"unit" => "months"}
+      end
     end
   end
 

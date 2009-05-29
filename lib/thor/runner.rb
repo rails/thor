@@ -1,4 +1,3 @@
-require 'thor'
 require 'thor/tasks/runner'
 
 class Thor::Runner < Thor
@@ -15,7 +14,7 @@ class Thor::Runner < Thor
 
     initialize_thorfiles(meth)
     klass, task = self.class.task_from_thor_class(meth)
-    klass[task].run(klass.new, args)
+    klass.invoke(task, args)
   end
 
   def self.thor_root
