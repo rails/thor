@@ -1,14 +1,3 @@
-module ObjectSpace
-  class << self
-    # @return <Array[Class]> All the classes in the object space.
-    def classes
-      klasses = []
-      ObjectSpace.each_object(Class) {|o| klasses << o}
-      klasses
-    end
-  end
-end
-
 class Thor
   module Tasks; end
 
@@ -43,12 +32,18 @@ class Thor
       str.gsub(/:(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
     end
 
-    def self.constants_in_contents(str, file = __FILE__)
-      klasses = ObjectSpace.classes.dup
-      Module.new.class_eval(str, file)
-      klasses = ObjectSpace.classes - klasses
-      klasses = klasses.select {|k| k < Thor }
-      klasses.map! {|k| k.to_s.gsub(/#<Module:\w+>::/, '')}
+    def self.constants_in_contents(contents, file=__FILE__)
+      old_constants = Thor.subclasses.dup
+      Thor.subclasses.clear
+
+      Thor::Tasks.class_eval(contents, file)
+
+      new_constants = Thor.subclasses.dup
+      Thor.subclasses.replace(old_constants)
+
+      new_constants.map do |constant|
+        constant.name.gsub(/^Thor::Tasks::/, '')
+      end
     end
 
     def self.make_constant(str, base = [Thor::Tasks, Object])
