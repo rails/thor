@@ -221,7 +221,7 @@ class Thor
       # Retrieves the namespace for this class.
       #
       def namespace
-        Thor::Util.constant_to_thor_path(self, false)
+        Thor::Util.constant_to_namespace(self, false)
       end
 
       # Invokes a specific task. You can use this method instead of start() to

@@ -129,7 +129,7 @@ class Thor::Runner < Thor
 
     classes = Thor.subclasses.select do |k|
       (options[:all] || k.group_name == group) && 
-      Thor::Util.constant_to_thor_path(k.name) =~ search
+      Thor::Util.constant_to_namespace(k.name) =~ search
     end
 
     display_klasses(false, classes)
@@ -175,7 +175,7 @@ class Thor::Runner < Thor
 
       thor_yaml.each do |name, info|
         print "%-#{column_width}s" % name
-        puts info[:constants].map { |c| Thor::Util.constant_to_thor_path(c) }.join(", ")
+        puts info[:constants].map { |c| Thor::Util.constant_to_namespace(c) }.join(", ")
       end
 
       puts
@@ -183,7 +183,7 @@ class Thor::Runner < Thor
 
     # Calculate the largest base class name
     max_base = klasses.max do |x,y| 
-      Thor::Util.constant_to_thor_path(x.name).size <=> Thor::Util.constant_to_thor_path(y.name).size
+      x.namespace.size <=> y.namespace.size
     end.name.size
 
     # Calculate the size of the largest option description
@@ -203,7 +203,7 @@ class Thor::Runner < Thor
 
   def display_tasks(klass, max_base, max_left)
     if klass.tasks.values.length > 0
-      base = Thor::Util.constant_to_thor_path(klass.name)
+      base = klass.namespace
 
       if base.to_a.empty?
         base = 'default' 

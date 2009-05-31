@@ -51,7 +51,7 @@ class Thor::Runner < Thor
 
   def self.task_from_thor_class(task)
     namespaces = task.split(":")
-    klass = Thor::Util.constant_from_thor_path(namespaces[0...-1].join(":"))
+    klass = Thor::Util.namespace_to_constant(namespaces[0...-1].join(":"))
     raise Error, "'#{klass}' is not a Thor class" unless klass <= Thor
     return klass, namespaces.last
   end
@@ -126,7 +126,7 @@ class Thor::Runner < Thor
   end
 
   def thorfiles_relevant_to(meth)
-    klass_str = Thor::Util.to_constant(meth.split(":")[0...-1].join(":"))
+    klass_str = Thor::Util.namespace_to_constant_name(meth.split(":")[0...-1].join(":"))
     thor_yaml.select do |k, v|
       v[:constants] && v[:constants].include?(klass_str)
     end.map { |k, v| File.join(thor_root, "#{v[:filename]}") }
