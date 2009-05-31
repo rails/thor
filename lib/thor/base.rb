@@ -336,18 +336,18 @@ class Thor
           self == baseclass ? default : superclass.send(method).dup
         end
 
-        # SIGNATURE: Sets the baseclass to Thor. This is where the superclass
-        # lookup finishes.
+        # SIGNATURE: Sets the baseclass. This is where the superclass lookup
+        # finishes.
         def baseclass #:nodoc:
         end
 
         # SIGNATURE: Defines if a given method is a valid_task?. This method is
-        # called everytime a new method is added to the class.
+        # called before a new method is added to the class.
         def valid_task?(meth) #:nodoc:
         end
 
         # SIGNATURE: Creates a new task if valid_task? is true. This method is
-        # called everytime a new method is added to the class.
+        # called when a new method is added to the class.
         def create_task(meth) #:nodoc:
         end
 

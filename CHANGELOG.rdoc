@@ -1,15 +1,12 @@
 == TODO
 
-* Change Thor.start to parse ARGV in a single pass
 * Improve spec coverage for Thor::Runner
 * Improve help output to list shorthand switches, too
 * Investigate and fix deep namespacing ("foo:bar:baz") issues
 
 == Current
 
-* Created a Thor::DSL. If you plan to create a Thor task, this is where you
-  should look
-* Added some documentation and code refactoring
+* Added some documentation and code refactoring.
 
 == 0.9.8, released 2008-10-20
 
