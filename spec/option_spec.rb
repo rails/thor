@@ -147,28 +147,6 @@ describe Thor::Option do
     end
   end
 
-  it "raises an error if name is not supplied" do
-    lambda {
-      option(nil)
-    }.must raise_error(ArgumentError, "Option name can't be nil.")
-  end
-
-  it "raises an error if a default value is provided when required" do
-    lambda {
-      option(:task, nil, true, :string, "bla")
-    }.must raise_error(ArgumentError, "Option cannot be required and have default values.")
-  end
-
-  it "raises an error if type is unknown" do
-    lambda {
-      option(:task, nil, true, :unknown)
-    }.must raise_error(ArgumentError, "Type :unknown is not valid for options.")
-  end
-
-  it "is not an argument" do
-    option(:task).must_not be_argument
-  end
-
   it "returns the switch name" do
     option("foo").switch_name.must == "--foo"
     option("--foo").switch_name.must == "--foo"
@@ -179,95 +157,134 @@ describe Thor::Option do
     option("--foo").human_name.must == "foo"
   end
 
-  describe "#formatted_default" do
-    describe "and default is nil" do
-      it "must be nil" do
-        parse(:foo, :bar).formatted_default.must be_nil
-      end
+  it "is not an argument" do
+    option(:task).must_not be_argument
+  end
+
+  it "has higher priority on sort when is required" do
+    array = [ Thor::Option.parse(:foo, :optional), Thor::Option.parse(:foo, :required) ]
+    array.sort.first.must be_required
+  end
+
+  describe "errors" do
+    it "raises an error if name is not supplied" do
+      lambda {
+        option(nil)
+      }.must raise_error(ArgumentError, "Option name can't be nil.")
     end
 
-    describe "when type is a string" do
-      it "returns the string" do
-        parse(:foo, "bar").formatted_default.must == "bar"
-      end
+    it "raises an error if a default value is provided when required" do
+      lambda {
+        option(:task, nil, true, :string, "bla")
+      }.must raise_error(ArgumentError, "Option cannot be required and have default values.")
     end
 
-    describe "when type is a numeric" do
-      it "returns the value as string" do
-        parse(:foo, 2.0).formatted_default.must == "2.0"
-      end
-    end
-
-    describe "when type is an array" do
-      it "returns the inspected array" do
-        parse(:foo, [1,2,3]).formatted_default.must == "1 2 3"
-      end
-    end
-
-    describe "when type is a hash" do
-      it "returns the hash as key:value" do
-        value = parse(:foo, { :a => :b, :c => :d }).formatted_default
-        value.split(" ").sort.join(" ").must == "a:b c:d"
-      end
-    end
-
-    describe "when type is a boolean" do
-      it "returns nil" do
-        parse(:foo, true).formatted_default.must be_nil
-      end
+    it "raises an error if type is unknown" do
+      lambda {
+        option(:task, nil, true, :unknown)
+      }.must raise_error(ArgumentError, "Type :unknown is not valid for options.")
     end
   end
 
-  describe "#formatted_value" do
-    describe "when type is a string" do
-      it "returns the human name upcased" do
-        parse(:foo, :string).formatted_value.must == "FOO"
+  describe "#usage" do
+
+    describe "with default values" do
+      it "returns usage for string types" do
+        parse(:foo, "bar").usage.must == "[--foo=bar]"
+      end
+
+      it "returns usage for numeric types" do
+        parse(:foo, 2.0).usage.must == "[--foo=2.0]"
+      end
+
+      it "returns usage for array types" do
+        parse(:foo, [1,2,3]).usage.must == "[--foo=1 2 3]"
+      end
+
+      it "returns usage for hash types" do
+        value = parse(:foo, { :a => :b, :c => :d }).usage
+        value.split(" ").sort.join(" ").must == "[--foo=a:b c:d]"
+      end
+
+      it "returns usage for boolean types" do
+        parse(:foo, true).usage.must == "[--foo]"
       end
     end
 
-    describe "when type is a numeric" do
-      it "returns N" do
-        parse(:foo, :numeric).formatted_value.must == "N"
+    describe "without default values" do
+      it "returns usage for string types" do
+        parse(:foo, :string).usage.must == "[--foo=FOO]"
+      end
+
+      it "returns usage for numeric types" do
+        parse(:foo, :numeric).usage.must == "[--foo=N]"
+      end
+
+      it "returns usage for array types" do
+        parse(:foo, :array).usage.must == "[--foo=one two three]"
+      end
+
+      it "returns usage for hash types" do
+        parse(:foo, :hash).usage.must == "[--foo=key:value]"
+      end
+
+      it "returns usage for hash types" do
+        parse(:foo, :boolean).usage.must == "[--foo]"
       end
     end
 
-    describe "when type is an array" do
-      it "returns a generic array" do
-        parse(:foo, :array).formatted_value.must == "one two three"
+    describe "with required values" do
+      it "does not show the usage between brackets" do
+        parse(:foo, :required).usage.must == "--foo=FOO"
       end
     end
 
-    describe "when type is a hash" do
-      it "returns a key:value sample" do
-        parse(:foo, :hash).formatted_value.must == "key:value"
-      end
-    end
-
-    describe "when type is a boolean" do
-      it "returns nil" do
-        parse(:foo, :boolean).formatted_value.must be_nil
-      end
-    end
   end
 end
+
 describe Thor::Argument do
-  def argument(name, description=nil, type=:string, aliases=[])
-    @option ||= Thor::Argument.new(name, description, type, aliases)
-  end
 
-  it "raises an error if name is not supplied" do
-    lambda {
-      argument(nil)
-    }.must raise_error(ArgumentError, "Argument name can't be nil.")
-  end
-
-  it "raises an error if type is unknown" do
-    lambda {
-      argument(:task, nil, :unknown)
-    }.must raise_error(ArgumentError, "Type :unknown is not valid for arguments.")
+  def argument(name, type=:string)
+    @argument ||= Thor::Argument.new(name, nil, type, [])
   end
 
   it "is an argument" do
     argument(:task).must be_argument
+  end
+
+  describe "errors" do
+    it "raises an error if name is not supplied" do
+      lambda {
+        argument(nil)
+      }.must raise_error(ArgumentError, "Argument name can't be nil.")
+    end
+
+    it "raises an error if type is unknown" do
+      lambda {
+        argument(:task, :unknown)
+      }.must raise_error(ArgumentError, "Type :unknown is not valid for arguments.")
+    end
+  end
+
+  describe "#usage" do
+    it "returns usage for string types" do
+      argument(:foo, :string).usage.must == "FOO"
+    end
+
+    it "returns usage for numeric types" do
+      argument(:foo, :numeric).usage.must == "N"
+    end
+
+    it "returns usage for array types" do
+      argument(:foo, :array).usage.must == "one two three"
+    end
+
+    it "returns usage for hash types" do
+      argument(:foo, :hash).usage.must == "key:value"
+    end
+  end
+
+  it "has higher priority than options on sort" do
+    [ Thor::Option.parse(:foo, "bar"), argument(:task) ].sort.first.must be_kind_of(Thor::Argument)
   end
 end

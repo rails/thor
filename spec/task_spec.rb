@@ -11,12 +11,12 @@ describe Thor::Task do
 
   describe "#formatted_usage" do
     it "shows usage with options" do
-      task('foo' => true, :bar => :required).formatted_usage.must == "can_has [--foo] --bar=BAR"
+      task('foo' => true, :bar => :required).formatted_usage.must == "can_has --bar=BAR [--foo]"
     end
 
     it "includes class options if a class is given" do
       klass = mock!.class_options{{ :bar => Thor::Option.parse(:bar, :required) }}.subject
-      task('foo' => true).formatted_usage(klass, false).must == "can_has [--foo] --bar=BAR"
+      task('foo' => true).formatted_usage(klass, false).must == "can_has --bar=BAR [--foo]"
     end
 
     it "includes namespace within usage" do

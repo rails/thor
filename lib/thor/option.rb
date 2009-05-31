@@ -89,8 +89,12 @@ class Thor
       !required
     end
 
-    # Returns true if this type requires an argument to be given. Just :default
-    # and :boolean does not require an argument.
+    def <=>(other)
+      self.position <=> other.position
+    end
+
+    # Returns true if this type requires an input to be given. Just :default
+    # and :boolean does not require an input.
     #
     def input_required?
       [ :numeric, :hash, :array, :string ].include?(type)
@@ -116,42 +120,66 @@ class Thor
       (str.length > 1 ? "--" : "-") + str
     end
 
-    # If this option has a default value, format it to be shown to the user.
-    #
-    def formatted_default
-      return unless default
+    def usage
+      sample = formatted_default || formatted_value
 
-      case type
-        when :boolean
-          nil
-        when :string, :default, :numeric
-          default.to_s
-        when :hash
-          default.inject([]) do |mem, (key, value)|
-            mem << "#{key}:#{value}".gsub(/\s/, '_')
-            mem
-          end.join(' ')
-        when :array
-          default.join(" ")
+      sample = if sample
+        "#{switch_name}=#{sample}"
+      else
+        switch_name
+      end
+
+      if required?
+        sample
+      else
+        "[#{sample}]"
       end
     end
 
-    # Show how this value should be supplied by the user.
-    #
-    def formatted_value
-      case type
-        when :boolean
-          nil
-        when :string, :default
-          human_name.upcase
-        when :numeric
-          "N"
-        when :hash
-          "key:value"
-        when :array
-          "one two three"
+    protected
+
+      def position
+        if argument?
+          -1
+        elsif required?
+          0
+        else
+          1
+        end
       end
-    end
+
+      def formatted_default
+        return unless default
+
+        case type
+          when :boolean
+            nil
+          when :string, :default, :numeric
+            default.to_s
+          when :hash
+            default.inject([]) do |mem, (key, value)|
+              mem << "#{key}:#{value}".gsub(/\s/, '_')
+              mem
+            end.join(' ')
+          when :array
+            default.join(" ")
+        end
+      end
+
+      def formatted_value
+        case type
+          when :boolean
+            nil
+          when :string, :default
+            human_name.upcase
+          when :numeric
+            "N"
+          when :hash
+            "key:value"
+          when :array
+            "one two three"
+        end
+      end
   end
 
   # Argument is a subset of option. It support less types, are always required
@@ -169,6 +197,10 @@ class Thor
 
     def argument?
       true
+    end
+
+    def usage
+      formatted_value
     end
   end
 end

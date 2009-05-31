@@ -103,23 +103,10 @@ class Thor
     end
 
     def formatted_usage
-      return "" if @switches.empty?
-
-      @switches.map do |key, option|
-        sample = option.formatted_default || option.formatted_value
-
-        sample = if sample
-          "#{key}=#{sample}"
-        else
-          key
-        end
-
-        if option.required?
-          sample
-        else
-          "[#{sample}]"
-        end
-      end.join(" ")
+      options = @switches.values
+      options.sort!
+      options.map!{ |o| o.usage }
+      options.join(' ')
     end
     alias :to_s :formatted_usage
 
@@ -179,9 +166,8 @@ class Thor
       #
       def parse_argument(switch, option)
         unless @non_assigned_arguments.include?(option)
-          value = @arguments[option.human_name]
+          @trailing << @arguments[option.human_name]
           parse_option(switch, option, @arguments)
-          unshift(value)
         else
           @non_assigned_arguments.delete(option)
           parse_option(switch, option, @arguments)

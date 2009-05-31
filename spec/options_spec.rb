@@ -66,7 +66,7 @@ describe Thor::Options do
       opts["app"].must be_true
     end
 
-    it "accepts conjoined short switches with argument" do
+    it "accepts conjoined short switches with input" do
       create "--foo" => true, "--bar" => true, "--app" => :required
       opts = parse "-fba", "12"
       opts["foo"].must be_true
@@ -87,7 +87,22 @@ describe Thor::Options do
       }.must raise_error(TypeError)
     end
 
-    describe "with no arguments" do
+    it "extracts trailing inputs" do
+      create "--foo" => :required, "--bar" => true
+      args = [ "foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang" ]
+
+      parse(*args).must == { "foo" => "12", "bar" => true }
+      @opt.trailing.must == ["foo", "bar", "--baz", "-T", "bang"]
+    end
+
+    it "doesn't set nonexistant switches" do
+      create "--foo" => :boolean
+      parse("--foo")["bar"].must_not be
+      opts = parse
+      opts["foo"].must_not be
+    end
+
+    describe "with no input" do
       it "and no switches returns an empty hash" do
         create({})
         parse.must == {}
@@ -104,42 +119,25 @@ describe Thor::Options do
       end
     end
 
-    it "doesn't set nonexistant switches" do
-      create "--foo" => :boolean
-      parse("--foo")["bar"].must_not be
-      opts = parse
-      opts["foo"].must_not be
-    end
-
     describe "with one required and one optional switch" do
       before :each do
         create "--foo" => :required, "--bar" => :optional
       end
-    
+
       it "raises an error if the required switch has no argument" do
         lambda { parse("--foo") }.must raise_error(Thor::Options::Error)
       end
-    
+
       it "raises an error if the required switch isn't given" do
         lambda { parse("--bar") }.must raise_error(Thor::Options::Error)
       end
-    
+
       it "raises an error if a switch name is given as the argument to the required switch" do
         lambda { parse("--foo", "--bar") }.must raise_error(Thor::Options::Error, "cannot pass switch '--bar' as an argument")
       end
     end
 
-    it "extracts non-option arguments" do
-      create "--foo" => :required, "--bar" => true
-
-      parse("foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang").must == {
-        "foo" => "12", "bar" => true
-      }
-
-      @opt.trailing.must == ["foo", "bar", "--baz", "-T", "bang"]
-    end
-
-    describe "options with default values" do
+    describe "with default values" do
       before(:each) do
         create "--branch" => "master"
       end
@@ -153,7 +151,7 @@ describe Thor::Options do
       end
     end
 
-    describe "with leading arguments" do
+    describe "with arguments" do
       it "parses leading arguments and assign them" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
         ordered_hash[:class_name] = Thor::Argument.new(:class_name, nil, :string, [])
@@ -201,7 +199,7 @@ describe Thor::Options do
         @opt.options.must == {"unit" => "months"}
       end
 
-      it "puts arguments back on the pile if they are later supplied as a switch" do
+      it "adds input to trailing array if it's later supplied as a switch" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
         ordered_hash[:interval] = Thor::Argument.new(:interval, nil, :numeric, [])
         ordered_hash[:unit]     = Thor::Option.new(:unit, nil, false, :string, "days", [])
@@ -210,7 +208,7 @@ describe Thor::Options do
         parse("1.0", "--unit", "months", "--interval", "3.0")
 
         @opt.arguments.must == {"interval" => 3.0}
-        @opt.options.must == {"unit" => "months"}
+        @opt.trailing.must  == [1.0]
       end
     end
   end
@@ -223,14 +221,13 @@ describe Thor::Options do
       end
 
       it "accepts a switch=<value> assignment" do
-        parse("--foo=12")["foo"].must == "12"
         parse("-f=12")["foo"].must == "12"
+        parse("--foo=12")["foo"].must == "12"
         parse("--foo=bar=baz")["foo"].must == "bar=baz"
-        parse("--foo=sentence with spaces")["foo"].must == "sentence with spaces"
       end
 
-      it "outputs formatted usage" do
-        usage.first.must == "--foo=FOO"
+      it "accepts a switch <value> assignment" do
+        parse("--foo", "12")["foo"].must == "12"
       end
     end
 
@@ -251,10 +248,6 @@ describe Thor::Options do
         create "--no-foo" => true
         parse("--no-foo")["no-foo"].must == true
       end
-
-      it "outputs formatted usage" do
-        usage.first.must == "[--foo]"
-      end
     end
 
     describe "with :hash type" do
@@ -273,10 +266,6 @@ describe Thor::Options do
       it "must not mix values with other switches" do
         parse("--attributes", "name:string", "age:integer", "--baz", "cool")["attributes"].must == {"name" => "string", "age" => "integer"}
       end
-
-      it "outputs formatted usage" do
-        usage.first.must == "[--attributes=key:value]"
-      end
     end
 
     describe "with :array type" do
@@ -294,10 +283,6 @@ describe Thor::Options do
 
       it "must not mix values with other switches" do
         parse("--attributes", "a", "b", "c", "--baz", "cool")["attributes"].must == ["a", "b", "c"]
-      end
-
-      it "outputs formatted usage" do
-        usage.first.must == "[--attributes=one two three]"
       end
     end
 
@@ -357,10 +342,6 @@ describe Thor::Options do
         lambda { parse("-n") }.must raise_error(Thor::Options::Error,
           "no value provided for argument '-n'")
       end
-
-      it "outputs numeric args with 'N' as sample value" do
-        sorted_usage.must == "[-m=5] [-n=N]"
-      end
     end
 
   end
@@ -369,6 +350,16 @@ describe Thor::Options do
     it "outputs optional args with sample values" do
       create "--repo" => :required, "--branch" => "bugfix", "-n" => 6, :force => true
       sorted_usage.must == "--repo=REPO [--branch=bugfix] [--force] [-n=6]"
+    end
+
+    it "outputs required values first" do
+      create "--repo" => :required, "--branch" => "bugfix"
+      usage.must == "--repo=REPO [--branch=bugfix]"
+    end
+
+    it "outputs arguments first" do
+      create "--repo" => :required, "--branch" => Thor::Argument.new(:branch), "-n" => 6
+      usage.must == "BRANCH --repo=REPO [-n=6]"
     end
   end
 end
