@@ -14,8 +14,8 @@ describe Thor::Options do
     @opt.parse(args.flatten)
   end
 
-  def usage
-    @opt.formatted_usage
+  def usage(only_arguments=false)
+    @opt.formatted_usage(only_arguments)
   end
 
   def sorted_usage
@@ -154,8 +154,8 @@ describe Thor::Options do
     describe "with arguments" do
       it "parses leading arguments and assign them" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
-        ordered_hash[:class_name] = Thor::Argument.new(:class_name, nil, :string, [])
-        ordered_hash[:attributes] = Thor::Argument.new(:attributes, nil, :hash, [])
+        ordered_hash[:class_name] = Thor::Argument.new(:class_name, nil, true, :string, nil, [])
+        ordered_hash[:attributes] = Thor::Argument.new(:attributes, nil, true, :hash, nil, [])
 
         create ordered_hash
         parse("User", "name:string", "age:integer")
@@ -165,7 +165,7 @@ describe Thor::Options do
 
       it "parses leading arguments and just then parse optionals" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
-        ordered_hash[:interval] = Thor::Argument.new(:interval, nil, :numeric, [])
+        ordered_hash[:interval] = Thor::Argument.new(:interval, nil, true, :numeric, nil, [])
         ordered_hash[:unit]     = Thor::Option.new(:unit, nil, false, :string, "days", [])
 
         create ordered_hash
@@ -177,7 +177,7 @@ describe Thor::Options do
 
       it "does not assign leading arguments to optionals" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
-        ordered_hash[:interval] = Thor::Argument.new(:interval, nil, :numeric, [])
+        ordered_hash[:interval] = Thor::Argument.new(:interval, nil, true, :numeric, nil, [])
         ordered_hash[:unit]     = Thor::Option.new(:unit, nil, false, :string, "days", [])
 
         create ordered_hash
@@ -189,7 +189,7 @@ describe Thor::Options do
 
       it "assigns switches to arguments" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
-        ordered_hash[:interval] = Thor::Argument.new(:interval, nil, :numeric, [])
+        ordered_hash[:interval] = Thor::Argument.new(:interval, nil, true, :numeric, nil, [])
         ordered_hash[:unit]     = Thor::Option.new(:unit, nil, false, :string, "days", [])
 
         create ordered_hash
@@ -201,7 +201,7 @@ describe Thor::Options do
 
       it "adds input to trailing array if it's later supplied as a switch" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
-        ordered_hash[:interval] = Thor::Argument.new(:interval, nil, :numeric, [])
+        ordered_hash[:interval] = Thor::Argument.new(:interval, nil, true, :numeric, nil, [])
         ordered_hash[:unit]     = Thor::Option.new(:unit, nil, false, :string, "days", [])
 
         create ordered_hash
@@ -360,6 +360,11 @@ describe Thor::Options do
     it "outputs arguments first" do
       create "--repo" => :required, "--branch" => Thor::Argument.new(:branch), "-n" => 6
       usage.must == "BRANCH --repo=REPO [-n=6]"
+    end
+
+    it "outputs only arguments" do
+      create "--repo" => :required, "--branch" => Thor::Argument.new(:branch), "-n" => 6
+      usage(true).must == "BRANCH"
     end
   end
 end

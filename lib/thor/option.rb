@@ -129,11 +129,7 @@ class Thor
         switch_name
       end
 
-      if required?
-        sample
-      else
-        "[#{sample}]"
-      end
+      required? ? sample : "[#{sample}]"
     end
 
     protected
@@ -154,15 +150,21 @@ class Thor
         case type
           when :boolean
             nil
-          when :string, :default, :numeric
+          when :numeric
             default.to_s
+          when :string, :default
+            default.empty? ? formatted_value : default.to_s
           when :hash
-            default.inject([]) do |mem, (key, value)|
-              mem << "#{key}:#{value}".gsub(/\s/, '_')
-              mem
-            end.join(' ')
+            if default.empty?
+              formatted_value
+            else
+              default.inject([]) do |mem, (key, value)|
+                mem << "#{key}:#{value}".gsub(/\s/, '_')
+                mem
+              end.join(' ')
+            end
           when :array
-            default.join(" ")
+            default.empty? ? formatted_value : default.join(" ")
         end
       end
 
@@ -182,17 +184,17 @@ class Thor
       end
   end
 
-  # Argument is a subset of option. It support less types, are always required
-  # and does not have default values.
+  # Argument is a subset of option. It does not support :boolean and :default
+  # as types.
   #
   class Argument < Option
     VALID_TYPES = [:numeric, :hash, :array, :string]
 
-    def initialize(name, description=nil, type=nil, aliases=nil)
+    def initialize(name, description=nil, required=true, type=:string, default=nil, aliases=nil)
       raise ArgumentError, "Argument name can't be nil."               if name.nil?
       raise ArgumentError, "Type :#{type} is not valid for arguments." if type && !VALID_TYPES.include?(type.to_sym)
 
-      super(name, description, true, type || :string, nil, aliases)
+      super(name, description, required, type || :string, default, aliases)
     end
 
     def argument?
@@ -200,7 +202,8 @@ class Thor
     end
 
     def usage
-      formatted_value
+      sample = formatted_default || formatted_value
+      required? ? sample : "[#{sample}]"
     end
   end
 end

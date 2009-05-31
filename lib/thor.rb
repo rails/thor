@@ -144,7 +144,7 @@ class Thor
     #
     # ==== Parameters
     # name<Symbol>:: The name of the argument.
-    # options<Hash>:: The description, type, default value and aliases for this option.
+    # options<Hash>:: The description, type, default value, aliases and if this option is required or not.
     #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
     #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
     #
@@ -183,7 +183,7 @@ class Thor
 
   end
 
-  map ["-h", "-?", "--help", "-D"] => :help
+  map HELP_MAPPINGS => :help
 
   desc "help [TASK]", "describe available tasks or one specific task"
   def help(task = nil)

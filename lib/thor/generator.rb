@@ -40,8 +40,12 @@ class Thor::Generator
     # Start in generators works differently. It invokes all tasks inside the class.
     #
     def start(args=ARGV)
-      instance, trailing = setup(args)
-      all_tasks.values.map { |task| task.run(instance) }
+      if Thor::HELP_MAPPINGS.include?(args.first)
+        self.help
+      else
+        instance, trailing = setup(args)
+        all_tasks.values.map { |task| task.run(instance) }
+      end
     rescue Thor::Error, Thor::Options::Error => e
       $stderr.puts e.message
     end

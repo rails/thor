@@ -8,6 +8,7 @@ require 'thor/task'
 require 'thor/util'
 
 class Thor
+  HELP_MAPPINGS = ["-h", "-?", "--help", "-D"]
 
   class Maxima < Struct.new(:description, :usage, :options)
   end
@@ -35,8 +36,8 @@ class Thor
 
       # Adds an argument to the class and creates an attr_accessor for it.
       #
-      # The difference between arguments and options are that, the first is
-      # always required and can be retrieved from the command line in two ways:
+      # The difference between arguments and options are how they are parsed
+      # from the command line. Arguments can be retrieved in two ways:
       #
       #   thor task NAME
       #
@@ -44,17 +45,39 @@ class Thor
       #
       #   thor task --name=NAME
       #
-      # Options are retrieved only in the second format, doesn't matter if they
+      # While options are only retrieved in the second way, doesn't matter if they
       # are required or not. Besides, arguments cannot have type :default or :boolean.
+      #
+      # Finally, arguments can be optional (supplying :optional => :true or
+      # :required => false), but you cannot have a required argument after a
+      # non-required argument. If you try it, an error is raised.
       #
       # ==== Parameters
       # name<Symbol>:: The name of the argument.
-      # options<Hash>:: The description, type and aliases for this argument.
-      #                 The type can be :string, :numeric, :hash or :array. If none is given string is assumed.
+      # options<Hash>:: The description, type, default value and aliases for this argument.
+      #                 The type can be :string, :numeric, :hash or :array. If none, string is assumed.
+      #
+      # ==== Errors
+      # ArgumentError:: Raised if you supply a required argument after a non required one.
       #
       def argument(name, options={})
         no_tasks { attr_accessor name }
-        class_options[name] = Thor::Argument.new(name, options[:description], options[:type], options[:aliases])
+
+        required = if options.key?(:optional)
+          !options[:optional]
+        elsif options.key?(:required)
+          options[:required]
+        else
+          options[:default].nil?
+        end
+
+        class_options.values.each do |option|
+          next unless option.argument? && !option.required?
+          raise ArgumentError, "You cannot have a required argument after a non-required argument"
+        end if required
+
+        class_options[name] = Thor::Argument.new(name, options[:description], required,
+                                                 options[:type], options[:default], options[:aliases])
       end
 
       # Adds a bunch of options to the set of class options.
@@ -76,7 +99,7 @@ class Thor
       #
       # ==== Parameters
       # name<Symbol>:: The name of the argument.
-      # options<Hash>:: The description, type, default value and aliases for this option.
+      # options<Hash>:: The description, type, default value, aliases and if this option is required or not.
       #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
       #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
       #

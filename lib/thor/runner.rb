@@ -14,7 +14,7 @@ class Thor::Runner < Thor
 
     initialize_thorfiles(meth)
     klass, task = Thor::Util.full_namespace_to_task_name(meth)
-    klass.invoke(task, args)
+    klass.start(args.unshift(task).compact)
   end
 
   def self.thor_root

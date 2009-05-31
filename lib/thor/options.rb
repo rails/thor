@@ -40,9 +40,12 @@ class Thor
 
       @switches = switches.values.inject({}) do |mem, option|
         @non_assigned_required  << option if option.required?
-        @non_assigned_arguments << option if option.argument?
 
-        @defaults[option.human_name] = option.default unless option.default.nil?
+        if option.argument?
+          @non_assigned_arguments << option
+        elsif !option.default.nil?
+          @defaults[option.human_name] = option.default
+        end
 
         # If there are no shortcuts specified, generate one using the first character
         shorts = option.aliases.dup
@@ -53,6 +56,7 @@ class Thor
         mem
       end
 
+      assign_arguments_default_values!
       remove_duplicated_shortcuts!
     end
 
@@ -102,9 +106,10 @@ class Thor
       @options
     end
 
-    def formatted_usage
+    def formatted_usage(only_arguments=false)
       options = @switches.values
       options.sort!
+      options.reject!{ |o| !o.argument? } if only_arguments
       options.map!{ |o| o.usage }
       options.join(' ')
     end
@@ -267,6 +272,14 @@ class Thor
         unless @non_assigned_required.empty?
           switch_names = @non_assigned_required.map{ |o| o.switch_name }.join(', ')
           raise Error, "no value provided for required arguments '#{switch_names}'" 
+        end
+      end
+
+      # Assign default values to the argument hash.
+      #
+      def assign_arguments_default_values!
+        @non_assigned_arguments.each do |option|
+          @arguments[option.human_name] = option.default
         end
       end
 
