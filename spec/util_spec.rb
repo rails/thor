@@ -87,8 +87,8 @@ describe Thor::Util do
       Thor::Util.constant_to_namespace(Thor::Util).must == "thor:util"
     end
 
-    it "removes Thor::Tasks namespace" do
-      Thor::Util.constant_to_namespace("Thor::Tasks::Package").must == "package"
+    it "removes Thor::Sandbox namespace" do
+      Thor::Util.constant_to_namespace("Thor::Sandbox::Package").must == "package"
     end
   end
 
@@ -127,6 +127,18 @@ describe Thor::Util do
 
     it "places underscores between multiple capitals" do
       Thor::Util.snake_case("ABClass").must == "a_b_class"
+    end
+  end
+
+  describe "#full_namespace_to_task_name" do
+    it "returns a Thor class and the task name" do
+      Thor::Util.full_namespace_to_task_name("thor:help").must == [Thor, "help"]
+    end
+
+    it "raises an error if the task does not inherit from Thor" do
+      lambda {
+        Thor::Util.full_namespace_to_task_name("object:help")
+      }.must raise_error(Thor::Error, "'Object' is not a Thor class")
     end
   end
 end

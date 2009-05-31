@@ -25,7 +25,7 @@ module MyTasks
   end  
 end
 
-module Thor::Tasks
+module Thor::Sandbox
   class Default < Thor
     desc "test", "prints 'test'"
     def test

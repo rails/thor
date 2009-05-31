@@ -107,7 +107,7 @@ class Thor::Runner < Thor
   def installed
     thor_root_glob.each do |f|
       next if f =~ /thor\.yml$/
-      load_thorfile(f) unless Thor.subclass_files.keys.include?(File.expand_path(f))
+      Thor::Util.load_thorfile(f) unless Thor.subclass_files.keys.include?(File.expand_path(f))
     end
 
     klasses = Thor.subclasses

@@ -13,7 +13,7 @@ class Thor::Runner < Thor
     super(meth.to_sym, *args) unless meth.include?(?:)
 
     initialize_thorfiles(meth)
-    klass, task = self.class.task_from_thor_class(meth)
+    klass, task = Thor::Util.full_namespace_to_task_name(meth)
     klass.invoke(task, args)
   end
 
@@ -49,13 +49,6 @@ class Thor::Runner < Thor
     end
   end
 
-  def self.task_from_thor_class(task)
-    namespaces = task.split(":")
-    klass = Thor::Util.namespace_to_constant(namespaces[0...-1].join(":"))
-    raise Error, "'#{klass}' is not a Thor class" unless klass <= Thor
-    return klass, namespaces.last
-  end
-
   def self.globs_for(path)
     ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
   end
@@ -72,19 +65,11 @@ class Thor::Runner < Thor
 
   def initialize_thorfiles(relevant_to = nil)
     thorfiles(relevant_to).each do |f|
-      load_thorfile(f) unless Thor.subclass_files.keys.include?(File.expand_path(f))
+      Thor::Util.load_thorfile(f) unless Thor.subclass_files.keys.include?(File.expand_path(f))
     end
   end
   
-  def load_thorfile(path)
-    txt = File.read(path)
-    begin
-      Thor::Tasks.class_eval(txt, path)
-    rescue Object => e
-      $stderr.puts "WARNING: unable to load thorfile #{path.inspect}: #{e.message}"
-    end
-  end
-  
+ 
   # Finds Thorfiles by traversing from your current directory down to the root
   # directory of your system. If at any time we find a Thor file, we stop.
   #

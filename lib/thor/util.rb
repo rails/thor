@@ -1,11 +1,16 @@
 class Thor
-  module Tasks; end
+  module Sandbox; end
 
-  # This module holds several utilities methods for converting thor namespaces
-  # to constants. For example:
+  # This module holds several utilities:
+  #
+  # 1) Methods to convert thor namespaces to constants and vice-versa.
   #
   #   Thor::Utils.constant_to_namespace(Foo::Bar::Baz) #=> "foo:bar:baz"
   #   Thor::Utils.namespace_to_constant("foo:bar:baz") #=> Foo::Bar::Baz
+  #
+  # 2) Loading thor files and sandboxing:
+  #
+  #   Thor::Utils.load_thorfile("~/.thor/foo")
   #
   module Util
 
@@ -43,7 +48,7 @@ class Thor
     #
     # ==== Parameters
     # string<String>:: The string to be found in the given bases.
-    # base<Array>:: Where to look for the string. By default is Thor::Tasks and Object.
+    # base<Array>:: Where to look for the string. By default is Thor::Sandbox and Object.
     #
     # ==== Returns
     # <Object>:: The first constant found with name "string" in one of the bases.
@@ -51,7 +56,7 @@ class Thor
     # ==== Errors
     # NameError:: Raised if no constant is found.
     #
-    def self.make_constant(string, base=[Thor::Tasks, Object])
+    def self.make_constant(string, base=[Thor::Sandbox, Object])
       base.each do |namespace|
         constant = full_const_get(namespace, string) rescue nil
         return constant if constant
@@ -106,7 +111,7 @@ class Thor
     # String:: If we receive Foo::Bar::Baz it returns "foo:bar:baz"
     #
     def self.constant_to_namespace(constant, remove_default=true)
-      constant = constant.to_s.gsub(/^Thor::Tasks::/, "")
+      constant = constant.to_s.gsub(/^Thor::Sandbox::/, "")
       constant = snake_case(constant).squeeze(":")
       constant.gsub!(/^default/, '') if remove_default
       constant
@@ -125,13 +130,13 @@ class Thor
       old_constants = Thor.subclasses.dup
       Thor.subclasses.clear
 
-      Thor::Tasks.class_eval(contents, file)
+      load_thorfile(file, contents)
 
       new_constants = Thor.subclasses.dup
       Thor.subclasses.replace(old_constants)
 
       new_constants.map do |constant|
-        constant.name.gsub(/^Thor::Tasks::/, '')
+        constant.name.gsub(/^Thor::Sandbox::/, '')
       end
     end
 
@@ -147,6 +152,43 @@ class Thor
       return str.downcase if str =~ /^[A-Z_]+$/
       str.gsub(/\B[A-Z]/, '_\&').squeeze('_') =~ /_*(.*)/
       return $+.downcase
+    end
+
+    # Receives a full namespace (namespace + method to be invoked) and returns a
+    # Thor class with the given method.
+    #
+    # ==== Examples
+    #
+    #   Thor::Util.full_namespace_to_task_name("foo:bar:baz") #=> Foo::Bar, "baz"
+    #
+    # ==== Parameters
+    # namespace<String>
+    #
+    # ==== Errors
+    # Thor::Error:: raised if the namespace evals to a class which does not
+    #               inherit from Thor.
+    #
+    def self.full_namespace_to_task_name(namespace)
+      namespace = namespace.split(":")
+      task_name = namespace.pop
+
+      klass = Thor::Util.namespace_to_constant(namespace.join(":"))
+      raise Error, "'#{klass}' is not a Thor class" unless klass <= Thor
+
+      return klass, task_name
+    end
+
+    # Receives a path and load the thor file in the path. The file is evaluated
+    # inside the sandbox to avoid namespacing conflicts.
+    #
+    def self.load_thorfile(path, content=nil)
+      content ||= File.read(path)
+
+      begin
+        Thor::Sandbox.class_eval(content, path)
+      rescue Exception => e
+        $stderr.puts "WARNING: unable to load thorfile #{path.inspect}: #{e.message}"
+      end
     end
   end
 end
