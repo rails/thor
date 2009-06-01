@@ -204,23 +204,6 @@ class Thor
         all_tasks[meth.to_s] || Thor::Task.dynamic(meth)
       end
 
-      # Returns the maxima for this Thor class and all subclasses
-      #
-      # ==== Returns
-      # maxima<Struct @description @usage @options>
-      #
-      def maxima
-        @maxima ||= begin
-          compare = lambda { |x,y| x.size <=> y.size }
-
-          max_usage = all_tasks.map{ |_, t| t.usage.to_s }.max(&compare).to_s.size
-          max_opts  = all_tasks.map{ |_, t| t.formatted_options.to_s }.max(&compare).to_s.size
-          max_class = class_options.map{ |_, o| o.usage.to_s }.max(&compare).to_s.size
-
-          Thor::Maxima.new(max_usage, max_opts, max_class)
-        end
-      end
-
       # All methods defined inside the given block are not added as tasks.
       #
       # So you can do:

@@ -345,21 +345,4 @@ describe Thor::Options do
     end
 
   end
-
-  describe "#formatted_usage" do
-    it "outputs optional args with sample values" do
-      create "--repo" => :required, "--branch" => "bugfix", "-n" => 6, :force => true
-      sorted_usage.must == "--repo=REPO [--branch=bugfix] [--force] [-n=6]"
-    end
-
-    it "outputs required values first" do
-      create "--repo" => :required, "--branch" => "bugfix"
-      usage.must == "--repo=REPO [--branch=bugfix]"
-    end
-
-    it "outputs arguments first" do
-      create "--repo" => :required, "--branch" => Thor::Argument.new(:branch), "-n" => 6
-      usage.must == "BRANCH --repo=REPO [-n=6]"
-    end
-  end
 end

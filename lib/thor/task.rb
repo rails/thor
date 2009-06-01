@@ -48,7 +48,7 @@ class Thor
     # Returns the options usage for this task.
     #
     def formatted_options
-      @formatted_options ||= options.values.map{ |o| o.usage }.join(" ")
+      @formatted_options ||= options.values.sort.map{ |o| o.usage }.join(" ")
     end
 
     protected

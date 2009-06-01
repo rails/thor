@@ -106,14 +106,6 @@ class Thor
       @options
     end
 
-    def formatted_usage
-      options = @switches.values
-      options.sort!
-      options.map!{ |o| o.usage }
-      options.join(' ')
-    end
-    alias :to_s :formatted_usage
-
     private
 
       def peek
