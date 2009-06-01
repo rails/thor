@@ -213,7 +213,8 @@ class Thor
 
     # Prints a list. Used to show options and list of tasks.
     #
-    # TODO Spec'it
+    # ==== Parameters
+    # Array[Array[String, String]]
     #
     def self.print_list(list)
       return if list.empty?

@@ -159,4 +159,34 @@ describe Thor::Util do
       end
     end
   end
+
+  describe "#print_list" do
+    it "does not print if the list is empty" do
+      capture(:stdout){ Thor::Util.print_list([]) }.must be_empty
+    end
+
+    it "prints each item on the list" do
+      list    = [ %w(a 1), %w(b 2), %w(c 3) ]
+      content = capture(:stdout){ Thor::Util.print_list(list) }
+
+      content.must =~ /^  a +# 1/
+      content.must =~ /^  b +# 2/
+      content.must =~ /^  c +# 3/
+    end
+
+    it "does not show description if it's no available" do
+      list    = [ %w(a 1), ["b", nil], %w(c 3) ]
+      content = capture(:stdout){ Thor::Util.print_list(list) }
+      content.must =~ /^  b +$/
+    end
+
+    it "calculates the maximum size from each item and use it as padding" do
+      list    = [ %w(a 1), %w(foo 2), %w(c 3) ]
+      content = capture(:stdout){ Thor::Util.print_list(list) }.split("\n")
+
+      content[0].size.must == 11
+      content[1].size.must == 11
+      content[2].size.must == 11
+    end
+  end
 end
