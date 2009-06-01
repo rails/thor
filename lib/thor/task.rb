@@ -27,11 +27,14 @@ class Thor
       instance.invoke(name, *args)
     end
 
+    # Returns the first line of the given description.
+    #
+    def short_description
+      description.split("\n").first
+    end
+
     # Returns the formatted usage. If a klass is given, the klass default options
     # are merged with the task options providinf a full description.
-    #
-    # TODO Ensure namespace is used only when class is sent
-    # TODO Ensure it removes the default namespace
     #
     def formatted_usage(klass=nil)
       formatted = ''

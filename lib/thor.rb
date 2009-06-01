@@ -189,8 +189,7 @@ class Thor
           end
         end
         puts
-        puts "Description:"
-        puts "  #{task.description}"
+        puts task.description
       else
         puts "Global options:"
 
@@ -212,7 +211,7 @@ class Thor
         self.all_tasks.each do |_, task|
           format = "%-" + (self.maxima.usage + self.maxima.options + 4).to_s + "s"
           print format % ("#{task.formatted_usage(false)}")
-          puts  task.description.split("\n").first
+          puts  short_description
         end
       end
     end

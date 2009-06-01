@@ -55,4 +55,14 @@ describe Thor::Task do
       }.must raise_error(NoMethodError, "the 'task' task of Object is private")
     end
   end
+
+  describe "#short_description" do
+    it "returns the first line of the description" do
+      Thor::Task.new(:task, "I can has\ncheezburger", "can_has", {}).short_description == "I can has"
+    end
+
+    it "returns the whole description if it's one line" do
+      Thor::Task.new(:task, "I can has cheezburger", "can_has", {}).short_description == "I can has cheezburger"
+    end
+  end
 end
