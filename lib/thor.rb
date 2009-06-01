@@ -174,6 +174,7 @@ class Thor
     # TODO Spec'it!
     #
     def help(meth=nil, options={})
+      meth, options = nil, meth if meth.is_a?(Hash)
       namespace = options[:namespace] ? self : nil
 
       if meth
@@ -200,7 +201,9 @@ class Thor
       if task
         puts task.description
       else
-        list = self.all_tasks.map do |_, task|
+        list = options[:skip_inherited] ? tasks : all_tasks
+
+        list = list.map do |_, task|
           [ task.formatted_usage(namespace), task.short_description ]
         end
 

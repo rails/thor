@@ -42,22 +42,22 @@ end
 describe Thor::Runner do
   it "can give a list of the available tasks" do
     ARGV.replace ["list"]
-    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
+    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +# bar/
   end
 
   it "can filter a list of the available tasks by --group" do
     ARGV.replace ["list", "--group", "standard"]
-    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +bar/
-    capture(:stdout) { Thor::Runner.start }.must_not =~ /my_tasks:advanced_task:zoo +zip/
+    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:thor_task:foo +# bar/
+    capture(:stdout) { Thor::Runner.start }.must_not =~ /my_tasks:advanced_task:zoo +# zip/
     ARGV.replace ["list", "--group", "advanced"]
-    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:advanced_task:zoo +zip/
+    capture(:stdout) { Thor::Runner.start }.must =~ /my_tasks:advanced_task:zoo +# zip/
   end
 
   it "can skip all filters to show all tasks using --all" do
     ARGV.replace ["list", "--all"]
     content = capture(:stdout) { Thor::Runner.start }
-    content.must =~ /my_tasks:thor_task:foo +bar/
-    content.must =~ /my_tasks:advanced_task:zoo +zip/
+    content.must =~ /my_tasks:thor_task:foo +# bar/
+    content.must =~ /my_tasks:advanced_task:zoo +# zip/
   end
 
   it "doesn't list superclass tasks in the subclass" do
@@ -87,7 +87,7 @@ describe Thor::Runner do
 
   it "presents tasks in the default namespace with an empty namespace" do
     ARGV.replace ["list"]
-    capture(:stdout) { Thor::Runner.start }.must =~ /^:test +prints 'test'/
+    capture(:stdout) { Thor::Runner.start }.must =~ /^  :test +# prints 'test'/
   end
 
   it "runs tasks with an empty namespace from the default namespace" do
@@ -164,8 +164,8 @@ describe Thor::Runner do
       stdout = capture(:stdout) { Thor::Runner.start(["installed"]) }
 
       stdout.must =~ /random\s*amazing/
-      stdout.must =~ /amazing:describe NAME \[\-\-forcefully\]\s*say that someone is amazing/
-      stdout.must =~ /amazing:hello\s*say hello/
+      stdout.must =~ /amazing:describe NAME \[\-\-forcefully\] +# say that someone is amazing/
+      stdout.must =~ /amazing:hello +# say hello/
     end
   end
 end

@@ -53,23 +53,28 @@ class Thor::Generator
 
     # TODO Spec'it
     #
-    def help
-      puts "Usage:"
-      puts "  #{self.namespace} #{self.arguments.map{|o| o.usage}.join(' ')}"
-      puts
-
-      list = self.class_options.map do |_, option|
-        next if option.argument?
-        [ option.usage, option.description ]
-      end.compact
-
-      unless list.empty?
-        puts "Options:"
-        Thor::Util.print_list(list)
+    def help(options={})
+      if options[:short]
+        puts "Usage:"
+        puts " #{self.namespace} #{self.class_options.map {|_,o| o.usage}.join(' ')}"
+      else
+        puts "Usage:"
+        puts "  #{self.namespace} #{self.arguments.map{|o| o.usage}.join(' ')}"
         puts
-      end
 
-      # puts self.description
+        list = self.class_options.map do |_, option|
+          next if option.argument?
+          [ option.usage, option.description ]
+        end.compact
+
+        unless list.empty?
+          puts "Options:"
+          Thor::Util.print_list(list)
+          puts
+        end
+
+        # puts self.description
+      end
     end
 
   end

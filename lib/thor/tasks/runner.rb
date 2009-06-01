@@ -8,7 +8,7 @@ require "pathname"
 
 class Thor::Runner < Thor
   map "-T" => :list, "-i" => :install, "-u" => :update
-  
+
   desc "install NAME", "install a Thor file into your system tasks, optionally named for future updates"
   method_options :as => :optional, :relative => :boolean
   def install(name)
@@ -29,66 +29,62 @@ class Thor::Runner < Thor
     rescue Errno::ENOENT
       raise Error, "Error opening file '#{name}'"
     end
-    
+
     puts "Your Thorfile contains: "
     puts contents
     print "Do you wish to continue [y/N]? "
     response = Readline.readline
-    
+
     return false unless response =~ /^\s*y/i
-    
+
     as = options["as"] || begin
       first_line = contents.split("\n")[0]
       (match = first_line.match(/\s*#\s*module:\s*([^\n]*)/)) ? match[1].strip : nil
     end
-        
+
     unless as
       print "Please specify a name for #{name} in the system repository [#{name}]: "
       as = Readline.readline
       as = name if as.empty?
     end
-    
+
     FileUtils.mkdir_p(thor_root)
     FileUtils.touch(File.join(thor_root, "thor.yml"))
-    
+
     yaml_file = File.join(thor_root, "thor.yml")
     FileUtils.touch(yaml_file)
-    
+
     thor_yaml[as] = {
       :filename  => Digest::MD5.hexdigest(name + as),
       :location  => (options[:relative] || File.exists?(name)) ? name : File.expand_path(name),
       :constants => Thor::Util.constants_in_contents(contents, base)
     }
-    
+
     save_yaml(thor_yaml)
-    
     puts "Storing thor file in your system repository"
-    
     destination = File.join(thor_root, thor_yaml[as][:filename])
-    
+
     if package == :file
       File.open(destination, "w") { |f| f.puts contents }
     else
       FileUtils.cp_r(name, destination)
     end
-    
-    thor_yaml[as][:filename] # Indicate sucess
+
+    thor_yaml[as][:filename] # Indicate success
   end
-  
+
   desc "uninstall NAME", "uninstall a named Thor module"
   def uninstall(name)
     raise Error, "Can't find module '#{name}'" unless thor_yaml[name]
-    
     puts "Uninstalling #{name}."
-    
     FileUtils.rm_rf(File.join(thor_root, "#{thor_yaml[name][:filename]}"))
 
     thor_yaml.delete(name)
     save_yaml(thor_yaml)
-    
+
     puts "Done."
   end
-  
+
   desc "update NAME", "update a Thor file from its original location"
   def update(name)
     raise Error, "Can't find module '#{name}'" if !thor_yaml[name] || !thor_yaml[name][:location]
@@ -97,6 +93,7 @@ class Thor::Runner < Thor
     old_filename = thor_yaml[name][:filename]
     self.options = self.options.merge("as" => name)
     filename     = install(thor_yaml[name][:location])
+
     unless filename == old_filename
       File.delete(File.join(thor_root, old_filename))
     end
@@ -152,13 +149,13 @@ class Thor::Runner < Thor
       yaml || {}
     end
   end
-  
+
   def save_yaml(yaml)
     yaml_file = File.join(thor_root, "thor.yml")
     File.open(yaml_file, "w") { |f| f.puts yaml.to_yaml }
   end
 
-  def display_klasses(with_modules = false, klasses = Thor.subclasses)
+  def display_klasses(with_modules=false, klasses=Thor.subclasses)
     klasses -= [Thor, Thor::Runner] unless with_modules
     raise Error, "No Thor tasks available" if klasses.empty?
 
@@ -181,50 +178,27 @@ class Thor::Runner < Thor
       puts
     end
 
-    # Calculate the largest base class name
-    max_base = klasses.max do |x,y| 
-      x.namespace.size <=> y.namespace.size
-    end.name.size
-
-    # Calculate the size of the largest option description
-    max_left_item = klasses.max do |x,y| 
-      (x.maxima.usage + x.maxima.options).to_i <=> (y.maxima.usage + y.maxima.options).to_i
-    end
-
-    max_left = max_left_item.maxima.usage + max_left_item.maxima.options
-
     unless klasses.empty?
+      klasses.each { |k| display_tasks(k) }
       puts # add some spacing
-      klasses.each { |k| display_tasks(k, max_base, max_left); }
     else
       puts "\033[1;34mNo Thor tasks available\033[0m"
     end
   end
 
-  def display_tasks(klass, max_base, max_left)
-    if klass.tasks.values.length > 0
+  def display_tasks(klass)
+    unless klass.tasks.empty?
       base = klass.namespace
 
-      if base.to_a.empty?
-        base = 'default' 
+      if base == "default"
         puts "\033[1;35m#{base}\033[0m"
       else
         puts "\033[1;34m#{base}\033[0m"
       end
-
       puts "-" * base.length
 
-      klass.tasks.each do |name, task|
-        format_string = "%-#{max_left + max_base + 5}s"
-        print format_string % task.formatted_usage(klass)
-        puts task.description
-      end
-
-      unless klass.class_options.empty?
-        puts "\nglobal options: #{Options.new(klass.class_options)}"
-      end
-
-      puts # add some spacing
+      klass.help(:short => true, :namespace => true, :skip_inherited => true)
+      puts
     end
   end
 end
