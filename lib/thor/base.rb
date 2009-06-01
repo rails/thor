@@ -13,16 +13,9 @@ class Thor
 
   module Base
 
-    def self.included(base)
-      base.extend ClassMethods
-    end
-
-    def self.register_klass_file(klass)
-      file = caller[1].match(/(.*):\d+/)[1]
-      Thor::Base.subclasses << klass unless Thor::Base.subclasses.include?(klass)
-
-      file_subclasses = Thor::Base.subclass_files[File.expand_path(file)]
-      file_subclasses << klass unless file_subclasses.include?(klass)
+    def self.included(base) #:nodoc:
+      base.send :extend,  ClassMethods
+      base.send :include, SingletonMethods
     end
 
     # Returns the classes that inherits from Thor or Thor::Generator.
@@ -43,21 +36,18 @@ class Thor
       @subclass_files ||= Hash.new{ |h,k| h[k] = [] }
     end
 
-    attr_accessor :options
-
-    def initialize(options={}, *args)
-      self.options = options
-    end
-
-    # Main entry point method that actually invoke the task. Currently
-    # overwritten both by Thor and Thor::Generator.
+    # Whenever a class inherits from Thor or Thor::Generator, we should track the
+    # class and the file on Thor::Base. This is the method responsable for it.
     #
-    def invoke(meth, *args)
-      self.send(meth, *args)
+    def self.register_klass_file(klass) #:nodoc:
+      file = caller[1].match(/(.*):\d+/)[1]
+      Thor::Base.subclasses << klass unless Thor::Base.subclasses.include?(klass)
+
+      file_subclasses = Thor::Base.subclass_files[File.expand_path(file)]
+      file_subclasses << klass unless file_subclasses.include?(klass)
     end
 
     module ClassMethods
-
       # Adds an argument to the class and creates an attr_accessor for it.
       #
       # The difference between arguments and options are how they are parsed
@@ -369,7 +359,21 @@ class Thor
         # class.
         def initialize_added #:nodoc:
         end
+    end
 
+    module SingletonMethods
+      attr_accessor :options
+
+      def initialize(options={}, *args)
+        self.options = options
+      end
+
+      # Main entry point method that actually invoke the task. Currently
+      # overwritten both by Thor and Thor::Generator.
+      #
+      def invoke(meth, *args)
+        self.send(meth, *args)
+      end
     end
 
   end
