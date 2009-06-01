@@ -107,10 +107,10 @@ class Thor::Runner < Thor
   def installed
     thor_root_glob.each do |f|
       next if f =~ /thor\.yml$/
-      Thor::Util.load_thorfile(f) unless Thor.subclass_files.keys.include?(File.expand_path(f))
+      Thor::Util.load_thorfile(f) unless Thor::Base.subclass_files.keys.include?(File.expand_path(f))
     end
 
-    klasses = Thor.subclasses
+    klasses = Thor::Base.subclasses
     klasses -= [Thor, Thor::Runner] unless options["internal"]
 
     display_klasses(true, klasses)
@@ -127,7 +127,7 @@ class Thor::Runner < Thor
     search = /^#{search}.*/i
     group  = options[:group] || "standard"
 
-    classes = Thor.subclasses.select do |k|
+    classes = Thor::Base.subclasses.select do |k|
       (options[:all] || k.group_name == group) && 
       Thor::Util.constant_to_namespace(k.name) =~ search
     end

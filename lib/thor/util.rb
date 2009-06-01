@@ -127,13 +127,13 @@ class Thor
     # Array[Object]
     #
     def self.constants_in_contents(contents, file=__FILE__)
-      old_constants = Thor.subclasses.dup
-      Thor.subclasses.clear
+      old_constants = Thor::Base.subclasses.dup
+      Thor::Base.subclasses.clear
 
       load_thorfile(file, contents)
 
-      new_constants = Thor.subclasses.dup
-      Thor.subclasses.replace(old_constants)
+      new_constants = Thor::Base.subclasses.dup
+      Thor::Base.subclasses.replace(old_constants)
 
       new_constants.map do |constant|
         constant.name.gsub(/^Thor::Sandbox::/, '')

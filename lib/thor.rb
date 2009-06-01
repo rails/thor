@@ -31,13 +31,6 @@ class Thor
   # Implement the hooks required by Thor::Base.
   #
   class << self
-    def subclasses
-      Thor::Base.subclasses
-    end
-  
-    def subclass_files
-      Thor::Base.subclass_files
-    end
     protected
       def baseclass
         Thor
