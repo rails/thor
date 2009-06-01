@@ -10,10 +10,8 @@ class Thor::Runner < Thor
 
   def method_missing(meth, *args)
     meth = meth.to_s
-    super(meth.to_sym, *args) unless meth.include?(?:)
-
     initialize_thorfiles(meth)
-    klass, task = Thor::Util.full_namespace_to_task_name(meth)
+    klass, task = Thor::Util.namespace_to_thor_class(meth)
     klass.start(args.unshift(task).compact)
   end
 

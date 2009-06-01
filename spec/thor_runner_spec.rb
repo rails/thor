@@ -72,7 +72,7 @@ describe Thor::Runner do
   
   it "prints an error if a toplevel thor task is not found" do
     ARGV.replace ["hello"]
-    capture(:stderr) { Thor::Runner.start }.must =~ /The thor:runner namespace doesn't have a 'hello' task/
+    capture(:stderr) { Thor::Runner.start }.must =~ /could not find generator or task 'hello'/
   end
   
   it "prints an error if the namespace could not be found" do

@@ -154,26 +154,39 @@ class Thor
       return $+.downcase
     end
 
-    # Receives a full namespace (namespace + method to be invoked) and returns a
-    # Thor class with the given method.
+    # Receives a namespace and tries to retrieve a Thor or Thor::Generator class
+    # from it. If a Thor class is found, also returns the task.
     #
     # ==== Examples
     #
-    #   Thor::Util.full_namespace_to_task_name("foo:bar:baz") #=> Foo::Bar, "baz"
+    #   class Foo::Bar < Thor
+    #     def baz
+    #     end
+    #   end
+    #
+    #   class Baz::Foo < Thor::Generator
+    #   end
+    #
+    #   Thor::Util.namespace_to_thor_class("baz:foo")     #=> Baz::Foo, nil
+    #   Thor::Util.namespace_to_thor_class("foo:bar:baz") #=> Foo::Bar, "baz"
     #
     # ==== Parameters
     # namespace<String>
     #
     # ==== Errors
-    # Thor::Error:: raised if the namespace evals to a class which does not
-    #               inherit from Thor.
+    # Thor::Error:: raised if the namespace cannot be found.
     #
-    def self.full_namespace_to_task_name(namespace)
+    # Thor::Error:: raised if the namespace evals to a class which does not
+    #               inherit from Thor or Thor::Generator.
+    #
+    def self.namespace_to_thor_class(namespace)
       generator = Thor::Util.namespace_to_constant(namespace) rescue nil
 
       if generator
         raise Error, "'#{generator}' is not a Thor::Generator class" unless generator <= Thor::Generator
         return generator, nil
+      elsif !namespace.include?(?:)
+        raise Error, "could not find generator or task '#{namespace}'"
       end
 
       namespace = namespace.split(":")
