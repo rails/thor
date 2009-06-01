@@ -27,6 +27,11 @@ describe Thor::Generator do
     it "raises an error when a generator task expects arguments" do
       lambda { WhinyGenerator.start }.must raise_error
     end
+
+    it "invokes help message if any of the shortcuts is given" do
+      stub(MyCounter).help
+      MyCounter.start(["-h"])
+    end
   end
 
   describe "#help" do
