@@ -210,5 +210,20 @@ class Thor
         $stderr.puts "WARNING: unable to load thorfile #{path.inspect}: #{e.message}"
       end
     end
+
+    # Prints a list. Used to show options and list of tasks.
+    #
+    def self.print_list(list)
+      return if list.empty?
+
+      maxima = list.max{ |a,b| a[0].size <=> b[0].size }[0].size
+      format = "  %-#{maxima+3}s"
+
+      list.each do |name, description|
+        print format % name
+        print "# #{description}" if description
+        puts
+      end
+    end
   end
 end

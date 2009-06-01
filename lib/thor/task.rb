@@ -30,7 +30,7 @@ class Thor
     # Returns the first line of the given description.
     #
     def short_description
-      description.split("\n").first
+      description.split("\n").first if description
     end
 
     # Returns the formatted usage. If a klass is given, the klass default options

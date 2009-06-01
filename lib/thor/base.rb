@@ -8,7 +8,7 @@ require 'thor/util'
 class Thor
   HELP_MAPPINGS = ["-h", "-?", "--help", "-D"]
 
-  class Maxima < Struct.new(:description, :usage, :options)
+  class Maxima < Struct.new(:usage, :options, :class_options)
   end
 
   module Base
@@ -213,11 +213,11 @@ class Thor
         @maxima ||= begin
           compare = lambda { |x,y| x.size <=> y.size }
 
-          max_usage = all_tasks.map{ |_, t| t.usage.to_s }.max(&compare).size
-          max_desc  = all_tasks.map{ |_, t| t.description.to_s }.max(&compare).size
-          max_opts  = all_tasks.map{ |_, t| t.formatted_options.to_s }.max(&compare).size
+          max_usage = all_tasks.map{ |_, t| t.usage.to_s }.max(&compare).to_s.size
+          max_opts  = all_tasks.map{ |_, t| t.formatted_options.to_s }.max(&compare).to_s.size
+          max_class = class_options.map{ |_, o| o.usage.to_s }.max(&compare).to_s.size
 
-          Thor::Maxima.new(max_desc, max_usage, max_opts)
+          Thor::Maxima.new(max_usage, max_opts, max_class)
         end
       end
 

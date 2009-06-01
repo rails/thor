@@ -67,24 +67,26 @@ describe Thor do
     end
 
     it "provides useful help info for the help method itself" do
-      @content.must =~ /help \[TASK\] +Describe available tasks/
+      @content.must =~ /help \[TASK\] +# Describe available tasks/
     end
 
     it "provides useful help info for a simple method" do
-      @content.must =~ /zoo +zoo around/
+      @content.must =~ /zoo +# zoo around/
     end
 
     it "provides useful help info for a method with params" do
-      @content.must =~ /animal TYPE +horse around/
+      @content.must =~ /animal TYPE +# horse around/
     end
 
     it "provides useful help info for a method with options" do
-      @content.must =~ /foo BAR \[\-\-force\] +do some fooing/
+      @content.must =~ /foo BAR \[\-\-force\] +# do some fooing/
     end
 
     it "provides full help info when talking about a specific task" do
       capture(:stdout) { MyScript.start(["help", "foo"]) }.must == <<END
-foo BAR [--force]
+Usage:
+  foo BAR [--force]
+
 do some fooing
   This is more info!
   Everyone likes more info!
@@ -93,7 +95,7 @@ END
 
     describe "when :for is supplied" do
       it "overwrites a previous defined task" do
-        capture(:stdout) { MyChildScript.start(["help"]) }.must =~ /animal KIND \[\-\-other=OTHER\] +fish around/
+        capture(:stdout) { MyChildScript.start(["help"]) }.must =~ /animal KIND \[\-\-other=OTHER\] +# fish around/
       end
     end
   end

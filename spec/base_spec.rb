@@ -132,10 +132,14 @@ describe Thor::Base do
   end
 
   describe "#maxima" do
-    it "returns the maximum length for usage, description and options" do
-      MyScript.maxima.description.must == 64
-      MyScript.maxima.usage.must       == 28
-      MyScript.maxima.options.must     == 9
+    it "returns the maximum length for usage, options and class options" do
+      MyScript.maxima.usage.must         == 28
+      MyScript.maxima.options.must       == 9
+      MyScript.maxima.class_options.must == 0
+
+      MyCounter.maxima.usage.must         == 0
+      MyCounter.maxima.options.must       == 0
+      MyCounter.maxima.class_options.must == 11
     end
   end
 end

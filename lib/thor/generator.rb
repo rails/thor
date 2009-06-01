@@ -51,21 +51,25 @@ class Thor::Generator
       $stderr.puts e.message
     end
 
+    # TODO Spec'it
+    #
     def help
       puts "Usage:"
       puts "  #{self.namespace} #{self.arguments.map{|o| o.usage}.join(' ')}"
       puts
-      puts "Options:"
-      self.class_options.values.each do |option|
-        next if option.argument?
-        print "  " + option.usage
 
-        if option.description
-          puts " " + option.description
-        else
-          puts
-        end
+      list = self.class_options.map do |_, option|
+        next if option.argument?
+        [ option.usage, option.description ]
+      end.compact
+
+      unless list.empty?
+        puts "Options:"
+        Thor::Util.print_list(list)
+        puts
       end
+
+      # puts self.description
     end
 
   end

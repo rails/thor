@@ -137,7 +137,7 @@ class Thor
     #     # magic
     #   end
     #
-    #   method_option :foo => :bar, :for => :previous_task
+    #   method_options :foo => :bar, :for => :previous_task
     #
     #   def next_task
     #     # magic
@@ -171,48 +171,41 @@ class Thor
       $stderr.puts e.message
     end
 
-    def help(meth=nil)
+    # TODO Spec'it!
+    #
+    def help(meth=nil, options={})
+      namespace = options[:namespace] ? self : nil
+
       if meth
-        task = self.class.tasks[meth]
+        task = self.all_tasks[meth]
+        raise Error, "task '#{meth}' could not be found in namespace '#{self.namespace}'" unless task
+      end
 
+      if task
         puts "Usage:"
-        puts "  #{task.formatted_usage(true)}"
+        puts "  #{task.formatted_usage(namespace)}"
         puts
-        puts "Global options:"
-        self.class_options.values.each do |option|
-          print "  " + option.usage
+      end
 
-          if option.description
-            puts " " + option.description
-          else
-            puts
-          end
+      unless self.class_options.empty?
+        list = self.class_options.map do |_, option|
+          [ option.usage, option.description ]
         end
+
+        puts "Global options:"
+        Thor::Util.print_list(list)
         puts
+      end
+
+      if task
         puts task.description
       else
-        puts "Global options:"
-
-        self.class_options.values.each do |option|
-          print "  " + option.usage
-
-          if option.description
-            puts " " + option.description
-          else
-            puts
-          end
+        list = self.all_tasks.map do |_, task|
+          [ task.formatted_usage(namespace), task.short_description ]
         end
 
-        puts
         puts "Tasks:"
-
-        # maxima = namespace + usage + options
-
-        self.all_tasks.each do |_, task|
-          format = "%-" + (self.maxima.usage + self.maxima.options + 4).to_s + "s"
-          print format % ("#{task.formatted_usage(false)}")
-          puts  short_description
-        end
+        Thor::Util.print_list(list)
       end
     end
 
@@ -233,21 +226,7 @@ class Thor
 
   desc "help [TASK]", "Describe available tasks or one specific task"
   def help(task=nil)
-    if task
-      task = self.class.tasks[task]
-      namespace = task.include?(?:) ? self : nil
-
-      puts task.formatted_usage(namespace)
-      puts task.description
-    else
-      puts "Options"
-      puts "-------"
-      self.class.all_tasks.each do |_, task|
-        format = "%-" + (self.class.maxima.usage + self.class.maxima.options + 4).to_s + "s"
-        print format % ("#{task.formatted_usage}")
-        puts  task.description.split("\n").first
-      end
-    end
+    self.class.help(task, :namespace => task && task.include?(?:))
   end
 
   protected
