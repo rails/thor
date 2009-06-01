@@ -171,7 +171,15 @@ class Thor
       $stderr.puts e.message
     end
 
-    # TODO Spec'it!
+    # Prints help information about this generator. If a task name is given, it
+    # shows information only about the specific task.
+    #
+    # ==== Parameters
+    # meth<String>:: An optional task name to print usage information about.
+    #
+    # ==== Options
+    # namespace:: When true, shows the namespace in the output before the usage.
+    # skip_inherited:: When true, does not show tasks from superclass.
     #
     def help(meth=nil, options={})
       meth, options = nil, meth if meth.is_a?(Hash)

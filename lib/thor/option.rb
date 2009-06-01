@@ -202,8 +202,7 @@ class Thor
     end
 
     def usage
-      sample = formatted_default || formatted_value
-      required? ? sample : "[#{sample}]"
+      required? ? formatted_value : "[#{formatted_value}]"
     end
   end
 end

@@ -66,31 +66,8 @@ describe Thor do
       @content = capture(:stdout) { MyScript.start(["help"]) }
     end
 
-    it "provides useful help info for the help method itself" do
-      @content.must =~ /help \[TASK\] +# Describe available tasks/
-    end
-
-    it "provides useful help info for a simple method" do
+    it "provides description for a task" do
       @content.must =~ /zoo +# zoo around/
-    end
-
-    it "provides useful help info for a method with params" do
-      @content.must =~ /animal TYPE +# horse around/
-    end
-
-    it "provides useful help info for a method with options" do
-      @content.must =~ /foo BAR \[\-\-force\] +# do some fooing/
-    end
-
-    it "provides full help info when talking about a specific task" do
-      capture(:stdout) { MyScript.start(["help", "foo"]) }.must == <<END
-Usage:
-  foo BAR [--force]
-
-do some fooing
-  This is more info!
-  Everyone likes more info!
-END
     end
 
     describe "when :for is supplied" do
@@ -154,6 +131,70 @@ END
   describe "#invoke" do
     it "invokes the named command regardless of the command line options with invoke()" do
       MyScript.invoke(:animal, ["fish"]).must == ["fish"]
+    end
+  end
+
+  describe "#help" do
+    describe "on general" do
+      before(:each) do
+        @content = capture(:stdout){ MyScript.help }
+      end
+
+      it "provides useful help info for the help method itself" do
+        @content.must =~ /help \[TASK\] +# Describe available tasks/
+      end
+
+      it "provides useful help info for a method with params" do
+        @content.must =~ /animal TYPE +# horse around/
+      end
+
+      it "provides useful help info for a method with options" do
+        @content.must =~ /foo BAR \[\-\-force\] +# do some fooing/
+      end
+
+      it "shows superclass tasks" do
+        capture(:stdout){ MyChildScript.help }.must =~ /foo BAR \[\-\-force\] +# do some fooing/
+      end
+
+      it "shows global options information" do
+        capture(:stdout){ MyChildScript.help }.must =~ /\[\-\-param=N\]/
+      end
+    end
+
+    describe "for a specific task" do
+      it "provides full help info when talking about a specific task" do
+        capture(:stdout) { MyScript.help("foo") }.must == <<END
+Usage:
+  foo BAR [--force]
+
+do some fooing
+  This is more info!
+  Everyone likes more info!
+END
+      end
+
+      it "raises an error if the task can't be found" do
+        lambda {
+          MyScript.help("unknown")
+        }.must raise_error(Thor::Error, "task 'unknown' could not be found in namespace 'my_script'")
+      end
+    end
+
+    describe "options" do
+      it "shows the namespace if required" do
+        capture(:stdout){ MyScript.help(:namespace => true) }.must =~ /my_script:foo BAR/
+      end
+
+      it "does not show superclass tasks if required" do
+        capture(:stdout){ MyScript.help(:skip_inherited => true) }.must_not =~ /help/
+      end
+    end
+
+    describe "instance method" do
+      it "calls the class method" do
+        stub(MyScript).help(nil, :namespace => nil)
+        MyScript.start(["help"])
+      end
     end
   end
 end

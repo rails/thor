@@ -51,7 +51,10 @@ class Thor::Generator
       $stderr.puts e.message
     end
 
-    # TODO Spec'it
+    # Prints help information about this generator.
+    #
+    # ==== Options
+    # short:: When true, shows only usage.
     #
     def help(options={})
       if options[:short]

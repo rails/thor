@@ -3,6 +3,7 @@ require 'thor/tasks/runner'
 class Thor::Runner < Thor
 
   # Override Thor#help so we can give info about not-yet-loaded tasks
+  # TODO Spec the statement above
   def help(task = nil)
     initialize_thorfiles(task) if task && task.include?(?:)
     super

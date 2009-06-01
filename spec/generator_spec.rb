@@ -28,4 +28,25 @@ describe Thor::Generator do
       lambda { WhinyGenerator.start }.must raise_error
     end
   end
+
+  describe "#help" do
+    before(:each) do
+      @content = capture(:stdout){ MyCounter.help }
+    end
+
+    it "provides usage information" do
+      @content.must =~ /my_counter N \[N\]/
+    end
+
+    it "shows global options information" do
+      @content.must =~ /Options/
+      @content.must =~ /\[\-\-third=N\]/
+    end
+
+    it "shows only usage if a short help is required" do
+      content = capture(:stdout){ MyCounter.help(:short => true) }
+      content.must =~ /my_counter N \[N\] \[\-\-third=N\]/
+      content.must_not =~ /Options/
+    end
+  end
 end
