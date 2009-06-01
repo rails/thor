@@ -66,25 +66,22 @@ describe Thor::Base do
 
   describe "#subclasses" do
     it "tracks its subclasses in an Array" do
-      Thor.subclasses.must include(MyScript)
-      Thor.subclasses.must include(MyChildScript)
-      Thor.subclasses.must include(Scripts::MyGrandChildScript)
-
-      MyChildScript.subclasses.must include(Scripts::MyGrandChildScript)
-      MyChildScript.subclasses.must_not include(MyScript)
+      Thor::Base.subclasses.must include(MyScript)
+      Thor::Base.subclasses.must include(MyChildScript)
+      Thor::Base.subclasses.must include(Scripts::MyGrandChildScript)
     end
   end
 
   describe "#subclass_files" do
     it "returns tracked subclasses, grouped by the files they come from" do
       thorfile = File.join(File.dirname(__FILE__), "fixtures", "script.thor")
-      Thor.subclass_files[File.expand_path(thorfile)].must == [ MyScript, MyChildScript, Scripts::MyGrandChildScript ]
+      Thor::Base.subclass_files[File.expand_path(thorfile)].must == [ MyScript, MyChildScript, Scripts::MyGrandChildScript ]
     end
 
     it "tracks a single subclass across multiple files" do
       thorfile = File.join(File.dirname(__FILE__), "fixtures", "task.thor")
-      Thor.subclass_files[File.expand_path(thorfile)].must include(Amazing)
-      Thor.subclass_files[File.expand_path(__FILE__)].must include(Amazing)
+      Thor::Base.subclass_files[File.expand_path(thorfile)].must include(Amazing)
+      Thor::Base.subclass_files[File.expand_path(__FILE__)].must include(Amazing)
     end
   end
 

@@ -1,5 +1,3 @@
-$:.unshift File.expand_path(File.join(File.dirname(__FILE__), '..'))
-
 require 'thor/core_ext/ordered_hash'
 require 'thor/error'
 require 'thor/option'
@@ -17,6 +15,32 @@ class Thor
 
     def self.included(base)
       base.extend ClassMethods
+    end
+
+    def self.register_klass_file(klass)
+      file = caller[1].match(/(.*):\d+/)[1]
+      Thor::Base.subclasses << klass unless Thor::Base.subclasses.include?(klass)
+
+      file_subclasses = Thor::Base.subclass_files[File.expand_path(file)]
+      file_subclasses << klass unless file_subclasses.include?(klass)
+    end
+
+    # Returns the classes that inherits from Thor or Thor::Generator.
+    #
+    # ==== Returns
+    # Array[Class]
+    #
+    def self.subclasses
+      @subclasses ||= []
+    end
+
+    # Returns the files where the subclasses are kept.
+    #
+    # ==== Returns
+    # Hash[path<String> => Class]
+    #
+    def self.subclass_files
+      @subclass_files ||= Hash.new{ |h,k| h[k] = [] }
     end
 
     attr_accessor :options
@@ -73,7 +97,8 @@ class Thor
 
         class_options.values.each do |option|
           next unless option.argument? && !option.required?
-          raise ArgumentError, "You cannot have a required argument after a non-required argument"
+          raise ArgumentError, "You cannot have #{name.to_s.inspect} as required argument after " <<
+                               "the non-required argument #{option.human_name.inspect}."
         end if required
 
         class_options[name] = Thor::Argument.new(name, options[:description], required,
@@ -124,25 +149,6 @@ class Thor
       #
       def group_name
         @group_name ||= from_superclass(:group_name, 'standard')
-      end
-
-      # Returns the files where the subclasses are maintained.
-      #
-      # ==== Returns
-      # Hash[path<String> => Class]
-      #
-      def subclass_files
-        @subclass_files ||= Hash.new{ |h,k| h[k] = [] }
-      end
-
-      # Returns the subclasses. Subclasses are dynamically added to the array when
-      # a class inherits from the Thor class.
-      #
-      # ==== Returns
-      # Array[Class]
-      #
-      def subclasses
-        @subclasses ||= []
       end
 
       # Returns the tasks for this Thor class.
@@ -321,7 +327,7 @@ class Thor
         # and file into baseclass.
         #
         def inherited(klass)
-          register_klass_file(klass)
+          Thor::Base.register_klass_file(klass)
         end
 
         # Fire this callback whenever a method is added. Added methods are
@@ -336,23 +342,8 @@ class Thor
           end
 
           return if @no_tasks || !valid_task?(meth)
-          register_klass_file(self)
+          Thor::Base.register_klass_file(self)
           create_task(meth)
-        end
-
-        # Register the klass file by tracking the class in the base class and
-        # the file where the class was defined.
-        #
-        def register_klass_file(klass, file=caller[1].match(/(.*):\d+/)[1])
-          subclasses << klass unless subclasses.include?(klass)
-
-          unless self == baseclass
-            superclass.register_klass_file(klass, file)
-            return
-          end
-
-          file_subclasses = subclass_files[File.expand_path(file)]
-          file_subclasses << klass unless file_subclasses.include?(klass)
         end
 
         def from_superclass(method, default=nil)

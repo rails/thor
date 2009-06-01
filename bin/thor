@@ -2,6 +2,7 @@
 # -*- mode: ruby -*-
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'thor')
+require 'thor/generator'
 require 'thor/runner'
 
 Thor::Runner.start

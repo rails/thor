@@ -169,10 +169,17 @@ class Thor
     #               inherit from Thor.
     #
     def self.full_namespace_to_task_name(namespace)
+      generator = Thor::Util.namespace_to_constant(namespace) rescue nil
+
+      if generator
+        raise Error, "'#{generator}' is not a Thor::Generator class" unless generator <= Thor::Generator
+        return generator, nil
+      end
+
       namespace = namespace.split(":")
       task_name = namespace.pop
+      klass     = Thor::Util.namespace_to_constant(namespace.join(":"))
 
-      klass = Thor::Util.namespace_to_constant(namespace.join(":"))
       raise Error, "'#{klass}' is not a Thor class" unless klass <= Thor
 
       return klass, task_name

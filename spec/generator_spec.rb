@@ -17,7 +17,7 @@ describe Thor::Generator do
     it "raises an error if a required argument is added after a non-required" do
       lambda {
         MyCounter.argument(:foo, :type => :string)
-      }.must raise_error(ArgumentError, "You cannot have a required argument after a non-required argument")
+      }.must raise_error(ArgumentError, 'You cannot have "foo" as required argument after the non-required argument "second".')
     end
 
     it "raises when an exception happens within the task call" do

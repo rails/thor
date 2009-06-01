@@ -65,7 +65,7 @@ class Thor::Runner < Thor
 
   def initialize_thorfiles(relevant_to = nil)
     thorfiles(relevant_to).each do |f|
-      Thor::Util.load_thorfile(f) unless Thor.subclass_files.keys.include?(File.expand_path(f))
+      Thor::Util.load_thorfile(f) unless Thor::Base.subclass_files.keys.include?(File.expand_path(f))
     end
   end
   
@@ -111,9 +111,11 @@ class Thor::Runner < Thor
   end
 
   def thorfiles_relevant_to(meth)
-    klass_str = Thor::Util.namespace_to_constant_name(meth.split(":")[0...-1].join(":"))
+    thor_class      = Thor::Util.namespace_to_constant_name(meth.split(":")[0...-1].join(":"))
+    generator_class = Thor::Util.namespace_to_constant_name(meth)
+  
     thor_yaml.select do |k, v|
-      v[:constants] && v[:constants].include?(klass_str)
+      v[:constants] && (v[:constants].include?(thor_class) || v[:constants].include?(generator_class))
     end.map { |k, v| File.join(thor_root, "#{v[:filename]}") }
   end
 end

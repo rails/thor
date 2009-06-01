@@ -1,4 +1,5 @@
-require File.join(File.dirname(__FILE__), 'base')
+$:.unshift File.expand_path(File.join(File.dirname(__FILE__), '..'))
+require 'thor/base'
 
 class Thor::Generator
 
@@ -48,6 +49,15 @@ class Thor::Generator
       end
     rescue Thor::Error, Thor::Options::Error => e
       $stderr.puts e.message
+    end
+
+    def help
+      puts "Usage: #{self.namespace} #{Thor::Options.new(self.class_options).formatted_usage(true)}"
+      puts
+      puts "Options"
+      puts "-------"
+      puts
+      puts
     end
 
   end
