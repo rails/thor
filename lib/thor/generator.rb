@@ -52,12 +52,20 @@ class Thor::Generator
     end
 
     def help
-      puts "Usage: #{self.namespace} #{Thor::Options.new(self.class_options).formatted_usage(true)}"
+      puts "Usage:"
+      puts "  #{self.namespace} #{self.arguments.map{|o| o.usage}.join(' ')}"
       puts
-      puts "Options"
-      puts "-------"
-      puts
-      puts
+      puts "Options:"
+      self.class_options.values.each do |option|
+        next if option.argument?
+        print "  " + option.usage
+
+        if option.description
+          puts " " + option.description
+        else
+          puts
+        end
+      end
     end
 
   end

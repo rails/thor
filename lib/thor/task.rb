@@ -8,7 +8,11 @@ class Thor
       new(name, "A dynamically-generated task", name.to_s, nil)
     end
 
-    # Dup the options hash on clone or copy.
+    def initialize(name, description, usage, options)
+      super(name, description, usage, options || {})
+    end
+
+    # Dup the options hash on clone.
     #
     def initialize_copy(other)
       super(other)
@@ -23,31 +27,25 @@ class Thor
       instance.invoke(name, *args)
     end
 
-    # Get the full options for this task. If a klass is given, the klass default
-    # options are merged with the task options.
-    #
-    def full_options(klass=nil)
-      merged_options = if klass && klass.respond_to?(:class_options)
-        klass.class_options.merge(options || {})
-      else
-        options || {}
-      end
-
-      Options.new(merged_options)
-    end
-
     # Returns the formatted usage. If a klass is given, the klass default options
     # are merged with the task options providinf a full description.
     #
-    # By default it removes the default namespace (TODO is this a good assumption?)
+    # TODO Ensure namespace is used only when class is sent
+    # TODO Ensure it removes the default namespace
     #
-    def formatted_usage(klass=nil, use_namespace=true)
+    def formatted_usage(klass=nil)
       formatted = ''
-      formatted << "#{klass.namespace.gsub(/^default/,'')}:" if klass && use_namespace
+      formatted << "#{klass.namespace.gsub(/^default/,'')}:" if klass
       formatted << usage.to_s
-      formatted << " #{full_options(klass).formatted_usage}"
+      formatted << " #{formatted_options}"
       formatted.strip!
       formatted
+    end
+
+    # Returns the options usage for this task.
+    #
+    def formatted_options
+      @formatted_options ||= options.values.map{ |o| o.usage }.join(" ")
     end
 
     protected

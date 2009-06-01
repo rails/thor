@@ -95,6 +95,15 @@ class Thor
                                                  options[:type], options[:default], options[:aliases])
       end
 
+      # Returns this class arguments, looking up in the ancestors chain.
+      #
+      # ==== Returns
+      # Array[Thor::Argument]
+      #
+      def arguments
+        @arguments ||= class_options.values.select{ |o| o.argument? }
+      end
+
       # Adds a bunch of options to the set of class options.
       #
       #   class_options :foo => :optional, :bar => :required, :baz => :string
@@ -206,7 +215,7 @@ class Thor
 
           max_usage = all_tasks.map{ |_, t| t.usage.to_s }.max(&compare).size
           max_desc  = all_tasks.map{ |_, t| t.description.to_s }.max(&compare).size
-          max_opts  = all_tasks.map{ |_, t| t.full_options(self).formatted_usage }.max(&compare).size
+          max_opts  = all_tasks.map{ |_, t| t.formatted_options.to_s }.max(&compare).size
 
           Thor::Maxima.new(max_desc, max_usage, max_opts)
         end

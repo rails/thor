@@ -171,6 +171,52 @@ class Thor
       $stderr.puts e.message
     end
 
+    def help(meth=nil)
+      if meth
+        task = self.class.tasks[meth]
+
+        puts "Usage:"
+        puts "  #{task.formatted_usage(true)}"
+        puts
+        puts "Global options:"
+        self.class_options.values.each do |option|
+          print "  " + option.usage
+
+          if option.description
+            puts " " + option.description
+          else
+            puts
+          end
+        end
+        puts
+        puts "Description:"
+        puts "  #{task.description}"
+      else
+        puts "Global options:"
+
+        self.class_options.values.each do |option|
+          print "  " + option.usage
+
+          if option.description
+            puts " " + option.description
+          else
+            puts
+          end
+        end
+
+        puts
+        puts "Tasks:"
+
+        # maxima = namespace + usage + options
+
+        self.all_tasks.each do |_, task|
+          format = "%-" + (self.maxima.usage + self.maxima.options + 4).to_s + "s"
+          print format % ("#{task.formatted_usage(false)}")
+          puts  task.description.split("\n").first
+        end
+      end
+    end
+
     protected
 
       # Receives a task name (can be nil), and try to get a map from it.
@@ -186,20 +232,20 @@ class Thor
 
   map HELP_MAPPINGS => :help
 
-  desc "help [TASK]", "describe available tasks or one specific task"
-  def help(task = nil)
+  desc "help [TASK]", "Describe available tasks or one specific task"
+  def help(task=nil)
     if task
       task = self.class.tasks[task]
-      namespace = task.include?(?:)
+      namespace = task.include?(?:) ? self : nil
 
-      puts task.formatted_usage(self, namespace)
+      puts task.formatted_usage(namespace)
       puts task.description
     else
       puts "Options"
       puts "-------"
       self.class.all_tasks.each do |_, task|
         format = "%-" + (self.class.maxima.usage + self.class.maxima.options + 4).to_s + "s"
-        print format % ("#{task.formatted_usage(self, false)}")
+        print format % ("#{task.formatted_usage}")
         puts  task.description.split("\n").first
       end
     end

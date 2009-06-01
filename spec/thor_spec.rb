@@ -67,7 +67,7 @@ describe Thor do
     end
 
     it "provides useful help info for the help method itself" do
-      @content.must =~ /help \[TASK\] +describe available tasks/
+      @content.must =~ /help \[TASK\] +Describe available tasks/
     end
 
     it "provides useful help info for a simple method" do

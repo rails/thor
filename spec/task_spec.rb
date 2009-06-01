@@ -14,15 +14,14 @@ describe Thor::Task do
       task('foo' => true, :bar => :required).formatted_usage.must == "can_has --bar=BAR [--foo]"
     end
 
-    it "includes class options if a class is given" do
-      klass = mock!.class_options{{ :bar => Thor::Option.parse(:bar, :required) }}.subject
-      task('foo' => true).formatted_usage(klass, false).must == "can_has --bar=BAR [--foo]"
+    it "includes namespace within usage" do
+      stub(Object).namespace{ "foo" }
+      task(:bar => :required).formatted_usage(Object).must == "foo:can_has --bar=BAR"
     end
 
-    it "includes namespace within usage" do
-      stub(Object).class_options{{ :bar => Thor::Option.parse(:bar, :required) }}
-      stub(Object).namespace{ "string" }
-      task.formatted_usage(Object, true).must == "string:can_has --bar=BAR"
+    it "removes default from namespace beginning" do
+      stub(Object).namespace{ "default:foo" }
+      task(:bar => :required).formatted_usage(Object).must == ":foo:can_has --bar=BAR"
     end
   end
 
@@ -31,7 +30,7 @@ describe Thor::Task do
       Thor::Task.dynamic('task').name.must == 'task'
       Thor::Task.dynamic('task').description.must == 'A dynamically-generated task'
       Thor::Task.dynamic('task').usage.must == 'task'
-      Thor::Task.dynamic('task').options.must be_nil
+      Thor::Task.dynamic('task').options.must == {}
     end
   end
 

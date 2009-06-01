@@ -14,8 +14,8 @@ describe Thor::Options do
     @opt.parse(args.flatten)
   end
 
-  def usage(only_arguments=false)
-    @opt.formatted_usage(only_arguments)
+  def usage
+    @opt.formatted_usage
   end
 
   def sorted_usage
@@ -360,11 +360,6 @@ describe Thor::Options do
     it "outputs arguments first" do
       create "--repo" => :required, "--branch" => Thor::Argument.new(:branch), "-n" => 6
       usage.must == "BRANCH --repo=REPO [-n=6]"
-    end
-
-    it "outputs only arguments" do
-      create "--repo" => :required, "--branch" => Thor::Argument.new(:branch), "-n" => 6
-      usage(true).must == "BRANCH"
     end
   end
 end

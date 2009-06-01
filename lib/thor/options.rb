@@ -106,10 +106,9 @@ class Thor
       @options
     end
 
-    def formatted_usage(only_arguments=false)
+    def formatted_usage
       options = @switches.values
       options.sort!
-      options.reject!{ |o| !o.argument? } if only_arguments
       options.map!{ |o| o.usage }
       options.join(' ')
     end
