@@ -6,6 +6,7 @@ require 'thor'
 require 'thor/generator'
 require 'stringio'
 require 'rubygems'
+require 'rr'
 
 # Load fixtures
 load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
