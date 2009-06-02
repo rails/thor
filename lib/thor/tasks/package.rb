@@ -1,18 +1,31 @@
-require "thor/task"
+require "fileutils"
 
-class Thor::PackageTask < Thor::Task
-  attr_accessor :spec
-  attr_accessor :opts
-
-  def initialize(gemspec, opts = {})
-    super(:package, "build a gem package")
-    @spec = gemspec
-    @opts = {:dir => File.join(Dir.pwd, "pkg")}.merge(opts)
+class Thor
+  # Creates a package task.
+  #
+  # ==== Parameters
+  # spec<Gem::Specification>
+  #
+  # ==== Options
+  # :dir - The package directory. Defaults to ./pkg.
+  #
+  def self.package_task(spec, options={})
+    tasks['package'] = Thor::PackageTask.new(spec, options)
   end
 
-  def run
-    FileUtils.mkdir_p(@opts[:dir])
-    Gem::Builder.new(spec).build
-    FileUtils.mv(spec.file_name, File.join(@opts[:dir], spec.file_name))
+  class PackageTask < Task
+    attr_accessor :spec, :config
+
+    def initialize(gemspec, config={})
+      super(:package, "Build a gem package", "package", {})
+      @spec   = gemspec
+      @config = {:dir => File.join(Dir.pwd, "pkg")}.merge(config)
+    end
+
+    def run(instance, args=[])
+      FileUtils.mkdir_p(config[:dir])
+      Gem::Builder.new(spec).build
+      FileUtils.mv(spec.file_name, File.join(config[:dir], spec.file_name))
+    end
   end
 end

@@ -203,7 +203,9 @@ describe Thor::Option do
 
       it "returns usage for hash types" do
         value = parse(:foo, { :a => :b, :c => :d }).usage
-        value.split(" ").sort.join(" ").must == "[--foo=a:b c:d]"
+        value.must =~ /\[-\-foo=/
+        value.must =~ /a:b/
+        value.must =~ /c:d/
       end
 
       it "returns usage for boolean types" do

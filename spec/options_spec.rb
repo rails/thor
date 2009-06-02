@@ -40,8 +40,8 @@ describe Thor::Options do
     end
 
     it "joins several values" do
-      switches = Thor::Options.to_switches(:color => true, :foo => "bar")
-      switches.split("--").sort.join("--").must == %{--color --foo "bar"}
+      switches = Thor::Options.to_switches(:color => true, :foo => "bar").split(' ').sort
+      switches.must == ['"bar"', "--color", "--foo"]
     end
   end
 
