@@ -4,12 +4,12 @@ require 'thor/runner'
 describe Thor::Runner do
   describe "#help" do
     it "shows information about Thor::Runner itself" do
-      capture(:stdout){ Thor::Runner.start(["help"]) }.must =~ /list the available thor tasks/
+      capture(:stdout){ Thor::Runner.start(["help"]) }.must =~ /List the available thor tasks/
     end
 
     it "shows information about an specific Thor::Runner task" do
       content = capture(:stdout){ Thor::Runner.start(["help", "list"]) }
-      content.must =~ /list the available thor tasks/
+      content.must =~ /List the available thor tasks/
       content.must_not =~ /help \[TASK\]/
     end
 

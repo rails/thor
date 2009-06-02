@@ -269,5 +269,11 @@ class Thor
       end
     end
 
+    # Where to look for Thor files.
+    #
+    def self.globs_for(path)
+      ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
+    end
+
   end
 end
