@@ -71,15 +71,15 @@ class Thor::Runner < Thor
       as = name if as.empty?
     end
 
-    FileUtils.mkdir_p(thor_root)
-    FileUtils.touch(File.join(thor_root, "thor.yml"))
-
-    yaml_file = File.join(thor_root, "thor.yml")
-    FileUtils.touch(yaml_file)
+    location = if options[:relative] || File.exists?(name) || name =~ /^http:\/\//
+      name
+    else
+      File.expand_path(name)
+    end
 
     thor_yaml[as] = {
       :filename  => Digest::MD5.hexdigest(name + as),
-      :location  => (options[:relative] || File.exists?(name)) ? name : File.expand_path(name),
+      :location  => location,
       :constants => Thor::Util.constants_in_contents(contents, base)
     }
 
@@ -125,10 +125,7 @@ class Thor::Runner < Thor
   desc "installed", "List the installed Thor modules and tasks"
   method_options :internal => :boolean
   def installed
-    thor_root_glob.each do |f|
-      next if f =~ /thor\.yml$/
-      Thor::Util.load_thorfile(f) unless Thor::Base.subclass_files.keys.include?(File.expand_path(f))
-    end
+    initialize_thorfiles(nil, true)
 
     klasses = Thor::Base.subclasses
     klasses -= [Thor, Thor::Runner] unless options["internal"]
@@ -138,9 +135,7 @@ class Thor::Runner < Thor
 
   desc "list [SEARCH]",
        "List the available thor tasks (--substring means SEARCH anywhere in the namespace)"
-  method_options :substring => :boolean,
-                 :group     => :optional,
-                 :all       => :boolean
+  method_options :substring => :boolean, :group => :optional, :all => :boolean
   def list(search="")
     initialize_thorfiles
     search = ".*#{search}" if options["substring"]
@@ -161,10 +156,6 @@ class Thor::Runner < Thor
       Thor::Util.thor_root
     end
 
-    def thor_root_glob
-      Thor::Util.thor_root_glob
-    end
-
     def thor_yaml
       @thor_yaml ||= begin
         yaml_file = File.join(thor_root, "thor.yml")
@@ -173,13 +164,29 @@ class Thor::Runner < Thor
       end
     end
 
+    # Save the yaml file. If none exists in thor root, creates one.
+    #
     def save_yaml(yaml)
       yaml_file = File.join(thor_root, "thor.yml")
+
+      unless File.exists?(yaml_file)
+        FileUtils.mkdir_p(thor_root)
+        yaml_file = File.join(thor_root, "thor.yml")
+        FileUtils.touch(yaml_file)
+      end
+
       File.open(yaml_file, "w") { |f| f.puts yaml.to_yaml }
     end
 
-    def initialize_thorfiles(relevant_to = nil)
-      thorfiles(relevant_to).each do |f|
+    # Load the thorfiles. If relevant_to is supplied, looks for specific files
+    # in the thor_root instead of loading them all.
+    #
+    # By default, it also traverses the current path until find Thor files, as
+    # described in thorfiles. This look up can be skipped by suppliying
+    # skip_lookup true.
+    #
+    def initialize_thorfiles(relevant_to=nil, skip_lookup=false)
+      thorfiles(relevant_to, skip_lookup).each do |f|
         Thor::Util.load_thorfile(f) unless Thor::Base.subclass_files.keys.include?(File.expand_path(f))
       end
     end
@@ -206,15 +213,17 @@ class Thor::Runner < Thor
     # 4. c:\Documents and Settings
     # 5. c:\ <-- no Thorfiles found!
     #
-    def thorfiles(relevant_to=nil)
+    def thorfiles(relevant_to=nil, skip_lookup=false)
       thorfiles = []
 
-      Pathname.pwd.ascend do |path|
-        thorfiles = Thor::Util.globs_for(path).map { |g| Dir[g] }.flatten
-        break unless thorfiles.empty?
+      unless skip_lookup
+        Pathname.pwd.ascend do |path|
+          thorfiles = Thor::Util.globs_for(path).map { |g| Dir[g] }.flatten
+          break unless thorfiles.empty?
+        end
       end
 
-      files  = (relevant_to ? thorfiles_relevant_to(relevant_to) : thor_root_glob)
+      files  = (relevant_to ? thorfiles_relevant_to(relevant_to) : Thor::Util.thor_root_glob)
       files += thorfiles
       files -= ["#{thor_root}/thor.yml"]
 
@@ -223,6 +232,10 @@ class Thor::Runner < Thor
       end
     end
 
+    # Load thorfiles relevant to the given method. If you provide "foo:bar" it
+    # will load all thor files in the thor.yaml that has "foo" e "foo:bar"
+    # namespaces registered.
+    #
     def thorfiles_relevant_to(meth)
       thor_class      = Thor::Util.namespace_to_constant_name(meth.split(":")[0...-1].join(":"))
       generator_class = Thor::Util.namespace_to_constant_name(meth)
@@ -232,37 +245,36 @@ class Thor::Runner < Thor
       end.map { |k, v| File.join(thor_root, "#{v[:filename]}") }
     end
 
+    # Display class information about the loaded tasks.
+    #
     def display_klasses(with_modules=false, klasses=Thor.subclasses)
       klasses -= [Thor, Thor::Runner] unless with_modules
       raise Error, "No Thor tasks available" if klasses.empty?
 
       if with_modules && !thor_yaml.empty?
-        max_name = thor_yaml.max { |x, y| x[0].to_s.size <=> y[0].to_s.size }.first.size
-        modules_label    = "Modules"
-        namespaces_label = "Namespaces"
-        column_width     = [max_name + 4, modules_label.size + 1].max
+        table  = []
+        labels = ["Modules", "Namespaces"]
 
-        print "%-#{column_width}s" % modules_label
-        puts namespaces_label
-        print "%-#{column_width}s" % ("-" * modules_label.size)
-        puts "-" * namespaces_label.size
+        table << labels
+        table << [ "-" * labels[0].size, "-" * labels[1].size ]
 
         thor_yaml.each do |name, info|
-          print "%-#{column_width}s" % name
-          puts info[:constants].map { |c| Thor::Util.constant_to_namespace(c) }.join(", ")
+          table << [ name, info[:constants].map { |c| Thor::Util.constant_to_namespace(c) }.join(", ") ]
         end
 
+        Thor::Util.print_table(table)
         puts
       end
 
       unless klasses.empty?
         klasses.each { |k| display_tasks(k) }
-        puts # add some spacing
       else
         puts "\033[1;34mNo Thor tasks available\033[0m"
       end
     end
 
+    # Display tasks from the given Thor class.
+    #
     def display_tasks(klass)
       unless klass.tasks.empty?
         base = klass.namespace

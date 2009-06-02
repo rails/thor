@@ -173,33 +173,44 @@ describe Thor::Util do
       list    = [ %w(a 1), %w(b 2), %w(c 3) ]
       content = capture(:stdout){ Thor::Util.print_list(list) }
 
-      content.must =~ /^  a +# 1/
-      content.must =~ /^  b +# 2/
-      content.must =~ /^  c +# 3/
+      content.must =~ /^  a +# 1$/
+      content.must =~ /^  b +# 2$/
+      content.must =~ /^  c +# 3$/
     end
 
-    it "does not show description if it's no available" do
+    it "does not show description if it's not available" do
       list    = [ %w(a 1), ["b", nil], %w(c 3) ]
       content = capture(:stdout){ Thor::Util.print_list(list) }
       content.must =~ /^  b +$/
-    end
-
-    it "calculates the maximum size from each item and use it as padding" do
-      list    = [ %w(a 1), %w(foo 2), %w(c 3) ]
-      content = capture(:stdout){ Thor::Util.print_list(list) }.split("\n")
-
-      content[0].size.must == 11
-      content[1].size.must == 11
-      content[2].size.must == 11
     end
 
     it "skips spacing if required" do
       list    = [ %w(a 1), %w(b 2), %w(c 3) ]
       content = capture(:stdout){ Thor::Util.print_list(list, :skip_spacing => true) }
 
-      content.must =~ /^a +# 1/
-      content.must =~ /^b +# 2/
-      content.must =~ /^c +# 3/
+      content.must =~ /^a +# 1$/
+      content.must =~ /^b +# 2$/
+      content.must =~ /^c +# 3$/
+    end
+  end
+
+  describe "#print_table" do
+    it "prints each item on the table" do
+      table   = [ %w(a 1), %w(b 2), %w(c 3) ]
+      content = capture(:stdout){ Thor::Util.print_table(table) }
+
+      content.must =~ /^a   1$/
+      content.must =~ /^b   2$/
+      content.must =~ /^c   3$/
+    end
+
+    it "calculates the maximum size from each item and use it as padding" do
+      table    = [ %w(a 1), %w(foo 2), %w(c 3) ]
+      content = capture(:stdout){ Thor::Util.print_table(table) }.split("\n")
+
+      content[0].size.must == 7
+      content[1].size.must == 7
+      content[2].size.must == 7
     end
   end
 
