@@ -3,58 +3,6 @@ require 'thor/base'
 
 class Thor
 
-  # Invokes a task.
-  #
-  # ==== Errors
-  # Thor::Error:: A Thor error is raised if the user called an undefined task
-  #               or called an exisisting task wrongly.
-  #
-  def invoke(meth, *args)
-    super
-  rescue ArgumentError => e
-    backtrace = sans_backtrace(e.backtrace, caller)
-
-    if backtrace.empty?
-      task = self.class[meth]
-      raise Error, "'#{meth}' was called incorrectly. Call as '#{task.formatted_usage(self.class)}'"
-    else
-      raise e
-    end
-  rescue NoMethodError => e
-    if e.message =~ /^undefined method `#{meth}' for #{Regexp.escape(self.inspect)}$/
-      raise Error, "The #{self.class.namespace} namespace doesn't have a '#{meth}' task"
-    else
-      raise e
-    end
-  end
-
-  # Implement the hooks required by Thor::Base.
-  #
-  class << self
-    protected
-      def baseclass
-        Thor
-      end
-
-      def valid_task?(meth)
-        public_instance_methods.include?(meth) && @usage && @desc
-      end
-
-      def create_task(meth)
-        tasks[meth.to_s] = Thor::Task.new(meth, @desc, @usage, method_options)
-        @usage, @desc, @method_options = nil
-      end
-
-      def initialize_added
-        class_options.merge!(method_options)
-        @method_options = nil
-      end
-  end
-
-  include Thor::Base
-
-  # Implement specific Thor methods.
-  #
   class << self
 
     # Sets the default task when thor is executed without an explicit task to be called.
@@ -216,16 +164,34 @@ class Thor
 
     protected
 
+      def baseclass #:nodoc:
+        Thor
+      end
+
+      def valid_task?(meth) #:nodoc:
+        public_instance_methods.include?(meth) && @usage && @desc
+      end
+
+      def create_task(meth) #:nodoc:
+        tasks[meth.to_s] = Thor::Task.new(meth, @desc, @usage, method_options)
+        @usage, @desc, @method_options = nil
+      end
+
+      def initialize_added #:nodoc:
+        class_options.merge!(method_options)
+        @method_options = nil
+      end
+
       # Receives a task name (can be nil), and try to get a map from it.
       # If a map can't be found use the sent name or the default task.
       #
-      def normalize_task_name(meth)
+      def normalize_task_name(meth) #:nodoc:
         mapping = map[meth.to_s]
         meth = mapping || meth || default_task
         meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
       end
 
-      def options_help
+      def options_help #:nodoc:
         unless self.class_options.empty?
           list = self.class_options.map do |_, option|
             [ option.usage, option.description ]
@@ -236,8 +202,34 @@ class Thor
           puts
         end
       end
-
   end
+
+  # Invokes a task.
+  #
+  # ==== Errors
+  # Thor::Error:: A Thor error is raised if the user called an undefined task
+  #               or called an exisisting task wrongly.
+  #
+  def invoke(meth, *args)
+    super
+  rescue ArgumentError => e
+    backtrace = sans_backtrace(e.backtrace, caller)
+
+    if backtrace.empty?
+      task = self.class[meth]
+      raise Error, "'#{meth}' was called incorrectly. Call as '#{task.formatted_usage(self.class)}'"
+    else
+      raise e
+    end
+  rescue NoMethodError => e
+    if e.message =~ /^undefined method `#{meth}' for #{Regexp.escape(self.inspect)}$/
+      raise Error, "The #{self.class.namespace} namespace doesn't have a '#{meth}' task"
+    else
+      raise e
+    end
+  end
+
+  include Thor::Base
 
   map HELP_MAPPINGS => :help
 
