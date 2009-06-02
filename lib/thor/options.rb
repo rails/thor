@@ -15,6 +15,23 @@ class Thor
     SHORT_SQ_RE = /^-([a-z]{2,})$/i # Allow either -x -v or -xv style for single char args
     SHORT_NUM   = /^(-[a-z])#{NUMERIC}$/i
 
+    # Receives a hash and makes it switches.
+    #
+    def self.to_switches(options)
+      options.map do |key, value|
+        case value
+          when true
+            "--#{key}"
+          when Array
+            value.map {|v| "--#{key} #{v.inspect}"}.join(" ")
+          when nil, false
+            ""
+          else
+            "--#{key} #{value.inspect}"
+        end
+      end.join(" ")
+    end
+
     attr_reader :arguments, :options, :trailing
 
     # Takes an array of switches. Each array consists of up to three

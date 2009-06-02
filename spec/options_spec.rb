@@ -22,6 +22,29 @@ describe Thor::Options do
     usage.split(" ").sort.join(" ")
   end
 
+  describe "#to_switches" do
+    it "turns true values into a flag" do
+      Thor::Options.to_switches(:color => true).must == "--color"
+    end
+
+    it "ignores nil" do
+      Thor::Options.to_switches(:color => nil).must == ""
+    end
+
+    it "ignores false" do
+      Thor::Options.to_switches(:color => false).must == ""
+    end
+
+    it "writes --name value for anything else" do
+      Thor::Options.to_switches(:format => "specdoc").must == %{--format "specdoc"}
+    end
+
+    it "joins several values" do
+      switches = Thor::Options.to_switches(:color => true, :foo => "bar")
+      switches.split("--").sort.join("--").must == %{--color --foo "bar"}
+    end
+  end
+
   describe "#initialize" do
     it "automatically aliases long switches with their first letter" do
       create "--foo" => true
