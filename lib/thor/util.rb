@@ -231,5 +231,43 @@ class Thor
         puts
       end
     end
+
+    # Returns the root where thor files are located, dependending on the OS.
+    #
+    def self.thor_root
+      return File.join(ENV["HOME"], '.thor') if ENV["HOME"]
+
+      if ENV["HOMEDRIVE"] && ENV["HOMEPATH"]
+        return File.join(ENV["HOMEDRIVE"], ENV["HOMEPATH"], '.thor')
+      end
+
+      return File.join(ENV["APPDATA"], '.thor') if ENV["APPDATA"]
+
+      begin
+        File.expand_path("~")
+      rescue
+        if File::ALT_SEPARATOR
+          "C:/"
+        else
+          "/"
+        end
+      end
+    end
+
+    # Returns the files in the thor root. On Windows thor_root will be something
+    # like this:
+    #
+    #   C:\Documents and Settings\james\.thor
+    #
+    # If we don't #gsub the \ character, Dir.glob will fail.
+    #
+    def self.thor_root_glob
+      files = Dir["#{thor_root.gsub(/\\/, '/')}/*"]
+
+      files.map! do |file|
+        File.directory?(file) ? File.join(file, "main.thor") : file
+      end
+    end
+
   end
 end

@@ -25,38 +25,6 @@ class Thor::Runner < Thor
     klass.start(args)
   end
 
-  def self.thor_root
-    return File.join(ENV["HOME"], '.thor') if ENV["HOME"]
-
-    if ENV["HOMEDRIVE"] && ENV["HOMEPATH"] then
-      return File.join(ENV["HOMEDRIVE"], ENV["HOMEPATH"], '.thor')
-    end
-    
-    return File.join(ENV["APPDATA"], '.thor') if ENV["APPDATA"]
-
-    begin
-      File.expand_path("~")
-    rescue
-      if File::ALT_SEPARATOR then
-        "C:/"
-      else
-        "/"
-      end
-    end
-  end
-
-  def self.thor_root_glob
-    # On Windows thor_root will be something like this:
-    #
-    #   C:\Documents and Settings\james\.thor
-    #
-    # If we don't #gsub the \ character, Dir.glob will fail.
-    files = Dir["#{thor_root.gsub(/\\/, '/')}/*"]
-    files.map! do |file|
-      File.directory?(file) ? File.join(file, "main.thor") : file
-    end
-  end
-
   def self.globs_for(path)
     ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
   end
@@ -64,11 +32,11 @@ class Thor::Runner < Thor
   private
 
   def thor_root
-    self.class.thor_root
+    Thor::Util.thor_root
   end
 
   def thor_root_glob
-    self.class.thor_root_glob
+    Thor::Util.thor_root_glob
   end
 
   def initialize_thorfiles(relevant_to = nil)

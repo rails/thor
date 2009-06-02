@@ -202,4 +202,46 @@ describe Thor::Util do
       content.must =~ /^c +# 3/
     end
   end
+
+  describe "#thor_root" do
+    before(:each) do
+      stub(ENV)[]
+    end
+
+    it "returns the user path if none variable is set on the environment" do
+      Thor::Util.thor_root.must == "/home/jose"
+    end
+
+    it "returns the *unix system path if file cannot be expanded and separator does not exist" do
+      stub(File).expand_path("~"){ raise }
+      previous_value = File::ALT_SEPARATOR
+      capture(:stderr){ File.const_set(:ALT_SEPARATOR, false) }
+      Thor::Util.thor_root.must == "/"
+      capture(:stderr){ File.const_set(:ALT_SEPARATOR, previous_value) }
+    end
+
+    it "returns the windows system path if file cannot be expanded and a separator exists" do
+      stub(File).expand_path("~"){ raise }
+      previous_value = File::ALT_SEPARATOR
+      capture(:stderr){ File.const_set(:ALT_SEPARATOR, true) }
+      Thor::Util.thor_root.must == "C:/"
+      capture(:stderr){ File.const_set(:ALT_SEPARATOR, previous_value) }
+    end
+
+    it "returns HOME/.thor if set" do
+      stub(ENV)["HOME"].returns{ "/home/user" }
+      Thor::Util.thor_root.must == "/home/user/.thor"
+    end
+
+    it "returns path with HOMEDRIVE and HOMEPATH if set" do
+      stub(ENV)["HOMEDRIVE"].returns{ "D:/" }
+      stub(ENV)["HOMEPATH"].returns{ "Documents and Settings/James" }
+      Thor::Util.thor_root.must == "D:/Documents and Settings/James/.thor"
+    end
+
+    it "returns APPDATA/.thor if set" do
+      stub(ENV)["APPDATA"].returns{ "/home/user" }
+      Thor::Util.thor_root.must == "/home/user/.thor"
+    end
+  end
 end

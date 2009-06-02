@@ -140,7 +140,7 @@ describe Thor::Runner do
   describe "update" do
     it "updates existing thor files" do
       mock.instance_of(Thor::Runner).install(@original_yaml["random"][:location]) { true }
-      mock(File).delete(File.join(Thor::Runner.thor_root, @original_yaml["random"][:filename]))
+      mock(File).delete(File.join(Thor::Util.thor_root, @original_yaml["random"][:filename]))
     
       silence(:stdout) { Thor::Runner.start(["update", "random"]) }
     end
