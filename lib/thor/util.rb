@@ -155,7 +155,9 @@ class Thor
     end
 
     # Receives a namespace and tries to retrieve a Thor or Thor::Generator class
-    # from it. If a Thor class is found, also returns the task.
+    # from it. It first searches for a class using the all the given namespace,
+    # if it's not found, removes the highest entry and searches for the class
+    # again. If found, returns the highest entry as the class name.
     #
     # ==== Examples
     #
@@ -167,6 +169,7 @@ class Thor
     #   class Baz::Foo < Thor::Generator
     #   end
     #
+    #   Thor::Util.namespace_to_thor_class("foo:bar")     #=> Foo::Bar, nil # will invoke default task
     #   Thor::Util.namespace_to_thor_class("baz:foo")     #=> Baz::Foo, nil
     #   Thor::Util.namespace_to_thor_class("foo:bar:baz") #=> Foo::Bar, "baz"
     #
@@ -180,13 +183,13 @@ class Thor
     #               inherit from Thor or Thor::Generator.
     #
     def self.namespace_to_thor_class(namespace)
-      generator = Thor::Util.namespace_to_constant(namespace) rescue nil
+      klass = Thor::Util.namespace_to_constant(namespace) rescue nil
 
-      if generator
-        raise Error, "'#{generator}' is not a Thor::Generator class" unless generator <= Thor::Generator
-        return generator, nil
+      if klass
+        return klass, nil if klass <= Thor || klass <= Thor::Generator
+        raise Error, "'#{klass}' is not a Thor or Thor::Generator class"
       elsif !namespace.include?(?:)
-        raise Error, "could not find generator or task '#{namespace}'"
+        raise Error, "could not find Thor class or task '#{namespace}'"
       end
 
       namespace = namespace.split(":")

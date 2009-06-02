@@ -64,6 +64,11 @@ describe Thor::Runner do
     ARGV.replace ["list"]
     capture(:stdout) { Thor::Runner.start }.must_not =~ /my_tasks:thor_task:help/
   end
+
+  it "invokes other thor classes" do
+    ARGV.replace ["thor"]
+    capture(:stdout) { Thor::Runner.start }.must =~ /help \[TASK\] +# Describe/
+  end
   
   it "runs tasks from other Thor files" do
     ARGV.replace ["my_tasks:thor_task:foo"]
@@ -72,7 +77,7 @@ describe Thor::Runner do
   
   it "prints an error if a toplevel thor task is not found" do
     ARGV.replace ["hello"]
-    capture(:stderr) { Thor::Runner.start }.must =~ /could not find generator or task 'hello'/
+    capture(:stderr) { Thor::Runner.start }.must =~ /could not find Thor class or task 'hello'/
   end
   
   it "prints an error if the namespace could not be found" do

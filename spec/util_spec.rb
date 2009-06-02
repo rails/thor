@@ -131,8 +131,12 @@ describe Thor::Util do
   end
 
   describe "#namespace_to_thor_class" do
-    it "returns a Thor::Generator class and the task name" do
+    it "returns a Thor::Generator class if full namespace matches" do
       Thor::Util.namespace_to_thor_class("my_counter").must == [MyCounter, nil]
+    end
+
+    it "returns a Thor class if full namespace matches" do
+      Thor::Util.namespace_to_thor_class("thor").must == [Thor, nil]
     end
 
     it "returns a Thor class and the task name" do
@@ -140,16 +144,16 @@ describe Thor::Util do
     end
 
     describe 'errors' do
-      it "raises an error if the task does not inherit from Thor::Generator" do
+      it "raises an error if the task does not inherit from Thor" do
         lambda {
           Thor::Util.namespace_to_thor_class("object")
-        }.must raise_error(Thor::Error, "'Object' is not a Thor::Generator class")
+        }.must raise_error(Thor::Error, "'Object' is not a Thor or Thor::Generator class")
       end
 
-      it "raises an error if the task or generator can't be found" do
+      it "raises an error if the Thor class or task can't be found" do
         lambda {
           Thor::Util.namespace_to_thor_class("foobar")
-        }.must raise_error(Thor::Error, "could not find generator or task 'foobar'")
+        }.must raise_error(Thor::Error, "could not find Thor class or task 'foobar'")
       end
 
       it "raises an error if the task does not inherit from Thor" do

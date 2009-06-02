@@ -13,7 +13,8 @@ class Thor::Runner < Thor
     meth = meth.to_s
     initialize_thorfiles(meth)
     klass, task = Thor::Util.namespace_to_thor_class(meth)
-    klass.start(args.unshift(task).compact)
+    args.unshift(task) if task
+    klass.start(args)
   end
 
   def self.thor_root
