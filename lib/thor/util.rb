@@ -126,7 +126,7 @@ class Thor
     # ==== Returns
     # Array[Object]
     #
-    def self.constants_in_contents(contents, file=__FILE__)
+    def self.namespaces_in_contents(contents, file=__FILE__)
       old_constants = Thor::Base.subclasses.dup
       Thor::Base.subclasses.clear
 
@@ -135,9 +135,9 @@ class Thor
       new_constants = Thor::Base.subclasses.dup
       Thor::Base.subclasses.replace(old_constants)
 
-      new_constants.map do |constant|
-        constant.name.gsub(/^Thor::Sandbox::/, '')
-      end
+      new_constants.map!{ |c| c.namespace }
+      new_constants.compact!
+      new_constants
     end
 
     # Receives a string and convert it to snake case. SnakeCase returns snake_case.
@@ -256,6 +256,24 @@ class Thor
         print second
         puts
       end
+    end
+
+    # Receives a yaml (hash) and updates all constants entries to namespace.
+    # This was added to deal with deprecated versions of Thor.
+    #
+    # ==== Returns
+    # TrueClass|FalseClass:: Returns true if any change to the yaml file was made.
+    #
+    def self.convert_constants_to_namespaces(yaml)
+      yaml_changed = false
+
+      yaml.each do |k, v|
+        next unless v[:constants] && v[:namespaces].nil?
+        yaml_changed = true
+        yaml[k][:namespaces] = v[:constants].map{|c| Thor::Util.constant_to_namespace(c)}
+      end
+
+      yaml_changed
     end
 
     # Returns the root where thor files are located, dependending on the OS.

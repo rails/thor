@@ -102,7 +102,9 @@ describe Thor::Runner do
         }
       }
 
+      # Stub load and save to avoid thor.yaml from being overwritten
       stub(YAML).load_file { @original_yaml }
+      stub(File).open(File.join(Thor::Util.thor_root, "thor.yml"), "w")
     end
 
     describe "list" do
@@ -144,6 +146,11 @@ describe Thor::Runner do
       it "runs tasks with an empty namespace from the default namespace" do
         ARGV.replace [":test"]
         capture(:stdout) { Thor::Runner.start }.must == "test\n"
+      end
+
+      it "updates the yaml file when invoked" do
+        capture(:stdout) { Thor::Runner.start(["list"]) }
+        @original_yaml["random"][:namespaces].must == ["amazing"]
       end
     end
 
@@ -191,8 +198,6 @@ describe Thor::Runner do
         stub(FileUtils).touch
 
         mock(File).open(File.join(Thor::Util.thor_root, Digest::MD5.hexdigest(@location + "randomness")), "w")
-        mock(File).open(File.join(Thor::Util.thor_root, "thor.yml"), "w")
-
         silence(:stdout) { Thor::Runner.start }
       end
     end

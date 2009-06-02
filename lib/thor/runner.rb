@@ -78,9 +78,9 @@ class Thor::Runner < Thor
     end
 
     thor_yaml[as] = {
-      :filename  => Digest::MD5.hexdigest(name + as),
-      :location  => location,
-      :constants => Thor::Util.constants_in_contents(contents, base)
+      :filename   => Digest::MD5.hexdigest(name + as),
+      :location   => location,
+      :namespaces => Thor::Util.namespaces_in_contents(contents, base)
     }
 
     save_yaml(thor_yaml)
@@ -214,6 +214,9 @@ class Thor::Runner < Thor
     # 5. c:\ <-- no Thorfiles found!
     #
     def thorfiles(relevant_to=nil, skip_lookup=false)
+      # Deal with deprecated thor when :namespaces: is available as constants
+      save_yaml(thor_yaml) if Thor::Util.convert_constants_to_namespaces(thor_yaml)
+
       thorfiles = []
 
       unless skip_lookup
@@ -237,15 +240,18 @@ class Thor::Runner < Thor
     # namespaces registered.
     #
     def thorfiles_relevant_to(meth)
-      thor_class      = Thor::Util.namespace_to_constant_name(meth.split(":")[0...-1].join(":"))
-      generator_class = Thor::Util.namespace_to_constant_name(meth)
+      lookup = [ meth, meth.split(":")[0...-1].join(":") ]
 
-      thor_yaml.select do |k, v|
-        v[:constants] && (v[:constants].include?(thor_class) || v[:constants].include?(generator_class))
-      end.map { |k, v| File.join(thor_root, "#{v[:filename]}") }
+      files = thor_yaml.select do |k, v|
+        v[:namespaces] && !(v[:namespaces] & lookup).empty?
+      end
+
+      files.map! { |k, v| File.join(thor_root, "#{v[:filename]}") }
+      files
     end
 
-    # Display class information about the loaded tasks.
+    # Display information about the given klasses. If with_module is given,
+    # it shows a table with information extracted from the yaml file.
     #
     def display_klasses(with_modules=false, klasses=Thor.subclasses)
       klasses -= [Thor, Thor::Runner] unless with_modules
@@ -259,7 +265,7 @@ class Thor::Runner < Thor
         table << [ "-" * labels[0].size, "-" * labels[1].size ]
 
         thor_yaml.each do |name, info|
-          table << [ name, info[:constants].map { |c| Thor::Util.constant_to_namespace(c) }.join(", ") ]
+          table << [ name, info[:namespaces].join(", ") ]
         end
 
         Thor::Util.print_table(table)

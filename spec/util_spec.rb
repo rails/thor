@@ -92,16 +92,17 @@ describe Thor::Util do
     end
   end
 
-  describe "#constants_in_contents" do
+  describe "#namespaces_in_contents" do
     it "returns an array of names of constants defined in the string" do
-      list = Thor::Util.constants_in_contents("class Foo; class Bar < Thor; end; end; class Baz; class Bat; end; end")
-      list.must include("Foo::Bar")
-      list.must_not include("Baz::Bat")
+      list = Thor::Util.namespaces_in_contents("class Foo; class Bar < Thor; end; end; class Baz; class Bat; end; end")
+      list.must include("foo:bar")
+      list.must_not include("bar:bat")
     end
 
     it "doesn't put the newly-defined constants in the enclosing namespace" do
-      Thor::Util.constants_in_contents("class Blat; end")
+      Thor::Util.namespaces_in_contents("class Blat; end")
       defined?(Blat).must_not be
+      defined?(Thor::Sandbox::Blat).must be
     end
   end
 
@@ -253,6 +254,30 @@ describe Thor::Util do
     it "returns APPDATA/.thor if set" do
       stub(ENV)["APPDATA"].returns{ "/home/user" }
       Thor::Util.thor_root.must == "/home/user/.thor"
+    end
+  end
+
+  describe "#convert_constants_to_namespaces" do
+    before(:each) do
+      @hash = {
+        :git => {
+          :constants => [Object, "Thor::Sandbox::Package", Thor::CoreExt::OrderedHash]
+        }
+      }
+    end
+
+    it "converts constants in the hash to namespaces" do
+      Thor::Util.convert_constants_to_namespaces(@hash)
+      @hash[:git][:namespaces].must == [ "object", "package", "thor:core_ext:ordered_hash" ]
+    end
+
+    it "returns true if the hash changed" do
+      Thor::Util.convert_constants_to_namespaces(@hash).must be_true
+    end
+
+    it "does not add namespaces to the hash if namespaces were already added" do
+      Thor::Util.convert_constants_to_namespaces(@hash)
+      Thor::Util.convert_constants_to_namespaces(@hash).must be_false
     end
   end
 end
