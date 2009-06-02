@@ -143,13 +143,13 @@ describe Thor::Util do
       Thor::Util.namespace_to_thor_class("thor:help").must == [Thor, "help"]
     end
 
-    describe 'errors' do
-      it "raises an error if the task does not inherit from Thor" do
-        lambda {
-          Thor::Util.namespace_to_thor_class("object")
-        }.must raise_error(Thor::Error, "'Object' is not a Thor or Thor::Generator class")
-      end
+    it "fallbacks in the namespace:task look up even if a full namespace does not match" do
+      Thor.const_set(:Help, Module.new)
+      Thor::Util.namespace_to_thor_class("thor:help").must == [Thor, "help"]
+      Thor.send :remove_const, :Help
+    end
 
+    describe 'errors' do
       it "raises an error if the Thor class or task can't be found" do
         lambda {
           Thor::Util.namespace_to_thor_class("foobar")

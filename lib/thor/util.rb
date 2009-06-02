@@ -187,7 +187,6 @@ class Thor
 
       if klass
         return klass, nil if klass <= Thor || klass <= Thor::Generator
-        raise Error, "'#{klass}' is not a Thor or Thor::Generator class"
       elsif !namespace.include?(?:)
         raise Error, "could not find Thor class or task '#{namespace}'"
       end
