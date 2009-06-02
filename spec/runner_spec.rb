@@ -1,6 +1,15 @@
 require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
 require 'thor/runner'
 
+module Thor::Sandbox
+  class Default < Thor
+    desc "test", "prints 'test'"
+    def test
+      puts "test"
+    end
+  end
+end
+
 describe Thor::Runner do
   describe "#help" do
     it "shows information about Thor::Runner itself" do
@@ -74,6 +83,118 @@ describe Thor::Runner do
     it "raises an error if class/task can't be found" do
       ARGV.replace ["unknown"]
       capture(:stderr){ Thor::Runner.start }.must =~ /could not find Thor class or task 'unknown'/
+    end
+
+    it "does not swallow NoMethodErrors that occur inside the called method" do
+      ARGV.replace ["my_script:call_unexistent_method"]
+      lambda { Thor::Runner.start }.must raise_error(NoMethodError)
+    end
+  end
+
+  describe "tasks" do
+    before(:each) do
+      @location = "#{File.dirname(__FILE__)}/fixtures/task.thor"
+      @original_yaml = {
+        "random" => {
+          :location  => @location,
+          :filename  => "4a33b894ffce85d7b412fc1b36f88fe0",
+          :constants => ["Amazing"]
+        }
+      }
+
+      stub(YAML).load_file { @original_yaml }
+    end
+
+    describe "list" do
+      it "gives a list of the available tasks" do
+        ARGV.replace ["list"]
+        capture(:stdout) { Thor::Runner.start }.must =~ /amazing:describe NAME \[\-\-forcefully\] +# say that someone is amazing/
+      end
+
+      it "gives a list of the available generators" do
+        ARGV.replace ["list"]
+        capture(:stdout) { Thor::Runner.start }.must =~ /my_counter N \[N\] \[\-\-third=N\]/
+      end
+
+      it "can filter a list of the available tasks by --group" do
+        ARGV.replace ["list", "--group", "standard"]
+        capture(:stdout) { Thor::Runner.start }.must =~ /amazing:describe NAME/
+        capture(:stdout) { Thor::Runner.start }.must_not =~ /my_script:animal TYPE/
+        ARGV.replace ["list", "--group", "script"]
+        capture(:stdout) { Thor::Runner.start }.must =~ /my_script:animal TYPE/
+      end
+
+      it "can skip all filters to show all tasks using --all" do
+        ARGV.replace ["list", "--all"]
+        content = capture(:stdout) { Thor::Runner.start }
+        content.must =~ /amazing:describe NAME/
+        content.must =~ /my_script:animal TYPE/
+      end
+
+      it "doesn't list superclass tasks in the subclass" do
+        ARGV.replace ["list"]
+        capture(:stdout) { Thor::Runner.start }.must_not =~ /amazing:help/
+      end
+
+      it "presents tasks in the default namespace with an empty namespace" do
+        ARGV.replace ["list"]
+        capture(:stdout) { Thor::Runner.start }.must =~ /^:test +# prints 'test'/
+      end
+
+      it "runs tasks with an empty namespace from the default namespace" do
+        ARGV.replace [":test"]
+        capture(:stdout) { Thor::Runner.start }.must == "test\n"
+      end
+    end
+
+    describe "update" do
+      it "updates existing thor files" do
+        mock.instance_of(Thor::Runner).install(@original_yaml["random"][:location]) { true }
+        stub(File).delete(File.join(Thor::Util.thor_root, @original_yaml["random"][:filename]))
+        silence(:stdout) { Thor::Runner.start(["update", "random"]) }
+      end
+    end
+
+    describe "uninstall" do
+      before(:each) do
+        stub.instance_of(Thor::Runner).save_yaml(anything)
+        stub(File).delete(anything)
+        stub(@original_yaml).delete(anything)
+      end
+
+      it "uninstalls existing thor modules" do
+        silence(:stdout) { Thor::Runner.start(["uninstall", "random"]) }
+      end
+    end
+
+    describe "installed" do
+      before(:each) do
+        stub(Dir).[](anything) { [] }
+      end
+
+      it "displays the modules installed in a pretty way" do
+        stdout = capture(:stdout) { Thor::Runner.start(["installed"]) }
+
+        stdout.must =~ /random\s*amazing/
+        stdout.must =~ /amazing:describe NAME \[\-\-forcefully\] +# say that someone is amazing/
+        stdout.must =~ /amazing:hello +# say hello/
+      end
+    end
+
+    describe "install" do
+      it "installs thor files" do
+        ARGV.replace ["install", @location]
+
+        # Stubs for the file system interactions
+        stub(Readline).readline { "y" }
+        stub(FileUtils).mkdir_p
+        stub(FileUtils).touch
+
+        mock(File).open(File.join(Thor::Util.thor_root, Digest::MD5.hexdigest(@location + "randomness")), "w")
+        mock(File).open(File.join(Thor::Util.thor_root, "thor.yml"), "w")
+
+        silence(:stdout) { Thor::Runner.start }
+      end
     end
   end
 end

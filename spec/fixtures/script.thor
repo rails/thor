@@ -40,8 +40,16 @@ END
     call_myself_with_wrong_arity(4)
   end
 
+  def call_unexistent_method
+    boom!
+  end
+
   def method_missing(meth, *args)
-    [meth, args]
+    if meth == :boom!
+      super
+    else
+      [meth, args]
+    end
   end
 
   private
