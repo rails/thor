@@ -188,35 +188,29 @@ class Thor
       if meth
         task = self.all_tasks[meth]
         raise Error, "task '#{meth}' could not be found in namespace '#{self.namespace}'" unless task
-      end
 
-      if task
         puts "Usage:"
         puts "  #{task.formatted_usage(namespace)}"
         puts
-      end
-
-      unless self.class_options.empty?
-        list = self.class_options.map do |_, option|
-          [ option.usage, option.description ]
-        end
-
-        puts "Global options:"
-        Thor::Util.print_list(list)
-        puts
-      end
-
-      if task
+        options_help
         puts task.description
       else
-        list = options[:skip_inherited] ? tasks : all_tasks
+        if options[:short]
+          list = self.tasks.map do |_, task|
+            [ task.formatted_usage(namespace), task.short_description ]
+          end
 
-        list = list.map do |_, task|
-          [ task.formatted_usage(namespace), task.short_description ]
+          Thor::Util.print_list(list, :skip_spacing => true)
+        else
+          options_help
+
+          list = self.all_tasks.map do |_, task|
+            [ task.formatted_usage(namespace), task.short_description ]
+          end
+
+          puts "Tasks:"
+          Thor::Util.print_list(list)
         end
-
-        puts "Tasks:"
-        Thor::Util.print_list(list)
       end
     end
 
@@ -229,6 +223,18 @@ class Thor
         mapping = map[meth.to_s]
         meth = mapping || meth || default_task
         meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
+      end
+
+      def options_help
+        unless self.class_options.empty?
+          list = self.class_options.map do |_, option|
+            [ option.usage, option.description ]
+          end
+
+          puts "Global options:"
+          Thor::Util.print_list(list)
+          puts
+        end
       end
 
   end

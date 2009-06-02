@@ -219,11 +219,12 @@ class Thor
     # ==== Parameters
     # Array[Array[String, String]]
     #
-    def self.print_list(list)
+    def self.print_list(list, options={})
       return if list.empty?
 
       maxima = list.max{ |a,b| a[0].size <=> b[0].size }[0].size
-      format = "  %-#{maxima+3}s"
+      format = "%-#{maxima+3}s"
+      format = "  #{format}" unless options[:skip_spacing]
 
       list.each do |name, description|
         print format % name

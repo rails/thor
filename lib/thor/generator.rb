@@ -58,8 +58,9 @@ class Thor::Generator
     #
     def help(options={})
       if options[:short]
-        puts "Usage:"
-        puts " #{self.namespace} #{self.class_options.map {|_,o| o.usage}.join(' ')}"
+        print "#{self.namespace} #{self.class_options.map {|_,o| o.usage}.join(' ')}"
+        # print self.description.split("\n").first if self.description
+        puts
       else
         puts "Usage:"
         puts "  #{self.namespace} #{self.arguments.map{|o| o.usage}.join(' ')}"

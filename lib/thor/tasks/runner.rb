@@ -197,7 +197,7 @@ class Thor::Runner < Thor
       end
       puts "-" * base.length
 
-      klass.help(:short => true, :namespace => true, :skip_inherited => true)
+      klass.help(:short => true, :namespace => true)
       puts
     end
   end

@@ -186,7 +186,7 @@ END
       end
 
       it "does not show superclass tasks if required" do
-        capture(:stdout){ MyScript.help(:skip_inherited => true) }.must_not =~ /help/
+        capture(:stdout){ MyScript.help(:short => true) }.must_not =~ /help/
       end
     end
 

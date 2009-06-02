@@ -192,5 +192,14 @@ describe Thor::Util do
       content[1].size.must == 11
       content[2].size.must == 11
     end
+
+    it "skips spacing if required" do
+      list    = [ %w(a 1), %w(b 2), %w(c 3) ]
+      content = capture(:stdout){ Thor::Util.print_list(list, :skip_spacing => true) }
+
+      content.must =~ /^a +# 1/
+      content.must =~ /^b +# 2/
+      content.must =~ /^c +# 3/
+    end
   end
 end
