@@ -2,13 +2,21 @@ require 'thor/tasks/runner'
 
 class Thor::Runner < Thor
 
-  # Override Thor#help so we can give info about not-yet-loaded tasks
-  # TODO Spec the statement above
-  def help(task = nil)
-    initialize_thorfiles(task) if task && task.include?(?:)
-    super
+  # Override Thor#help so it can give information about any class and any method.
+  #
+  def help(meth=nil)
+    if meth && !self.respond_to?(meth)
+      initialize_thorfiles(meth)
+      klass, task = Thor::Util.namespace_to_thor_class(meth)
+      klass.start(["-h", task].compact) # send mapping -h because it works with generators too
+    else
+      super
+    end
   end
 
+  # If a task is not found on Thor::Runner, method missing is invoked and
+  # Thor::Runner is then responsable for finding the task in all classes.
+  #
   def method_missing(meth, *args)
     meth = meth.to_s
     initialize_thorfiles(meth)

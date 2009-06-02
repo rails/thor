@@ -6,6 +6,24 @@
 
 == Current
 
+* thor help now show information about any class/task. All those calls are
+  possible:
+  
+    thor help describe
+    thor help describe:amazing
+
+  Or even with default namespaces:
+
+    thor help :spec
+
+* Thor::Runner now invokes the default task if none is supplied:
+
+    thor describe # invokes the default task, usually help
+
+* Thor::Runner now works with mappings:
+
+    thor describe -h
+
 * Added some documentation and code refactoring.
 
 == 0.9.8, released 2008-10-20
