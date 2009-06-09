@@ -53,8 +53,12 @@ describe Thor::Base do
   end
 
   describe "#namespace" do
-    it "returns this class namespace" do
+    it "returns the default class namespace" do
       Scripts::MyGrandChildScript.namespace.must == "scripts:my_grand_child_script"
+    end
+
+    it "sets a namespace to the class" do
+      Scripts::MyDefaults.namespace.must == "default"
     end
   end
 
@@ -83,7 +87,7 @@ describe Thor::Base do
   describe "#subclass_files" do
     it "returns tracked subclasses, grouped by the files they come from" do
       thorfile = File.join(File.dirname(__FILE__), "fixtures", "script.thor")
-      Thor::Base.subclass_files[File.expand_path(thorfile)].must == [ MyScript, MyChildScript, Scripts::MyGrandChildScript ]
+      Thor::Base.subclass_files[File.expand_path(thorfile)].must == [ MyScript, MyChildScript, Scripts::MyGrandChildScript, Scripts::MyDefaults ]
     end
 
     it "tracks a single subclass across multiple files" do

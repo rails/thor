@@ -35,11 +35,11 @@ class Default < Thor
   spec_task(Dir["spec/**/*_spec.rb"], :name => "rcov", :rcov =>
     {:exclude => %w(spec /Library /Users task.thor lib/getopt.rb)})
   install_task SPEC
-  
+
   desc "gemspec", "make a gemspec file"
   def gemspec
     File.open("#{GEM}.gemspec", "w") do |file|
       file.puts SPEC.to_ruby
-    end    
+    end
   end
 end

@@ -228,10 +228,35 @@ class Thor
         @no_tasks = false
       end
 
-      # Retrieves the namespace for this class.
+      # Sets the namespace for the Thor or Thor::Group class. By default the
+      # namespace is retrieved from the class name. If your Thor class is named
+      # Scripts::MyScript, the help method, for example, will be called as:
       #
-      def namespace
-        Thor::Util.constant_to_namespace(self, false)
+      #   thor scripts:my_script -h
+      #
+      # If you change the namespace:
+      #
+      #   namespace :my_scripts
+      #
+      # You change how your tasks are invoked:
+      #
+      #   thor my_scripts -h
+      #
+      # Finally, if you change your namespace to default:
+      #
+      #   namespace :default
+      #
+      # Your tasks can be invoked with a shortcut. Instead of:
+      #
+      #   thor :my_task
+      #
+      def namespace(name=nil)
+        case name
+          when nil
+            @namespace ||= Thor::Util.constant_to_namespace(self, false)
+          else
+            @namespace = name.to_s
+        end
       end
 
       # Invokes a specific task. You can use this method instead of start() to

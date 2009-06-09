@@ -1,15 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
 require 'thor/runner'
 
-module Thor::Sandbox
-  class Default < Thor
-    desc "test", "prints 'test'"
-    def test
-      puts "test"
-    end
-  end
-end
-
 describe Thor::Runner do
   describe "#help" do
     it "shows information about Thor::Runner itself" do

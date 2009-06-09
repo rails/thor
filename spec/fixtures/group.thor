@@ -22,6 +22,7 @@ FOO
 end
 
 class BrokenCounter < MyCounter
+  namespace "app:broken:counter"
   class_option :fail, :type => :boolean, :default => false
 
   def one

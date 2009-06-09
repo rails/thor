@@ -14,89 +14,16 @@ class Thor
   #
   module Util
 
-    # Tries to get a constant in the given object. We cannot use Object.const_get
-    # because it looks for constants in the  ancestor chain, but we only want
-    # constants that are defined in the given object.
+    # Receives a namespace and search for it in the Thor::Base subclasses.
     #
     # ==== Parameters
-    # object<Object>:: The object in which we look for the constant.
-    # constant<Object>:: The name of the constant to look for.
+    # namespace<String>:: The namespace to search for.
     #
-    # ==== Returns
-    # <Object>:: The constant, if found.
-    #
-    # ==== Errors
-    # NameError:: Raised if the constant can't be found.
-    #
-    def self.full_const_get(object, constant)
-      list = constant.to_s.split("::")
-      list.shift if list.first.empty?
-
-      list.each do |x| 
-        object = if object.const_defined?(x)
-          object.const_get(x)
-        else
-          object.const_missing(x)
-        end
-      end
-
-      object
-    end
-
-    # Receives a string and search for it in the given bases. If it's found,
-    # returns a constant.
-    #
-    # ==== Parameters
-    # string<String>:: The string to be found in the given bases.
-    # base<Array>:: Where to look for the string. By default is Thor::Sandbox and Object.
-    #
-    # ==== Returns
-    # <Object>:: The first constant found with name "string" in one of the bases.
-    #
-    # ==== Errors
-    # NameError:: Raised if no constant is found.
-    #
-    def self.make_constant(string, base=[Thor::Sandbox, Object])
-      base.each do |namespace|
-        constant = full_const_get(namespace, string) rescue nil
-        return constant if constant
-      end
-      raise NameError, "uninitialized constant #{string}"
-    end
-
-    # Receives a thor namespace and converts it to the constant name. This
-    # method returns a string, use namespace_to_constant if you want a constant
-    # as result.
-    #
-    # ==== Parameters
-    # namespace<String>
-    #
-    # ==== Returns
-    # constant_name<String>
-    # 
-    def self.namespace_to_constant_name(namespace)
+    def self.find_by_namespace(namespace)
       namespace = 'default' if namespace.empty?
-      namespace.gsub(/:(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
-    end
 
-    # Receives a thor namespace and converts it to a constant.
-    #
-    # ==== Parameters
-    # namespace<String>
-    #
-    # ==== Returns
-    # constant<Object>
-    #
-    # ==== Errors
-    # Thor::Error:: Raised if the namespace could not be found.
-    #
-    def self.namespace_to_constant(namespace)
-      make_constant(namespace_to_constant_name(namespace))
-    rescue NameError => e
-      if e.message =~ /^uninitialized constant (.*)$/
-        raise Error, "There was no available namespace '#{namespace}'."
-      else
-        raise e 
+      Thor::Base.subclasses.find do |klass|
+        klass.namespace == namespace
       end
     end
 
@@ -183,19 +110,15 @@ class Thor
     #               inherit from Thor or Thor::Group.
     #
     def self.namespace_to_thor_class(namespace)
-      klass = Thor::Util.namespace_to_constant(namespace) rescue nil
+      klass, task_name = Thor::Util.find_by_namespace(namespace), nil
 
-      if klass
-        return klass, nil if klass <= Thor::Base
-      elsif !namespace.include?(?:)
-        raise Error, "could not find Thor class or task '#{namespace}'"
+      if klass.nil? && namespace.include?(?:)
+        namespace = namespace.split(":")
+        task_name = namespace.pop
+        klass     = Thor::Util.find_by_namespace(namespace.join(":"))
       end
 
-      namespace = namespace.split(":")
-      task_name = namespace.pop
-      klass     = Thor::Util.namespace_to_constant(namespace.join(":"))
-
-      raise Error, "'#{klass}' is not a Thor class" unless klass <= Thor
+      raise Error, "could not find Thor class or task '#{namespace}'" unless klass
 
       return klass, task_name
     end

@@ -1,70 +1,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Thor::Util do
-  describe "#full_const_get" do
-    it "looks for a constant in the given object" do
-      Thor::Util.full_const_get(Object, :Thor).must == Thor
+  describe "#find_by_namespace" do
+    it "returns 'Default' if no namespace is given" do
+      Thor::Util.find_by_namespace('').must == Scripts::MyDefaults
     end
 
-    it "does not looks for constants in the ancestors chain" do
-      lambda {
-        Thor::Util.full_const_get(Thor::Util, :Thor)
-      }.must raise_error(NameError)
-
-      lambda {
-        Thor::Util.const_get(:Thor)
-      }.must_not raise_error
+    it "returns nil if the namespace can't be found" do
+      Thor::Util.find_by_namespace('thor:core_ext:ordered_hash').must be_nil
     end
 
-    it "ignores :: in the look up" do
-      Thor::Util.full_const_get(Thor, :"::Util").must == Thor::Util
-    end
-  end
-
-  describe "#make_constant" do
-    it "returns the constant given by the string" do
-      Thor::Util.make_constant("Object").must == Object
+    it "returns a class if it matches the namespace" do
+      Thor::Util.find_by_namespace('app:broken:counter').must == BrokenCounter
     end
 
-    it "resolves constant nesting" do
-      Thor::Util.make_constant("Thor::Util").must == Thor::Util
-    end
-
-    it "raises an error if the constant cannot be found in the given base" do
-      lambda {
-        Thor::Util.make_constant("Foo", [])
-      }.must raise_error(NameError)
-    end
-  end
-
-  describe "#namespace_to_constant_name" do
-    it "returns 'Default' if no name is given" do
-      Thor::Util.namespace_to_constant_name("").must == "Default"
-    end
-
-    it "upcases the namespaces" do
-      Thor::Util.namespace_to_constant_name("foo").must == "Foo"
-      Thor::Util.namespace_to_constant_name("foo:bar").must == "Foo::Bar"
-    end
-
-    it "expands task namespacing into constant nesting" do
-      Thor::Util.namespace_to_constant_name("foo:bar:baz").must == "Foo::Bar::Baz"
-    end
-
-    it "replaces snake-casing with camel-casing" do
-      Thor::Util.namespace_to_constant_name("foo_bar:bar_baz").must == "FooBar::BarBaz"
-    end
-  end
-
-  describe "#namespace_to_constant" do
-    it "returns the named constant" do
-      Thor::Util.namespace_to_constant('thor:core_ext:ordered_hash').must == Thor::CoreExt::OrderedHash
-    end
-
-    it "raises a Thor::Error if the namespace is not available" do
-      lambda {
-        Thor::Util.namespace_to_constant('foo:bar')
-      }.must raise_error(Thor::Error)
+    it "matches classes default namespace" do
+      Thor::Util.find_by_namespace('scripts:my_grand_child_script').must == Scripts::MyGrandChildScript
     end
   end
 
@@ -155,12 +106,6 @@ describe Thor::Util do
         lambda {
           Thor::Util.namespace_to_thor_class("foobar")
         }.must raise_error(Thor::Error, "could not find Thor class or task 'foobar'")
-      end
-
-      it "raises an error if the task does not inherit from Thor" do
-        lambda {
-          Thor::Util.namespace_to_thor_class("object:help")
-        }.must raise_error(Thor::Error, "'Object' is not a Thor class")
       end
     end
   end

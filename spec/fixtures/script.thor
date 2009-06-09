@@ -97,4 +97,13 @@ module Scripts
       self.accessor
     end
   end
+
+  class MyDefaults < Thor
+    namespace :default
+    desc "test", "prints 'test'"
+    def test
+      puts "test"
+    end
+  end
 end
+
