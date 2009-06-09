@@ -13,7 +13,7 @@ class Thor::Runner < Thor
     if meth && !self.respond_to?(meth)
       initialize_thorfiles(meth)
       klass, task = Thor::Util.namespace_to_thor_class(meth)
-      klass.start(["-h", task].compact) # send mapping -h because it works with Thor::Group too
+      klass.start(["-h", task].compact, :shell => self.shell) # send mapping -h because it works with Thor::Group too
     else
       super
     end
@@ -27,7 +27,7 @@ class Thor::Runner < Thor
     initialize_thorfiles(meth)
     klass, task = Thor::Util.namespace_to_thor_class(meth)
     args.unshift(task) if task
-    klass.start(args)
+    klass.start(args, :shell => self.shell)
   end
 
   desc "install NAME", "Install a Thor file into your system tasks, optionally named for future updates"

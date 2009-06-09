@@ -29,9 +29,5 @@ class Thor
     def self.shell
       @shell || Thor::Shells::Basic
     end
-
-    def shell
-      Thor::Base.shell
-    end
   end
 end

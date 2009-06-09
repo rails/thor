@@ -137,7 +137,7 @@ describe Thor do
   describe "#help" do
     describe "on general" do
       before(:each) do
-        @content = capture(:stdout){ MyScript.help(Thor::Base.shell) }
+        @content = capture(:stdout){ MyScript.help(Thor::Base.shell.new) }
       end
 
       it "provides useful help info for the help method itself" do
@@ -153,17 +153,17 @@ describe Thor do
       end
 
       it "shows superclass tasks" do
-        capture(:stdout){ MyChildScript.help(Thor::Base.shell) }.must =~ /foo BAR \[\-\-force\] +# do some fooing/
+        capture(:stdout){ MyChildScript.help(Thor::Base.shell.new) }.must =~ /foo BAR \[\-\-force\] +# do some fooing/
       end
 
       it "shows global options information" do
-        capture(:stdout){ MyChildScript.help(Thor::Base.shell) }.must =~ /\[\-\-param=N\]/
+        capture(:stdout){ MyChildScript.help(Thor::Base.shell.new) }.must =~ /\[\-\-param=N\]/
       end
     end
 
     describe "for a specific task" do
       it "provides full help info when talking about a specific task" do
-        capture(:stdout) { MyScript.help(Thor::Base.shell, "foo") }.must == <<END
+        capture(:stdout) { MyScript.help(Thor::Base.shell.new, "foo") }.must == <<END
 Usage:
   foo BAR [--force]
 
@@ -182,17 +182,17 @@ END
 
     describe "options" do
       it "shows the namespace if required" do
-        capture(:stdout){ MyScript.help(Thor::Base.shell, nil, :namespace => true) }.must =~ /my_script:foo BAR/
+        capture(:stdout){ MyScript.help(Thor::Base.shell.new, nil, :namespace => true) }.must =~ /my_script:foo BAR/
       end
 
       it "does not show superclass tasks if required" do
-        capture(:stdout){ MyScript.help(Thor::Base.shell, nil, :short => true) }.must_not =~ /help/
+        capture(:stdout){ MyScript.help(Thor::Base.shell.new, nil, :short => true) }.must_not =~ /help/
       end
     end
 
     describe "instance method" do
       it "calls the class method" do
-        stub(MyScript).help(Thor::Base.shell, nil, :namespace => nil)
+        stub(MyScript).help(mock.instance_of(Thor::Base.shell), nil, :namespace => nil)
         MyScript.start(["help"])
       end
     end

@@ -21,11 +21,11 @@ class Thor::Group
 
     # Start in Thor::Group works differently. It invokes all tasks inside the class.
     #
-    def start(args=ARGV)
+    def start(args=ARGV, config={})
       if Thor::HELP_MAPPINGS.include?(args.first)
-        self.help(Thor::Base.shell)
+        help(Thor::Base.shell.new)
       else
-        instance, trailing = setup(args)
+        instance, trailing = setup(args, nil, config)
         all_tasks.values.map { |task| task.run(instance) }
       end
     rescue Thor::Error => e

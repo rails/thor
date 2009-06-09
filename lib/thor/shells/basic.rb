@@ -6,7 +6,7 @@ class Thor
       # ==== Example
       # ask("What is your name?")
       #
-      def self.ask(statement)
+      def ask(statement)
         say("#{statement} ")
         $stdin.gets.strip
       end
@@ -18,7 +18,7 @@ class Thor
       # ==== Example
       # say("I know you knew that.")
       #
-      def self.say(statement='')
+      def say(statement='')
         statement = statement.to_s
 
         if statement[-1, 1] == ' ' || statement[-1, 1] == "\t"
@@ -32,14 +32,14 @@ class Thor
       # Make a question the to user and returns true if the user replies "y" or
       # "yes".
       #
-      def self.yes?(statement)
+      def yes?(statement)
         ["y", "yes"].include?(ask(statement).downcase)
       end
 
       # Make a question the to user and returns true if the user replies "n" or
       # "no".
       #
-      def self.no?(statement)
+      def no?(statement)
         !yes?(statement)
       end
 
@@ -48,7 +48,7 @@ class Thor
       # ==== Parameters
       # Array[Array[String, String, ...]]
       #
-      def self.table(table, options={})
+      def table(table, options={})
         return if table.empty?
 
         formats = []

@@ -112,10 +112,10 @@ class Thor
     # Parse the options given and extract the task to be called from it. If no
     # method can be extracted from args the default task is invoked.
     #
-    def start(args=ARGV)
+    def start(args=ARGV, config={})
       meth = normalize_task_name(args.shift)
       task = self[meth]
-      instance, args = setup(args, task.options)
+      instance, args = setup(args, task.options, config)
       task.run(instance, args)
     rescue Thor::Error => e
       $stderr.puts e.message

@@ -273,9 +273,9 @@ class Thor
         # Setup this thor class using the given arguments and extra options. This
         # holds the initialization process common to all Thor classes.
         #
-        def setup(args, extra_options=nil)
+        def setup(args, task_options=nil, config={})
           options = self.class_options
-          options = options.merge(extra_options) if extra_options
+          options = options.merge(task_options) if task_options
 
           opts = Thor::Options.new(options)
           opts.parse(args)
@@ -284,6 +284,8 @@ class Thor
           opts.arguments.each do |key, value|
             instance.send(:"#{key}=", value)
           end
+
+          instance.shell = config[:shell] if config[:shell]
 
           return instance, opts.trailing
         end
@@ -389,6 +391,18 @@ class Thor
       #
       def invoke(meth, *args)
         self.send(meth, *args)
+      end
+
+      def shell=(duck) #:nodoc:
+        @shell = if duck.is_a?(Class)
+          duck.new
+        else
+          duck
+        end
+      end
+
+      def shell #:nodoc:
+        @shell ||= Thor::Base.shell.new
       end
     end
 
