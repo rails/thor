@@ -1,6 +1,5 @@
 require 'thor/core_ext/ordered_hash'
 require 'thor/error'
-require 'thor/option'
 require 'thor/options'
 require 'thor/task'
 require 'thor/util'

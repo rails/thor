@@ -1,3 +1,4 @@
+require 'thor/option'
 require 'thor/core_ext/hash_with_indifferent_access'
 
 class Thor
