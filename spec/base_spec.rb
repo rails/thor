@@ -9,6 +9,12 @@ class Amazing
 end
 
 describe Thor::Base do
+  describe "#shell" do
+    it "returns the shell in use" do
+      Thor::Base.shell.must == Thor::Shells::Basic
+    end
+  end
+
   describe "#no_tasks" do
     it "avoids methods being added as tasks" do
       MyScript.tasks.keys.must include("animal")
