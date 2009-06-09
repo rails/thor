@@ -1,8 +1,8 @@
 class Thor
   module Shells
     class Basic
-      def self.ask?(sentence)
-        say sentence
+      def self.ask(sentence)
+        say("#{sentence} ", false)
         $stdin.gets.strip
       end
 
@@ -15,7 +15,7 @@ class Thor
       end
 
       def self.yes?(sentence)
-        ["y", "yes"].include?(ask?(sentence).downcase)
+        ["y", "yes"].include?(ask(sentence).downcase)
       end
 
       def self.no?(sentence)

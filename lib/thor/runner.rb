@@ -1,10 +1,8 @@
-require "thor/util"
-require "open-uri"
-require "fileutils"
-require "yaml"
-require "digest/md5"
-require "readline"
-require "pathname"
+require 'open-uri'
+require 'fileutils'
+require 'yaml'
+require 'digest/md5'
+require 'pathname'
 
 class Thor::Runner < Thor
   map "-T" => :list, "-i" => :install, "-u" => :update
@@ -53,12 +51,10 @@ class Thor::Runner < Thor
       raise Error, "Error opening file '#{name}'"
     end
 
-    puts "Your Thorfile contains: "
-    puts contents
-    print "Do you wish to continue [y/N]? "
-    response = Readline.readline
+    say "Your Thorfile contains:"
+    say contents
 
-    return false unless response =~ /^\s*y/i
+    return false if no?("Do you wish to continue [y/N]?")
 
     as = options["as"] || begin
       first_line = contents.split("\n")[0]
@@ -66,12 +62,12 @@ class Thor::Runner < Thor
     end
 
     unless as
-      print "Please specify a name for #{name} in the system repository [#{name}]: "
-      as = Readline.readline
-      as = name if as.empty?
+      basename = File.basename(name)
+      as = ask("Please specify a name for #{name} in the system repository [#{basename}]:")
+      as = basename if as.empty?
     end
 
-    location = if options[:relative] || File.exists?(name) || name =~ /^http:\/\//
+    location = if options[:relative] || name =~ /^http:\/\//
       name
     else
       File.expand_path(name)
@@ -84,7 +80,7 @@ class Thor::Runner < Thor
     }
 
     save_yaml(thor_yaml)
-    puts "Storing thor file in your system repository"
+    say "Storing thor file in your system repository"
     destination = File.join(thor_root, thor_yaml[as][:filename])
 
     if package == :file
@@ -99,7 +95,7 @@ class Thor::Runner < Thor
   desc "uninstall NAME", "Uninstall a named Thor module"
   def uninstall(name)
     raise Error, "Can't find module '#{name}'" unless thor_yaml[name]
-    puts "Uninstalling #{name}."
+    say "Uninstalling #{name}."
     FileUtils.rm_rf(File.join(thor_root, "#{thor_yaml[name][:filename]}"))
 
     thor_yaml.delete(name)
@@ -112,7 +108,8 @@ class Thor::Runner < Thor
   def update(name)
     raise Error, "Can't find module '#{name}'" if !thor_yaml[name] || !thor_yaml[name][:location]
 
-    puts "Updating '#{name}' from #{thor_yaml[name][:location]}"
+    say "Updating '#{name}' from #{thor_yaml[name][:location]}"
+
     old_filename = thor_yaml[name][:filename]
     self.options = self.options.merge("as" => name)
     filename     = install(thor_yaml[name][:location])

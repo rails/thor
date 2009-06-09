@@ -2,8 +2,8 @@ require 'thor/shells/basic'
 
 class Thor
   module Actions
-    def ask?(*args)
-      shell.ask?(*args)
+    def ask(*args)
+      shell.ask(*args)
     end
 
     def yes?(*args)

@@ -5,21 +5,21 @@ describe Thor::Shells::Basic do
     Thor::Shells::Basic
   end
 
-  describe "#ask?" do
+  describe "#ask" do
     it "prints a message to the user and gets the response" do
-      mock($stdout).puts("Should I overwrite it?")
+      mock($stdout).print("Should I overwrite it? ")
       mock($stdin).gets{ "Sure" }
-      shell.ask?("Should I overwrite it?").must == "Sure"
+      shell.ask("Should I overwrite it?").must == "Sure"
     end
   end
 
   describe "#yes?" do
     it "asks the user and returns true if the user replies yes" do
-      mock($stdout).puts("Should I overwrite it?")
+      mock($stdout).print("Should I overwrite it? ")
       mock($stdin).gets{ "y" }
       shell.yes?("Should I overwrite it?").must be_true
 
-      mock($stdout).puts("Should I overwrite it?")
+      mock($stdout).print("Should I overwrite it? ")
       mock($stdin).gets{ "n" }
       shell.yes?("Should I overwrite it?").must be_false
     end
@@ -27,11 +27,11 @@ describe Thor::Shells::Basic do
 
   describe "#no?" do
     it "asks the user and returns true if the user replies no" do
-      mock($stdout).puts("Should I overwrite it?")
+      mock($stdout).print("Should I overwrite it? ")
       mock($stdin).gets{ "n" }
       shell.no?("Should I overwrite it?").must be_true
 
-      mock($stdout).puts("Should I overwrite it?")
+      mock($stdout).print("Should I overwrite it? ")
       mock($stdin).gets{ "Yes" }
       shell.no?("Should I overwrite it?").must be_false
     end
