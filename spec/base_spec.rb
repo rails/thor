@@ -11,7 +11,7 @@ end
 describe Thor::Base do
   describe "#shell" do
     it "returns the shell in use" do
-      Thor::Base.shell.must == Thor::Shells::Basic
+      Thor::Base.shell.must == Thor::Shell::Basic
     end
   end
 

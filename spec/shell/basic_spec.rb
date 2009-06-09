@@ -1,8 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe Thor::Shells::Basic do
+describe Thor::Shell::Basic do
   def shell
-    @shell ||= Thor::Shells::Basic.new
+    @shell ||= Thor::Shell::Basic.new
   end
 
   describe "#ask" do

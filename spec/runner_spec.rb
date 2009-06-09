@@ -184,7 +184,7 @@ describe Thor::Runner do
         ARGV.replace ["install", @location]
 
         # Stubs for the file system interactions
-        stub.instance_of(Thor::Shells::Basic).no? { false }
+        stub.instance_of(Thor::Shell::Basic).no? { false }
         stub(FileUtils).mkdir_p
         stub(FileUtils).touch
 

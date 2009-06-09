@@ -1,4 +1,4 @@
-require 'thor/shells/basic'
+require 'thor/shell/basic'
 
 class Thor
   module Actions
@@ -27,7 +27,7 @@ class Thor
     end
 
     def self.shell
-      @shell || Thor::Shells::Basic
+      @shell || Thor::Shell::Basic
     end
   end
 end

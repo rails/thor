@@ -1,5 +1,5 @@
 class Thor
-  module Shells
+  module Shell
     class Basic
       # Ask something to the user and receives a response.
       #
