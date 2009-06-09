@@ -3,6 +3,11 @@ class MyCounter < Thor::Group
   argument :second,    :type => :numeric, :default => 2
   class_option :third, :type => :numeric
 
+  desc <<-FOO
+Description:
+  This generator run three tasks: one, two and three.
+FOO
+
   def one
     first
   end

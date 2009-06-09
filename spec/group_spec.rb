@@ -43,6 +43,17 @@ describe Thor::Group do
       @content.must =~ /my_counter N \[N\]/
     end
 
+    it "shows description" do
+      @content.must =~ /Description:/
+      @content.must =~ /This generator run three tasks: one, two and three./
+    end
+
+    it "shows inherited description" do
+      @content = capture(:stdout){ BrokenCounter.help }
+      @content.must =~ /Description:/
+      @content.must =~ /This generator run three tasks: one, two and three./
+    end
+
     it "shows global options information" do
       @content.must =~ /Options/
       @content.must =~ /\[\-\-third=N\]/

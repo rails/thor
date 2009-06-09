@@ -5,6 +5,23 @@ class Thor::Group
 
   class << self
 
+    # The descrition for this Thor::Group as a whole.
+    #
+    # ==== Parameters
+    # description<String>:: The description for this Thor::Group.
+    #
+    def desc(description=nil)
+      case description
+        # TODO When a symbol is given, read a file in the current directory
+        # when Symbol
+        #   @desc = File.read
+        when nil
+          @desc ||= from_superclass(:desc, nil)
+        else
+          @desc = description
+      end
+    end
+
     # Start in Thor::Group works differently. It invokes all tasks inside the class.
     #
     def start(args=ARGV)
@@ -26,7 +43,6 @@ class Thor::Group
     def help(options={})
       if options[:short]
         print "#{self.namespace} #{self.class_options.map {|_,o| o.usage}.join(' ')}"
-        # print self.description.split("\n").first if self.description
         puts
       else
         puts "Usage:"
@@ -44,7 +60,7 @@ class Thor::Group
           puts
         end
 
-        # puts self.description
+        puts self.desc if self.desc
       end
     end
 

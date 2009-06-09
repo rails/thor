@@ -48,7 +48,7 @@ class Thor
     # Will invoke the list task.
     #
     # ==== Parameters
-    # Hash[String|Array => Symbol]:: Maps the string or the string in the array to the given task.
+    # Hash[String|Array => Symbol]:: Maps the string or the strings in the array to the given task.
     #
     def map(mappings=nil)
       @map ||= from_superclass(:map, {})
