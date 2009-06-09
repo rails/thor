@@ -36,7 +36,7 @@ describe Thor::Group do
 
   describe "#help" do
     before(:each) do
-      @content = capture(:stdout){ MyCounter.help }
+      @content = capture(:stdout){ MyCounter.help(Thor::Base.shell) }
     end
 
     it "provides usage information" do
@@ -49,7 +49,7 @@ describe Thor::Group do
     end
 
     it "shows inherited description" do
-      @content = capture(:stdout){ BrokenCounter.help }
+      @content = capture(:stdout){ BrokenCounter.help(Thor::Base.shell) }
       @content.must =~ /Description:/
       @content.must =~ /This generator run three tasks: one, two and three./
     end
@@ -60,7 +60,7 @@ describe Thor::Group do
     end
 
     it "shows only usage if a short help is required" do
-      content = capture(:stdout){ MyCounter.help(:short => true) }
+      content = capture(:stdout){ MyCounter.help(Thor::Base.shell, :short => true) }
       content.must =~ /my_counter N \[N\] \[\-\-third=N\]/
       content.must_not =~ /Options/
     end

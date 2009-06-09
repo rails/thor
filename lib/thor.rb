@@ -131,7 +131,7 @@ class Thor
     # namespace:: When true, shows the namespace in the output before the usage.
     # skip_inherited:: When true, does not show tasks from superclass.
     #
-    def help(meth=nil, options={})
+    def help(shell, meth=nil, options={})
       meth, options = nil, meth if meth.is_a?(Hash)
       namespace = options[:namespace] ? self : nil
 
@@ -139,27 +139,27 @@ class Thor
         task = self.all_tasks[meth]
         raise UndefinedTaskError, "task '#{meth}' could not be found in namespace '#{self.namespace}'" unless task
 
-        puts "Usage:"
-        puts "  #{task.formatted_usage(namespace)}"
-        puts
-        options_help
-        puts task.description
+        shell.say "Usage:"
+        shell.say "  #{task.formatted_usage(namespace)}"
+        shell.say
+        options_help(shell)
+        shell.say task.description
       else
         if options[:short]
           list = self.tasks.map do |_, task|
-            [ task.formatted_usage(namespace), task.short_description ]
+            [ task.formatted_usage(namespace), task.short_description || '' ]
           end
 
-          Thor::Util.print_list(list, :skip_spacing => true)
+          shell.table(list, :emphasize_last => true)
         else
-          options_help
+          options_help(shell)
 
           list = self.all_tasks.map do |_, task|
-            [ task.formatted_usage(namespace), task.short_description ]
+            [ task.formatted_usage(namespace), task.short_description || '' ]
           end
 
-          puts "Tasks:"
-          Thor::Util.print_list(list)
+          shell.say "Tasks:"
+          shell.table(list, :ident => 2, :emphasize_last => true)
         end
       end
     end
@@ -193,15 +193,15 @@ class Thor
         meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
       end
 
-      def options_help #:nodoc:
+      def options_help(shell) #:nodoc:
         unless self.class_options.empty?
           list = self.class_options.map do |_, option|
-            [ option.usage, option.description ]
+            [ option.usage, option.description || '' ]
           end
 
-          puts "Global options:"
-          Thor::Util.print_list(list)
-          puts
+          shell.say "Global options:"
+          shell.table(list, :emphasize_last => true)
+          shell.say ""
         end
       end
   end
@@ -237,7 +237,7 @@ class Thor
 
   desc "help [TASK]", "Describe available tasks or one specific task"
   def help(task=nil)
-    self.class.help(task, :namespace => task && task.include?(?:))
+    self.class.help(shell, task, :namespace => task && task.include?(?:))
   end
 
   protected

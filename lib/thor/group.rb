@@ -23,7 +23,7 @@ class Thor::Group
     #
     def start(args=ARGV)
       if Thor::HELP_MAPPINGS.include?(args.first)
-        self.help
+        self.help(Thor::Base.shell)
       else
         instance, trailing = setup(args)
         all_tasks.values.map { |task| task.run(instance) }
@@ -37,27 +37,26 @@ class Thor::Group
     # ==== Options
     # short:: When true, shows only usage.
     #
-    def help(options={})
+    def help(shell, options={})
       if options[:short]
-        print "#{self.namespace} #{self.class_options.map {|_,o| o.usage}.join(' ')}"
-        puts
+        shell.say "#{self.namespace} #{self.class_options.map {|_,o| o.usage}.join(' ')}"
       else
-        puts "Usage:"
-        puts "  #{self.namespace} #{self.arguments.map{|o| o.usage}.join(' ')}"
-        puts
+        shell.say "Usage:"
+        shell.say "  #{self.namespace} #{self.arguments.map{|o| o.usage}.join(' ')}"
+        shell.say
 
         list = self.class_options.map do |_, option|
           next if option.argument?
-          [ option.usage, option.description ]
+          [ option.usage, option.description || '' ]
         end.compact
 
         unless list.empty?
-          puts "Options:"
-          Thor::Util.print_list(list)
-          puts
+          shell.say "Options:"
+          shell.table(list, :emphasize_last => true)
+          shell.say
         end
 
-        puts self.desc if self.desc
+        shell.say self.desc if self.desc
       end
     end
 

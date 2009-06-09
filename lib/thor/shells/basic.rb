@@ -1,25 +1,78 @@
 class Thor
   module Shells
     class Basic
-      def self.ask(sentence)
-        say("#{sentence} ", false)
+      # Ask something to the user and receives a response.
+      #
+      # ==== Example
+      # ask("What is your name?")
+      #
+      def self.ask(statement)
+        say("#{statement} ")
         $stdin.gets.strip
       end
 
-      def self.say(sentence, new_line=true)
-        if new_line
-          $stdout.puts sentence
+      # Say (print) something to the user. If the sentence ends with a whitespace
+      # or tab character, a new line is not appended (print + flush). Otherwise
+      # are passed straight to puts (behavior got from Highline).
+      #
+      # ==== Example
+      # say("I know you knew that.")
+      #
+      def self.say(statement='')
+        statement = statement.to_s
+
+        if statement[-1, 1] == ' ' || statement[-1, 1] == "\t"
+          $stdout.print(statement)
+          $stdout.flush
         else
-          $stdout.print sentence
+          $stdout.puts(statement)
         end
       end
 
-      def self.yes?(sentence)
-        ["y", "yes"].include?(ask(sentence).downcase)
+      # Make a question the to user and returns true if the user replies "y" or
+      # "yes".
+      #
+      def self.yes?(statement)
+        ["y", "yes"].include?(ask(statement).downcase)
       end
 
-      def self.no?(sentence)
-        !yes?(sentence)
+      # Make a question the to user and returns true if the user replies "n" or
+      # "no".
+      #
+      def self.no?(statement)
+        !yes?(statement)
+      end
+
+      # Prints a table.
+      #
+      # ==== Parameters
+      # Array[Array[String, String, ...]]
+      #
+      def self.table(table, options={})
+        return if table.empty?
+
+        formats = []
+        0.upto(table.first.length - 2) do |i|
+          maxima = table.max{ |a,b| a[i].size <=> b[i].size }[i].size
+          formats << "%-#{maxima + 2}s"
+        end
+
+        formats[0] = formats[0].insert(0, " " * options[:ident]) if options[:ident]
+        formats << "%s"
+
+        if options[:emphasize_last]
+          table.each do |row|
+            next if row[-1].empty?
+            row[-1] = "# #{row[-1]}"
+          end
+        end
+
+        table.each do |row|
+          row.each_with_index do |column, i|
+            $stdout.print formats[i] % column.to_s
+          end
+          $stdout.puts
+        end
       end
     end
   end

@@ -43,9 +43,36 @@ describe Thor::Shells::Basic do
       shell.say("Running...")
     end
 
-    it "prints a message to the user without new line when required" do
-      mock($stdout).print("Running...")
-      shell.say("Running...", false)
+    it "prints a message to the user without new line if it ends with a whitespace" do
+      mock($stdout).print("Running... ")
+      shell.say("Running... ")
+    end
+  end
+
+  describe "#table" do
+    before(:each) do
+      @table = []
+      @table << ["abc", "#123", "first three"]
+      @table << ["", "#0", "empty"]
+      @table << ["xyz", "#786", "last three"]
+    end
+
+    it "prints a table" do
+      content = capture(:stdout){ shell.table(@table) }
+      content.must == <<-TABLE
+abc  #123  first three
+     #0    empty
+xyz  #786  last three
+TABLE
+    end
+
+    it "prints a table with identation" do
+      content = capture(:stdout){ shell.table(@table, :ident => 2) }
+      content.must == <<-TABLE
+  abc  #123  first three
+       #0    empty
+  xyz  #786  last three
+TABLE
     end
   end
 end

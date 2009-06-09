@@ -136,51 +136,6 @@ class Thor
       end
     end
 
-    # Prints a list. Used to show options and list of tasks.
-    #
-    # ==== Example
-    #
-    #   Thor::Util.print_list [["foo", "does some foo"], ["bar", "does some bar"]]
-    #
-    # Prints:
-    #
-    #    foo   # does some foo
-    #    bar   # does some bar
-    #
-    # ==== Parameters
-    # Array[Array[String, String]]
-    #
-    def self.print_list(list, options={})
-      return if list.empty?
-
-      list.map! do |item|
-        item[0] = "  #{item[0]}" unless options[:skip_spacing]
-        item[1] = item[1] ? "# #{item[1]}" : ""
-        item
-      end
-
-      print_table(list)
-    end
-
-    # Prints a table. Right now it supports just a table with two columns.
-    # Feel free to improve it if needed.
-    #
-    # ==== Parameters
-    # Array[Array[String, String]]
-    #
-    def self.print_table(table)
-      return if table.empty?
-
-      maxima = table.max{ |a,b| a[0].size <=> b[0].size }[0].size
-      format = "%-#{maxima+3}s"
-
-      table.each do |first, second|
-        print format % first
-        print second
-        puts
-      end
-    end
-
     # Receives a yaml (hash) and updates all constants entries to namespace.
     # This was added to deal with deprecated versions of Thor.
     #

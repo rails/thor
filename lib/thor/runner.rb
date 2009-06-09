@@ -265,14 +265,14 @@ class Thor::Runner < Thor
           table << [ name, info[:namespaces].join(", ") ]
         end
 
-        Thor::Util.print_table(table)
-        puts
+        shell.table(table)
+        say ""
       end
 
       unless klasses.empty?
         klasses.each { |k| display_tasks(k) }
       else
-        puts "\033[1;34mNo Thor tasks available\033[0m"
+        say "\033[1;34mNo Thor tasks available\033[0m"
       end
     end
 
@@ -289,7 +289,7 @@ class Thor::Runner < Thor
         end
         puts "-" * base.length
 
-        klass.help(:short => true, :namespace => true)
+        klass.help(shell, :short => true, :namespace => true)
         puts
       end
     end
