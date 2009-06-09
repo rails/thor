@@ -52,7 +52,7 @@ describe Thor::Task do
       mock = mock!.private_methods{ [ "task" ] }.subject
       lambda {
         task.run(mock)
-      }.must raise_error(NoMethodError, "the 'task' task of Object is private")
+      }.must raise_error(Thor::UndefinedTaskError, "the 'task' task of Object is private")
     end
   end
 

@@ -120,7 +120,7 @@ describe Thor do
     end
 
     it "does not call a private method no matter what" do
-      lambda { MyScript.start(["what"]) }.must raise_error(NoMethodError, "the 'what' task of MyScript is private")
+      capture(:stderr) { MyScript.start(["what"]) }.must =~ /the 'what' task of MyScript is private/
     end
 
     it "raises when an exception happens within the task call" do

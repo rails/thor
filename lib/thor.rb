@@ -116,7 +116,7 @@ class Thor
       task = self[meth]
       instance, args = setup(args, task.options)
       task.run(instance, args)
-    rescue Thor::Error, Thor::Options::Error => e
+    rescue Thor::Error => e
       $stderr.puts e.message
     end
 
@@ -136,7 +136,7 @@ class Thor
 
       if meth
         task = self.all_tasks[meth]
-        raise Error, "task '#{meth}' could not be found in namespace '#{self.namespace}'" unless task
+        raise UndefinedTaskError, "task '#{meth}' could not be found in namespace '#{self.namespace}'" unless task
 
         puts "Usage:"
         puts "  #{task.formatted_usage(namespace)}"
@@ -218,13 +218,13 @@ class Thor
 
     if backtrace.empty?
       task = self.class[meth]
-      raise Error, "'#{meth}' was called incorrectly. Call as '#{task.formatted_usage(self.class)}'"
+      raise InvocationError, "'#{meth}' was called incorrectly. Call as '#{task.formatted_usage(self.class)}'"
     else
       raise e
     end
   rescue NoMethodError => e
     if e.message =~ /^undefined method `#{meth}' for #{Regexp.escape(self.inspect)}$/
-      raise Error, "The #{self.class.namespace} namespace doesn't have a '#{meth}' task"
+      raise UndefinedTaskError, "The #{self.class.namespace} namespace doesn't have a '#{meth}' task"
     else
       raise e
     end

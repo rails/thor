@@ -168,7 +168,7 @@ class Thor
         @all_tasks.merge(tasks)
       end
 
-      # Remove a given task from this Thor class. This is usually done if you 
+      # Removes a given task from this Thor class. This is usually done if you
       # are inheriting from another class and don't want it to be available
       # anymore.
       #

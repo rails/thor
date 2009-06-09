@@ -7,8 +7,6 @@ class Thor
   # licensed under Ruby's license.
   #
   class Options
-    class Error < StandardError; end
-
     NUMERIC     = /(\d*\.\d+|\d+)/
     LONG_RE     = /^(--\w+[-\w+]*)$/
     SHORT_RE    = /^(-[a-z])$/i
@@ -261,7 +259,7 @@ class Thor
       #
       def parse_numeric(switch)
         unless peek =~ NUMERIC && $& == peek
-          raise Error, "expected numeric value for '#{switch}'; got #{peek.inspect}"
+          raise MalformattedArgumentError, "expected numeric value for '#{switch}'; got #{peek.inspect}"
         end
         $&.index('.') ? shift.to_f : shift.to_i
       end
@@ -270,8 +268,8 @@ class Thor
       #
       def check_requirement!(switch, option)
         if option.input_required?
-          raise Error, "no value provided for argument '#{switch}'"  if peek.nil?
-          raise Error, "cannot pass switch '#{peek}' as an argument" if switch?(peek)
+          raise RequiredArgumentMissingError, "no value provided for argument '#{switch}'"  if peek.nil?
+          raise MalformattedArgumentError, "cannot pass switch '#{peek}' as an argument" if switch?(peek)
         end
       end
 
@@ -280,7 +278,7 @@ class Thor
       def check_validity!
         unless @non_assigned_required.empty?
           switch_names = @non_assigned_required.map{ |o| o.switch_name }.join(', ')
-          raise Error, "no value provided for required arguments '#{switch_names}'" 
+          raise RequiredArgumentMissingError, "no value provided for required arguments '#{switch_names}'" 
         end
       end
 

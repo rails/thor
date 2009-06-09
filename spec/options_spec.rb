@@ -138,7 +138,7 @@ describe Thor::Options do
 
       it "and a required switch raises an error" do
         create "--foo" => :required
-        lambda { parse }.must raise_error(Thor::Options::Error, "no value provided for required arguments '--foo'")
+        lambda { parse }.must raise_error(Thor::RequiredArgumentMissingError, "no value provided for required arguments '--foo'")
       end
     end
 
@@ -148,15 +148,15 @@ describe Thor::Options do
       end
 
       it "raises an error if the required switch has no argument" do
-        lambda { parse("--foo") }.must raise_error(Thor::Options::Error)
+        lambda { parse("--foo") }.must raise_error(Thor::RequiredArgumentMissingError)
       end
 
       it "raises an error if the required switch isn't given" do
-        lambda { parse("--bar") }.must raise_error(Thor::Options::Error)
+        lambda { parse("--bar") }.must raise_error(Thor::RequiredArgumentMissingError)
       end
 
       it "raises an error if a switch name is given as the argument to the required switch" do
-        lambda { parse("--foo", "--bar") }.must raise_error(Thor::Options::Error, "cannot pass switch '--bar' as an argument")
+        lambda { parse("--foo", "--bar") }.must raise_error(Thor::MalformattedArgumentError, "cannot pass switch '--bar' as an argument")
       end
     end
 
@@ -357,12 +357,12 @@ describe Thor::Options do
       end
 
       it "raises error when value isn't numeric" do
-        lambda { parse("-n", "foo") }.must raise_error(Thor::Options::Error,
+        lambda { parse("-n", "foo") }.must raise_error(Thor::MalformattedArgumentError,
           "expected numeric value for '-n'; got \"foo\"")
       end
 
       it "raises error when switch is present without value" do
-        lambda { parse("-n") }.must raise_error(Thor::Options::Error,
+        lambda { parse("-n") }.must raise_error(Thor::RequiredArgumentMissingError,
           "no value provided for argument '-n'")
       end
     end

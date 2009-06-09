@@ -23,7 +23,7 @@ class Thor
     # not invoke private methods and this is the only validation done here.
     #
     def run(instance, args=[])
-      raise NoMethodError, "the '#{name}' task of #{instance.class} is private" unless public_method?(instance)
+      raise UndefinedTaskError, "the '#{name}' task of #{instance.class} is private" unless public_method?(instance)
       instance.invoke(name, *args)
     end
 

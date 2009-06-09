@@ -28,7 +28,7 @@ class Thor::Group
         instance, trailing = setup(args)
         all_tasks.values.map { |task| task.run(instance) }
       end
-    rescue Thor::Error, Thor::Options::Error => e
+    rescue Thor::Error => e
       $stderr.puts e.message
     end
 
