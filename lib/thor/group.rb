@@ -1,11 +1,11 @@
 $:.unshift File.expand_path(File.join(File.dirname(__FILE__), '..'))
 require 'thor/base'
 
-class Thor::Generator
+class Thor::Group
 
   class << self
 
-    # Start in generators works differently. It invokes all tasks inside the class.
+    # Start in Thor::Group works differently. It invokes all tasks inside the class.
     #
     def start(args=ARGV)
       if Thor::HELP_MAPPINGS.include?(args.first)
@@ -18,7 +18,7 @@ class Thor::Generator
       $stderr.puts e.message
     end
 
-    # Prints help information about this generator.
+    # Prints help information.
     #
     # ==== Options
     # short:: When true, shows only usage.
@@ -51,7 +51,7 @@ class Thor::Generator
     protected
 
       def baseclass #:nodoc:
-        Thor::Generator
+        Thor::Group
       end
 
       def valid_task?(meth) #:nodoc:
@@ -72,7 +72,7 @@ class Thor::Generator
   #
   def invoke(meth, *args)
     arity = self.method(meth).arity
-    raise ArgumentError, "Tasks in generators must not accept any argument, but #{meth} has arity #{arity}." if arity != 0
+    raise ArgumentError, "Tasks in Thor::Group must not accept any argument, but #{meth} has arity #{arity}." if arity != 0
     super(meth)
   end
 

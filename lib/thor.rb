@@ -119,8 +119,8 @@ class Thor
       $stderr.puts e.message
     end
 
-    # Prints help information about this generator. If a task name is given, it
-    # shows information only about the specific task.
+    # Prints help information. If a task name is given, it shows information
+    # only about the specific task.
     #
     # ==== Parameters
     # meth<String>:: An optional task name to print usage information about.

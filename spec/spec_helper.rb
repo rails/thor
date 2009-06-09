@@ -3,15 +3,15 @@ $TESTING=true
 $:.push File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require 'thor'
-require 'thor/generator'
+require 'thor/group'
 require 'stringio'
 require 'rubygems'
 require 'rr'
 
 # Load fixtures
 load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
+load File.join(File.dirname(__FILE__), "fixtures", "group.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
-load File.join(File.dirname(__FILE__), "fixtures", "generator.thor")
 
 undefinable = if defined?(Spec::Expectations::ObjectExpectations) # rspec <= 1.2.0
   Spec::Expectations::ObjectExpectations

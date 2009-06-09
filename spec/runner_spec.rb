@@ -33,7 +33,7 @@ describe Thor::Runner do
       content.must_not =~ /help \[TASK\]/
     end
 
-    it "shows information about a specific Thor::Generator class" do
+    it "shows information about a specific Thor group class" do
       content = capture(:stdout){ Thor::Runner.start(["help", "my_counter"]) }
       content.must =~ /my_counter N \[N\]/
     end
@@ -75,7 +75,7 @@ describe Thor::Runner do
       Thor::Runner.start.must == ["horse"]
     end
 
-    it "invokes a specific Thor::Generator" do
+    it "invokes a Thor::Group" do
       ARGV.replace ["my_counter", "1", "2", "--third", "3"]
       Thor::Runner.start.must == [1, 2, 3]
     end
@@ -113,7 +113,7 @@ describe Thor::Runner do
         capture(:stdout) { Thor::Runner.start }.must =~ /amazing:describe NAME \[\-\-forcefully\] +# say that someone is amazing/
       end
 
-      it "gives a list of the available generators" do
+      it "gives a list of the available Thor::Group classes" do
         ARGV.replace ["list"]
         capture(:stdout) { Thor::Runner.start }.must =~ /my_counter N \[N\] \[\-\-third=N\]/
       end

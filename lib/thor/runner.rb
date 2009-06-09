@@ -15,7 +15,7 @@ class Thor::Runner < Thor
     if meth && !self.respond_to?(meth)
       initialize_thorfiles(meth)
       klass, task = Thor::Util.namespace_to_thor_class(meth)
-      klass.start(["-h", task].compact) # send mapping -h because it works with generators too
+      klass.start(["-h", task].compact) # send mapping -h because it works with Thor::Group too
     else
       super
     end

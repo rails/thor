@@ -132,7 +132,7 @@ describe Thor::Util do
   end
 
   describe "#namespace_to_thor_class" do
-    it "returns a Thor::Generator class if full namespace matches" do
+    it "returns a Thor::Group class if full namespace matches" do
       Thor::Util.namespace_to_thor_class("my_counter").must == [MyCounter, nil]
     end
 

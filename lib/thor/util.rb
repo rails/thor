@@ -154,7 +154,7 @@ class Thor
       return $+.downcase
     end
 
-    # Receives a namespace and tries to retrieve a Thor or Thor::Generator class
+    # Receives a namespace and tries to retrieve a Thor or Thor::Group class
     # from it. It first searches for a class using the all the given namespace,
     # if it's not found, removes the highest entry and searches for the class
     # again. If found, returns the highest entry as the class name.
@@ -166,7 +166,7 @@ class Thor
     #     end
     #   end
     #
-    #   class Baz::Foo < Thor::Generator
+    #   class Baz::Foo < Thor::Group
     #   end
     #
     #   Thor::Util.namespace_to_thor_class("foo:bar")     #=> Foo::Bar, nil # will invoke default task
@@ -180,13 +180,13 @@ class Thor
     # Thor::Error:: raised if the namespace cannot be found.
     #
     # Thor::Error:: raised if the namespace evals to a class which does not
-    #               inherit from Thor or Thor::Generator.
+    #               inherit from Thor or Thor::Group.
     #
     def self.namespace_to_thor_class(namespace)
       klass = Thor::Util.namespace_to_constant(namespace) rescue nil
 
       if klass
-        return klass, nil if klass <= Thor || klass <= Thor::Generator
+        return klass, nil if klass <= Thor::Base
       elsif !namespace.include?(?:)
         raise Error, "could not find Thor class or task '#{namespace}'"
       end

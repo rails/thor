@@ -1,8 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe Thor::Generator do
+describe Thor::Group do
   describe "#start" do
-    it "invokes all the tasks under the generator" do
+    it "invokes all the tasks under the Thor group" do
       MyCounter.start(["1", "2", "--third", "3"]).must == [ 1, 2, 3 ]
     end
 
@@ -10,7 +10,7 @@ describe Thor::Generator do
       MyCounter.start(["1", "--third", "3"]).must == [ 1, 2, 3 ]
     end
 
-    it "invokes all the tasks under the generator and his parents" do
+    it "invokes all the tasks in the Thor group and his parents" do
       BrokenCounter.start(["1", "2", "--third", "3"]).must == [ nil, 2, 3, false, 5 ]
     end
 
@@ -24,7 +24,7 @@ describe Thor::Generator do
       lambda { BrokenCounter.start(["1", "2", "--fail"]) }.must raise_error
     end
 
-    it "raises an error when a generator task expects arguments" do
+    it "raises an error when a Thor group task expects arguments" do
       lambda { WhinyGenerator.start }.must raise_error
     end
 

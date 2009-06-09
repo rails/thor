@@ -18,7 +18,7 @@ class Thor
       base.send :include, SingletonMethods
     end
 
-    # Returns the classes that inherits from Thor or Thor::Generator.
+    # Returns the classes that inherits from Thor or Thor::Group.
     #
     # ==== Returns
     # Array[Class]
@@ -36,7 +36,7 @@ class Thor
       @subclass_files ||= Hash.new{ |h,k| h[k] = [] }
     end
 
-    # Whenever a class inherits from Thor or Thor::Generator, we should track the
+    # Whenever a class inherits from Thor or Thor::Group, we should track the
     # class and the file on Thor::Base. This is the method responsable for it.
     #
     def self.register_klass_file(klass) #:nodoc:
@@ -361,7 +361,7 @@ class Thor
       end
 
       # Main entry point method that actually invoke the task. Currently
-      # overwritten both by Thor and Thor::Generator.
+      # overwritten both by Thor and Thor::Group.
       #
       def invoke(meth, *args)
         self.send(meth, *args)
