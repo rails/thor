@@ -98,6 +98,15 @@ class Thor
           $stdout.puts
         end
       end
+
+      # Called if something goes wrong during the execution. This is used by Thor
+      # internally and should not be used inside your scripts. If someone went
+      # wrong, you can always raise an exception. If you raise a Thor::Error, it
+      # will be rescued and wrapped in the method below.
+      #
+      def error(statement) #:nodoc:
+        $stderr.puts statement
+      end
     end
   end
 end

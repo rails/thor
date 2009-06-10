@@ -113,12 +113,14 @@ class Thor
     # method can be extracted from args the default task is invoked.
     #
     def start(args=ARGV, config={})
+      config[:shell] ||= Thor::Base.shell.new
+
       meth = normalize_task_name(args.shift)
       task = self[meth]
       instance, args = setup(args, task.options, config)
       task.run(instance, args)
     rescue Thor::Error => e
-      $stderr.puts e.message
+      config[:shell].error e.message
     end
 
     # Prints help information. If a task name is given, it shows information
@@ -224,7 +226,7 @@ class Thor
       raise e
     end
   rescue NoMethodError => e
-    if e.message =~ /^undefined method `#{meth}' for #{Regexp.escape(self.inspect)}$/
+    if e.message =~ /^undefined method `#{meth}' for #{Regexp.escape(self.to_s)}$/
       raise UndefinedTaskError, "The #{self.class.namespace} namespace doesn't have a '#{meth}' task"
     else
       raise e

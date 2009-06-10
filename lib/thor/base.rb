@@ -380,9 +380,9 @@ class Thor
     end
 
     module SingletonMethods
-      attr_accessor :options
+      attr_accessor :options, :shell
 
-      def initialize(options={}, *args)
+      def initialize(options={}, *args) #:nodoc:
         self.options = options
       end
 
@@ -391,18 +391,6 @@ class Thor
       #
       def invoke(meth, *args)
         self.send(meth, *args)
-      end
-
-      def shell=(duck) #:nodoc:
-        @shell = if duck.is_a?(Class)
-          duck.new
-        else
-          duck
-        end
-      end
-
-      def shell #:nodoc:
-        @shell ||= Thor::Base.shell.new
       end
     end
 
