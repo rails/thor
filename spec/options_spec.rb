@@ -76,6 +76,8 @@ describe Thor::Options do
     it "doesn't recognize long switch format for a switch that is originally short" do
       create 'f' => :optional
       parse("-f", "1").must == {"f" => "1"}
+
+      create 'f' => :optional
       parse("--f", "1").must == {}
     end
   end
@@ -97,32 +99,12 @@ describe Thor::Options do
       opts["app"].must == "12"
     end
 
-    it "makes hash keys available as symbols as well" do
-      create "--foo" => :optional
-      parse("--foo", "12")[:foo].must == "12"
-    end
-
-    it "result is immutable" do
-      create "--foo" => :optional
-      lambda {
-        hash = parse
-        hash['foo'] = 'baz'
-      }.must raise_error(TypeError)
-    end
-
     it "extracts trailing inputs" do
       create "--foo" => :required, "--bar" => true
       args = [ "foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang" ]
 
       parse(*args).must == { "foo" => "12", "bar" => true }
       @opt.trailing.must == ["foo", "bar", "--baz", "-T", "bang"]
-    end
-
-    it "doesn't set nonexistant switches" do
-      create "--foo" => :boolean
-      parse("--foo")["bar"].must_not be
-      opts = parse
-      opts["foo"].must_not be
     end
 
     describe "with no input" do
@@ -263,6 +245,10 @@ describe Thor::Options do
         parse("--foo")["foo"].must == true
       end
 
+      it "doesn't set nonexistant switches" do
+        parse("--foo")["bar"].must_not be
+      end
+
       it "accepts --[no-]opt variant, setting false for value" do
         parse("--no-foo")["foo"].must == false
       end
@@ -316,12 +302,10 @@ describe Thor::Options do
 
       it "sets switches without arguments to true" do
         parse("--foo")["foo"].must be_true
-        parse("--bar")["bar"].must be_true
       end
 
       it "doesn't set nonexistant switches" do
         parse("--foo")["bar"].must_not be
-        parse("--bar")["foo"].must_not be
       end
 
       it "sets switches with arguments to their arguments" do

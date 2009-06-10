@@ -1,3 +1,4 @@
+require 'thor/core_ext/hash_with_indifferent_access'
 require 'thor/core_ext/ordered_hash'
 require 'thor/error'
 require 'thor/options'
@@ -272,19 +273,6 @@ class Thor
 
       protected
 
-        # Setup this thor class using the given arguments and extra options. This
-        # holds the initialization process common to all Thor classes.
-        #
-        def setup(args, task_options=nil, config={})
-          options = self.class_options
-          options = options.merge(task_options) if task_options
-
-          opts = Thor::Options.new(options)
-          opts.parse(args)
-
-          return new(opts.arguments, opts.options, config), opts.trailing
-        end
-
         # Build an option and adds it to the given scope.
         #
         # ==== Parameters
@@ -383,7 +371,11 @@ class Thor
       # ==== Parameters
       # args<Array[Object]>:: An array of objects. The objects are applied to their
       #                       respective accessors declared with <tt>argument</tt>.
+      #
       # options<Hash>:: An options hash that will be available as self.options.
+      #                 The hash given is converted to a hash with indifferent
+      #                 access, magic predicates (options.skip?) and then frozen.
+      #
       # config<Hash>:: Configuration for this Thor class.
       #
       # ==== Configuration
@@ -404,28 +396,34 @@ class Thor
           send("#{argument.human_name}=", value)
         end
 
-        self.options = options
+        self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
         self.root    = config[:root]
         self.shell   = config[:shell]
       end
 
       # Holds the shell for the given Thor instance. If no shell is given,
-      # it gets a default shell from Thor::Base.shell. Do not overwrite this
-      # method
+      # it gets a default shell from Thor::Base.shell.
       #
-      def shell #:nodoc:
+      def shell
         @shell ||= Thor::Base.shell.new
       end
 
-      def shell=(shell) #:nodoc:
+      # Sets the shell for this thor class.
+      #
+      def shell=(shell)
         @shell = shell
       end
 
-      def root #:nodoc:
+      # Returns the root for this thor class (also known as destination root).
+      #
+      def root
         @root ||= File.expand_path(File.join(Dir.pwd, ''))
       end
 
-      def root=(root) #:nodoc:
+      # Sets the root for this thor class. Relatives path are added to the
+      # directory where the script was invoked and expanded.
+      #
+      def root=(root)
         @root = if root && File.directory?(root)
           File.expand_path(root)
         else

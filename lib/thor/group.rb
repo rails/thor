@@ -27,7 +27,10 @@ class Thor::Group
       if Thor::HELP_MAPPINGS.include?(args.first)
         help(config[:shell])
       else
-        instance, trailing = setup(args, nil, config)
+        opts = Thor::Options.new(class_options)
+        opts.parse(args)
+
+        instance = new(opts.arguments, opts.options, config)
         all_tasks.values.map { |task| task.run(instance) }
       end
     rescue Thor::Error => e

@@ -1,5 +1,4 @@
 require 'thor/option'
-require 'thor/core_ext/hash_with_indifferent_access'
 
 class Thor
 
@@ -51,8 +50,8 @@ class Thor
     #   ).parse(args)
     #
     def initialize(switches={})
-      @defaults, @shorts, @options = {}, {}, {}
-      @arguments, @non_assigned_required, @non_assigned_arguments, @trailing = [], [], [], []
+      @arguments, @shorts, @options = [], {}, {}
+      @non_assigned_required, @non_assigned_arguments, @trailing = [], [], []
 
       @switches = switches.values.inject({}) do |mem, option|
         @non_assigned_required  << option if option.required?
@@ -60,7 +59,7 @@ class Thor
         if option.argument?
           @non_assigned_arguments << option
         elsif option.default
-          @defaults[option.human_name] = option.default
+          @options[option.human_name] = option.default
         end
 
         # If there are no shortcuts specified, generate one using the first character
@@ -77,9 +76,6 @@ class Thor
 
     def parse(args)
       @pile, @trailing = args, []
-
-      # Start hash with indifferent access pre-filled with defaults
-      @options = Thor::CoreExt::HashWithIndifferentAccess.new(@defaults)
 
       while peek
         if current_is_switch?
@@ -114,7 +110,6 @@ class Thor
 
       assign_arguments_default_values!
       check_validity!
-      @options.freeze
       @options
     end
 

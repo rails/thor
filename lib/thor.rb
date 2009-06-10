@@ -122,8 +122,13 @@ class Thor
 
       meth = normalize_task_name(args.shift)
       task = self[meth]
-      instance, args = setup(args, task.options, config)
-      task.run(instance, args)
+
+      options = class_options.merge(task.options)
+      opts = Thor::Options.new(options)
+      opts.parse(args)
+
+      instance = new(opts.arguments, opts.options, config)
+      task.run(instance, opts.trailing)
     rescue Thor::Error => e
       config[:shell].error e.message
     end
