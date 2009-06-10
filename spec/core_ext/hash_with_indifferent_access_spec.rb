@@ -3,7 +3,7 @@ require 'thor/core_ext/hash_with_indifferent_access'
 
 describe Thor::CoreExt::HashWithIndifferentAccess do
   before(:each) do
-    @hash = Thor::CoreExt::HashWithIndifferentAccess.new 'foo' => 'bar', 'baz' => 'bee', 'force' => true
+    @hash = Thor::CoreExt::HashWithIndifferentAccess.new :foo => 'bar', 'baz' => 'bee', :force => true
   end
 
   it "has values accessible by either strings or symbols" do

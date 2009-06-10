@@ -9,6 +9,35 @@ class Amazing
 end
 
 describe Thor::Base do
+  describe "#initialize" do
+    it "sets values in arguments" do
+      base = MyCounter.new [1, 2]
+      base.first.must == 1
+      base.second.must == 2
+    end
+
+    it "sets options hash" do
+      base = MyCounter.new [1, 2], :third => 3
+      base.options[:third].must == 3
+    end
+
+    it "sets options with indifferent access" do
+      base = MyCounter.new [1, 2], :third => 3
+      base.options['third'].must == 3
+    end
+
+    it "sets options with magic predicates" do
+      base = MyCounter.new [1, 2], :third => 3
+      base.options.third.must == 3
+    end
+
+    it "sets shell value" do
+      shell_mock = stub(Thor::Shell::Basic)
+      base = MyCounter.new [1, 2], { }, :shell => shell_mock
+      base.shell.must == shell_mock
+    end
+  end
+
   describe "#shell" do
     it "returns the shell in use" do
       Thor::Base.shell.must == Thor::Shell::Basic

@@ -368,6 +368,9 @@ class Thor
       # It receives arguments in an Array and two hashes, one for options and
       # other for configuration.
       #
+      # Notice that it does not check arguments type neither if all required
+      # arguments were supplied. It should be done by the parser.
+      #
       # ==== Parameters
       # args<Array[Object]>:: An array of objects. The objects are applied to their
       #                       respective accessors declared with <tt>argument</tt>.

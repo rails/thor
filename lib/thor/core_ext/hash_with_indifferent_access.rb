@@ -13,7 +13,14 @@ class Thor
 
       def initialize(hash)
         super()
-        update(hash)
+
+        hash.each do |key, value|
+          if key.is_a?(Symbol)
+            self[key.to_s] = value
+          else
+            self[key] = value
+          end
+        end
       end
 
       def [](key)
