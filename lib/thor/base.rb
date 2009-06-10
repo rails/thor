@@ -49,21 +49,23 @@ class Thor
     module ClassMethods
       # Adds an argument to the class and creates an attr_accessor for it.
       #
-      # The difference between arguments and options are how they are parsed
-      # from the command line. Arguments can be retrieved in two ways:
+      # Arguments are different from options in several aspects. The first one
+      # is how they are parsed from the command line, arguments are retrieved
+      # from position:
       #
       #   thor task NAME
       #
-      # Or:
+      # Instead of:
       #
       #   thor task --name=NAME
       #
-      # While options are only retrieved in the second way, doesn't matter if they
-      # are required or not. Besides, arguments cannot have type :default or :boolean.
+      # Besides, arguments are used inside your code as an accessor (self.argument),
+      # while options are all kept in a hash (self.options).
       #
-      # Finally, arguments can be optional (supplying :optional => :true or
-      # :required => false), but you cannot have a required argument after a
-      # non-required argument. If you try it, an error is raised.
+      # Finally, arguments cannot have type :default or :boolean but can be
+      # optional (supplying :optional => :true or :required => false), although
+      # you cannot have a required argument after a non-required argument. If you
+      # try it, an error is raised.
       #
       # ==== Parameters
       # name<Symbol>:: The name of the argument.
@@ -100,7 +102,7 @@ class Thor
       # Array[Thor::Argument]
       #
       def arguments
-        @arguments ||= class_options.values.select{ |o| o.argument? }
+        class_options.values.select{ |o| o.argument? }
       end
 
       # Adds a bunch of options to the set of class options.
@@ -280,14 +282,7 @@ class Thor
           opts = Thor::Options.new(options)
           opts.parse(args)
 
-          instance = new(opts.options)
-          opts.arguments.each do |key, value|
-            instance.send(:"#{key}=", value)
-          end
-
-          instance.shell = config[:shell] if config[:shell]
-
-          return instance, opts.trailing
+          return new(opts.arguments, opts.options, config), opts.trailing
         end
 
         # Build an option and adds it to the given scope.
@@ -380,10 +375,62 @@ class Thor
     end
 
     module SingletonMethods
-      attr_accessor :options, :shell
+      attr_accessor :options
 
-      def initialize(options={}, *args) #:nodoc:
+      # It receives arguments in an Array and two hashes, one for options and
+      # other for configuration.
+      #
+      # ==== Parameters
+      # args<Array[Object]>:: An array of objects. The objects are applied to their
+      #                       respective accessors declared with <tt>argument</tt>.
+      # options<Hash>:: An options hash that will be available as self.options.
+      # config<Hash>:: Configuration for this Thor class.
+      #
+      # ==== Configuration
+      # shell<Object>:: The shell instance object to be used.
+      # root<String>:: The directory to be considered as root, necessary if you are using
+      #                certain actions.
+      #
+      # ==== Examples
+      #
+      #   class MyScript < Thor
+      #     argument :first, :type => :numeric
+      #   end
+      #
+      #   MyScript.new [1.0], { :foo => :bar }, :shell => Thor::Shell::Basic.new, :root => "~/"
+      #
+      def initialize(args=[], options={}, config={})
+        self.class.arguments.zip(args).each do |argument, value|
+          send("#{argument.human_name}=", value)
+        end
+
         self.options = options
+        self.root    = config[:root]
+        self.shell   = config[:shell]
+      end
+
+      # Holds the shell for the given Thor instance. If no shell is given,
+      # it gets a default shell from Thor::Base.shell. Do not overwrite this
+      # method
+      #
+      def shell #:nodoc:
+        @shell ||= Thor::Base.shell.new
+      end
+
+      def shell=(shell) #:nodoc:
+        @shell = shell
+      end
+
+      def root #:nodoc:
+        @root ||= File.expand_path(File.join(Dir.pwd, ''))
+      end
+
+      def root=(root) #:nodoc:
+        @root = if root && File.directory?(root)
+          File.expand_path(root)
+        else
+          File.expand_path(File.join(Dir.pwd, root || ''))
+        end
       end
 
       # Main entry point method that actually invoke the task. Currently

@@ -183,7 +183,7 @@ describe Thor::Options do
         create ordered_hash
         parse("User", "name:string", "age:integer")
 
-        @opt.arguments.must == { "class_name"=>"User", "attributes" => { "name"=>"string", "age"=>"integer" } }
+        @opt.arguments.must == [ "User", { "name"=>"string", "age"=>"integer" } ]
       end
 
       it "parses leading arguments and just then parse optionals" do
@@ -194,7 +194,7 @@ describe Thor::Options do
         create ordered_hash
         parse("3.0", "--unit", "months")
 
-        @opt.arguments.must == {"interval" => 3.0}
+        @opt.arguments.must == [ 3.0 ]
         @opt.options.must == {"unit" => "months"}
       end
 
@@ -206,7 +206,7 @@ describe Thor::Options do
         create ordered_hash
         parse("3.0", "months")
 
-        @opt.arguments.must == {"interval" => 3.0}
+        @opt.arguments.must == [ 3.0 ]
         @opt.options.must == {"unit" => "days"}
       end
 
@@ -218,11 +218,11 @@ describe Thor::Options do
         create ordered_hash
         parse("--unit", "months", "--interval", "3.0")
 
-        @opt.arguments.must == {"interval" => 3.0}
+        @opt.arguments.must == [ 3.0 ]
         @opt.options.must == {"unit" => "months"}
       end
 
-      it "adds input to trailing array if it's later supplied as a switch" do
+      it "ignores switches that match arguments" do
         ordered_hash = Thor::CoreExt::OrderedHash.new
         ordered_hash[:interval] = Thor::Argument.new(:interval, nil, true, :numeric, nil, [])
         ordered_hash[:unit]     = Thor::Option.new(:unit, nil, false, :string, "days", [])
@@ -230,8 +230,8 @@ describe Thor::Options do
         create ordered_hash
         parse("1.0", "--unit", "months", "--interval", "3.0")
 
-        @opt.arguments.must == {"interval" => 3.0}
-        @opt.trailing.must  == [1.0]
+        @opt.arguments.must == [ 1.0 ]
+        @opt.options.must == {"unit" => "months"}
       end
     end
   end

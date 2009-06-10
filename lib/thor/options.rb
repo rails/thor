@@ -51,15 +51,15 @@ class Thor
     #   ).parse(args)
     #
     def initialize(switches={})
-      @defaults, @shorts, @arguments, @options = {}, {}, {}, {}
-      @non_assigned_required, @non_assigned_arguments, @trailing = [], [], []
+      @defaults, @shorts, @options = {}, {}, {}
+      @arguments, @non_assigned_required, @non_assigned_arguments, @trailing = [], [], [], []
 
       @switches = switches.values.inject({}) do |mem, option|
         @non_assigned_required  << option if option.required?
 
         if option.argument?
           @non_assigned_arguments << option
-        elsif !option.default.nil?
+        elsif option.default
           @defaults[option.human_name] = option.default
         end
 
@@ -72,7 +72,6 @@ class Thor
         mem
       end
 
-      assign_arguments_default_values!
       remove_duplicated_shortcuts!
     end
 
@@ -98,25 +97,22 @@ class Thor
           switch = normalize_switch(switch)
           option = switch_option(switch)
 
-          next unless option
+          next if option.nil? || option.argument?
 
           check_requirement!(switch, option)
-
-          if option.argument?
-            parse_argument(switch, option)
-          else
-            parse_option(switch, option, @options)
-          end
+          parse_option(switch, option, @options)
         else
           unless @non_assigned_arguments.empty?
-            option = @non_assigned_arguments.shift
-            parse_option(option.switch_name, option, @arguments)
+            argument = @non_assigned_arguments.shift
+            parse_option(argument.switch_name, argument, @options)
+            @arguments << @options.delete(argument.human_name)
           else
             @trailing << shift
           end
         end
       end
 
+      assign_arguments_default_values!
       check_validity!
       @options.freeze
       @options
@@ -171,19 +167,6 @@ class Thor
       #
       def normalize_switch(arg)
         @shorts.key?(arg) ? @shorts[arg] : arg
-      end
-
-      # Parse the argument. If the argument was already assigned, get the current
-      # value, parse the new one and put the old one back on the pile.
-      #
-      def parse_argument(switch, option)
-        unless @non_assigned_arguments.include?(option)
-          @trailing << @arguments[option.human_name]
-          parse_option(switch, option, @arguments)
-        else
-          @non_assigned_arguments.delete(option)
-          parse_option(switch, option, @arguments)
-        end
       end
 
       # Receives switch, option and the current values hash and assign the next
@@ -286,7 +269,7 @@ class Thor
       #
       def assign_arguments_default_values!
         @non_assigned_arguments.each do |option|
-          @arguments[option.human_name] = option.default
+          @arguments << option.default
         end
       end
 

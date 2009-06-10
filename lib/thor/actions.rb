@@ -1,5 +1,9 @@
 require 'thor/shell/basic'
 
+Dir[File.join(File.dirname(__FILE__), "actions", "*.rb")].each do |action|
+  require action
+end
+
 class Thor
   module Actions
     [:ask, :yes?, :no?, :say, :print_list, :print_table].each do |method|

@@ -109,8 +109,13 @@ class Thor
       build_option(name, options, scope)
     end
 
-    # Parse the options given and extract the task to be called from it. If no
-    # method can be extracted from args the default task is invoked.
+    # Responsable to invoke this Thor class. It parses the task and options from
+    # args, instantiate the class and invoke the task. This method is used when
+    # the arguments must be parsed from an array. If you are inside Ruby and want
+    # to use a Thor class, you can do that just calling new:
+    #
+    #   script = MyScript.new(args, options, config)
+    #   script.invoke(:task, task_args)
     #
     def start(args=ARGV, config={})
       config[:shell] ||= Thor::Base.shell.new
