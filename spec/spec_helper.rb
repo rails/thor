@@ -3,7 +3,6 @@ $TESTING=true
 $:.push File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require 'thor'
-require 'thor/group'
 require 'stringio'
 require 'rubygems'
 require 'rr'
@@ -40,6 +39,14 @@ Spec::Runner.configure do |config|
     end
 
     result
+  end
+
+  def source_root
+    File.join(File.dirname(__FILE__), 'fixtures')
+  end
+
+  def destination_root
+    File.join(File.dirname(__FILE__), 'sandbox')
   end
 
   alias silence capture

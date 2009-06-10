@@ -5,7 +5,7 @@ class Thor
     # destination root respectively.
     #
     def copy_file(source, destination=nil)
-      action CopyFile.new(source, destination || source)
+      action CopyFile.new(self, source, destination || source)
     end
 
     class CopyFile #:nodoc:
