@@ -408,11 +408,12 @@ class Thor
         @shell = shell
       end
 
-      # Returns the root for this thor class (also known as destination root).
+      # Returns the root for this thor class (also aliased as destination root).
       #
       def root
         @root ||= File.expand_path(File.join(Dir.pwd, ''))
       end
+      alias :destination_root :root
 
       # Sets the root for this thor class. Relatives path are added to the
       # directory where the script was invoked and expanded.
@@ -425,7 +426,10 @@ class Thor
         end
       end
 
-      # Invokes a task.
+      # Finds a task with the name given and invokes it with the given arguments.
+      # This is the default interface to invoke tasks. You can always run a task
+      # directly, but the invocation system will be implemented in a fashion
+      # that a same task cannot be invoked twice (a la rake).
       #
       def invoke(name, *args)
         self.class[name].run(self, *args)

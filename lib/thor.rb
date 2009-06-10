@@ -109,10 +109,10 @@ class Thor
       build_option(name, options, scope)
     end
 
-    # Responsable to invoke this Thor class. It parses the task and options from
-    # args, instantiate the class and invoke the task. This method is used when
-    # the arguments must be parsed from an array. If you are inside Ruby and want
-    # to use a Thor class, you can do that just calling new:
+    # Parses the task and options from the given args, instantiate the class
+    # and invoke the task. This method is used when the arguments must be parsed
+    # from an array. If you are inside Ruby and want to use a Thor class, you
+    # can simply initialize it:
     #
     #   script = MyScript.new(args, options, config)
     #   script.invoke(:task, first_arg, second_arg, third_arg)
