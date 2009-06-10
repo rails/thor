@@ -1,5 +1,6 @@
 require 'thor/core_ext/hash_with_indifferent_access'
 require 'thor/core_ext/ordered_hash'
+require 'thor/shell/basic'
 require 'thor/error'
 require 'thor/options'
 require 'thor/task'
@@ -34,6 +35,18 @@ class Thor
     #
     def self.subclass_files
       @subclass_files ||= Hash.new{ |h,k| h[k] = [] }
+    end
+
+    # Returns the shell used in all Thor classes.
+    #
+    def self.shell
+      @shell || Thor::Shell::Basic
+    end
+
+    # Sets the shell used in all Thor classes.
+    #
+    def self.shell=(klass)
+      @shell = klass
     end
 
     # Whenever a class inherits from Thor or Thor::Group, we should track the
@@ -354,7 +367,7 @@ class Thor
     end
 
     module SingletonMethods
-      attr_accessor :options
+      attr_accessor :options, :behavior
 
       # It receives arguments in an Array and two hashes, one for options and
       # other for configuration.
@@ -374,8 +387,12 @@ class Thor
       #
       # ==== Configuration
       # shell<Object>:: The shell instance object to be used.
+      #
       # root<String>:: The directory to be considered as root, necessary if you are using
       #                certain actions.
+      #
+      # behavior<Symbol>:: The behavior for this thor class used by some actions, can be
+      #                    invoke or revoke. By default is invoke.
       #
       # ==== Examples
       #
@@ -383,16 +400,17 @@ class Thor
       #     argument :first, :type => :numeric
       #   end
       #
-      #   MyScript.new [1.0], { :foo => :bar }, :shell => Thor::Shell::Basic.new, :root => "~/"
+      #   MyScript.new [1.0], { :foo => :bar }, :shell => Thor::Shell::Basic.new, :behavior => :revoke
       #
       def initialize(args=[], options={}, config={})
         self.class.arguments.zip(args).each do |argument, value|
           send("#{argument.human_name}=", value)
         end
 
-        self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
-        self.root    = config[:root]
-        self.shell   = config[:shell]
+        self.options  = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
+        self.root     = config[:root]
+        self.shell    = config[:shell]
+        self.behavior = config[:behavior] || :invoke
       end
 
       # Holds the shell for the given Thor instance. If no shell is given,

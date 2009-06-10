@@ -25,9 +25,8 @@ class Thor
       null, sudo, gem = RUBY_PLATFORM =~ /mswin|mingw/ ? ['NUL', '', 'gem.bat'] :
                                                          ['/dev/null', 'sudo', 'gem']
 
-      # Run the package task. We need an invocation system that does exactly it.
       old_stderr, $stderr = $stderr.dup, File.open(null, "w")
-      instance.class["package"].run(instance, args)
+      instance.invoke(:package)
       $stderr = old_stderr
 
       system %{#{sudo} #{Gem.ruby} -S #{gem} install #{config[:dir]}/#{spec.name}-#{spec.version} --no-rdoc --no-ri --no-update-sources}

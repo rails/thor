@@ -1,22 +1,25 @@
 class Thor
   module Actions
 
-    def copy_file
+    # Receives the source and the destination, relative to the source root and
+    # destination root respectively.
+    #
+    def copy_file(source, destination=nil)
+      action CopyFile.new(source, destination || source)
     end
 
     class CopyFile #:nodoc:
-
       attr_accessor :base, :source, :destination
-  
+
       def source=(source)
-        unless source.blank?
+        if source
           @source = ::File.expand_path(source, base.source_root)
         end
       end
-      
+
       def destination=(destination)
-        unless destination.blank?
-          @destination = ::File.expand_path(convert_encoded_instructions(destination), base.destination_root)
+        if destination
+          @destination = ::File.expand_path(destination, base.destination_root)
         end
       end
 
@@ -26,7 +29,8 @@ class Thor
       # source<String>:: Full path to the source of this file
       # destination<String>:: Full path to the destination of this file
       #
-      def initialize(source, destination)
+      def initialize(base, source, destination)
+        self.base = base
         self.source = source
         self.destination = destination
       end
