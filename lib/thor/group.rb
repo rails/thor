@@ -52,7 +52,7 @@ class Thor::Group
 
         unless list.empty?
           shell.say "Options:"
-          shell.table(list, :emphasize_last => true)
+          shell.print_table(list, :emphasize_last => true)
           shell.say
         end
 

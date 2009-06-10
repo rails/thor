@@ -49,7 +49,29 @@ describe Thor::Shell::Basic do
     end
   end
 
-  describe "#table" do
+  describe "#print_list" do
+    before(:each) do
+      @list = ["abc", "#123", "first three"]
+    end
+
+    it "prints a list" do
+      content = capture(:stdout){ shell.print_list(@list) }
+      content.must == <<-LIST
+abc
+#123
+first three
+LIST
+    end
+
+    it "prints a list inline" do
+      content = capture(:stdout){ shell.print_list(@list, :inline) }
+      content.must == <<-LIST
+abc, #123, and first three
+LIST
+    end
+  end
+
+  describe "#print_table" do
     before(:each) do
       @table = []
       @table << ["abc", "#123", "first three"]
@@ -58,7 +80,7 @@ describe Thor::Shell::Basic do
     end
 
     it "prints a table" do
-      content = capture(:stdout){ shell.table(@table) }
+      content = capture(:stdout){ shell.print_table(@table) }
       content.must == <<-TABLE
 abc  #123  first three
      #0    empty
@@ -67,7 +89,7 @@ TABLE
     end
 
     it "prints a table with identation" do
-      content = capture(:stdout){ shell.table(@table, :ident => 2) }
+      content = capture(:stdout){ shell.print_table(@table, :ident => 2) }
       content.must == <<-TABLE
   abc  #123  first three
        #0    empty

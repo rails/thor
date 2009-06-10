@@ -18,10 +18,10 @@ class Thor
       # ==== Example
       # say("I know you knew that.")
       #
-      def say(statement='')
+      def say(statement="")
         statement = statement.to_s
 
-        if statement[-1, 1] == ' ' || statement[-1, 1] == "\t"
+        if statement[-1, 1] == " " || statement[-1, 1] == "\t"
           $stdout.print(statement)
           $stdout.flush
         else
@@ -43,12 +43,36 @@ class Thor
         !yes?(statement)
       end
 
+      # Prints a list of items.
+      #
+      # ==== Parameters
+      # list<Array[String, String, ...]>
+      # mode<Symbol>:: Can be :rows or :inline. Defaults to :rows.
+      #
+      def print_list(list, mode=:rows)
+        return if list.empty?
+
+        content = case mode
+          when :inline
+            last = list.pop
+            "#{list.join(", ")}, and #{last}"
+          else # rows
+            list.join("\n")
+        end
+
+        $stdout.puts content
+      end
+
       # Prints a table.
       #
       # ==== Parameters
       # Array[Array[String, String, ...]]
       #
-      def table(table, options={})
+      # ==== Options
+      # ident<Integer>:: Ident the first column by ident value.
+      # emphasize_last<Boolean>:: When true, add a different behavior to the last column.
+      #
+      def print_table(table, options={})
         return if table.empty?
 
         formats = []

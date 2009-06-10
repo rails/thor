@@ -150,7 +150,7 @@ class Thor
             [ task.formatted_usage(namespace), task.short_description || '' ]
           end
 
-          shell.table(list, :emphasize_last => true)
+          shell.print_table(list, :emphasize_last => true)
         else
           options_help(shell)
 
@@ -159,7 +159,7 @@ class Thor
           end
 
           shell.say "Tasks:"
-          shell.table(list, :ident => 2, :emphasize_last => true)
+          shell.print_table(list, :ident => 2, :emphasize_last => true)
         end
       end
     end
@@ -200,7 +200,7 @@ class Thor
           end
 
           shell.say "Global options:"
-          shell.table(list, :emphasize_last => true)
+          shell.print_table(list, :emphasize_last => true)
           shell.say ""
         end
       end

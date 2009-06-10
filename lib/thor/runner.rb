@@ -255,17 +255,17 @@ class Thor::Runner < Thor
       raise Error, "No Thor tasks available" if klasses.empty?
 
       if with_modules && !thor_yaml.empty?
-        table  = []
+        info  = []
         labels = ["Modules", "Namespaces"]
 
-        table << labels
-        table << [ "-" * labels[0].size, "-" * labels[1].size ]
+        info << labels
+        info << [ "-" * labels[0].size, "-" * labels[1].size ]
 
-        thor_yaml.each do |name, info|
-          table << [ name, info[:namespaces].join(", ") ]
+        thor_yaml.each do |name, hash|
+          info << [ name, hash[:namespaces].join(", ") ]
         end
 
-        shell.table(table)
+        print_table info
         say ""
       end
 
@@ -283,14 +283,14 @@ class Thor::Runner < Thor
         base = klass.namespace
 
         if base == "default"
-          puts "\033[1;35m#{base}\033[0m"
+          say "\033[1;35m#{base}\033[0m"
         else
-          puts "\033[1;34m#{base}\033[0m"
+          say "\033[1;34m#{base}\033[0m"
         end
-        puts "-" * base.length
+        say "-" * base.length
 
         klass.help(shell, :short => true, :namespace => true)
-        puts
+        say
       end
     end
 end
