@@ -115,7 +115,7 @@ class Thor
     # to use a Thor class, you can do that just calling new:
     #
     #   script = MyScript.new(args, options, config)
-    #   script.invoke(:task, task_args)
+    #   script.invoke(:task, first_arg, second_arg, third_arg)
     #
     def start(args=ARGV, config={})
       config[:shell] ||= Thor::Base.shell.new
@@ -128,7 +128,7 @@ class Thor
       opts.parse(args)
 
       instance = new(opts.arguments, opts.options, config)
-      task.run(instance, opts.trailing)
+      instance.invoke(task.name, *opts.trailing)
     rescue Thor::Error => e
       config[:shell].error e.message
     end
@@ -218,31 +218,6 @@ class Thor
       end
   end
 
-  # Invokes a task.
-  #
-  # ==== Errors
-  # Thor::Error:: A Thor error is raised if the user called an undefined task
-  #               or called an exisisting task wrongly.
-  #
-  def invoke(meth, *args)
-    super
-  rescue ArgumentError => e
-    backtrace = sans_backtrace(e.backtrace, caller)
-
-    if backtrace.empty?
-      task = self.class[meth]
-      raise InvocationError, "'#{meth}' was called incorrectly. Call as '#{task.formatted_usage(self.class)}'"
-    else
-      raise e
-    end
-  rescue NoMethodError => e
-    if e.message =~ /^undefined method `#{meth}' for #{Regexp.escape(self.to_s)}$/
-      raise UndefinedTaskError, "The #{self.class.namespace} namespace doesn't have a '#{meth}' task"
-    else
-      raise e
-    end
-  end
-
   include Thor::Base
 
   map HELP_MAPPINGS => :help
@@ -251,15 +226,4 @@ class Thor
   def help(task=nil)
     self.class.help(shell, task, :namespace => task && task.include?(?:))
   end
-
-  protected
-
-    # Clean everything that comes from the Thor gempath and remove the caller.
-    #
-    def sans_backtrace(backtrace, caller)
-      dirname = /^#{Regexp.escape(File.dirname(__FILE__))}/
-      saned  = backtrace.reject { |frame| frame =~ dirname }
-      saned -= caller
-    end
-
 end

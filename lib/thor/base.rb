@@ -262,15 +262,6 @@ class Thor
         end
       end
 
-      # Invokes a specific task. You can use this method instead of start() to
-      # to run a thor task if you know the specific task you want to invoke.
-      #
-      def invoke(task_name, args=ARGV)
-        args = args.dup
-        args.unshift(task_name)
-        start(args)
-      end
-
       protected
 
         # Build an option and adds it to the given scope.
@@ -434,11 +425,10 @@ class Thor
         end
       end
 
-      # Main entry point method that actually invoke the task. Currently
-      # overwritten both by Thor and Thor::Group.
+      # Invokes a task.
       #
-      def invoke(meth, *args)
-        self.send(meth, *args)
+      def invoke(name, *args)
+        self.class[name].run(self, *args)
       end
     end
 

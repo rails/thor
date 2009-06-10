@@ -128,12 +128,6 @@ describe Thor do
     end
   end
 
-  describe "#invoke" do
-    it "invokes the named command regardless of the command line options with invoke()" do
-      MyScript.invoke(:animal, ["fish"]).must == ["fish"]
-    end
-  end
-
   describe "#help" do
     describe "on general" do
       before(:each) do

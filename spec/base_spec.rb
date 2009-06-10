@@ -32,15 +32,39 @@ describe Thor::Base do
     end
 
     it "sets shell value" do
-      shell_mock = stub(Thor::Shell::Basic)
-      base = MyCounter.new [1, 2], { }, :shell => shell_mock
-      base.shell.must == shell_mock
+      shell_stub = stub(Thor::Shell::Basic)
+      base = MyCounter.new [1, 2], { }, :shell => shell_stub
+      base.shell.must == shell_stub
+    end
+  end
+
+  describe "#invoke" do
+    it "invokes an specific task" do
+      MyScript.new.invoke(:animal, "fish").must == ["fish"]
     end
   end
 
   describe "#shell" do
     it "returns the shell in use" do
-      Thor::Base.shell.must == Thor::Shell::Basic
+      MyCounter.new.shell.class.must == Thor::Shell::Basic
+    end
+  end
+
+  describe "#root=" do
+    it "gets the current directory and expands the path to set the root" do
+      base = MyCounter.new
+      base.root = "here"
+      base.root.must == File.expand_path(File.join(File.dirname(__FILE__), "..", "here"))
+    end
+
+    it "does not use the current directory if one is given" do
+      base = MyCounter.new
+      base.root = "/"
+      base.root.must == "/"
+    end
+
+    it "uses the current directory if none is given" do
+      MyCounter.new.root.must == File.expand_path(File.join(File.dirname(__FILE__), ".."))
     end
   end
 

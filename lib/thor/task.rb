@@ -19,12 +19,26 @@ class Thor
       self.options = other.options.dup if other.options
     end
 
-    # Invokes the task name in the given parent with the given args. A task does
-    # not invoke private methods and this is the only validation done here.
+    # By default, a task invokes a method in the thor class. You can change this
+    # implementation to create custom tasks.
     #
-    def run(instance, args=[])
+    def run(instance, *args)
       raise UndefinedTaskError, "the '#{name}' task of #{instance.class} is private" unless public_method?(instance)
-      instance.invoke(name, *args)
+      instance.send(name, *args)
+    rescue ArgumentError => e
+      backtrace = sans_backtrace(e.backtrace, caller)
+
+      if instance.is_a?(Thor) && backtrace.empty?
+        raise InvocationError, "'#{name}' was called incorrectly. Call as '#{formatted_usage(instance.class)}'"
+      else
+        raise e
+      end
+    rescue NoMethodError => e
+      if e.message =~ /^undefined method `#{name}' for #{Regexp.escape(instance.to_s)}$/
+        raise UndefinedTaskError, "The #{instance.class.namespace} namespace doesn't have a '#{name}' task"
+      else
+        raise e
+      end
     end
 
     # Returns the first line of the given description.
@@ -57,6 +71,14 @@ class Thor
       #
       def public_method?(instance)
         !(instance.private_methods + instance.protected_methods).include?(name.to_s)
+      end
+
+      # Clean everything that comes from the Thor gempath and remove the caller.
+      #
+      def sans_backtrace(backtrace, caller)
+        dirname = /^#{Regexp.escape(File.dirname(__FILE__))}/
+        saned  = backtrace.reject { |frame| frame =~ dirname }
+        saned -= caller
       end
 
   end

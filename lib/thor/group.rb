@@ -19,7 +19,8 @@ class Thor::Group
       end
     end
 
-    # Start in Thor::Group works differently. It invokes all tasks inside the class.
+    # Start in Thor::Group works differently. It invokes all tasks inside the
+    # class and does not have to parse task options.
     #
     def start(args=ARGV, config={})
       config[:shell] ||= Thor::Base.shell.new
@@ -30,8 +31,7 @@ class Thor::Group
         opts = Thor::Options.new(class_options)
         opts.parse(args)
 
-        instance = new(opts.arguments, opts.options, config)
-        all_tasks.values.map { |task| task.run(instance) }
+        new(opts.arguments, opts.options, config).invoke_all
       end
     rescue Thor::Error => e
       config[:shell].error e.message
@@ -78,19 +78,12 @@ class Thor::Group
       def create_task(meth) #:nodoc:
         tasks[meth.to_s] = Thor::Task.new(meth, nil, nil, nil)
       end
-
   end
 
-  # Invokes a task.
+  # Invokes all tasks in the instance.
   #
-  # ==== Errors
-  # ArgumentError:: raised if the arity of the called task is different from 0.
-  # NoMethodError:: raised if the method being invoked does not exist.
-  #
-  def invoke(meth, *args)
-    arity = self.method(meth).arity
-    raise ArgumentError, "Tasks in Thor::Group must not accept any argument, but #{meth} has arity #{arity}." if arity != 0
-    super(meth)
+  def invoke_all
+    self.class.all_tasks.map { |_, task| task.run(self) }
   end
 
   include Thor::Base
