@@ -36,7 +36,7 @@ class Thor
       # ==== Returns
       # String:: The source file.
       #
-      def show
+      def render
         ::File.read(source)
       end
 
@@ -110,7 +110,7 @@ class Thor
             else
               say_status :conflict, :red
 
-              if shell.file_collision(destination)
+              if shell.file_collision(destination){ render }
                 say_status :forced, :yellow
                 yield unless options[:pretend]
               else

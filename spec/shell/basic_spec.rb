@@ -21,7 +21,7 @@ describe Thor::Shell::Basic do
 
       mock($stdout).print("Should I overwrite it? ")
       mock($stdin).gets{ "n" }
-      shell.yes?("Should I overwrite it?").must be_false
+      shell.yes?("Should I overwrite it?").must_not be_true
     end
   end
 
@@ -102,6 +102,71 @@ TABLE
        #0    empty
   xyz  #786  last three
 TABLE
+    end
+  end
+
+  describe "#file_collision" do
+    it "shows a menu with options" do
+      mock($stdout).print('Overwrite foo? (enter "h" for help) [Ynaqh] ')
+      mock($stdin).gets{ 'n' }
+      shell.file_collision('foo')
+    end
+
+    it "returns false if the user choose no" do
+      stub($stdout).print
+      mock($stdin).gets{ 'n' }
+      shell.file_collision('foo').must be_false
+    end
+
+    it "returns true if the user choose yes" do
+      stub($stdout).print
+      mock($stdin).gets{ 'y' }
+      shell.file_collision('foo').must be_true
+    end
+
+    it "shows help usage if the user choose help" do
+      stub($stdout).print
+      mock($stdin).gets{ 'h' }
+      mock($stdin).gets{ 'n' }
+      help = capture(:stdout){ shell.file_collision('foo') }
+      help.must =~ /h \- help, show this help/
+    end
+
+    it "quits if the user choose quit" do
+      stub($stdout).print
+      mock($stdout).puts('Aborting...')
+      mock($stdin).gets{ 'q' }
+
+      lambda {
+        shell.file_collision('foo')
+      }.must raise_error(SystemExit)
+    end
+
+    it "always returns true if the user choose always" do
+      mock($stdout).print('Overwrite foo? (enter "h" for help) [Ynaqh] ')
+      mock($stdin).gets{ 'a' }
+
+      shell.file_collision('foo').must be_true
+
+      dont_allow($stdout).print
+      shell.file_collision('foo').must be_true
+    end
+
+    describe "when a block is given" do
+      it "displays diff options to the user" do
+        mock($stdout).print('Overwrite foo? (enter "h" for help) [Ynaqdh] ')
+        mock($stdin).gets{ 's' }
+        shell.file_collision('foo'){ }
+      end
+
+      it "invokes the diff command" do
+        stub($stdout).print
+        mock($stdin).gets{ 'd' }
+        mock($stdin).gets{ 'n' }
+        stub(shell).system{ 'diff_output' }
+
+        capture(:stdout){ shell.file_collision('foo'){ } }.must =~ /diff_output/
+      end
     end
   end
 end

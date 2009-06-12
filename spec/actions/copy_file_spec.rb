@@ -12,7 +12,7 @@ describe Thor::Actions::CopyFile do
       stub(base).source_root{ source_root }
       stub(base).destination_root{ destination_root }
       stub(base).options{ options }
-      stub(base).shell{ Thor::Shell::Basic.new }
+      stub(base).shell{ @shell = Thor::Shell::Basic.new }
       base
     end
 
@@ -58,6 +58,8 @@ describe Thor::Actions::CopyFile do
       copy_file("task.thor")
       invoke!.must == "   [CREATED] task.thor\n"
     end
+
+    it "shows conflict status to ther user"
 
     it "works with files inside directories" do
       copy_file("doc/README")
@@ -105,9 +107,9 @@ describe Thor::Actions::CopyFile do
     end
   end
 
-  describe "#show" do
+  describe "#render" do
     it "shows file content" do
-      copy_file("task.thor").show.must == File.read(File.join(source_root, "task.thor"))
+      copy_file("task.thor").render.must == File.read(File.join(source_root, "task.thor"))
     end
   end
 

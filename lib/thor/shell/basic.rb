@@ -42,7 +42,7 @@ class Thor
       # "yes".
       #
       def yes?(statement, color=nil)
-        ["y", "yes"].include?(ask(statement, color).downcase)
+        ask(statement, color) =~ is?(:yes)
       end
 
       # Make a question the to user and returns true if the user replies "n" or
@@ -112,26 +112,30 @@ class Thor
       # overwriten and false otherwise. If a block is given, it uses the block
       # response as the content for the diff.
       #
+      # ==== Parameters
+      # destination<String>:: the destination file to solve conflicts
+      # block<Proc>:: an optional proc that returns the value to be used in diff
+      #
       def file_collision(destination)
+        return true if @always_force
+
         options = block_given? ? "[Ynaqdh]" : "[Ynaqh]"
         answer  = ask %[Overwrite #{destination}? (enter "h" for help) #{options}]
 
-        return true if @always_force
-
         case answer
-          when is?(:d)
+          when is?(:yes), is?(:force)
+            true
+          when is?(:no), is?(:skip)
+            false
+          when is?(:always)
+            @always_force = true
+          when is?(:quit)
+            say 'Aborting...'
+            raise SystemExit
+          when is?(:diff)
             show_diff(destination, yield) if block_given?
             say 'Retrying...'
             raise ScriptError
-          when is?(:a)
-            @always_force = true
-          when is?(:q)
-            say 'Aborting...'
-            raise SystemExit
-          when is?(:n)
-            false
-          when is?(:y)
-            true
           else
             say file_collision_help
             raise ScriptError
@@ -152,7 +156,13 @@ class Thor
       protected
 
         def is?(value)
-          /\A#{value.to_s}\z/i
+          value = value.to_s
+
+          if value.size == 1
+            /\A#{value}\z/i
+          else
+            /\A#{value}|#{value[0,1]}\z/i
+          end
         end
 
         def file_collision_help
@@ -170,7 +180,7 @@ HELP
           Tempfile.open(File.basename(destination), File.dirname(destination)) do |temp|
             temp.write content
             temp.rewind
-            say `#{diff_cmd} "#{destination}" "#{temp.path}"`
+            say system(%[#{diff_cmd} "#{destination}" "#{temp.path}"])
           end
         end
 
