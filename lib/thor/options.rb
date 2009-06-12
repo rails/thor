@@ -2,8 +2,8 @@ require 'thor/option'
 
 class Thor
 
-  # This is a modified version of Daniel Berger's Getopt::Long class,
-  # licensed under Ruby's license.
+  # This is a modified version of Daniel Berger's Getopt::Long class, licensed
+  # under Ruby's license.
   #
   class Options
     NUMERIC     = /(\d*\.\d+|\d+)/

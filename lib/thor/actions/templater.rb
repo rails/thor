@@ -4,6 +4,9 @@ class Thor
     # This is the base class for templater actions, ie. that copies something
     # from some directory (source) to another (destination).
     #
+    # This implementation is completely based in the Templater actions,
+    # created by Jonas Nicklas and Michael S. Klishin under MIT LICENSE.
+    #
     class Templater #:nodoc:
       attr_reader :base, :source, :destination, :relative_destination
 
