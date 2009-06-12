@@ -103,13 +103,19 @@ class Thor
             say_status :identical, :blue
           elsif exists?
             if options[:force]
-              yield unless options[:pretend]
               say_status :forced, :yellow
+              yield unless options[:pretend]
             elsif options[:skip]
               say_status :skipped, :yellow
             else
               say_status :conflict, :red
-              # shell.conflict_menu(action)
+
+              if shell.file_collision(destination)
+                say_status :forced, :yellow
+                yield unless options[:pretend]
+              else
+                say_status :skipped, :yellow
+              end
             end
           else
             yield unless options[:pretend]

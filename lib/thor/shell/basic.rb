@@ -1,3 +1,5 @@
+require 'tempfile'
+
 class Thor
   module Shell
     class Basic
@@ -106,6 +108,38 @@ class Thor
         end
       end
 
+      # Deals with file collision and returns true if the file should be
+      # overwriten and false otherwise. If a block is given, it uses the block
+      # response as the content for the diff.
+      #
+      def file_collision(destination)
+        options = block_given? ? "[Ynaqdh]" : "[Ynaqh]"
+        answer  = ask %[Overwrite #{destination}? (enter "h" for help) #{options}]
+
+        return true if @always_force
+
+        case answer
+          when is?(:d)
+            show_diff(destination, yield) if block_given?
+            say 'Retrying...'
+            raise ScriptError
+          when is?(:a)
+            @always_force = true
+          when is?(:q)
+            say 'Aborting...'
+            raise SystemExit
+          when is?(:n)
+            false
+          when is?(:y)
+            true
+          else
+            say file_collision_help
+            raise ScriptError
+        end
+      rescue ScriptError
+        retry
+      end
+
       # Called if something goes wrong during the execution. This is used by Thor
       # internally and should not be used inside your scripts. If someone went
       # wrong, you can always raise an exception. If you raise a Thor::Error, it
@@ -114,6 +148,36 @@ class Thor
       def error(statement) #:nodoc:
         $stderr.puts statement
       end
+
+      protected
+
+        def is?(value)
+          /\A#{value.to_s}\z/i
+        end
+
+        def file_collision_help
+<<HELP
+Y - yes, overwrite
+n - no, do not overwrite
+a - all, overwrite this and all others
+q - quit, abort
+d - diff, show the differences between the old and the new
+h - help, show this help
+HELP
+        end
+
+        def show_diff(destination, content)
+          Tempfile.open(File.basename(destination), File.dirname(destination)) do |temp|
+            temp.write content
+            temp.rewind
+            say `#{diff_cmd} "#{destination}" "#{temp.path}"`
+          end
+        end
+
+        def diff_cmd
+          ENV['THOR_DIFF'] || ENV['RAILS_DIFF'] || 'diff -u'
+        end
+
     end
   end
 end
