@@ -163,7 +163,7 @@ TABLE
         stub($stdout).print
         mock($stdin).gets{ 'd' }
         mock($stdin).gets{ 'n' }
-        stub(shell).system{ 'diff_output' }
+        stub(shell).`{ 'diff_output' }
 
         capture(:stdout){ shell.file_collision('foo'){ } }.must =~ /diff_output/
       end

@@ -161,7 +161,7 @@ class Thor
           if value.size == 1
             /\A#{value}\z/i
           else
-            /\A#{value}|#{value[0,1]}\z/i
+            /\A(#{value}|#{value[0,1]})\z/i
           end
         end
 
@@ -180,7 +180,7 @@ HELP
           Tempfile.open(File.basename(destination), File.dirname(destination)) do |temp|
             temp.write content
             temp.rewind
-            say system(%[#{diff_cmd} "#{destination}" "#{temp.path}"])
+            say `#{diff_cmd} "#{destination}" "#{temp.path}"`
           end
         end
 
