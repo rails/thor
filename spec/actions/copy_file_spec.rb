@@ -3,7 +3,7 @@ require 'thor/actions'
 
 describe Thor::Actions::CopyFile do
   before(:each) do
-    ::FileUtils.rm_r(destination_root, :force => true)
+    ::FileUtils.rm_rf(destination_root)
   end
 
   def copy_file(source, destination=nil, options={})
