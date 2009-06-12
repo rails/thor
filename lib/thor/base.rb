@@ -367,7 +367,7 @@ class Thor
     end
 
     module SingletonMethods
-      attr_accessor :options, :behavior
+      attr_accessor :options
 
       # It receives arguments in an Array and two hashes, one for options and
       # other for configuration.
@@ -391,9 +391,6 @@ class Thor
       # root<String>:: The directory to be considered as root, necessary if you are using
       #                certain actions.
       #
-      # behavior<Symbol>:: The behavior for this thor class used by some actions, can be
-      #                    invoke or revoke. By default is invoke.
-      #
       # ==== Examples
       #
       #   class MyScript < Thor
@@ -410,7 +407,6 @@ class Thor
         self.options  = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
         self.root     = config[:root]
         self.shell    = config[:shell]
-        self.behavior = config[:behavior] || :invoke
       end
 
       # Holds the shell for the given Thor instance. If no shell is given,

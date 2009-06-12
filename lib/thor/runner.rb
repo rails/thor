@@ -1,4 +1,3 @@
-require 'thor/actions'
 require 'open-uri'
 require 'yaml'
 require 'digest/md5'

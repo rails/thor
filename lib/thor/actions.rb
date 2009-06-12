@@ -6,6 +6,27 @@ end
 
 class Thor
   module Actions
+    attr_accessor :behavior
+
+    def initialize(args=[], options={}, config={})
+      self.behavior = case config[:behavior]
+        when :force
+          options.merge!(:force => true)
+          :invoke
+        when :skip
+          options.merge!(:skip => true)
+          :invoke
+        when :pretend
+          options.merge!(:pretend => true)
+          :invoke
+        when :revoke
+          :revoke
+        else
+          :invoke
+      end
+
+      super
+    end
 
     protected
 
