@@ -9,12 +9,22 @@ describe Thor::Actions::CopyFile do
   def copy_file(source, destination=nil)
     @base ||= begin
       base = Object.new
-      mock(base).source_root{ source_root }
-      mock(base).destination_root{ destination_root }
+      stub(base).source_root{ source_root }
+      stub(base).destination_root{ destination_root }
+      stub(base).options{ {} }
+      stub(base).shell{ Thor::Shell::Basic.new }
       base
     end
 
     @action ||= Thor::Actions::CopyFile.new(base, source, destination || source)
+  end
+
+  def invoke!(source, destination=nil)
+    capture(:stdout){ copy_file(source, destination).invoke! }
+  end
+
+  def revoke!(source, destination=nil)
+    capture(:stdout){ copy_file(source, destination).revoke! }
   end
 
   describe "#source" do
@@ -24,14 +34,14 @@ describe Thor::Actions::CopyFile do
   end
 
   describe "#destination" do
-    it "sets the destination based on the destinatino root" do
+    it "sets the destination based on the destination root" do
       copy_file("task.thor").destination.must == File.join(destination_root, 'task.thor')
     end
   end
 
   describe "#invoke!" do
     it "copies the file to the destination root" do
-      copy_file("task.thor").invoke!
+      invoke!("task.thor")
       File.exists?(@action.destination).must be_true
       FileUtils.identical?(@action.source, @action.destination).must be_true
     end
@@ -39,8 +49,8 @@ describe Thor::Actions::CopyFile do
 
   describe "#revoke!" do
     it "removes the destination file" do
-      copy_file("task.thor").invoke!
-      @action.revoke!
+      invoke!("task.thor")
+      revoke!("task.thor")
       File.exists?(@action.destination).must be_false
     end
   end
@@ -55,7 +65,7 @@ describe Thor::Actions::CopyFile do
     it "returns true if the destination file exists" do
       copy_file("task.thor")
       @action.exists?.must be_false
-      @action.invoke!
+      invoke!("task.thor")
       @action.exists?.must be_true
     end
   end
@@ -64,7 +74,7 @@ describe Thor::Actions::CopyFile do
     it "returns true if the destination file and is identical" do
       copy_file("task.thor")
       @action.identical?.must be_false
-      @action.invoke!
+      invoke!("task.thor")
       @action.identical?.must be_true
     end
   end

@@ -49,6 +49,13 @@ describe Thor::Shell::Basic do
     end
   end
 
+  describe "#say_status" do
+    it "prints a message to the user with status" do
+      mock($stdout).puts("   [CREATED] ~/.thor/task.thor")
+      shell.say_status(:created, "~/.thor/task.thor")
+    end
+  end
+
   describe "#print_list" do
     before(:each) do
       @list = ["abc", "#123", "first three"]

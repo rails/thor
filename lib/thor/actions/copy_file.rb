@@ -9,19 +9,7 @@ class Thor
     end
 
     class CopyFile #:nodoc:
-      attr_accessor :base, :source, :destination
-
-      def source=(source)
-        if source
-          @source = ::File.expand_path(source, base.source_root)
-        end
-      end
-
-      def destination=(destination)
-        if destination
-          @destination = ::File.expand_path(destination, base.destination_root)
-        end
-      end
+      attr_reader :base, :source, :destination, :relative_destination
 
       # Copies a new file from source to destination.
       #
@@ -30,7 +18,7 @@ class Thor
       # destination<String>:: Full path to the destination of this file
       #
       def initialize(base, source, destination)
-        self.base = base
+        @base = base
         self.source = source
         self.destination = destination
       end
@@ -62,18 +50,82 @@ class Thor
         exists? && ::FileUtils.identical?(source, destination)
       end
 
-      # Renders the template and copies it to the destination.
+      # Creates the directory which holds the file (if it doesn't exist yet) and
+      # copy the file to it.
       #
       def invoke!
-        ::FileUtils.mkdir_p(::File.dirname(destination))
-        ::FileUtils.cp_r(source, destination)
+        invoke_with_options!(base.options) do
+          ::FileUtils.mkdir_p(::File.dirname(destination))
+          ::FileUtils.cp_r(source, destination)
+        end
       end
 
-      # Removes the destination file
+      # Removes the destination file.
       #
       def revoke!
+        say_status :deleted, :green
         ::FileUtils.rm_r(destination, :force => true)
       end
+
+      protected
+
+        # Sets the source value from a relative source value.
+        #
+        def source=(source)
+          if source
+            @source = ::File.expand_path(source, base.source_root)
+          end
+        end
+
+        # Sets the destination value from a relative destination value. The
+        # relative destination is kept to be used in output messages.
+        #
+        def destination=(destination)
+          if destination
+            @relative_destination = destination
+            @destination = ::File.expand_path(destination, base.destination_root)
+          end
+        end
+
+        # Receives a hash of options and just execute the block if some
+        # conditions are met.
+        #
+        def invoke_with_options!(options)
+          if identical?
+            say_status :identical, :blue
+          elsif exists?
+            if options[:force]
+              yield unless options[:pretend]
+              say_status :forced, :yellow
+            elsif options[:skip]
+              say_status :skipped, :yellow
+            else
+              say_status :conflict, :red
+              # shell.conflict_menu(action)
+            end
+          else
+            yield unless options[:pretend]
+            say_status :created, :green
+          end
+        end
+
+        # Retrieves the shell object from base class.
+        #
+        def shell
+          base.shell
+        end
+
+        # Retrieves options hash from base class.
+        #
+        def options
+          base.options
+        end
+
+        # Shortcut to say_status shell method.
+        #
+        def say_status(status, color)
+          shell.say_status status, relative_destination, color
+        end
 
     end
   end

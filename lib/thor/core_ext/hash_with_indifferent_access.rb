@@ -38,7 +38,7 @@ class Thor
       protected
 
         def convert_key(key)
-          key.kind_of?(Symbol) ? key.to_s : key
+          key.is_a?(Symbol) ? key.to_s : key
         end
 
         # Magic predicates. For instance:

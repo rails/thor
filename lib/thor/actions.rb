@@ -11,13 +11,13 @@ class Thor
     def initialize(args=[], options={}, config={})
       self.behavior = case config[:behavior]
         when :force
-          options.merge!(:force => true)
+          options.merge!(:force => true, 'force' => true)
           :invoke
         when :skip
-          options.merge!(:skip => true)
+          options.merge!(:skip => true, 'skip' => true)
           :invoke
         when :pretend
-          options.merge!(:pretend => true)
+          options.merge!(:pretend => true, 'pretend' => true)
           :invoke
         when :revoke
           :revoke

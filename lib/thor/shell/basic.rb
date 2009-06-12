@@ -6,8 +6,8 @@ class Thor
       # ==== Example
       # ask("What is your name?")
       #
-      def ask(statement)
-        say("#{statement} ")
+      def ask(statement, color=nil)
+        say("#{statement} ", color)
         $stdin.gets.strip
       end
 
@@ -18,7 +18,7 @@ class Thor
       # ==== Example
       # say("I know you knew that.")
       #
-      def say(statement="")
+      def say(statement="", color=nil)
         statement = statement.to_s
 
         if statement[-1, 1] == " " || statement[-1, 1] == "\t"
@@ -29,18 +29,25 @@ class Thor
         end
       end
 
+      # Say a status with the given color and appends the message.
+      #
+      def say_status(status, message, color=nil)
+        status_flag = "[#{status.to_s.upcase}]".rjust(12)
+        say "#{status_flag} #{message}"
+      end
+
       # Make a question the to user and returns true if the user replies "y" or
       # "yes".
       #
-      def yes?(statement)
-        ["y", "yes"].include?(ask(statement).downcase)
+      def yes?(statement, color=nil)
+        ["y", "yes"].include?(ask(statement, color).downcase)
       end
 
       # Make a question the to user and returns true if the user replies "n" or
       # "no".
       #
-      def no?(statement)
-        !yes?(statement)
+      def no?(statement, color=nil)
+        !yes?(statement, color)
       end
 
       # Prints a list of items.
