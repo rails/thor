@@ -6,25 +6,25 @@ describe Thor::Actions::CopyFile do
     ::FileUtils.rm_r(destination_root, :force => true)
   end
 
-  def copy_file(source, destination=nil)
-    @base ||= begin
+  def copy_file(source, destination=nil, options={})
+    @base = begin
       base = Object.new
       stub(base).source_root{ source_root }
       stub(base).destination_root{ destination_root }
-      stub(base).options{ {} }
+      stub(base).options{ options }
       stub(base).shell{ Thor::Shell::Basic.new }
       base
     end
 
-    @action ||= Thor::Actions::CopyFile.new(base, source, destination || source)
+    @action = Thor::Actions::CopyFile.new(base, source, destination || source)
   end
 
-  def invoke!(source, destination=nil)
-    capture(:stdout){ copy_file(source, destination).invoke! }
+  def invoke!
+    capture(:stdout){ @action.invoke! }
   end
 
-  def revoke!(source, destination=nil)
-    capture(:stdout){ copy_file(source, destination).revoke! }
+  def revoke!
+    capture(:stdout){ @action.revoke! }
   end
 
   describe "#source" do
@@ -40,17 +40,67 @@ describe Thor::Actions::CopyFile do
   end
 
   describe "#invoke!" do
-    it "copies the file to the destination root" do
-      invoke!("task.thor")
-      File.exists?(@action.destination).must be_true
+    it "copies the file to the default destination" do
+      copy_file("task.thor")
+      invoke!
+      File.exists?(File.join(destination_root, "task.thor")).must be_true
       FileUtils.identical?(@action.source, @action.destination).must be_true
+    end
+
+    it "copies the file to the specified destination" do
+      copy_file("task.thor", "foo.thor")
+      invoke!
+      File.exists?(File.join(destination_root, "foo.thor")).must be_true
+      FileUtils.identical?(@action.source, @action.destination).must be_true
+    end
+
+    it "shows created status to the user" do
+      copy_file("task.thor")
+      invoke!.must == "   [CREATED] task.thor\n"
+    end
+
+    it "works with files inside directories" do
+      copy_file("doc/README")
+      invoke!.must == "   [CREATED] doc/README\n"
+    end
+
+    describe "when file exists" do
+      before(:each) do
+        copy_file("task.thor")
+        invoke!
+      end
+
+      describe "and is identical" do
+        it "shows identical status" do
+          copy_file("task.thor")
+          invoke!
+          invoke!.must == " [IDENTICAL] task.thor\n"
+        end
+      end
+
+      describe "and is not identical" do
+        before(:each) do
+          File.open(File.join(destination_root, 'task.thor'), 'w'){ |f| f.write("foo") }
+        end
+
+        it "shows forced status to the user if force is given" do
+          copy_file("task.thor", "task.thor", :force => true).must_not be_identical
+          invoke!.must == "    [FORCED] task.thor\n"
+        end
+
+        it "shows skipped status to the user if skip is given" do
+          copy_file("task.thor", "task.thor", :skip => true).must_not be_identical
+          invoke!.must == "   [SKIPPED] task.thor\n"
+        end
+      end
     end
   end
 
   describe "#revoke!" do
     it "removes the destination file" do
-      invoke!("task.thor")
-      revoke!("task.thor")
+      copy_file("task.thor")
+      invoke!
+      revoke!
       File.exists?(@action.destination).must be_false
     end
   end
@@ -65,7 +115,7 @@ describe Thor::Actions::CopyFile do
     it "returns true if the destination file exists" do
       copy_file("task.thor")
       @action.exists?.must be_false
-      invoke!("task.thor")
+      invoke!
       @action.exists?.must be_true
     end
   end
@@ -74,7 +124,7 @@ describe Thor::Actions::CopyFile do
     it "returns true if the destination file and is identical" do
       copy_file("task.thor")
       @action.identical?.must be_false
-      invoke!("task.thor")
+      invoke!
       @action.identical?.must be_true
     end
   end
