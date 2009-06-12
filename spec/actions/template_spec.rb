@@ -17,7 +17,7 @@ describe Thor::Actions::Template do
       base
     end
 
-    @action = Thor::Actions::Template.new(base, source, destination || source)
+    @action = Thor::Actions::Template.new(base, source, destination || source, !@silence)
   end
 
   def invoke!
@@ -26,6 +26,10 @@ describe Thor::Actions::Template do
 
   def revoke!
     capture(:stdout){ @action.revoke! }
+  end
+
+  def silence!
+    @silence = true
   end
 
   describe "#invoke!" do
@@ -47,6 +51,12 @@ describe Thor::Actions::Template do
     it "shows created status to the user" do
       template("doc/config.rb")
       invoke!.must == "   [CREATED] doc/config.rb\n"
+    end
+
+    it "does not show any information if log status is false" do
+      silence!
+      template("doc/config.rb")
+      invoke!.must be_empty
     end
 
     describe "when file exists" do

@@ -14,8 +14,8 @@ class Thor
     # copy_file "README", "doc/README"
     # copy_file "doc/README"
     #
-    def copy_file(source, destination=nil)
-      action CopyFile.new(self, source, destination || source)
+    def copy_file(source, destination=nil, log_status=true)
+      action CopyFile.new(self, source, destination || source, log_status)
     end
 
     class CopyFile < Template #:nodoc:

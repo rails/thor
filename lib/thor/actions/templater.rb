@@ -16,8 +16,8 @@ class Thor
       # source<String>:: Full path to the source of this file
       # destination<String>:: Full path to the destination of this file
       #
-      def initialize(base, source, destination)
-        @base = base
+      def initialize(base, source, destination, log_status=true)
+        @base, @log_status = base, log_status
         self.source = source
         self.destination = destination
       end
@@ -63,6 +63,10 @@ class Thor
       end
 
       protected
+
+        def log_status?
+          @log_status
+        end
 
         # Sets the source value from a relative source value.
         #
@@ -137,7 +141,7 @@ class Thor
         # Shortcut to say_status shell method.
         #
         def say_status(status, color)
-          shell.say_status status, relative_destination, color
+          shell.say_status status, relative_destination, color if log_status?
         end
 
     end

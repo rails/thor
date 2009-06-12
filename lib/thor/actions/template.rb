@@ -16,8 +16,8 @@ class Thor
     # template "README", "doc/README"
     # template "doc/README"
     #
-    def template(source, destination=nil)
-      action Template.new(self, source, destination || source)
+    def template(source, destination=nil, log_status=true)
+      action Template.new(self, source, destination || source, log_status)
     end
 
     class Template < Templater #:nodoc:

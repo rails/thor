@@ -11,8 +11,8 @@ class Thor
     # ==== Examples
     # empty_directory "doc"
     #
-    def empty_directory(destination)
-      action EmptyDirectory.new(self, nil, destination)
+    def empty_directory(destination, log_status=true)
+      action EmptyDirectory.new(self, nil, destination, log_status)
     end
 
     class EmptyDirectory < Templater #:nodoc:

@@ -15,7 +15,7 @@ describe Thor::Actions::AddFile do
       base
     end
 
-    @action = Thor::Actions::AddFile.new(base, destination, data, &block)
+    @action = Thor::Actions::AddFile.new(base, destination, data, !@silence, &block)
   end
 
   def invoke!
@@ -26,6 +26,10 @@ describe Thor::Actions::AddFile do
     capture(:stdout){ @action.revoke! }
   end
 
+  def silence!
+    @silence = true
+  end
+
   describe "#invoke!" do
     it "creates a file in the given destination with the given content" do
       add_file("doc/USAGE", "just use it")
@@ -34,6 +38,17 @@ describe Thor::Actions::AddFile do
       file = File.join(destination_root, "doc/USAGE")
       File.exists?(file).must be_true
       File.read(file).must == "just use it"
+    end
+
+    it "shows progress information to the user" do
+      add_file("doc/USAGE", "just use it")
+      invoke!.must == "   [CREATED] doc/USAGE\n"
+    end
+
+    it "does not show progress information if log status is false" do
+      silence!
+      add_file("doc/USAGE", "just use it")
+      invoke!.must be_empty
     end
   end
 
