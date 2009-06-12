@@ -1,22 +1,23 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'thor/actions'
 
-describe Thor::Actions::CopyFile do
+describe Thor::Actions::Template do
   before(:each) do
     ::FileUtils.rm_rf(destination_root)
   end
 
-  def copy_file(source, destination=nil, options={})
+  def template(source, destination=nil, options={})
     @base = begin
       base = Object.new
       stub(base).source_root{ source_root }
       stub(base).destination_root{ destination_root }
       stub(base).options{ options }
       stub(base).shell{ @shell = Thor::Shell::Basic.new }
+      base.instance_variable_set('@klass', 'Config')
       base
     end
 
-    @action = Thor::Actions::CopyFile.new(base, source, destination || source)
+    @action = Thor::Actions::Template.new(base, source, destination || source)
   end
 
   def invoke!
@@ -29,86 +30,82 @@ describe Thor::Actions::CopyFile do
 
   describe "#invoke!" do
     it "copies the file to the default destination" do
-      copy_file("task.thor")
+      template("doc/config.rb")
       invoke!
-      File.exists?(File.join(destination_root, "task.thor")).must be_true
-      FileUtils.identical?(@action.source, @action.destination).must be_true
+      file = File.join(destination_root, "doc/config.rb")
+      File.exists?(file).must be_true
+      File.read(file).must == "class Config; end\n"
     end
 
     it "copies the file to the specified destination" do
-      copy_file("task.thor", "foo.thor")
+      template("doc/config.rb", "doc/configuration.rb")
       invoke!
-      File.exists?(File.join(destination_root, "foo.thor")).must be_true
-      FileUtils.identical?(@action.source, @action.destination).must be_true
+      file = File.join(destination_root, "doc/configuration.rb")
+      File.exists?(file).must be_true
     end
 
     it "shows created status to the user" do
-      copy_file("task.thor")
-      invoke!.must == "   [CREATED] task.thor\n"
-    end
-
-    it "works with files inside directories" do
-      copy_file("doc/README")
-      invoke!.must == "   [CREATED] doc/README\n"
+      template("doc/config.rb")
+      invoke!.must == "   [CREATED] doc/config.rb\n"
     end
 
     describe "when file exists" do
       before(:each) do
-        copy_file("task.thor")
+        template("doc/config.rb")
         invoke!
       end
 
       describe "and is identical" do
         it "shows identical status" do
-          copy_file("task.thor")
+          template("doc/config.rb")
           invoke!
-          invoke!.must == " [IDENTICAL] task.thor\n"
+          invoke!.must == " [IDENTICAL] doc/config.rb\n"
         end
       end
 
       describe "and is not identical" do
         before(:each) do
-          File.open(File.join(destination_root, 'task.thor'), 'w'){ |f| f.write("NEWCONTENT") }
+          File.open(File.join(destination_root, 'doc/config.rb'), 'w'){ |f| f.write("FOO = 3") }
         end
 
         it "shows forced status to the user if force is given" do
-          copy_file("task.thor", "task.thor", :force => true).must_not be_identical
-          invoke!.must == "    [FORCED] task.thor\n"
+          template("doc/config.rb", "doc/config.rb", :force => true).must_not be_identical
+          invoke!.must == "    [FORCED] doc/config.rb\n"
         end
 
         it "shows skipped status to the user if skip is given" do
-          copy_file("task.thor", "task.thor", :skip => true).must_not be_identical
-          invoke!.must == "   [SKIPPED] task.thor\n"
+          template("doc/config.rb", "doc/config.rb", :skip => true).must_not be_identical
+          invoke!.must == "   [SKIPPED] doc/config.rb\n"
         end
 
         it "shows conflict status to ther user" do
-          copy_file("task.thor").must_not be_identical
+          template("doc/config.rb").must_not be_identical
           mock($stdin).gets{ 's' }
-          file = File.join(destination_root, 'task.thor')
+          file = File.join(destination_root, 'doc/config.rb')
 
           content = invoke!
-          content.must =~ /  \[CONFLICT\] task\.thor/
+          content.must =~ /  \[CONFLICT\] doc\/config\.rb/
           content.must =~ /Overwrite #{file}\? \(enter "h" for help\) \[Ynaqdh\]/
-          content.must =~ /   \[SKIPPED\] task\.thor/
+          content.must =~ /   \[SKIPPED\] doc\/config\.rb/
         end
 
         it "creates the file if the file collision menu returns true" do
-          copy_file("task.thor")
+          template("doc/config.rb")
           mock($stdin).gets{ 'y' }
-          invoke!.must =~ /   \[FORCED\] task\.thor/
+          invoke!.must =~ /   \[FORCED\] doc\/config\.rb/
         end
 
         it "skips the file if the file collision menu returns false" do
-          copy_file("task.thor")
+          template("doc/config.rb")
           mock($stdin).gets{ 'n' }
-          invoke!.must =~ /   \[SKIPPED\] task\.thor/
+          invoke!.must =~ /   \[SKIPPED\] doc\/config\.rb/
         end
 
         it "executes the block given to show file content" do
-          copy_file("task.thor")
+          template("doc/config.rb")
           mock($stdin).gets{ 'd' }
           mock($stdin).gets{ 'n' }
-          invoke!.must =~ /\-NEWCONTENT/
+          invoke!.must =~ /\-FOO = 3/
         end
       end
     end
@@ -116,7 +113,7 @@ describe Thor::Actions::CopyFile do
 
   describe "#revoke!" do
     it "removes the destination file" do
-      copy_file("task.thor")
+      template("doc/config.rb")
       invoke!
       revoke!
       File.exists?(@action.destination).must be_false
@@ -124,14 +121,14 @@ describe Thor::Actions::CopyFile do
   end
 
   describe "#render" do
-    it "shows file content" do
-      copy_file("task.thor").render.must == File.read(File.join(source_root, "task.thor"))
+    it "renders the template" do
+      template("doc/config.rb").render.must == "class Config; end\n"
     end
   end
 
   describe "#exists?" do
     it "returns true if the destination file exists" do
-      copy_file("task.thor")
+      template("doc/config.rb")
       @action.exists?.must be_false
       invoke!
       @action.exists?.must be_true
@@ -140,7 +137,7 @@ describe Thor::Actions::CopyFile do
 
   describe "#identical?" do
     it "returns true if the destination file and is identical" do
-      copy_file("task.thor")
+      template("doc/config.rb")
       @action.identical?.must be_false
       invoke!
       @action.identical?.must be_true
