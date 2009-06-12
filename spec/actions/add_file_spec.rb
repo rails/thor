@@ -1,22 +1,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'thor/actions'
 
-describe Thor::Actions::CopyFile do
+describe Thor::Actions::AddFile do
   before(:each) do
     ::FileUtils.rm_rf(destination_root)
   end
 
-  def copy_file(source, destination=nil, options={})
+  def add_file(destination, data=nil, options={}, &block)
     @base = begin
       base = Object.new
-      stub(base).source_root{ source_root }
       stub(base).destination_root{ destination_root }
       stub(base).options{ options }
       stub(base).shell{ @shell = Thor::Shell::Basic.new }
       base
     end
 
-    @action = Thor::Actions::CopyFile.new(base, source, destination || source)
+    @action = Thor::Actions::AddFile.new(base, destination, data, &block)
   end
 
   def invoke!
@@ -27,32 +26,20 @@ describe Thor::Actions::CopyFile do
     capture(:stdout){ @action.revoke! }
   end
 
-  def valid?(content, path)
-    content.must == "   [CREATED] #{path}\n"
-    File.exists?(File.join(destination_root, path)).must be_true
-    FileUtils.identical?(@action.source, @action.destination).must be_true
-  end
-
   describe "#invoke!" do
-    it "copies the file to the default destination" do
-      copy_file("task.thor")
-      valid?(invoke!, "task.thor")
-    end
+    it "creates a file in the given destination with the given content" do
+      add_file("doc/USAGE", "just use it")
+      invoke!
 
-    it "copies the file to the specified destination" do
-      copy_file("task.thor", "foo.thor")
-      valid?(invoke!, "foo.thor")
-    end
-
-    it "works with files inside directories" do
-      copy_file("doc/README")
-      valid?(invoke!, "doc/README")
+      file = File.join(destination_root, "doc/USAGE")
+      File.exists?(file).must be_true
+      File.read(file).must == "just use it"
     end
   end
 
   describe "#revoke!" do
     it "removes the destination file" do
-      copy_file("task.thor")
+      add_file("doc/USAGE", "just use it")
       invoke!
       revoke!
       File.exists?(@action.destination).must be_false
@@ -60,14 +47,18 @@ describe Thor::Actions::CopyFile do
   end
 
   describe "#render" do
-    it "shows file content" do
-      copy_file("task.thor").render.must == File.read(File.join(source_root, "task.thor"))
+    it "shows given data" do
+      add_file("doc/USAGE", "just use it").render.must == "just use it"
+    end
+
+    it "shows the result of the given block" do
+      add_file("doc/USAGE"){ "just use it" }.render.must == "just use it"
     end
   end
 
   describe "#exists?" do
     it "returns true if the destination file exists" do
-      copy_file("task.thor")
+      add_file("doc/USAGE", "just use it")
       @action.exists?.must be_false
       invoke!
       @action.exists?.must be_true
@@ -76,7 +67,7 @@ describe Thor::Actions::CopyFile do
 
   describe "#identical?" do
     it "returns true if the destination file and is identical" do
-      copy_file("task.thor")
+      add_file("doc/USAGE", "just use it")
       @action.identical?.must be_false
       invoke!
       @action.identical?.must be_true

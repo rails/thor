@@ -68,7 +68,7 @@ class Thor
         #
         def source=(source)
           if source
-            @source = ::File.expand_path(source, base.source_root)
+            @source = ::File.expand_path(source.to_s, base.source_root)
           end
         end
 
@@ -77,8 +77,8 @@ class Thor
         #
         def destination=(destination)
           if destination
-            @relative_destination = destination
-            @destination = ::File.expand_path(destination, base.destination_root)
+            @relative_destination = destination.to_s
+            @destination = ::File.expand_path(destination.to_s, base.destination_root)
           end
         end
 

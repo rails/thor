@@ -1,4 +1,4 @@
-require 'thor/actions/templater'
+require 'thor/actions/template'
 
 class Thor
   module Actions
@@ -18,18 +18,10 @@ class Thor
       action CopyFile.new(self, source, destination || source)
     end
 
-    class CopyFile < Templater #:nodoc:
+    class CopyFile < Template #:nodoc:
 
       def render
-        ::File.read(source)
-      end
-
-      def exists?
-        ::File.exists?(destination)
-      end
-
-      def identical?
-        exists? && ::FileUtils.identical?(source, destination)
+        @render ||= ::File.read(source)
       end
 
       def invoke!
@@ -37,11 +29,6 @@ class Thor
           ::FileUtils.mkdir_p(::File.dirname(destination))
           ::FileUtils.cp_r(source, destination)
         end
-      end
-
-      def revoke!
-        say_status :deleted, :green
-        ::FileUtils.rm(destination, :force => true)
       end
 
     end
