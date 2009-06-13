@@ -7,6 +7,7 @@ class Thor
     #
     # ==== Parameters
     # destination<String>:: the relative path to the destination root
+    # log_status<Boolean>:: if false, does not log the status. True by default.
     #
     # ==== Examples
     # empty_directory "doc"

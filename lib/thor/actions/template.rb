@@ -11,6 +11,7 @@ class Thor
     # ==== Parameters
     # source<String>:: the relative path to the source root
     # destination<String>:: the relative path to the destination root
+    # log_status<Boolean>:: if false, does not log the status. True by default.
     #
     # ==== Examples
     # template "README", "doc/README"

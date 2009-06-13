@@ -6,6 +6,11 @@ class Thor
     # Create a new file relative to the destination root with the given data,
     # which is the return value of a block or a data string.
     #
+    # ==== Parameters
+    # destination<String>:: the relative path to the destination root.
+    # data<String|NilClass>:: the data to append to the file.
+    # log_status<Boolean>:: if false, does not log the status. True by default.
+    #
     # ==== Examples
     #
     #   add_file "lib/fun_party.rb" do
