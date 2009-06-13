@@ -21,7 +21,9 @@ class Thor
           when true
             "--#{key}"
           when Array
-            value.map {|v| "--#{key} #{v.inspect}"}.join(" ")
+            "--#{key} #{value.map{ |v| v.inspect }.join(' ')}"
+          when Hash
+            "--#{key} #{value.map{ |k,v| "#{k}:#{v}" }.join(' ')}"
           when nil, false
             ""
           else

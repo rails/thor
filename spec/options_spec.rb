@@ -36,12 +36,20 @@ describe Thor::Options do
     end
 
     it "writes --name value for anything else" do
-      Thor::Options.to_switches(:format => "specdoc").must == %{--format "specdoc"}
+      Thor::Options.to_switches(:format => "specdoc").must == '--format "specdoc"'
     end
 
     it "joins several values" do
       switches = Thor::Options.to_switches(:color => true, :foo => "bar").split(' ').sort
       switches.must == ['"bar"', "--color", "--foo"]
+    end
+
+    it "works with arrays" do
+      Thor::Options.to_switches(:count => [1,2,3]).must == "--count 1 2 3"
+    end
+
+    it "works with hashes" do
+      Thor::Options.to_switches(:count => {:a => :b}).must == "--count a:b"
     end
   end
 
