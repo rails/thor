@@ -126,7 +126,7 @@ class Thor
     def run(command, log_status=true)
       color = log_status.is_a?(Symbol) ? log_status : :green
       shell.say_status :running, "#{command} from #{Dir.pwd}", color if log_status
-      `#{command}`
+      `#{command}` unless options[:pretend]
     end
 
     # Executes a ruby script (taking into account WIN32 platform quirks).

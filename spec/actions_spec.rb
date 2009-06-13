@@ -171,23 +171,28 @@ describe Thor::Actions do
   end
 
   describe "#run" do
-    before(:each) do
-      mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
-    end
-
     it "executes the command given" do
+      mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
       capture(:stdout) { runner.run('ls') }
     end
 
+    it "does not execute the command if pretending given" do
+      dont_allow(runner(:behavior => :pretend)).`("cd ./") # To avoid highlighting issues `
+      capture(:stdout) { runner.run('cd ./') }
+    end
+
     it "logs status" do
+      mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
       capture(:stdout) { runner.run('ls') }.must == "   [RUNNING] ls from #{Dir.pwd}\n"
     end
 
     it "does not log status if required" do
+      mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
       capture(:stdout) { runner.run('ls', false) }.must be_empty
     end
 
     it "accepts a color as status" do
+      mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
       mock(runner.shell).say_status(:running, "ls from #{Dir.pwd}", :yellow)
       runner.run('ls', :yellow)
     end
