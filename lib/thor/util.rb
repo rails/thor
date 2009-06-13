@@ -31,6 +31,12 @@ class Thor
     # can be added to a sandbox, this method is also responsable for removing
     # the sandbox namespace.
     #
+    # This method should not be used in general because it's used to deal with
+    # older versions of Thor. On current versions, if you need to get the
+    # namespace from a class, just call namespace on it.
+    #
+    # TODO Deprecate this method in the future.
+    #
     # ==== Parameters
     # constant<Object>:: The constant to be converted to the thor path.
     #
@@ -138,6 +144,8 @@ class Thor
 
     # Receives a yaml (hash) and updates all constants entries to namespace.
     # This was added to deal with deprecated versions of Thor.
+    #
+    # TODO Deprecate this method in the future.
     #
     # ==== Returns
     # TrueClass|FalseClass:: Returns true if any change to the yaml file was made.
