@@ -136,16 +136,16 @@ class Thor::Runner < Thor
   method_options :substring => :boolean, :group => :optional, :all => :boolean
   def list(search="")
     initialize_thorfiles
+
     search = ".*#{search}" if options["substring"]
     search = /^#{search}.*/i
     group  = options[:group] || "standard"
 
-    classes = Thor::Base.subclasses.select do |k|
-      (options[:all] || k.group_name == group) && 
-      Thor::Util.constant_to_namespace(k.name) =~ search
+    klasses = Thor::Base.subclasses.select do |k|
+      (options[:all] || k.group_name == group) && k.namespace =~ search
     end
 
-    display_klasses(false, classes)
+    display_klasses(false, klasses)
   end
 
   private
