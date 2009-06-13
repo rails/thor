@@ -114,6 +114,11 @@ describe Thor::Actions do
         end
       end.must be_empty
     end
+
+    it "accepts a color as status" do
+      mock(runner.shell).say_status(:inside, file, :yellow)
+      runner.inside("foo", :yellow){}
+    end
   end
 
   describe "#in_root" do
@@ -128,7 +133,7 @@ describe Thor::Actions do
 
   describe "#run" do
     before(:each) do
-            mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
+      mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
     end
 
     it "executes the command given" do
@@ -139,8 +144,77 @@ describe Thor::Actions do
       capture(:stdout) { runner.run('ls') }.must == "   [RUNNING] ls from #{Dir.pwd}\n"
     end
 
-    it "does not log status" do
+    it "does not log status if required" do
       capture(:stdout) { runner.run('ls', false) }.must be_empty
+    end
+
+    it "accepts a color as status" do
+      mock(runner.shell).say_status(:running, "ls from #{Dir.pwd}", :yellow)
+      runner.run('ls', :yellow)
+    end
+  end
+
+  describe "#run_ruby_script" do
+    it "executes the ruby script" do
+      mock(runner).run("ruby script.rb", true)
+      runner.run_ruby_script("script.rb")
+    end
+
+    it "does not log status if required" do
+      mock(runner).run("ruby script.rb", false)
+      runner.run_ruby_script("script.rb", false)
+    end
+  end
+
+  describe "#git" do
+    describe "when a symbol is given" do
+      it "executes the git command" do
+        mock(runner).run("git init", true)
+        runner.git(:init)
+      end
+
+      it "does not log status if required" do
+        mock(runner).run("git init", false)
+        runner.git(:init, false)
+      end
+    end
+
+    describe "when a hash is given" do
+      it "executes several commands when a hash is given" do
+        mock(runner).run("git add foo", true)
+        mock(runner).run("git remove bar", true)
+        runner.git(:add => "foo", :remove => "bar")
+      end
+
+      it "does not log status if required" do
+        mock(runner).run("git add foo", false)
+        runner.git({ :add => "foo" }, false)
+      end
+    end
+  end
+
+  describe "#thor" do
+    it "executes the thor command" do
+      mock(runner).run("thor list", true)
+      runner.thor(:list, true)
+    end
+
+    it "converts extra arguments to command arguments" do
+      mock(runner).run("thor list foo bar", true)
+      runner.thor(:list, "foo", "bar")
+    end
+
+    it "converts options hash to switches" do
+      mock(runner).run("thor list foo bar --foo", true)
+      runner.thor(:list, "foo", "bar", :foo => true)
+
+      mock(runner).run("thor list --foo 1 2 3", true)
+      runner.thor(:list, :foo => [1,2,3])
+    end
+
+    it "does not log status if required" do
+      mock(runner).run("thor list --foo 1 2 3", false)
+      runner.thor(:list, { :foo => [1,2,3] }, false)
     end
   end
 end

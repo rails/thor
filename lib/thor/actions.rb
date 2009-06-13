@@ -161,8 +161,8 @@ class Thor
       end
     end
 
-    # Run a thor command. A hash of options options can be given and it's
-    # converted to switches.
+    # Run a thor command. A hash of options can be given and it's converted to 
+    # switches.
     #
     # ==== Parameters
     # task<String>:: the task to be invoked
@@ -173,16 +173,20 @@ class Thor
     #
     # ==== Examples
     #
-    #   thor :install, "http://gist.github.com/103208"  #=> thor install http://gist.github.com/103208
-    #   thor :list, :all => true, :substring => 'rails' #=> thor list --all --substring=rails
+    #   thor :install, "http://gist.github.com/103208"
+    #   #=> thor install http://gist.github.com/103208
+    #
+    #   thor :list, :all => true, :substring => 'rails'
+    #   #=> thor list --all --substring=rails
     #
     def thor(task, *args)
       log_status = [true, false].include?(args.last) ? args.pop : true
       options = args.last.is_a?(Hash) ? args.pop : {}
 
       in_root do
-        command = "thor #{task} #{args.join(' ')} #{Thor::Options.to_switches(options)}"
-        run command.strip, log_status
+        args.unshift "thor #{task}"
+        args.push Thor::Options.to_switches(options)
+        run args.join(' ').strip, log_status
       end
     end
 
