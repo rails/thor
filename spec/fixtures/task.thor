@@ -1,4 +1,4 @@
-# module: randomness
+# module: random
 
 class Amazing < Thor
   desc "describe NAME", "say that someone is amazing"

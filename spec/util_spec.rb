@@ -116,7 +116,7 @@ describe Thor::Util do
     end
 
     it "returns the user path if none variable is set on the environment" do
-      Thor::Util.thor_root.must == "/home/jose"
+      Thor::Util.thor_root.must == File.expand_path("~")
     end
 
     it "returns the *unix system path if file cannot be expanded and separator does not exist" do

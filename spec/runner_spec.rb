@@ -95,6 +95,7 @@ describe Thor::Runner do
 
       # Stub load and save to avoid thor.yaml from being overwritten
       stub(YAML).load_file { @original_yaml }
+      stub(File).exists?(File.join(Thor::Util.thor_root, "thor.yml")){ true }
       stub(File).open(File.join(Thor::Util.thor_root, "thor.yml"), "w")
     end
 
@@ -188,7 +189,7 @@ describe Thor::Runner do
         stub(FileUtils).mkdir_p
         stub(FileUtils).touch
 
-        mock(File).open(File.join(Thor::Util.thor_root, Digest::MD5.hexdigest(@location + "randomness")), "w")
+        mock(File).open(File.join(Thor::Util.thor_root, Digest::MD5.hexdigest(@location + "random")), "w")
         silence(:stdout) { Thor::Runner.start }
       end
     end
