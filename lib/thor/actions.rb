@@ -8,6 +8,19 @@ class Thor
   module Actions
     attr_accessor :behavior
 
+    # Extends initializer to add more configuration options.
+    #
+    # ==== Configuration
+    # behavior<Symbol>:: The actions default behavior. Can be :invoke or :revoke.
+    #                    It also accepts :force, :skip and :pretend to set the behavior
+    #                    and the respective option.
+    #
+    # root<String>:: The root directory needed for some actions. It's also known
+    #                as destination root.
+    #
+    # in_root<Boolean>:: When true, creates the root directory if it does not exist
+    #                    and move to it. False by default.
+    #
     def initialize(args=[], options={}, config={})
       self.behavior = case config[:behavior]
         when :force
@@ -25,6 +38,13 @@ class Thor
           :invoke
       end
 
+      self.root = config[:root]
+
+      if config[:in_root]
+        FileUtils.mkdir_p(root) unless File.exist?(root)
+        FileUtils.cd(root)
+      end
+
       super
     end
 
@@ -37,6 +57,20 @@ class Thor
         instance.invoke!
       end
     end
+
+    # Sets the root for this thor class. Relatives path are added to the
+    # directory where the script was invoked and expanded.
+    #
+    def root=(root)
+      @root = File.expand_path(root) if root
+    end
+
+    # Returns the root for this thor class (also aliased as destination root).
+    #
+    def root
+      @root ||= File.expand_path(File.join(Dir.pwd, ''))
+    end
+    alias :destination_root :root
 
     # Get the source root in the class. Raises an error if a source root is
     # not specified in the thor class.
@@ -82,7 +116,7 @@ class Thor
     # ==== Example
     #
     #   inside('vendor') do
-    #     run('ln -s ~/edge rails)
+    #     run('ln -s ~/edge rails')
     #   end
     #
     def run(command, log_status=true)

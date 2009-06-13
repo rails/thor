@@ -57,24 +57,6 @@ describe Thor::Base do
     end
   end
 
-  describe "#root=" do
-    it "gets the current directory and expands the path to set the root" do
-      base = MyCounter.new
-      base.root = "here"
-      base.root.must == File.expand_path(File.join(File.dirname(__FILE__), "..", "here"))
-    end
-
-    it "does not use the current directory if one is given" do
-      base = MyCounter.new
-      base.root = "/"
-      base.root.must == "/"
-    end
-
-    it "uses the current directory if none is given" do
-      MyCounter.new.root.must == File.expand_path(File.join(File.dirname(__FILE__), ".."))
-    end
-  end
-
   describe "#no_tasks" do
     it "avoids methods being added as tasks" do
       MyScript.tasks.keys.must include("animal")

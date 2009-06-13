@@ -390,15 +390,13 @@ class Thor
       # ==== Configuration
       # shell<Object>:: An instance of the shell to be used.
       #
-      # root<String>:: The root directory, necessary if you are using certain actions.
-      #
       # ==== Examples
       #
       #   class MyScript < Thor
       #     argument :first, :type => :numeric
       #   end
       #
-      #   MyScript.new [1.0], { :foo => :bar }, :shell => Thor::Shell::Basic.new, :root => "/"
+      #   MyScript.new [1.0], { :foo => :bar }, :shell => Thor::Shell::Basic.new
       #
       def initialize(args=[], options={}, config={})
         self.class.arguments.zip(args).each do |argument, value|
@@ -407,7 +405,6 @@ class Thor
 
         self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
         self.shell   = config[:shell]
-        self.root    = config[:root]
 
         # Add base to shell if an accessor is provided.
         self.shell.base = self if self.shell.respond_to?(:base)
@@ -434,20 +431,6 @@ class Thor
       #
       def shell=(shell)
         @shell = shell
-      end
-
-      # Returns the root for this thor class (also aliased as destination root).
-      #
-      def root
-        @root ||= File.expand_path(File.join(Dir.pwd, ''))
-      end
-      alias :destination_root :root
-
-      # Sets the root for this thor class. Relatives path are added to the
-      # directory where the script was invoked and expanded.
-      #
-      def root=(root)
-        @root = File.expand_path(root) if root
       end
 
       # Finds a task with the name given and invokes it with the given arguments.
