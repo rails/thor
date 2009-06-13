@@ -369,6 +369,8 @@ class Thor
     module SingletonMethods
       attr_accessor :options
 
+      SHELL_DELEGATED_METHODS = [:ask, :yes?, :no?, :say, :print_list, :print_table]
+
       # It receives arguments in an Array and two hashes, one for options and
       # other for configuration.
       #
@@ -406,6 +408,16 @@ class Thor
         self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
         self.shell   = config[:shell]
         self.root    = config[:root]
+      end
+
+      # Common methods that are delegated to the shell.
+      #
+      SHELL_DELEGATED_METHODS.each do |method|
+        module_eval <<-METHOD, __FILE__, __LINE__
+          def #{method}(*args)
+            shell.#{method}(*args)
+          end
+        METHOD
       end
 
       # Holds the shell for the given Thor instance. If no shell is given,

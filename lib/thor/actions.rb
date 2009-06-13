@@ -8,8 +8,6 @@ class Thor
   module Actions
     attr_accessor :behavior
 
-    SHELL_DELEGATED_METHODS = [:ask, :yes?, :no?, :say, :print_list, :print_table]
-
     def initialize(args=[], options={}, config={})
       self.behavior = case config[:behavior]
         when :force
@@ -49,16 +47,6 @@ class Thor
       raise NoMethodError, "You have to specify the class method source_root in your thor class."
     end
 
-    # Common methods that are delegated to the shell.
-    #
-    SHELL_DELEGATED_METHODS.each do |method|
-      module_eval <<-METHOD, __FILE__, __LINE__
-        def #{method}(*args)
-          shell.#{method}(*args)
-        end
-      METHOD
-    end
-
     # Do something in the root or on a provided subfolder. The full path is
     # yielded to the block you provide. The path is set back to the previous
     # path when the method exits.
@@ -72,7 +60,7 @@ class Thor
       folder = File.join(root, dir)
 
       color = log_status.is_a?(Symbol) ? log_status : :green
-      shell.say_status :cd, folder, color if log_status
+      shell.say_status :inside, folder, color if log_status
 
       FileUtils.mkdir_p(folder) unless File.exist?(folder)
       FileUtils.cd(folder) { block.arity == 1 ? yield(folder) : yield }
