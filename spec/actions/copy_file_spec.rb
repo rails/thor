@@ -28,7 +28,7 @@ describe Thor::Actions::CopyFile do
   end
 
   def valid?(content, path)
-    content.must == "   [CREATED] #{path}\n"
+    content.must == "    [CREATE] #{path}\n"
     File.exists?(File.join(destination_root, path)).must be_true
     FileUtils.identical?(@action.source, @action.destination).must be_true
   end

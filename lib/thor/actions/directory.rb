@@ -26,13 +26,13 @@ class Thor
         files.each do |file_source|
           file_destination = File.join(relative_destination, file_source.gsub(source, ''))
           file_source.gsub!(base.source_root, '.')
-          base.copy_file(file_source, file_destination, log_status?)
+          base.copy_file(file_source, file_destination, @log_status)
         end
       end
 
       def revoke!
         say_status :deleted, :green
-        ::FileUtils.rm_rf(destination)
+        ::FileUtils.rm_rf(destination) unless pretend?
       end
 
     end

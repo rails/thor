@@ -42,7 +42,7 @@ describe Thor::Actions::AddFile do
 
     it "shows progress information to the user" do
       add_file("doc/USAGE", "just use it")
-      invoke!.must == "   [CREATED] doc/USAGE\n"
+      invoke!.must == "    [CREATE] doc/USAGE\n"
     end
 
     it "does not show progress information if log status is false" do

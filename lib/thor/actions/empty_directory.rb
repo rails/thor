@@ -34,7 +34,7 @@ class Thor
 
       def revoke!
         say_status :deleted, :green
-        ::FileUtils.rm_rf(destination)
+        ::FileUtils.rm_rf(destination) unless pretend?
       end
 
     end

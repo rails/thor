@@ -183,7 +183,7 @@ describe Thor::Actions do
 
     it "logs status" do
       mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
-      capture(:stdout) { runner.run('ls') }.must == "   [RUNNING] ls from #{Dir.pwd}\n"
+      capture(:stdout) { runner.run('ls') }.must == "       [RUN] ls from #{Dir.pwd}\n"
     end
 
     it "does not log status if required" do
@@ -193,7 +193,7 @@ describe Thor::Actions do
 
     it "accepts a color as status" do
       mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
-      mock(runner.shell).say_status(:running, "ls from #{Dir.pwd}", :yellow)
+      mock(runner.shell).say_status(:run, "ls from #{Dir.pwd}", :yellow)
       runner.run('ls', :yellow)
     end
   end

@@ -50,7 +50,7 @@ describe Thor::Actions::Template do
 
     it "shows created status to the user" do
       template("doc/config.rb")
-      invoke!.must == "   [CREATED] doc/config.rb\n"
+      invoke!.must == "    [CREATE] doc/config.rb\n"
     end
 
     it "does not show any information if log status is false" do
@@ -80,12 +80,12 @@ describe Thor::Actions::Template do
 
         it "shows forced status to the user if force is given" do
           template("doc/config.rb", "doc/config.rb", :force => true).must_not be_identical
-          invoke!.must == "    [FORCED] doc/config.rb\n"
+          invoke!.must == "     [FORCE] doc/config.rb\n"
         end
 
         it "shows skipped status to the user if skip is given" do
           template("doc/config.rb", "doc/config.rb", :skip => true).must_not be_identical
-          invoke!.must == "   [SKIPPED] doc/config.rb\n"
+          invoke!.must == "      [SKIP] doc/config.rb\n"
         end
 
         it "shows conflict status to ther user" do
@@ -94,21 +94,21 @@ describe Thor::Actions::Template do
           file = File.join(destination_root, 'doc/config.rb')
 
           content = invoke!
-          content.must =~ /  \[CONFLICT\] doc\/config\.rb/
+          content.must =~ /\[CONFLICT\] doc\/config\.rb/
           content.must =~ /Overwrite #{file}\? \(enter "h" for help\) \[Ynaqdh\]/
-          content.must =~ /   \[SKIPPED\] doc\/config\.rb/
+          content.must =~ /\[SKIP\] doc\/config\.rb/
         end
 
         it "creates the file if the file collision menu returns true" do
           template("doc/config.rb")
           mock($stdin).gets{ 'y' }
-          invoke!.must =~ /   \[FORCED\] doc\/config\.rb/
+          invoke!.must =~ /\[FORCE\] doc\/config\.rb/
         end
 
         it "skips the file if the file collision menu returns false" do
           template("doc/config.rb")
           mock($stdin).gets{ 'n' }
-          invoke!.must =~ /   \[SKIPPED\] doc\/config\.rb/
+          invoke!.must =~ /\[SKIP\] doc\/config\.rb/
         end
 
         it "executes the block given to show file content" do

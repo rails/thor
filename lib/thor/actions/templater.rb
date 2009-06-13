@@ -13,8 +13,11 @@ class Thor
       # Initializes given the source and destination.
       #
       # ==== Parameters
-      # source<String>:: Full path to the source of this file
-      # destination<String>:: Full path to the destination of this file
+      # base<Thor::Base>:: A Thor::Base instance
+      # source<String>:: Relative path to the source of this file
+      # destination<String>:: Relative path to the destination of this file
+      # log_status<Boolean>:: If false, does not log the status. True by default.
+      #                       Templater log status does not accept color.
       #
       def initialize(base, source, destination, log_status=true)
         @base, @log_status = base, log_status
@@ -64,8 +67,8 @@ class Thor
 
       protected
 
-        def log_status?
-          @log_status
+        def pretend?
+          base.options[:pretend]
         end
 
         # Sets the source value from a relative source value.
@@ -93,9 +96,9 @@ class Thor
           if identical?
             say_status :identical, :blue
           elsif exists?
-            force_or_skip_or_conflict(options[:force], options[:skip], &block)
+            force_or_skip_or_conflict(options[:force], options[:skip], options[:pretend], &block)
           else
-            say_status :created, :green
+            say_status :create, :green
             block.call unless options[:pretend]
           end
         end
@@ -104,15 +107,15 @@ class Thor
         # skipped. If both are false, show the file_collision menu, if the menu
         # returns true, force it, otherwise skip.
         #
-        def force_or_skip_or_conflict(force, skip, &block)
+        def force_or_skip_or_conflict(force, skip, pretend, &block)
           if force
-            say_status :forced, :yellow
-            block.call unless options[:pretend]
+            say_status :force, :yellow
+            block.call unless pretend
           elsif skip
-            say_status :skipped, :yellow
+            say_status :skip, :yellow
           else
             say_status :conflict, :red
-            force_or_skip_or_conflict(force_on_collision?, true, &block)
+            force_or_skip_or_conflict(force_on_collision?, true, pretend, &block)
           end
         end
 
@@ -120,28 +123,16 @@ class Thor
         #
         def force_on_collision?
           if respond_to?(:render)
-            shell.file_collision(destination){ render }
+            base.shell.file_collision(destination){ render }
           else
-            shell.file_collision(destination)
+            base.shell.file_collision(destination)
           end
-        end
-
-        # Retrieves the shell object from base class.
-        #
-        def shell
-          base.shell
-        end
-
-        # Retrieves options hash from base class.
-        #
-        def options
-          base.options
         end
 
         # Shortcut to say_status shell method.
         #
         def say_status(status, color)
-          shell.say_status status, relative_destination, color if log_status?
+          base.shell.say_status status, relative_destination, color if @log_status
         end
 
         # TODO Add this behavior to all actions.

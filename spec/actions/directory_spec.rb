@@ -34,7 +34,7 @@ describe Thor::Actions::Directory do
       relative    = File.join(@action.relative_destination, file)
       destination = File.join(destination_root, path, file)
 
-      content.must =~ /^   \[CREATED\] #{relative}$/
+      content.must =~ /^    \[CREATE\] #{relative}$/
 
       File.exists?(destination).must be_true
       FileUtils.identical?(source, destination).must be_true
