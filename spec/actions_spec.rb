@@ -86,8 +86,30 @@ describe Thor::Actions do
     it "executes the block inside the given folder" do
       capture(:stdout) do
         runner.inside("foo") do
-          Dir.pwd.must ==  file
+          Dir.pwd.must == file
         end
+      end
+    end
+
+    it "changes the base root" do
+      capture(:stdout) do
+        runner.inside("foo") do
+          runner.root.must == file
+        end
+      end
+    end
+
+    it "returns to the previous state" do
+      begin
+        runner(:in_root => true)
+
+        capture(:stdout) do
+          runner.inside("foo"){}
+          Dir.pwd.must == destination_root
+          runner.root.must == destination_root
+        end
+      ensure
+        FileUtils.cd(File.join(destination_root, '..', '..'))
       end
     end
 
@@ -126,6 +148,23 @@ describe Thor::Actions do
       capture(:stdout) do
         runner.inside("foo") do
           runner.in_root { Dir.pwd.must == destination_root }
+        end
+      end
+    end
+
+    it "changes the base root" do
+      capture(:stdout) do
+        runner.inside("foo") do
+          runner.in_root { runner.root.must == destination_root }
+        end
+      end
+    end
+
+    it "returns to the previous state" do
+      capture(:stdout) do
+        runner.inside("foo") do
+          runner.in_root { }
+          runner.root.must == file
         end
       end
     end

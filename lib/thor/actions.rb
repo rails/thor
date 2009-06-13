@@ -62,13 +62,14 @@ class Thor
     # directory where the script was invoked and expanded.
     #
     def root=(root)
-      @root = File.expand_path(root) if root
+      @root_stack ||= []
+      @root_stack[0] = File.expand_path(root || '')
     end
 
     # Returns the root for this thor class (also aliased as destination root).
     #
     def root
-      @root ||= File.expand_path(File.join(Dir.pwd, ''))
+      @root_stack.last
     end
     alias :destination_root :root
 
@@ -81,9 +82,10 @@ class Thor
       raise NoMethodError, "You have to specify the class method source_root in your thor class."
     end
 
-    # Do something in the root or on a provided subfolder. The full path is
-    # yielded to the block you provide. The path is set back to the previous
-    # path when the method exits.
+    # Do something in the root or on a provided subfolder. If a relative path
+    # is given it's referenced from the current root. The full path is yielded
+    # to the block you provide. The path is set back to the previous path when
+    # the method exits.
     #
     # ==== Parameters
     # dir<String>:: the directory to move to.
@@ -91,19 +93,21 @@ class Thor
     #                       If a symbol is given, uses it as the output color.
     #
     def inside(dir='', log_status=true, &block)
-      folder = File.join(root, dir)
+      @root_stack.push File.expand_path(dir, root)
 
       color = log_status.is_a?(Symbol) ? log_status : :green
-      shell.say_status :inside, folder, color if log_status
+      shell.say_status :inside, root, color if log_status
 
-      FileUtils.mkdir_p(folder) unless File.exist?(folder)
-      FileUtils.cd(folder) { block.arity == 1 ? yield(folder) : yield }
+      FileUtils.mkdir_p(root) unless File.exist?(root)
+      FileUtils.cd(root) { block.arity == 1 ? yield(root) : yield }
+
+      @root_stack.pop
     end
 
     # Goes to the root and execute the given block.
     #
     def in_root
-      FileUtils.cd(root) { yield }
+      inside(@root_stack.first, false) { yield }
     end
 
     # Executes a command.
