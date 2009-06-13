@@ -144,6 +144,19 @@ class Thor
           shell.say_status status, relative_destination, color if log_status?
         end
 
+        # TODO Add this behavior to all actions.
+        #
+        # def after_invoke
+        #   # Optionally change permissions.
+        #   if file_options[:chmod]
+        #     FileUtils.chmod(file_options[:chmod], destination)
+        #   end
+        #
+        #   # Optionally add file to subversion or git
+        #   system("svn add #{destination}") if options[:svn]
+        #   system("git add -v #{relative_destination}") if options[:git]
+        # end
+
     end
   end
 end
