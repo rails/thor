@@ -408,6 +408,9 @@ class Thor
         self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
         self.shell   = config[:shell]
         self.root    = config[:root]
+
+        # Add base to shell if an accessor is provided.
+        self.shell.base = self if self.shell.respond_to?(:base)
       end
 
       # Common methods that are delegated to the shell.

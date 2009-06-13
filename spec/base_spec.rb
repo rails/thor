@@ -32,9 +32,16 @@ describe Thor::Base do
     end
 
     it "sets shell value" do
-      shell_stub = stub(Thor::Shell::Basic)
-      base = MyCounter.new [1, 2], { }, :shell => shell_stub
-      base.shell.must == shell_stub
+      shell = Thor::Shell::Basic.new
+      base = MyCounter.new [1, 2], { }, :shell => shell
+      base.shell.must == shell
+    end
+
+    it "sets the base value on the shell if an accessor is available" do
+      shell = Thor::Shell::Basic.new
+      shell.instance_eval "def base=(base); @base = base; end; def base; @base; end"
+      base = MyCounter.new [1, 2], { }, :shell => shell
+      shell.base.must == base
     end
   end
 
