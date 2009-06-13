@@ -386,10 +386,9 @@ class Thor
       # config<Hash>:: Configuration for this Thor class.
       #
       # ==== Configuration
-      # shell<Object>:: The shell instance object to be used.
+      # shell<Object>:: An instance of the shell to be used.
       #
-      # root<String>:: The directory to be considered as root, necessary if you are using
-      #                certain actions.
+      # root<String>:: The root directory, necessary if you are using certain actions.
       #
       # ==== Examples
       #
@@ -397,16 +396,16 @@ class Thor
       #     argument :first, :type => :numeric
       #   end
       #
-      #   MyScript.new [1.0], { :foo => :bar }, :shell => Thor::Shell::Basic.new, :behavior => :revoke
+      #   MyScript.new [1.0], { :foo => :bar }, :shell => Thor::Shell::Basic.new, :root => "/"
       #
       def initialize(args=[], options={}, config={})
         self.class.arguments.zip(args).each do |argument, value|
           send("#{argument.human_name}=", value)
         end
 
-        self.options  = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
-        self.root     = config[:root]
-        self.shell    = config[:shell]
+        self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
+        self.shell   = config[:shell]
+        self.root    = config[:root]
       end
 
       # Holds the shell for the given Thor instance. If no shell is given,
@@ -433,11 +432,7 @@ class Thor
       # directory where the script was invoked and expanded.
       #
       def root=(root)
-        @root = if root && File.directory?(root)
-          File.expand_path(root)
-        else
-          File.expand_path(File.join(Dir.pwd, root || ''))
-        end
+        @root = File.expand_path(root) if root
       end
 
       # Finds a task with the name given and invokes it with the given arguments.
