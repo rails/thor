@@ -122,8 +122,6 @@ class Thor
     #
     # ==== Parameters
     # dir<String>:: the directory to move to.
-    # log_status<Boolean>:: if false, does not log the status. True by default.
-    #                       If a symbol is given, uses it as the output color.
     #
     def inside(dir='', &block)
       @root_stack.push File.expand_path(dir, root)

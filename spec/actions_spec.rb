@@ -132,27 +132,21 @@ describe Thor::Actions do
 
   describe "#in_root" do
     it "executes the block in the root folder" do
-      capture(:stdout) do
-        runner.inside("foo") do
-          runner.in_root { Dir.pwd.must == destination_root }
-        end
+      runner.inside("foo") do
+        runner.in_root { Dir.pwd.must == destination_root }
       end
     end
 
     it "changes the base root" do
-      capture(:stdout) do
-        runner.inside("foo") do
-          runner.in_root { runner.root.must == destination_root }
-        end
+      runner.inside("foo") do
+        runner.in_root { runner.root.must == destination_root }
       end
     end
 
     it "returns to the previous state" do
-      capture(:stdout) do
-        runner.inside("foo") do
-          runner.in_root { }
-          runner.root.must == file
-        end
+      runner.inside("foo") do
+        runner.in_root { }
+        runner.root.must == file
       end
     end
   end

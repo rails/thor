@@ -34,7 +34,11 @@ class Thor
       protected
 
         def source=(source)
-          @source = source
+          if source =~ /^http\:\/\//
+            @source = source
+          else
+            super(source)
+          end
         end
 
         def destination=(destination)
