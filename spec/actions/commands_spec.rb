@@ -53,33 +53,6 @@ describe Thor::Actions, 'commands' do
     end
   end
 
-  describe "#git" do
-    describe "when a symbol is given" do
-      it "executes the git command" do
-        mock(runner).run("git init", true)
-        runner.git(:init)
-      end
-
-      it "does not log status if required" do
-        mock(runner).run("git init", false)
-        runner.git(:init, false)
-      end
-    end
-
-    describe "when a hash is given" do
-      it "executes several commands when a hash is given" do
-        mock(runner).run("git add foo", true)
-        mock(runner).run("git remove bar", true)
-        runner.git(:add => "foo", :remove => "bar")
-      end
-
-      it "does not log status if required" do
-        mock(runner).run("git add foo", false)
-        runner.git({ :add => "foo" }, false)
-      end
-    end
-  end
-
   describe "#thor" do
     it "executes the thor command" do
       mock(runner).run("thor list", true)

@@ -29,31 +29,6 @@ class Thor
       run("ruby #{command}", log_status)
     end
 
-    # Run a command in git.
-    #
-    # ==== Parameters
-    # command<String>:: the command to be executed.
-    # log_status<Boolean>:: if false, does not log the status. True by default.
-    #                       If a symbol is given, uses it as the output color.
-    #
-    # ==== Examples
-    #
-    #   git :init
-    #   git :add => "this.file that.rb"
-    #   git :add => "onefile.rb", :rm => "badfile.cxx"
-    #
-    def git(command, log_status=true)
-      in_root do
-        if command.is_a?(Symbol)
-          run "git #{command}", log_status
-        else
-          command.each do |command, options|
-            run "git #{command} #{options}", log_status
-          end
-        end
-      end
-    end
-
     # Run a thor command. A hash of options can be given and it's converted to 
     # switches.
     #
