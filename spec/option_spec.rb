@@ -261,7 +261,7 @@ describe Thor::Option do
 
     describe "with aliases" do
       it "does not show the usage between brackets" do
-        parse([:foo, "-f", "-b"], :required).usage.must == "--foo=FOO (-f, -b)"
+        parse([:foo, "-f", "-b"], :required).usage.must == "-f, -b, --foo=FOO"
       end
     end
 
@@ -271,7 +271,7 @@ end
 describe Thor::Argument do
 
   def argument(name, type=:string, default=nil)
-    @argument ||= Thor::Argument.new(name, nil, default.nil?, type, default, [])
+    @argument ||= Thor::Argument.new(name, nil, default.nil?, type, default)
   end
 
   it "is an argument" do

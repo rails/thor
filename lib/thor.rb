@@ -211,8 +211,8 @@ class Thor
             [ option.usage, option.description || '' ]
           end
 
-          shell.say "Global options:"
-          shell.print_table(list, :emphasize_last => true)
+          shell.say "Global arguments:"
+          shell.print_table(list, :emphasize_last => true, :ident => 2)
           shell.say ""
         end
       end

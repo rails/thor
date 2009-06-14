@@ -56,8 +56,8 @@ class Thor::Group
         end.compact
 
         unless list.empty?
-          shell.say "Options:"
-          shell.print_table(list, :emphasize_last => true)
+          shell.say "Global options:"
+          shell.print_table(list, :emphasize_last => true, :ident => 2)
           shell.say
         end
 

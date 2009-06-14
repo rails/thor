@@ -55,7 +55,7 @@ describe Thor::Group do
     end
 
     it "shows global options information" do
-      @content.must =~ /Options/
+      @content.must =~ /Global options/
       @content.must =~ /\[\-\-third=N\]/
     end
 

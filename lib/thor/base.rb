@@ -83,7 +83,7 @@ class Thor
       #
       # ==== Parameters
       # name<Symbol>:: The name of the argument.
-      # options<Hash>:: The description, type, default value and aliases for this argument.
+      # options<Hash>:: The description, type, default value for this argument.
       #                 The type can be :string, :numeric, :hash or :array. If none, string is assumed.
       #
       # ==== Errors
@@ -106,8 +106,8 @@ class Thor
                                "the non-required argument #{option.human_name.inspect}."
         end if required
 
-        class_options[name] = Thor::Argument.new(name, options[:desc], required, options[:type],
-                                                       options[:default], options[:aliases])
+        class_options[name] = Thor::Argument.new(name, options[:desc], required,
+                                                 options[:type], options[:default])
       end
 
       # Returns this class arguments, looking up in the ancestors chain.
@@ -286,8 +286,8 @@ class Thor
         #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
         #
         def build_option(name, options, scope)
-          scope[name] = Thor::Option.new(name, options[:desc], options[:required], options[:type],
-                                               options[:default], options[:aliases])
+          scope[name] = Thor::Option.new(name, options[:desc], options[:required],
+                                         options[:type], options[:default], options[:aliases])
         end
 
         # Receives a hash of options, parse them and add to the scope. This is a

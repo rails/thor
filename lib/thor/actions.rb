@@ -8,6 +8,32 @@ class Thor
   module Actions
     attr_accessor :behavior
 
+    # On inclusion, add some options to base.
+    #
+    def self.included(base) #:nodoc:
+      return unless base.respond_to?(:class_option)
+
+      base.class_option :pretend, :type => :boolean, :aliases => "-p",
+                                  :desc => "Run but do not make any changes"
+
+      base.class_option :force, :type => :boolean, :aliases => "-f",
+                                :desc => "Overwrite files that already exist"
+
+      base.class_option :skip, :type => :boolean, :aliases => "-s",
+                               :desc => "Skip files that already exist"
+
+      base.class_option :quiet, :type => :boolean, :aliases => "-q",
+                                :desc => "Supress status output"
+
+      # TODO Add git support
+      base.class_option :git, :type => :boolean, :aliases => "-g",
+                              :desc => "Modify files with git (note: git must be on the path)"
+
+      # TODO Add chmod support
+      base.class_option :chmod, :type => :string, :aliases => "-c",
+                                :desc => "Set the mode of added/copied files"
+    end
+
     # Extends initializer to add more configuration options.
     #
     # ==== Configuration
