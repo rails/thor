@@ -59,6 +59,10 @@ describe Thor::Group do
       @content.must =~ /\[\-\-third=N\]/
     end
 
+    it "shows global options description" do
+      @content.must =~ /# The third argument\./
+    end
+
     it "shows only usage if a short help is required" do
       content = capture(:stdout){ MyCounter.help(Thor::Base.shell.new, :short => true) }
       content.must =~ /my_counter N \[N\] \[\-\-third=N\]/
