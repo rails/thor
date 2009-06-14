@@ -55,6 +55,11 @@ describe Thor::Shell::Basic do
       shell.say_status(:created, "~/.thor/task.thor")
     end
 
+    it "always use new line" do
+      mock($stdout).puts("   [CREATED] ")
+      shell.say_status(:created, "")
+    end
+
     it "does not print a message if base is set to quiet" do
       base = MyCounter.new
       mock(base).options { Hash.new(:quiet => true) }

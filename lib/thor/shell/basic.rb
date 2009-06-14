@@ -22,10 +22,10 @@ class Thor
       # ==== Example
       # say("I know you knew that.")
       #
-      def say(statement="", color=nil)
+      def say(statement="", color=nil, force_new_line=false)
         statement = statement.to_s
 
-        if statement[-1, 1] == " " || statement[-1, 1] == "\t"
+        if !force_new_line && (statement[-1, 1] == " " || statement[-1, 1] == "\t")
           $stdout.print(statement)
           $stdout.flush
         else
@@ -40,7 +40,7 @@ class Thor
         return if base && base.options[:quiet]
 
         status_flag = "[#{status.to_s.upcase}]".rjust(12)
-        say "#{status_flag} #{message}"
+        say "#{status_flag} #{message}", color, true
       end
 
       # Make a question the to user and returns true if the user replies "y" or
