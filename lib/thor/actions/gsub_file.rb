@@ -35,7 +35,7 @@ class Thor
     #
     # ==== Parameters
     # path<String>:: path of the file to be changed
-    # data<String>:: the data to append to the file
+    # data<String>:: the data to append to the file, can be also given as a block.
     # log_status<Boolean>:: if false, does not log the status. True by default.
     #                       If a symbol is given, uses it as the output color.
     #
@@ -43,18 +43,18 @@ class Thor
     #
     #   append_file 'config/environments/test.rb', 'config.gem "rspec"'
     #
-    def append_file(path, data, log_status=true)
+    def append_file(path, data=nil, log_status=true, &block)
       path = File.expand_path(path, root)
       say_status_if_log :append, relative_to_absolute_root(path), log_status
 
-      File.open(path, 'ab') { |file| file.write(data) } unless options[:pretend]
+      File.open(path, 'ab') { |file| file.write(data || block.call) } unless options[:pretend]
     end
 
     # Prepend text to a file.
     #
     # ==== Parameters
     # path<String>:: path of the file to be changed
-    # data<String>:: the data to prepend to the file
+    # data<String>:: the data to prepend to the file, can be also given as a block.
     # log_status<Boolean>:: if false, does not log the status. True by default.
     #                       If a symbol is given, uses it as the output color.
     #
@@ -62,11 +62,15 @@ class Thor
     #
     #   prepend_file 'config/environments/test.rb', 'config.gem "rspec"'
     #
-    def prepend_file(path, data, log_status=true)
+    def prepend_file(path, data=nil, log_status=true, &block)
       path = File.expand_path(path, root)
       say_status_if_log :prepend, relative_to_absolute_root(path), log_status
 
-      File.open(path, 'r+b') { |file| file.write(data) } unless options[:pretend]
+      unless options[:pretend]
+        content = data || block.call
+        content << File.read(path)
+        File.open(path, 'wb') { |file| file.write(content) }
+      end
     end
 
   end
