@@ -73,7 +73,7 @@ class Thor
     #   #=> thor list --all --substring=rails
     #
     def thor(task, *args)
-      log_status = [true, false].include?(args.last) ? args.pop : true
+      log_status = args.last.is_a?(Symbol) || [true, false].include?(args.last) ? args.pop : true
       options = args.last.is_a?(Hash) ? args.pop : {}
 
       in_root do

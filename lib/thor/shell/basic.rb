@@ -3,6 +3,7 @@ require 'tempfile'
 class Thor
   module Shell
     class Basic
+      attr_accessor :base
 
       # Ask something to the user and receives a response.
       #
@@ -33,8 +34,11 @@ class Thor
       end
 
       # Say a status with the given color and appends the message.
+      # It does not show the status if the base is set to quiet.
       #
       def say_status(status, message, color=nil)
+        return if base && base.options[:quiet]
+
         status_flag = "[#{status.to_s.upcase}]".rjust(12)
         say "#{status_flag} #{message}"
       end

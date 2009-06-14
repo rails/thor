@@ -54,6 +54,14 @@ describe Thor::Shell::Basic do
       mock($stdout).puts("   [CREATED] ~/.thor/task.thor")
       shell.say_status(:created, "~/.thor/task.thor")
     end
+
+    it "does not print a message if base is set to quiet" do
+      base = MyCounter.new
+      mock(base).options { Hash.new(:quiet => true) }
+
+      shell.base = base
+      capture(:stdout) { shell.say_status(:created, "~/.thor/task.thor") }.must be_empty
+    end
   end
 
   describe "#print_list" do
