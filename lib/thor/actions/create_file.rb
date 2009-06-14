@@ -13,22 +13,21 @@ class Thor
     #
     # ==== Examples
     #
-    #   add_file "lib/fun_party.rb" do
+    #   create_file "lib/fun_party.rb" do
     #     hostname = ask("What is the virtual hostname I should use?")
     #     "vhost.name = #{hostname}"
     #   end
     #
-    #   add_file "config/apach.conf", "your apache config"
+    #   create_file "config/apach.conf", "your apache config"
     #
-    def add_file(destination, data=nil, log_status=true, &block)
+    def create_file(destination, data=nil, log_status=true, &block)
       action AddFile.new(self, destination, block || data.to_s, log_status)
     end
-    alias :file :add_file
 
     # AddFile is a subset of Template, which instead of rendering a file with
     # ERB, it gets the content from the user.
     #
-    class AddFile < Templater #:nodoc:
+    class CreateFile < Templater #:nodoc:
       attr_reader :data
 
       def initialize(base, destination, data, log_status)
