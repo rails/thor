@@ -32,26 +32,6 @@ class Thor
         end
       end
 
-      def exists?
-        ::File.exists?(destination)
-      end
-
-      def identical?
-        exists? && ::File.read(destination) == render
-      end
-
-      def invoke!
-        invoke_with_options!(base.options) do
-          ::FileUtils.mkdir_p(::File.dirname(destination))
-          ::File.open(destination, 'w'){ |f| f.write render }
-        end
-      end
-
-      def revoke!
-        say_status :deleted, :green
-        ::FileUtils.rm(destination, :force => true) unless pretend?
-      end
-
     end
   end
 end

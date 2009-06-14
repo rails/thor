@@ -39,11 +39,11 @@ describe Thor::Actions::EmptyDirectory do
       invoke!.must == "    [CREATE] doc\n"
     end
 
-    describe "when directory exists exists" do
-      it "shows identical status" do
+    describe "when directory exists" do
+      it "shows exist status" do
         empty_directory("doc")
         invoke!
-        invoke!.must == " [IDENTICAL] doc\n"
+        invoke!.must == "     [EXIST] doc\n"
       end
     end
   end

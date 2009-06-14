@@ -1,4 +1,4 @@
-require 'thor/actions/empty_directory'
+require 'thor/actions/templater'
 
 class Thor
   module Actions
@@ -19,7 +19,7 @@ class Thor
       action Directory.new(self, source, destination || source, log_status)
     end
 
-    class Directory < EmptyDirectory #:nodoc:
+    class Directory < Templater #:nodoc:
 
       def invoke!
         files = Dir[File.join(source, '**', '*')].select{ |f| !File.directory?(f) }

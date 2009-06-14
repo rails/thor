@@ -1,4 +1,4 @@
-require 'thor/actions/template'
+require 'thor/actions/templater'
 
 class Thor
   module Actions
@@ -28,7 +28,7 @@ class Thor
     # AddFile is a subset of Template, which instead of rendering a file with
     # ERB, it gets the content from the user.
     #
-    class AddFile < Template #:nodoc:
+    class AddFile < Templater #:nodoc:
       attr_reader :data
 
       def initialize(base, destination, data, log_status)

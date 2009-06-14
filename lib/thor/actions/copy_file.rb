@@ -1,4 +1,4 @@
-require 'thor/actions/template'
+require 'thor/actions/templater'
 
 class Thor
   module Actions
@@ -21,17 +21,10 @@ class Thor
       action CopyFile.new(self, source, destination || source, log_status)
     end
 
-    class CopyFile < Template #:nodoc:
+    class CopyFile < Templater #:nodoc:
 
       def render
         @render ||= ::File.read(source)
-      end
-
-      def invoke!
-        invoke_with_options!(base.options) do
-          ::FileUtils.mkdir_p(::File.dirname(destination))
-          ::FileUtils.cp_r(source, destination)
-        end
       end
 
     end

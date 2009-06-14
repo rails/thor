@@ -1,4 +1,4 @@
-require 'thor/actions/template'
+require 'thor/actions/templater'
 require 'open-uri'
 
 class Thor
@@ -22,10 +22,10 @@ class Thor
     #   end
     #
     def get(source, destination=nil, log_status=true, &block)
-      action Template.new(self, source, block || destination, log_status)
+      action Get.new(self, source, block || destination, log_status)
     end
 
-    class Get < Template #:nodoc:
+    class Get < Templater #:nodoc:
 
       def render
         @render ||= open(source).read

@@ -32,7 +32,6 @@ class Thor
       # String:: The source file.
       #
       # def render
-      #   raise NotImplementedError
       # end
 
       # Checks if the destination file already exists.
@@ -41,7 +40,7 @@ class Thor
       # Boolean:: true if the file exists, false otherwise.
       #
       def exists?
-        raise NotImplementedError
+        ::File.exists?(destination)
       end
 
       # Checks if the content of the file at the destination is identical to the rendered result.
@@ -50,25 +49,39 @@ class Thor
       # Boolean:: true if it is identical, false otherwise.
       #
       def identical?
-        raise NotImplementedError
+        exists? && (is_not_comparable? || ::File.read(destination) == render)
       end
 
-      # Invokes the action.
+      # Invokes the action. By default it adds to the file the content rendered,
+      # but you can modify in the subclass.
       #
       def invoke!
-        raise NotImplementedError
+        invoke_with_options!(base.options) do
+          ::FileUtils.mkdir_p(::File.dirname(destination))
+          ::File.open(destination, 'w'){ |f| f.write render }
+        end
       end
 
-      # Revokes the action
+      # Revokes the action.
       #
       def revoke!
-        raise NotImplementedError
+        say_status :deleted, :green
+        ::FileUtils.rm_rf(destination) unless pretend?
       end
 
       protected
 
+        # Shortcut for pretend.
+        #
         def pretend?
           base.options[:pretend]
+        end
+
+        # A templater is comparable if responds to render. In such cases, we have
+        # to show the conflict menu to the user unless the files are identical.
+        #
+        def is_not_comparable?
+          !respond_to?(:render)
         end
 
         # Sets the source value from a relative source value.
@@ -93,13 +106,17 @@ class Thor
         # conditions are met.
         #
         def invoke_with_options!(options, &block)
-          if identical?
-            say_status :identical, :blue
-          elsif exists?
-            force_or_skip_or_conflict(options[:force], options[:skip], options[:pretend], &block)
+          if exists?
+            if is_not_comparable?
+              say_status :exist, :blue
+            elsif identical?
+              say_status :identical, :blue
+            else
+              force_or_skip_or_conflict(options[:force], options[:skip], &block)
+            end
           else
             say_status :create, :green
-            block.call unless options[:pretend]
+            block.call unless pretend?
           end
         end
 
@@ -107,26 +124,22 @@ class Thor
         # skipped. If both are false, show the file_collision menu, if the menu
         # returns true, force it, otherwise skip.
         #
-        def force_or_skip_or_conflict(force, skip, pretend, &block)
+        def force_or_skip_or_conflict(force, skip, &block)
           if force
             say_status :force, :yellow
-            block.call unless pretend
+            block.call unless pretend?
           elsif skip
             say_status :skip, :yellow
           else
             say_status :conflict, :red
-            force_or_skip_or_conflict(force_on_collision?, true, pretend, &block)
+            force_or_skip_or_conflict(force_on_collision?, true, &block)
           end
         end
 
-        # Asks the shell to show the file collision menu to the user.
+        # Shows the file collision menu to the user and gets the result.
         #
         def force_on_collision?
-          if respond_to?(:render)
-            base.shell.file_collision(destination){ render }
-          else
-            base.shell.file_collision(destination)
-          end
+          base.shell.file_collision(destination){ render }
         end
 
         # Shortcut to say_status shell method.
@@ -137,16 +150,13 @@ class Thor
 
         # TODO Add this behavior to all actions.
         #
-        # def after_invoke
-        #   # Optionally change permissions.
-        #   if file_options[:chmod]
-        #     FileUtils.chmod(file_options[:chmod], destination)
-        #   end
-        #
-        #   # Optionally add file to subversion or git
-        #   system("svn add #{destination}") if options[:svn]
-        #   system("git add -v #{relative_destination}") if options[:git]
-        # end
+        def after_invoke
+          # Optionally change permissions.
+          FileUtils.chmod(base.options[:chmod], destination) if base.options[:chmod]
+
+          # Optionally add file to subversion or git
+          system("git add -v #{relative_destination}") if options[:git]
+        end
 
     end
   end
