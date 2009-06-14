@@ -369,7 +369,7 @@ class Thor
     module SingletonMethods
       attr_accessor :options
 
-      SHELL_DELEGATED_METHODS = [:ask, :yes?, :no?, :say, :print_list, :print_table]
+      SHELL_DELEGATED_METHODS = [:ask, :yes?, :no?, :say, :say_status, :print_list, :print_table]
 
       # It receives arguments in an Array and two hashes, one for options and
       # other for configuration.

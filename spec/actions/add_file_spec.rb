@@ -15,7 +15,7 @@ describe Thor::Actions::AddFile do
       base
     end
 
-    @action = Thor::Actions::AddFile.new(base, destination, data, !@silence, &block)
+    @action = Thor::Actions::AddFile.new(base, destination, block || data.to_s, !@silence)
   end
 
   def invoke!

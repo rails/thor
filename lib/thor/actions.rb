@@ -95,8 +95,7 @@ class Thor
     def inside(dir='', log_status=true, &block)
       @root_stack.push File.expand_path(dir, root)
 
-      color = log_status.is_a?(Symbol) ? log_status : :green
-      shell.say_status :inside, root, color if log_status
+      say_status_if_log :inside, root, log_status
 
       FileUtils.mkdir_p(root) unless File.exist?(root)
       FileUtils.cd(root) { block.arity == 1 ? yield(root) : yield }
@@ -124,8 +123,7 @@ class Thor
     #   end
     #
     def run(command, log_status=true)
-      color = log_status.is_a?(Symbol) ? log_status : :green
-      shell.say_status :run, "#{command} from #{Dir.pwd}", color if log_status
+      say_status_if_log :run, "#{command} from #{Dir.pwd}", log_status
       `#{command}` unless options[:pretend]
     end
 
@@ -193,6 +191,13 @@ class Thor
         run args.join(' ').strip, log_status
       end
     end
+
+    protected
+
+      def say_status_if_log(status, message, log_status)
+        color = log_status.is_a?(Symbol) ? log_status : :green
+        shell.say_status status, message, color if log_status
+      end
 
   end
 end

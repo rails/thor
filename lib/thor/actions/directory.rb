@@ -1,4 +1,4 @@
-require 'thor/actions/templater'
+require 'thor/actions/empty_directory'
 
 class Thor
   module Actions
@@ -18,7 +18,7 @@ class Thor
       action Directory.new(self, source, destination || source, log_status)
     end
 
-    class Directory < Templater #:nodoc:
+    class Directory < EmptyDirectory #:nodoc:
 
       def invoke!
         files = Dir[File.join(source, '**', '*')].select{ |f| !File.directory?(f) }
@@ -28,11 +28,6 @@ class Thor
           file_source.gsub!(base.source_root, '.')
           base.copy_file(file_source, file_destination, @log_status)
         end
-      end
-
-      def revoke!
-        say_status :deleted, :green
-        ::FileUtils.rm_rf(destination) unless pretend?
       end
 
     end

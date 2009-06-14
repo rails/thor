@@ -21,7 +21,7 @@ class Thor
     #   add_file "config/apach.conf", "your apache config"
     #
     def add_file(destination, data=nil, log_status=true, &block)
-      action AddFile.new(self, destination, data, log_status, &block)
+      action AddFile.new(self, destination, block || data.to_s, log_status)
     end
     alias :file :add_file
 
@@ -31,9 +31,9 @@ class Thor
     class AddFile < Template #:nodoc:
       attr_reader :data
 
-      def initialize(base, destination, data, log_status, &block)
+      def initialize(base, destination, data, log_status)
         super(base, nil, destination, log_status)
-        @data = block || data.to_s
+        @data = data
       end
 
       def render
@@ -43,6 +43,7 @@ class Thor
           data
         end
       end
+
     end
   end
 end
