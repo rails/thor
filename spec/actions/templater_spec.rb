@@ -8,6 +8,7 @@ describe Thor::Actions::Templater do
       base = Object.new
       stub(base).source_root{ source_root }
       stub(base).destination_root{ destination_root }
+      stub(base).relative_to_absolute_root{ |p| p.gsub(destination_root, '.')[2..-1] }
       base
     end
 

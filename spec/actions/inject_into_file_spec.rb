@@ -12,6 +12,7 @@ describe Thor::Actions::InjectIntoFile do
       base = Object.new
       base.extend Thor::Actions
       stub(base).destination_root{ destination_root }
+      stub(base).relative_to_absolute_root{ |p| p.gsub(destination_root, '.')[2..-1] }
       stub(base).options{ options }
       stub(base).shell{ @shell = Thor::Shell::Basic.new }
       base

@@ -10,6 +10,7 @@ describe Thor::Actions::EmptyDirectory do
     @base = begin
       base = Object.new
       stub(base).destination_root{ destination_root }
+      stub(base).relative_to_absolute_root{ |p| p.gsub(destination_root, '.')[2..-1] }
       stub(base).options{ options }
       stub(base).shell{ @shell = Thor::Shell::Basic.new }
       base

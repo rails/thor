@@ -1,5 +1,4 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require 'thor/runner'
 
 class MyRunner < Thor
   include Actions
@@ -74,6 +73,22 @@ describe Thor::Actions do
     end
   end
 
+  describe "#relative_to_absolute_root" do
+    it "returns the path relative to the absolute root" do
+      runner.relative_to_absolute_root(File.join(destination_root, "foo")).must == "foo"
+    end
+
+    it "does not remove dot if required" do
+      runner.relative_to_absolute_root(File.join(destination_root, "foo"), false).must == "./foo"
+    end
+
+    it "always use the absolute root" do
+      runner.inside("foo") do
+        runner.relative_to_absolute_root(File.join(destination_root, "foo")).must == "foo"
+      end
+    end
+  end
+
   describe "#source_root" do
     it "raises an error if source root is not specified" do
       lambda {
@@ -84,10 +99,8 @@ describe Thor::Actions do
 
   describe "#inside" do
     it "executes the block inside the given folder" do
-      capture(:stdout) do
-        runner.inside("foo") do
-          Dir.pwd.must == file
-        end
+      runner.inside("foo") do
+        Dir.pwd.must == file
       end
     end
 
@@ -102,44 +115,18 @@ describe Thor::Actions do
     it "returns to the previous state" do
       begin
         runner(:in_root => true)
-
-        capture(:stdout) do
-          runner.inside("foo"){}
-          Dir.pwd.must == destination_root
-          runner.root.must == destination_root
-        end
+        runner.inside("foo"){}
+        Dir.pwd.must == destination_root
+        runner.root.must == destination_root
       ensure
         FileUtils.cd(File.join(destination_root, '..', '..'))
       end
     end
 
     it "creates the directory if it does not exist" do
-      capture(:stdout) do
-        runner.inside("foo") do
-          File.exists?(file).must be_true
-        end
+      runner.inside("foo") do
+        File.exists?(file).must be_true
       end
-    end
-
-    it "logs status" do
-      capture(:stdout) do
-        runner.inside("foo") do
-          File.exists?(file).must be_true
-        end
-      end.must == "    [INSIDE] #{file}\n"
-    end
-
-    it "does not log status if required" do
-      capture(:stdout) do
-        runner.inside("foo", false) do
-          File.exists?(file).must be_true
-        end
-      end.must be_empty
-    end
-
-    it "accepts a color as status" do
-      mock(runner.shell).say_status(:inside, file, :yellow)
-      runner.inside("foo", :yellow){}
     end
   end
 
@@ -167,98 +154,6 @@ describe Thor::Actions do
           runner.root.must == file
         end
       end
-    end
-  end
-
-  describe "#run" do
-    it "executes the command given" do
-      mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
-      capture(:stdout) { runner.run('ls') }
-    end
-
-    it "does not execute the command if pretending given" do
-      dont_allow(runner(:behavior => :pretend)).`("cd ./") # To avoid highlighting issues `
-      capture(:stdout) { runner.run('cd ./') }
-    end
-
-    it "logs status" do
-      mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
-      capture(:stdout) { runner.run('ls') }.must == "       [RUN] ls from #{Dir.pwd}\n"
-    end
-
-    it "does not log status if required" do
-      mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
-      capture(:stdout) { runner.run('ls', false) }.must be_empty
-    end
-
-    it "accepts a color as status" do
-      mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
-      mock(runner.shell).say_status(:run, "ls from #{Dir.pwd}", :yellow)
-      runner.run('ls', :yellow)
-    end
-  end
-
-  describe "#run_ruby_script" do
-    it "executes the ruby script" do
-      mock(runner).run("ruby script.rb", true)
-      runner.run_ruby_script("script.rb")
-    end
-
-    it "does not log status if required" do
-      mock(runner).run("ruby script.rb", false)
-      runner.run_ruby_script("script.rb", false)
-    end
-  end
-
-  describe "#git" do
-    describe "when a symbol is given" do
-      it "executes the git command" do
-        mock(runner).run("git init", true)
-        runner.git(:init)
-      end
-
-      it "does not log status if required" do
-        mock(runner).run("git init", false)
-        runner.git(:init, false)
-      end
-    end
-
-    describe "when a hash is given" do
-      it "executes several commands when a hash is given" do
-        mock(runner).run("git add foo", true)
-        mock(runner).run("git remove bar", true)
-        runner.git(:add => "foo", :remove => "bar")
-      end
-
-      it "does not log status if required" do
-        mock(runner).run("git add foo", false)
-        runner.git({ :add => "foo" }, false)
-      end
-    end
-  end
-
-  describe "#thor" do
-    it "executes the thor command" do
-      mock(runner).run("thor list", true)
-      runner.thor(:list, true)
-    end
-
-    it "converts extra arguments to command arguments" do
-      mock(runner).run("thor list foo bar", true)
-      runner.thor(:list, "foo", "bar")
-    end
-
-    it "converts options hash to switches" do
-      mock(runner).run("thor list foo bar --foo", true)
-      runner.thor(:list, "foo", "bar", :foo => true)
-
-      mock(runner).run("thor list --foo 1 2 3", true)
-      runner.thor(:list, :foo => [1,2,3])
-    end
-
-    it "does not log status if required" do
-      mock(runner).run("thor list --foo 1 2 3", false)
-      runner.thor(:list, { :foo => [1,2,3] }, false)
     end
   end
 end

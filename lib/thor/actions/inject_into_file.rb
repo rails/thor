@@ -24,9 +24,9 @@ class Thor
     #
     def inject_into_file(destination, *args, &block)
       if block_given?
-        data, flag = block, args.pop
+        data, flag = block, args.shift
       else
-        data, flag = args.pop, args.pop
+        data, flag = args.shift, args.shift
       end
 
       log_status = args.empty? || args.pop
@@ -67,8 +67,8 @@ class Thor
         #
         def destination=(destination)
           if destination
-            @relative_destination = destination.to_s
             @destination = ::File.expand_path(destination.to_s, base.destination_root)
+            @relative_destination = base.relative_to_absolute_root(@destination)
           end
         end
 

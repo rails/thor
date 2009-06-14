@@ -39,7 +39,6 @@ class Thor
       end
 
       self.root = config[:root]
-
       if config[:in_root]
         FileUtils.mkdir_p(root) unless File.exist?(root)
         FileUtils.cd(root)
@@ -58,6 +57,13 @@ class Thor
       end
     end
 
+    # Returns the root for this thor class (also aliased as destination root).
+    #
+    def root
+      @root_stack.last
+    end
+    alias :destination_root :root
+
     # Sets the root for this thor class. Relatives path are added to the
     # directory where the script was invoked and expanded.
     #
@@ -66,12 +72,13 @@ class Thor
       @root_stack[0] = File.expand_path(root || '')
     end
 
-    # Returns the root for this thor class (also aliased as destination root).
+    # Returns the given path relative to the absolute root (ie, root where
+    # the script started).
     #
-    def root
-      @root_stack.last
+    def relative_to_absolute_root(path, remove_dot=true)
+      path = path.gsub(@root_stack[0], '.')
+      remove_dot ? path[2..-1] : path
     end
-    alias :destination_root :root
 
     # Get the source root in the class. Raises an error if a source root is
     # not specified in the thor class.
@@ -92,104 +99,17 @@ class Thor
     # log_status<Boolean>:: if false, does not log the status. True by default.
     #                       If a symbol is given, uses it as the output color.
     #
-    def inside(dir='', log_status=true, &block)
+    def inside(dir='', &block)
       @root_stack.push File.expand_path(dir, root)
-
-      say_status_if_log :inside, root, log_status
-
       FileUtils.mkdir_p(root) unless File.exist?(root)
       FileUtils.cd(root) { block.arity == 1 ? yield(root) : yield }
-
       @root_stack.pop
     end
 
     # Goes to the root and execute the given block.
     #
     def in_root
-      inside(@root_stack.first, false) { yield }
-    end
-
-    # Executes a command.
-    #
-    # ==== Parameters
-    # command<String>:: the command to be executed.
-    # log_status<Boolean>:: if false, does not log the status. True by default.
-    #                       If a symbol is given, uses it as the output color.
-    #
-    # ==== Example
-    #
-    #   inside('vendor') do
-    #     run('ln -s ~/edge rails')
-    #   end
-    #
-    def run(command, log_status=true)
-      say_status_if_log :run, "#{command} from #{Dir.pwd}", log_status
-      `#{command}` unless options[:pretend]
-    end
-
-    # Executes a ruby script (taking into account WIN32 platform quirks).
-    #
-    # ==== Parameters
-    # command<String>:: the command to be executed.
-    # log_status<Boolean>:: if false, does not log the status. True by default.
-    #                       If a symbol is given, uses it as the output color.
-    #
-    def run_ruby_script(command, log_status=true)
-      run("ruby #{command}", log_status)
-    end
-
-    # Run a command in git.
-    #
-    # ==== Parameters
-    # command<String>:: the command to be executed.
-    # log_status<Boolean>:: if false, does not log the status. True by default.
-    #                       If a symbol is given, uses it as the output color.
-    #
-    # ==== Examples
-    #
-    #   git :init
-    #   git :add => "this.file that.rb"
-    #   git :add => "onefile.rb", :rm => "badfile.cxx"
-    #
-    def git(command, log_status=true)
-      in_root do
-        if command.is_a?(Symbol)
-          run "git #{command}", log_status
-        else
-          command.each do |command, options|
-            run "git #{command} #{options}", log_status
-          end
-        end
-      end
-    end
-
-    # Run a thor command. A hash of options can be given and it's converted to 
-    # switches.
-    #
-    # ==== Parameters
-    # task<String>:: the task to be invoked
-    # args<Array>:: arguments to the task
-    # options<Hash>:: a hash with options used on invocation
-    # log_status<Boolean>:: if false, does not log the status. True by default.
-    #                       If a symbol is given, uses it as the output color.
-    #
-    # ==== Examples
-    #
-    #   thor :install, "http://gist.github.com/103208"
-    #   #=> thor install http://gist.github.com/103208
-    #
-    #   thor :list, :all => true, :substring => 'rails'
-    #   #=> thor list --all --substring=rails
-    #
-    def thor(task, *args)
-      log_status = [true, false].include?(args.last) ? args.pop : true
-      options = args.last.is_a?(Hash) ? args.pop : {}
-
-      in_root do
-        args.unshift "thor #{task}"
-        args.push Thor::Options.to_switches(options)
-        run args.join(' ').strip, log_status
-      end
+      inside(@root_stack.first) { yield }
     end
 
     protected

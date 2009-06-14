@@ -10,7 +10,8 @@ class Thor
     # log_status<Boolean>:: if false, does not log the status. True by default.
     #
     # ==== Examples
-    # empty_directory "doc"
+    #
+    #   empty_directory "doc"
     #
     def empty_directory(destination, log_status=true)
       action EmptyDirectory.new(self, nil, destination, log_status)

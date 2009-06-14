@@ -11,6 +11,7 @@ describe Thor::Actions::Template do
       base = Object.new
       stub(base).source_root{ source_root }
       stub(base).destination_root{ destination_root }
+      stub(base).relative_to_absolute_root{ |p| p.gsub(destination_root, '.')[2..-1] }
       stub(base).options{ options }
       stub(base).shell{ @shell = Thor::Shell::Basic.new }
       base.instance_variable_set('@klass', 'Config')

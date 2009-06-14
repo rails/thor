@@ -12,7 +12,8 @@ class Thor
     # log_status<Boolean>:: if false, does not log the status. True by default.
     #
     # ==== Examples
-    # directory "doc"
+    #
+    #   directory "doc"
     #
     def directory(source, destination=nil, log_status=true)
       action Directory.new(self, source, destination || source, log_status)

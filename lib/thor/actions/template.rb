@@ -14,8 +14,10 @@ class Thor
     # log_status<Boolean>:: if false, does not log the status. True by default.
     #
     # ==== Examples
-    # template "README", "doc/README"
-    # template "doc/README"
+    #
+    #   template "README", "doc/README"
+    #
+    #   template "doc/README"
     #
     def template(source, destination=nil, log_status=true)
       action Template.new(self, source, destination || source, log_status)

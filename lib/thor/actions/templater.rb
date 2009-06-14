@@ -84,8 +84,8 @@ class Thor
         #
         def destination=(destination)
           if destination
-            @relative_destination = destination.to_s
             @destination = ::File.expand_path(destination.to_s, base.destination_root)
+            @relative_destination = base.relative_to_absolute_root(@destination)
           end
         end
 
