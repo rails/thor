@@ -118,6 +118,8 @@ class Thor
             say_status :create, :green
             block.call unless pretend?
           end
+
+          destination
         end
 
         # If force is true, run the action, otherwise check if it's not being
@@ -146,16 +148,6 @@ class Thor
         #
         def say_status(status, color)
           base.shell.say_status status, relative_destination, color if @log_status
-        end
-
-        # TODO Add this behavior to all actions.
-        #
-        def after_invoke
-          # Optionally change permissions.
-          FileUtils.chmod(base.options[:chmod], destination) if base.options[:chmod]
-
-          # Optionally add file to subversion or git
-          system("git add -v #{relative_destination}") if options[:git]
         end
 
     end

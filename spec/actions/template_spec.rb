@@ -60,6 +60,12 @@ describe Thor::Actions::Template do
       invoke!.must be_empty
     end
 
+    it "returns the destination" do
+      capture(:stdout) do
+        template("doc/config.rb").invoke!.must == File.join(destination_root, "doc/config.rb")
+      end
+    end
+
     describe "when file exists" do
       before(:each) do
         template("doc/config.rb")

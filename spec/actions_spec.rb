@@ -55,45 +55,47 @@ describe Thor::Actions do
     end
   end
 
-  describe "#root=" do
-    it "gets the current directory and expands the path to set the root" do
-      base = MyRunner.new
-      base.root = "here"
-      base.root.must == File.expand_path(File.join(File.dirname(__FILE__), "..", "here"))
-    end
+  describe "accessors" do
+    describe "#root=" do
+      it "gets the current directory and expands the path to set the root" do
+        base = MyRunner.new
+        base.root = "here"
+        base.root.must == File.expand_path(File.join(File.dirname(__FILE__), "..", "here"))
+      end
 
-    it "does not use the current directory if one is given" do
-      base = MyRunner.new
-      base.root = "/"
-      base.root.must == "/"
-    end
+      it "does not use the current directory if one is given" do
+        base = MyRunner.new
+        base.root = "/"
+        base.root.must == "/"
+      end
 
-    it "uses the current directory if none is given" do
-      MyRunner.new.root.must == File.expand_path(File.join(File.dirname(__FILE__), ".."))
-    end
-  end
-
-  describe "#relative_to_absolute_root" do
-    it "returns the path relative to the absolute root" do
-      runner.relative_to_absolute_root(File.join(destination_root, "foo")).must == "foo"
-    end
-
-    it "does not remove dot if required" do
-      runner.relative_to_absolute_root(File.join(destination_root, "foo"), false).must == "./foo"
-    end
-
-    it "always use the absolute root" do
-      runner.inside("foo") do
-        runner.relative_to_absolute_root(File.join(destination_root, "foo")).must == "foo"
+      it "uses the current directory if none is given" do
+        MyRunner.new.root.must == File.expand_path(File.join(File.dirname(__FILE__), ".."))
       end
     end
-  end
 
-  describe "#source_root" do
-    it "raises an error if source root is not specified" do
-      lambda {
-        runner.send(:source_root)
-      }.must raise_error(NoMethodError, "You have to specify the class method source_root in your thor class.")
+    describe "#relative_to_absolute_root" do
+      it "returns the path relative to the absolute root" do
+        runner.relative_to_absolute_root(File.join(destination_root, "foo")).must == "foo"
+      end
+
+      it "does not remove dot if required" do
+        runner.relative_to_absolute_root(File.join(destination_root, "foo"), false).must == "./foo"
+      end
+
+      it "always use the absolute root" do
+        runner.inside("foo") do
+          runner.relative_to_absolute_root(File.join(destination_root, "foo")).must == "foo"
+        end
+      end
+    end
+
+    describe "#source_root" do
+      it "raises an error if source root is not specified" do
+        lambda {
+          runner.send(:source_root)
+        }.must raise_error(NoMethodError, "You have to specify the class method source_root in your thor class.")
+      end
     end
   end
 
@@ -147,6 +149,199 @@ describe Thor::Actions do
       runner.inside("foo") do
         runner.in_root { }
         runner.root.must == file
+      end
+    end
+  end
+
+  describe "commands" do
+    describe "#chmod" do
+      it "executes the command given" do
+        mock(FileUtils).chmod_R(0755, file)
+        capture(:stdout) { runner.chmod(0755, "foo") }
+      end
+
+      it "does not execute the command if pretending given" do
+        dont_allow(FileUtils).chmod_R(0755, file)
+        capture(:stdout) { runner(:behavior => :pretend).chmod(0755, "foo") }
+      end
+
+      it "logs status" do
+        mock(FileUtils).chmod_R(0755, file)
+        capture(:stdout) { runner.chmod(0755, "foo") }.must == "     [CHMOD] foo\n"
+      end
+
+      it "does not log status if required" do
+        mock(FileUtils).chmod_R(0755, file)
+        capture(:stdout) { runner.chmod(0755, "foo", false) }.must be_empty
+      end
+    end
+
+    describe "#run" do
+      it "executes the command given" do
+        mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
+        capture(:stdout) { runner.run('ls') }
+      end
+
+      it "does not execute the command if pretend given" do
+        dont_allow(runner(:behavior => :pretend)).`("cd ./") # To avoid highlighting issues `
+        capture(:stdout) { runner.run('cd ./') }
+      end
+
+      it "logs status" do
+        mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
+        capture(:stdout) { runner.run('ls') }.must == "       [RUN] ls from .\n"
+      end
+
+      it "does not log status if required" do
+        mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
+        capture(:stdout) { runner.run('ls', false) }.must be_empty
+      end
+
+      it "accepts a color as status" do
+        mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
+        mock(runner.shell).say_status(:run, "ls from .", :yellow)
+        runner.run('ls', :yellow)
+      end
+    end
+
+    describe "#run_ruby_script" do
+      it "executes the ruby script" do
+        mock(runner).run("ruby script.rb", true)
+        runner.run_ruby_script("script.rb")
+      end
+
+      it "does not log status if required" do
+        mock(runner).run("ruby script.rb", false)
+        runner.run_ruby_script("script.rb", false)
+      end
+    end
+
+    describe "#thor" do
+      it "executes the thor command" do
+        mock(runner).run("thor list", true)
+        runner.thor(:list, true)
+      end
+
+      it "converts extra arguments to command arguments" do
+        mock(runner).run("thor list foo bar", true)
+        runner.thor(:list, "foo", "bar")
+      end
+
+      it "converts options hash to switches" do
+        mock(runner).run("thor list foo bar --foo", true)
+        runner.thor(:list, "foo", "bar", :foo => true)
+
+        mock(runner).run("thor list --foo 1 2 3", true)
+        runner.thor(:list, :foo => [1,2,3])
+      end
+
+      it "does not log status if required" do
+        mock(runner).run("thor list --foo 1 2 3", false)
+        runner.thor(:list, { :foo => [1,2,3] }, false)
+      end
+    end
+  end
+  describe 'file manipulation' do
+    before(:each) do
+      ::FileUtils.rm_rf(destination_root)
+      ::FileUtils.cp_r(source_root, destination_root)
+    end
+
+    def runner(config={})
+      @runner ||= MyRunner.new([], {}, { :root => destination_root }.merge(config))
+    end
+
+    def file
+      File.join(destination_root, "doc", "README")
+    end
+
+    describe "#gsub_file" do
+      it "replaces the content in the file" do
+        capture(:stdout){ runner.gsub_file("doc/README", "__start__", "START") }
+        File.open(file).read.must == "START\nREADME\n__end__\n"
+      end
+
+      it "does not replace if pretending" do
+        capture(:stdout){ runner(:behavior => :pretend).gsub_file("doc/README", "__start__", "START") }
+        File.open(file).read.must == "__start__\nREADME\n__end__\n"
+      end
+
+      it "accepts a block" do
+        capture(:stdout) do
+          runner.gsub_file("doc/README", "__start__"){ |match| match.gsub('__', '').upcase  }
+        end
+        File.open(file).read.must == "START\nREADME\n__end__\n"
+      end
+
+      it "logs status" do
+        content = capture(:stdout){ runner.gsub_file("doc/README", "__start__", "START") }
+        content.must == "      [GSUB] doc/README\n"
+      end
+
+      it "does not log status if required" do
+        capture(:stdout) do
+          runner.gsub_file(file, "__", false){ |match| match * 2 }
+        end.must be_empty
+      end
+    end
+
+    describe "#append_file" do
+      it "appends content to the file" do
+        capture(:stdout){ runner.append_file("doc/README", "END\n") }
+        File.open(file).read.must == "__start__\nREADME\n__end__\nEND\n"
+      end
+
+      it "does not append if pretending" do
+        capture(:stdout){ runner(:behavior => :pretend).append_file("doc/README", "END\n") }
+        File.open(file).read.must == "__start__\nREADME\n__end__\n"
+      end
+
+      it "accepts a block" do
+        capture(:stdout) do
+          runner.append_file("doc/README"){ "END\n" }
+        end
+        File.open(file).read.must == "__start__\nREADME\n__end__\nEND\n"
+      end
+
+      it "logs status" do
+        content = capture(:stdout){ runner.append_file("doc/README", "END") }
+        content.must == "    [APPEND] doc/README\n"
+      end
+
+      it "does not log status if required" do
+        capture(:stdout) do
+          runner.append_file("doc/README", nil, false){ "END" }
+        end.must be_empty
+      end
+    end
+
+    describe "#prepend_file" do
+      it "prepends content to the file" do
+        capture(:stdout){ runner.prepend_file("doc/README", "START\n") }
+        File.open(file).read.must == "START\n__start__\nREADME\n__end__\n"
+      end
+
+      it "does not prepend if pretending" do
+        capture(:stdout){ runner(:behavior => :pretend).prepend_file("doc/README", "START\n") }
+        File.open(file).read.must == "__start__\nREADME\n__end__\n"
+      end
+
+      it "accepts a block" do
+        capture(:stdout) do
+          runner.prepend_file("doc/README"){ "START\n" }
+        end
+        File.open(file).read.must == "START\n__start__\nREADME\n__end__\n"
+      end
+
+      it "logs status" do
+        content = capture(:stdout){ runner.prepend_file("doc/README", "START") }
+        content.must == "   [PREPEND] doc/README\n"
+      end
+
+      it "does not log status if required" do
+        capture(:stdout) do
+          runner.prepend_file("doc/README", nil, false){ "START" }
+        end.must be_empty
       end
     end
   end
