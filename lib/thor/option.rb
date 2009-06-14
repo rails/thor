@@ -129,7 +129,9 @@ class Thor
         switch_name
       end
 
-      required? ? sample : "[#{sample}]"
+      sample = "[#{sample}]"               unless required?
+      sample << " (#{aliases.join(", ")})" unless aliases.empty?
+      sample
     end
 
     protected

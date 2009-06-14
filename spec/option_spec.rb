@@ -259,6 +259,12 @@ describe Thor::Option do
       end
     end
 
+    describe "with aliases" do
+      it "does not show the usage between brackets" do
+        parse([:foo, "-f", "-b"], :required).usage.must == "--foo=FOO (-f, -b)"
+      end
+    end
+
   end
 end
 
