@@ -114,6 +114,12 @@ describe Thor::CoreExt::OrderedHash do
       @hash[:bar].must == "bar"
     end
 
+    it "groups values by" do
+      group = @hash.group_values_by { |value| value.include?(?a) }
+      group[true].must  == ["Bar!", "Baz!", "Bat!"]
+      group[false].must == ["Foo!", "Bop!"]
+    end
+
     it "converts to an array" do
       @hash.to_a.must == [[:foo, "Foo!"], [:bar, "Bar!"], [:baz, "Baz!"], [:bop, "Bop!"], [:bat, "Bat!"]]
     end

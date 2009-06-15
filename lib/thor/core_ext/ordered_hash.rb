@@ -7,8 +7,9 @@ class Thor #:nodoc:
     # while also keeping track of the order in which elements were set.
     #
     class OrderedHash #:nodoc:
-      Node = Struct.new(:key, :value, :next, :prev)
       include Enumerable
+
+      Node = Struct.new(:key, :value, :next, :prev)
 
       def initialize
         @hash = {}
@@ -82,6 +83,14 @@ class Thor #:nodoc:
         value
       end
 
+      def keys
+        self.map { |k, v| k }
+      end
+
+      def values
+        self.map { |k, v| v }
+      end
+
       def each
         return unless @first
         yield [@first.key, @first.value]
@@ -90,12 +99,14 @@ class Thor #:nodoc:
         self
       end
 
-      def keys
-        self.map { |k, v| k }
-      end
-
-      def values
-        self.map { |k, v| v }
+      def group_values_by
+        assoc = self.class.new
+        each do |_, element|
+          key = yield(element)
+          assoc[key] ||= []
+          assoc[key] << element
+        end
+        assoc
       end
 
       def merge(other)
@@ -118,10 +129,9 @@ class Thor #:nodoc:
       end
 
       def to_a
-        inject([]) do |array, (key, value)|
-          array << [key, value]
-          array
-        end
+        array = []
+        each { |k, v| array << [k, v] }
+        array
       end
 
       def to_s
