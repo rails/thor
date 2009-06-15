@@ -44,23 +44,12 @@ class Thor::Group
     #
     def help(shell, options={})
       if options[:short]
-        shell.say "#{self.namespace} #{self.class_options.map {|_,o| o.usage}.join(' ')}"
+        shell.say "#{self.namespace} #{self.arguments.map {|o| o.usage }.join(' ')}"
       else
         shell.say "Usage:"
-        shell.say "  #{self.namespace} #{self.arguments.map{|o| o.usage}.join(' ')}"
+        shell.say "  #{self.namespace} #{self.arguments.map {|o| o.usage }.join(' ')}"
         shell.say
-
-        list = self.class_options.map do |_, option|
-          next if option.argument?
-          [ option.usage, option.description || '' ]
-        end.compact
-
-        unless list.empty?
-          shell.say "Global options:"
-          shell.print_table(list, :emphasize_last => true, :ident => 2)
-          shell.say
-        end
-
+        class_options_help(shell, nil, true)
         shell.say self.desc if self.desc
       end
     end

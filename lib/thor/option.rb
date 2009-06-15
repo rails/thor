@@ -1,10 +1,10 @@
 class Thor
   class Option
-    attr_reader :name, :description, :required, :type, :default, :aliases
+    attr_reader :name, :description, :required, :type, :default, :aliases, :group
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string, :default]
 
-    def initialize(name, description=nil, required=nil, type=nil, default=nil, aliases=nil)
+    def initialize(name, description=nil, required=nil, type=nil, default=nil, aliases=nil, group=nil)
       raise ArgumentError, "Option name can't be nil."                          if name.nil?
       raise ArgumentError, "Option cannot be required and have default values." if required && !default.nil?
       raise ArgumentError, "Type :#{type} is not valid for options."            if type && !VALID_TYPES.include?(type.to_sym)
@@ -15,6 +15,7 @@ class Thor
       @type        = (type || :default).to_sym
       @default     = default
       @aliases     = [*aliases].compact
+      @group       = group.to_s.capitalize if group
     end
 
     # This parse quick options given as method_options. It makes several
@@ -196,7 +197,7 @@ class Thor
       raise ArgumentError, "Argument name can't be nil."               if name.nil?
       raise ArgumentError, "Type :#{type} is not valid for arguments." if type && !VALID_TYPES.include?(type.to_sym)
 
-      super(name, description, required, type || :string, default, [])
+      super(name, description, required, type || :string, default)
     end
 
     def argument?

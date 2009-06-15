@@ -55,7 +55,7 @@ describe Thor::Group do
     end
 
     it "shows global options information" do
-      @content.must =~ /Global options/
+      @content.must =~ /Options/
       @content.must =~ /\[\-\-third=N\]/
     end
 
@@ -65,7 +65,7 @@ describe Thor::Group do
 
     it "shows only usage if a short help is required" do
       content = capture(:stdout){ MyCounter.help(Thor::Base.shell.new, :short => true) }
-      content.must =~ /my_counter N \[N\] \[\-\-third=N\]/
+      content.must =~ /my_counter N \[N\]/
       content.must_not =~ /Options/
     end
   end

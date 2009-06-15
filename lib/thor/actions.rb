@@ -13,16 +13,16 @@ class Thor
     def self.included(base) #:nodoc:
       return unless base.respond_to?(:class_option)
 
-      base.class_option :pretend, :type => :boolean, :aliases => "-p",
+      base.class_option :pretend, :type => :boolean, :aliases => "-p", :group => :runtime,
                                   :desc => "Run but do not make any changes"
 
-      base.class_option :force, :type => :boolean, :aliases => "-f",
+      base.class_option :force, :type => :boolean, :aliases => "-f", :group => :runtime,
                                 :desc => "Overwrite files that already exist"
 
-      base.class_option :skip, :type => :boolean, :aliases => "-s",
+      base.class_option :skip, :type => :boolean, :aliases => "-s", :group => :runtime,
                                :desc => "Skip files that already exist"
 
-      base.class_option :quiet, :type => :boolean, :aliases => "-q",
+      base.class_option :quiet, :type => :boolean, :aliases => "-q", :group => :runtime,
                                 :desc => "Supress status output"
     end
 

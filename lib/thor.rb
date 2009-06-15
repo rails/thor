@@ -95,9 +95,15 @@ class Thor
     #
     # ==== Parameters
     # name<Symbol>:: The name of the argument.
-    # options<Hash>:: The description, type, default value, aliases and if this option is required or not.
-    #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
-    #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
+    # options<Hash>:: Described below.
+    #
+    # ==== Options
+    # :desc     - Description for the argument.
+    # :required - If the argument is required or not.
+    # :default  - Default value for this argument. It cannot be required and have default values.
+    # :aliases  - Aliases for this option.
+    # :type     - The type of the argument, can be :string, :hash, :array, :numeric, :boolean or :default.
+    #             Default accepts arguments as booleans (--switch) or as strings (--switch=VALUE).
     #
     def method_option(name, options)
       scope = if options[:for]
@@ -154,24 +160,21 @@ class Thor
         shell.say "Usage:"
         shell.say "  #{task.formatted_usage(namespace)}"
         shell.say
-        options_help(shell)
+        class_options_help(shell)
         shell.say task.description
       else
-        if options[:short]
-          list = self.tasks.map do |_, task|
-            [ task.formatted_usage(namespace), task.short_description || '' ]
-          end
+        list = (options[:short] ? tasks : all_tasks).map do |_, task|
+          [ task.formatted_usage(namespace), task.short_description || '' ]
+        end
 
+        if options[:short]
           shell.print_table(list, :emphasize_last => true)
         else
-          options_help(shell)
-
-          list = self.all_tasks.map do |_, task|
-            [ task.formatted_usage(namespace), task.short_description || '' ]
-          end
-
           shell.say "Tasks:"
           shell.print_table(list, :ident => 2, :emphasize_last => true)
+          shell.say
+
+          class_options_help(shell)
         end
       end
     end
@@ -205,17 +208,6 @@ class Thor
         meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
       end
 
-      def options_help(shell) #:nodoc:
-        unless self.class_options.empty?
-          list = self.class_options.map do |_, option|
-            [ option.usage, option.description || '' ]
-          end
-
-          shell.say "Global arguments:"
-          shell.print_table(list, :emphasize_last => true, :ident => 2)
-          shell.say ""
-        end
-      end
   end
 
   include Thor::Base

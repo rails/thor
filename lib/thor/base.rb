@@ -83,8 +83,14 @@ class Thor
       #
       # ==== Parameters
       # name<Symbol>:: The name of the argument.
-      # options<Hash>:: The description, type, default value for this argument.
-      #                 The type can be :string, :numeric, :hash or :array. If none, string is assumed.
+      # options<Hash>:: Described below.
+      #
+      # ==== Options
+      # :desc     - Description for the argument.
+      # :required - If the argument is required or not.
+      # :optional - If the argument is optional or not.
+      # :type     - The type of the argument, can be :string, :hash, :array, :numeric.
+      # :default  - Default value for this argument. It cannot be required and have default values.
       #
       # ==== Errors
       # ArgumentError:: Raised if you supply a required argument after a non required one.
@@ -138,9 +144,16 @@ class Thor
       #
       # ==== Parameters
       # name<Symbol>:: The name of the argument.
-      # options<Hash>:: The description, type, default value, aliases and if this option is required or not.
-      #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
-      #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
+      # options<Hash>:: Described below.
+      #
+      # ==== Options
+      # :desc     - Description for the argument.
+      # :required - If the argument is required or not.
+      # :default  - Default value for this argument. It cannot be required and have default values.
+      # :group    - The group for this options. Use by class options to output options in different levels.
+      # :aliases  - Aliases for this option.
+      # :type     - The type of the argument, can be :string, :hash, :array, :numeric, :boolean or :default.
+      #             Default accepts arguments as booleans (--switch) or as strings (--switch=VALUE).
       #
       def class_option(name, options)
         build_option(name, options, class_options)
@@ -277,17 +290,55 @@ class Thor
 
       protected
 
+        # Prints the class optins per group. If a class options does not belong
+        # to any group, it's grouped as "Class options" in Thor classes and as
+        # "Options" in Thor::Group (since Thor::Group does not have method
+        # options, there is not need to add "Class" frist).
+        #
+        # Finally, if skip arguments is true, arguments are not shown in the list.
+        #
+        def class_options_help(shell, ungrouped_name="Class", skip_arguments=false) #:nodoc:
+          unless self.class_options.empty?
+            groups = self.class_options.group_values_by { |o| o.group }
+
+            printer = lambda do |group_name, options|
+              unless options.empty?
+                options.map! do |option|
+                  next if skip_arguments && option.argument?
+                  [ option.usage, option.description || '' ]
+                end
+
+                options.compact!
+
+                if group_name
+                  shell.say "#{group_name} options:"
+                else
+                  shell.say "Options:"
+                end
+
+                shell.print_table(options, :emphasize_last => true, :ident => 2)
+                shell.say ""
+              end
+            end
+
+            # Deal with default group
+            global_options = groups.delete(nil)
+            printer.call(ungrouped_name, global_options) if global_options
+
+            # Print all others
+            groups.each(&printer)
+          end
+        end
+
         # Build an option and adds it to the given scope.
         #
         # ==== Parameters
         # name<Symbol>:: The name of the argument.
-        # options<Hash>:: The desc, type, default value and aliases for this option.
-        #                 The type can be :string, :boolean, :numeric, :hash or :array. If none is given
-        #                 a default type which accepts both (--name and --name=NAME) entries is assumed.
+        # options<Hash>:: Described in both class_option and method_option.
         #
         def build_option(name, options, scope)
-          scope[name] = Thor::Option.new(name, options[:desc], options[:required],
-                                         options[:type], options[:default], options[:aliases])
+          scope[name] = Thor::Option.new(name, options[:desc], options[:required], options[:type],
+                                               options[:default], options[:aliases], options[:group])
         end
 
         # Receives a hash of options, parse them and add to the scope. This is a

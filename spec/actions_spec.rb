@@ -1,16 +1,20 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-class MyRunner < Thor
-  include Actions
-end
-
 describe Thor::Actions do
   def runner(config={})
-    @runner ||= MyRunner.new([], {}, { :root => destination_root }.merge(config))
+    @runner ||= MyCounter.new([], {}, { :root => destination_root }.merge(config))
   end
 
   def file
     File.join(destination_root, "foo")
+  end
+
+  describe "on include" do
+    it "adds runtime options to the base class" do
+      content = capture(:stdout) { MyCounter.help(Thor::Shell::Basic.new) }
+      content.must =~ /Runtime options\:/
+      content.must =~ /\-p, \[\-\-pretend\]/
+    end
   end
 
   describe "#initialize" do
@@ -49,7 +53,7 @@ describe Thor::Actions do
       end
 
       it "overwrites options values with configuration values" do
-        thor = MyRunner.new([], { behavior => false }, :behavior => behavior.to_sym)
+        thor = MyCounter.new([], { behavior => false }, :behavior => behavior.to_sym)
         thor.options.send(:"#{behavior}?").must be_true
       end
     end
@@ -58,19 +62,19 @@ describe Thor::Actions do
   describe "accessors" do
     describe "#root=" do
       it "gets the current directory and expands the path to set the root" do
-        base = MyRunner.new
+        base = MyCounter.new
         base.root = "here"
         base.root.must == File.expand_path(File.join(File.dirname(__FILE__), "..", "here"))
       end
 
       it "does not use the current directory if one is given" do
-        base = MyRunner.new
+        base = MyCounter.new
         base.root = "/"
         base.root.must == "/"
       end
 
       it "uses the current directory if none is given" do
-        MyRunner.new.root.must == File.expand_path(File.join(File.dirname(__FILE__), ".."))
+        MyCounter.new.root.must == File.expand_path(File.join(File.dirname(__FILE__), ".."))
       end
     end
 
@@ -248,7 +252,7 @@ describe Thor::Actions do
     end
 
     def runner(config={})
-      @runner ||= MyRunner.new([], {}, { :root => destination_root }.merge(config))
+      @runner ||= MyCounter.new([], {}, { :root => destination_root }.merge(config))
     end
 
     def file

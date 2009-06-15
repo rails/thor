@@ -1,4 +1,6 @@
 class MyCounter < Thor::Group
+  include Thor::Actions
+
   argument :first,     :type => :numeric
   argument :second,    :type => :numeric, :default => 2
   class_option :third, :type => :numeric, :desc => "The third argument."

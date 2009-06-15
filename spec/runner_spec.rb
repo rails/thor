@@ -38,7 +38,7 @@ describe Thor::Runner do
   describe "#start" do
     it "invokes a task from Thor::Runner" do
       ARGV.replace ["list"]
-      capture(:stdout){ Thor::Runner.start }.must =~ /my_counter N \[N\] \[\-\-third=N\]/
+      capture(:stdout){ Thor::Runner.start }.must =~ /my_counter N \[N\]/
     end
 
     it "invokes a task from a specific Thor class" do
@@ -107,7 +107,7 @@ describe Thor::Runner do
 
       it "gives a list of the available Thor::Group classes" do
         ARGV.replace ["list"]
-        capture(:stdout) { Thor::Runner.start }.must =~ /my_counter N \[N\] \[\-\-third=N\]/
+        capture(:stdout) { Thor::Runner.start }.must =~ /my_counter N \[N\]/
       end
 
       it "can filter a list of the available tasks by --group" do
