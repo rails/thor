@@ -97,8 +97,23 @@ class Thor
         #
         def destination=(destination)
           if destination
-            @destination = ::File.expand_path(destination.to_s, base.destination_root)
+            @destination = ::File.expand_path(convert_encoded_instructions(destination.to_s), base.destination_root)
             @relative_destination = base.relative_to_absolute_root(@destination)
+          end
+        end
+
+        # Filenames in the encoded form are converted. If you have a file:
+        #
+        #   %class_name%.rb
+        #
+        # It gets the class name from the base and replace it:
+        #
+        #   user.rb
+        #
+        def convert_encoded_instructions(filename)
+          filename.gsub(/%(.*?)%/) do |string|
+            instruction = $1.strip
+            base.respond_to?(instruction) ? base.send(instruction) : string
           end
         end
 

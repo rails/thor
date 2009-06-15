@@ -9,6 +9,7 @@ describe Thor::Actions::CopyFile do
   def copy_file(source, destination=nil, options={})
     @base = begin
       base = Object.new
+      stub(base).file_name { "rdoc" }
       stub(base).source_root{ source_root }
       stub(base).destination_root{ destination_root }
       stub(base).relative_to_absolute_root{ |p| p.gsub(destination_root, '.')[2..-1] }
@@ -48,6 +49,11 @@ describe Thor::Actions::CopyFile do
     it "works with files inside directories" do
       copy_file("doc/README")
       valid?(invoke!, "doc/README")
+    end
+
+    it "converts encoded instructions" do
+      copy_file("doc/%file_name%.rb.tt")
+      valid?(invoke!, "doc/rdoc.rb.tt")
     end
   end
 

@@ -10,6 +10,7 @@ describe Thor::Actions::Directory do
     @base = begin
       base = Object.new
       base.extend Thor::Actions
+      stub(base).file_name{ "rdoc" }
       stub(base).source_root{ source_root }
       stub(base).destination_root{ destination_root }
       stub(base).relative_to_absolute_root{ |p| p.gsub(destination_root, '.')[2..-1] }
@@ -51,6 +52,15 @@ describe Thor::Actions::Directory do
     it "copies the whole directory to the specified destination" do
       directory "doc", "docs"
       valid? invoke!, "docs"
+    end
+
+    it "copies and evaluate templates" do
+      directory "doc", "docs"
+      invoke!
+
+      file = File.join(destination_root, "docs", "rdoc.rb")
+      File.exists?(file).must be_true
+      File.read(file).must == "FOO = FOO\n"
     end
   end
 

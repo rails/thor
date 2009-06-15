@@ -6,7 +6,7 @@ class Thor
 
     # Gets an ERB template at the relative source, executes it and makes a copy
     # at the relative destination. If the destination is not given it's assumed
-    # to be equal to the source.
+    # to be equal to the source removing .tt from the filename.
     #
     # ==== Parameters
     # source<String>:: the relative path to the source root
@@ -20,7 +20,8 @@ class Thor
     #   template "doc/README"
     #
     def template(source, destination=nil, log_status=true)
-      action Template.new(self, source, destination || source, log_status)
+      destination ||= source.gsub('.tt$', '')
+      action Template.new(self, source, destination, log_status)
     end
 
     class Template < Templater #:nodoc:
