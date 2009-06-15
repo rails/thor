@@ -29,7 +29,7 @@ class Thor
       backtrace = sans_backtrace(e.backtrace, caller)
 
       if instance.is_a?(Thor) && backtrace.empty?
-        raise InvocationError, "'#{name}' was called incorrectly. Call as '#{formatted_usage(instance.class)}'"
+        raise InvocationError, "'#{name}' was called incorrectly. Call as '#{formatted_usage(instance.class, true)}'"
       else
         raise e
       end
@@ -47,16 +47,28 @@ class Thor
       description.split("\n").first if description
     end
 
-    # Returns the formatted usage. If a klass is given, the klass default options
-    # are merged with the task options providinf a full description.
+    # Returns the formatted usage. If a klass is given, the klass arguments are
+    # injected in the usage.
     #
-    def formatted_usage(klass=nil)
+    def formatted_usage(klass=nil, namespace=false)
       formatted = ''
-      formatted << "#{klass.namespace.gsub(/^default/,'')}:" if klass
-      formatted << usage.to_s
+      formatted << "#{klass.namespace.gsub(/^default/,'')}:" if klass && namespace
+      formatted << formatted_arguments(klass)
       formatted << " #{formatted_options}"
       formatted.strip!
       formatted
+    end
+
+    # Injects the klass arguments into the defined usage.
+    #
+    def formatted_arguments(klass)
+      if klass && !klass.arguments.empty?
+        usage.to_s.gsub(/^#{name}/) do |match|
+          match << " " << klass.arguments.map{ |a| a.usage }.join(' ')
+        end
+      else
+        usage.to_s
+      end
     end
 
     # Returns the options usage for this task.

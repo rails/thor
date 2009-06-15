@@ -151,20 +151,19 @@ class Thor
     #
     def help(shell, meth=nil, options={})
       meth, options = nil, meth if meth.is_a?(Hash)
-      namespace = options[:namespace] ? self : nil
 
       if meth
         task = self.all_tasks[meth]
         raise UndefinedTaskError, "task '#{meth}' could not be found in namespace '#{self.namespace}'" unless task
 
         shell.say "Usage:"
-        shell.say "  #{task.formatted_usage(namespace)}"
+        shell.say "  #{task.formatted_usage(self, options[:namespace])}"
         shell.say
-        class_options_help(shell)
+        class_options_help(shell, "Class")
         shell.say task.description
       else
         list = (options[:short] ? tasks : all_tasks).map do |_, task|
-          [ task.formatted_usage(namespace), task.short_description || '' ]
+          [ task.formatted_usage(self, options[:namespace]), task.short_description || '' ]
         end
 
         if options[:short]
@@ -174,7 +173,7 @@ class Thor
           shell.print_table(list, :ident => 2, :emphasize_last => true)
           shell.say
 
-          class_options_help(shell)
+          class_options_help(shell, "Class")
         end
       end
     end

@@ -295,16 +295,14 @@ class Thor
         # "Options" in Thor::Group (since Thor::Group does not have method
         # options, there is not need to add "Class" frist).
         #
-        # Finally, if skip arguments is true, arguments are not shown in the list.
-        #
-        def class_options_help(shell, ungrouped_name="Class", skip_arguments=false) #:nodoc:
+        def class_options_help(shell, ungrouped_name=nil) #:nodoc:
           unless self.class_options.empty?
             groups = self.class_options.group_values_by { |o| o.group }
 
             printer = lambda do |group_name, options|
               unless options.empty?
                 options.map! do |option|
-                  next if skip_arguments && option.argument?
+                  next if option.argument?
                   [ option.usage, option.description || '' ]
                 end
 

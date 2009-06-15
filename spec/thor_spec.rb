@@ -129,9 +129,13 @@ describe Thor do
   end
 
   describe "#help" do
+    def shell
+      @shell ||= Thor::Base.shell.new
+    end
+
     describe "on general" do
       before(:each) do
-        @content = capture(:stdout){ MyScript.help(Thor::Base.shell.new) }
+        @content = capture(:stdout){ MyScript.help(shell) }
       end
 
       it "provides useful help info for the help method itself" do
@@ -147,17 +151,24 @@ describe Thor do
       end
 
       it "shows superclass tasks" do
-        capture(:stdout){ MyChildScript.help(Thor::Base.shell.new) }.must =~ /foo BAR \[\-\-force\] +# do some fooing/
+        capture(:stdout){ MyChildScript.help(shell) }.must =~ /foo BAR \[\-\-force\] +# do some fooing/
       end
 
-      it "shows global options information" do
-        capture(:stdout){ MyChildScript.help(Thor::Base.shell.new) }.must =~ /\[\-\-param=N\]/
+      it "shows class options information" do
+        content = capture(:stdout){ MyChildScript.help(shell) }
+        content.must =~ /Class options\:/
+        content.must =~ /\[\-\-param=N\]/
+      end
+
+      it "injects class arguments into default usage" do
+        content = capture(:stdout){ Scripts::MyGrandChildScript.help(shell) }
+        content.must =~ /zoo ACCESSOR \-\-param\=PARAM/
       end
     end
 
     describe "for a specific task" do
       it "provides full help info when talking about a specific task" do
-        capture(:stdout) { MyScript.help(Thor::Base.shell.new, "foo") }.must == <<END
+        capture(:stdout) { MyScript.help(shell, "foo") }.must == <<END
 Usage:
   foo BAR [--force]
 
@@ -169,18 +180,18 @@ END
 
       it "raises an error if the task can't be found" do
         lambda {
-          MyScript.help(Thor::Base.shell, "unknown")
+          MyScript.help(shell, "unknown")
         }.must raise_error(Thor::Error, "task 'unknown' could not be found in namespace 'my_script'")
       end
     end
 
     describe "options" do
       it "shows the namespace if required" do
-        capture(:stdout){ MyScript.help(Thor::Base.shell.new, nil, :namespace => true) }.must =~ /my_script:foo BAR/
+        capture(:stdout){ MyScript.help(shell, nil, :namespace => true) }.must =~ /my_script:foo BAR/
       end
 
       it "does not show superclass tasks if required" do
-        capture(:stdout){ MyScript.help(Thor::Base.shell.new, nil, :short => true) }.must_not =~ /help/
+        capture(:stdout){ MyScript.help(shell, nil, :short => true) }.must_not =~ /help/
       end
     end
 

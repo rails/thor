@@ -49,7 +49,7 @@ class Thor::Group
         shell.say "Usage:"
         shell.say "  #{self.namespace} #{self.arguments.map {|o| o.usage }.join(' ')}"
         shell.say
-        class_options_help(shell, nil, true)
+        class_options_help(shell)
         shell.say self.desc if self.desc
       end
     end
