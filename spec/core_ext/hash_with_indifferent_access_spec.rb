@@ -20,6 +20,11 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
     @hash.nothing?.must be_false
   end
 
+  it "handles magic comparisions" do
+    @hash.foo?('bar').must be_true
+    @hash.foo?('bee').must be_false
+  end
+
   it "maps methods to keys" do
     @hash.foo.must == @hash['foo']
   end

@@ -43,12 +43,18 @@ class Thor
 
         # Magic predicates. For instance:
         #
-        #   options.force? # => !!options['force']
+        #   options.force?                  # => !!options['force']
+        #   options.shebang                 # => "/usr/lib/local/ruby"
+        #   options.test_framework?(:rspec) # => options[:test_framework] == :rspec
         #
         def method_missing(method, *args, &block)
           method = method.to_s
           if method =~ /^(\w+)\?$/
-            !!self[$1]
+            if args.empty?
+              !!self[$1]
+            else
+              self[$1] == args.first
+            end
           else 
             self[method]
           end
