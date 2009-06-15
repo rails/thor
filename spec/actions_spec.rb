@@ -26,25 +26,6 @@ describe Thor::Actions do
       runner(:behavior => :revoke).behavior.must == :revoke
     end
 
-    it "goes to the root if in_root is given" do
-      begin
-        runner :in_root => true
-        Dir.pwd.must == destination_root
-      ensure
-        FileUtils.cd(File.join(destination_root, '..', '..'))
-      end
-    end
-
-    it "creates the root folder if it does not exist and in_root is given" do
-      begin
-        runner :in_root => true, :root => file
-        Dir.pwd.must == file
-        File.exists?(file).must be_true
-      ensure
-        FileUtils.cd(File.join(destination_root, '..', '..'))
-      end
-    end
-
     %w(skip force pretend).each do |behavior|
       it "accepts #{behavior.to_sym} as behavior" do
         thor = runner(:behavior => behavior.to_sym)
@@ -115,17 +96,6 @@ describe Thor::Actions do
         runner.inside("foo") do
           runner.root.must == file
         end
-      end
-    end
-
-    it "returns to the previous state" do
-      begin
-        runner(:in_root => true)
-        runner.inside("foo"){}
-        Dir.pwd.must == destination_root
-        runner.root.must == destination_root
-      ensure
-        FileUtils.cd(File.join(destination_root, '..', '..'))
       end
     end
 

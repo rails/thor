@@ -36,9 +36,6 @@ class Thor
     # root<String>:: The root directory needed for some actions. It's also known
     #                as destination root.
     #
-    # in_root<Boolean>:: When true, creates the root directory if it does not exist
-    #                    and move to it. False by default.
-    #
     def initialize(args=[], options={}, config={})
       self.behavior = case config[:behavior]
         when :force
@@ -57,11 +54,6 @@ class Thor
       end
 
       self.root = config[:root]
-      if config[:in_root]
-        FileUtils.mkdir_p(root) unless File.exist?(root)
-        FileUtils.cd(root)
-      end
-
       super
     end
 
