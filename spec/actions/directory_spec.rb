@@ -62,6 +62,23 @@ describe Thor::Actions::Directory do
       File.exists?(file).must be_true
       File.read(file).must == "FOO = FOO\n"
     end
+
+    it "copies directories" do
+      directory "doc", "docs"
+      invoke!
+
+      file = File.join(destination_root, "docs", "components")
+      File.exists?(file).must be_true
+      File.directory?(file).must be_true
+    end
+
+    it "does not copy .empty_diretories files" do
+      directory "doc", "docs"
+      invoke!
+
+      file = File.join(destination_root, "docs", "components", ".empty_directory")
+      File.exists?(file).must be_false
+    end
   end
 
   describe "#revoke!" do
