@@ -61,16 +61,16 @@ describe Thor::Actions do
 
     describe "#relative_to_absolute_root" do
       it "returns the path relative to the absolute root" do
-        runner.relative_to_absolute_root(File.join(destination_root, "foo")).must == "foo"
+        runner.relative_to_absolute_root(file).must == "foo"
       end
 
       it "does not remove dot if required" do
-        runner.relative_to_absolute_root(File.join(destination_root, "foo"), false).must == "./foo"
+        runner.relative_to_absolute_root(file, false).must == "./foo"
       end
 
       it "always use the absolute root" do
         runner.inside("foo") do
-          runner.relative_to_absolute_root(File.join(destination_root, "foo")).must == "foo"
+          runner.relative_to_absolute_root(file).must == "foo"
         end
       end
     end
@@ -321,47 +321,6 @@ describe Thor::Actions do
           runner.prepend_file("doc/README", nil, false){ "START" }
         end.must be_empty
       end
-    end
-  end
-
-  describe "invokable" do
-    before(:each) do
-      ::FileUtils.rm_rf(destination_root)
-    end
-
-    it "copies a file from source to destination" do
-      capture(:stdout){ runner.copy_file("task.thor") }.must == "    [CREATE] task.thor\n"
-    end
-
-    it "creates a file" do
-      capture(:stdout){ runner.create_file("foo.rb") }.must == "    [CREATE] foo.rb\n"
-    end
-
-    it "copies a directory" do
-      capture(:stdout){ runner.directory("doc") }.must =~ /\[CREATE\] doc\/components/
-    end
-
-    it "creates an empty directory" do
-      capture(:stdout){ runner.empty_directory("doc") }.must == "    [CREATE] doc\n"
-    end
-
-    it "gets the content of a file and move it to another location" do
-      capture(:stdout){ runner.get("task.thor"){ |c| "foo.thor" } }.must == "    [CREATE] foo.thor\n"
-    end
-
-    it "injects content into a file" do
-      capture(:stdout){ runner.copy_file("doc/README") }
-      capture(:stdout){ runner.inject_into_file("doc/README", "START", :after => "__start__") }.must == "    [INJECT] doc/README\n"
-    end
-
-    it "injects content given by a block into a file" do
-      capture(:stdout){ runner.copy_file("doc/README") }
-      capture(:stdout){ runner.inject_into_file("doc/README", :after => "__start__"){ "START" } }.must == "    [INJECT] doc/README\n"
-    end
-
-    it "creates a template" do
-      mock(runner).file_name{ "rdoc" }
-      capture(:stdout){ runner.template("doc/%file_name%.rb.tt") }.must == "    [CREATE] doc/rdoc.rb\n"
     end
   end
 end

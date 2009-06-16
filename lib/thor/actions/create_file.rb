@@ -23,6 +23,7 @@ class Thor
     def create_file(destination, data=nil, log_status=true, &block)
       action CreateFile.new(self, destination, block || data.to_s, log_status)
     end
+    alias :add_file :create_file
 
     # AddFile is a subset of Template, which instead of rendering a file with
     # ERB, it gets the content from the user.

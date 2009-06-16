@@ -4,39 +4,21 @@ require 'thor/actions'
 describe Thor::Actions::Directory do
   before(:each) do
     ::FileUtils.rm_rf(destination_root)
+    mock(invoker).file_name{ "rdoc" }
   end
 
-  def directory(source, destination=nil, options={})
-    @base = begin
-      base = Object.new
-      base.extend Thor::Actions
-      stub(base).file_name{ "rdoc" }
-      stub(base).source_root{ source_root }
-      stub(base).destination_root{ destination_root }
-      stub(base).relative_to_absolute_root{ |p| p.gsub(destination_root, '.')[2..-1] }
-      stub(base).options{ options }
-      stub(base).shell{ @shell = Thor::Shell::Basic.new }
-      base
-    end
-
-    @action = Thor::Actions::Directory.new(base, source, destination || source)
+  def invoker
+    @invoker ||= MyCounter.new([], {}, { :root => destination_root })
   end
 
-  def invoke!
-    capture(:stdout){ @action.invoke! }
+  def revoker
+    @revoker ||= MyCounter.new([], {}, { :root => destination_root, :behavior => :revoke })
   end
 
-  def revoke!
-    capture(:stdout){ @action.revoke! }
-  end
-
-  def valid?(content, path)
+  def exists_and_identical?(source_path, destination_path)
     %w(config.rb README).each do |file|
-      source      = File.join(@action.source, file)
-      relative    = File.join(@action.relative_destination, file)
-      destination = File.join(destination_root, path, file)
-
-      content.must =~ /^    \[CREATE\] #{relative}$/
+      source      = File.join(source_root, source_path, file)
+      destination = File.join(destination_root, destination_path, file)
 
       File.exists?(destination).must be_true
       FileUtils.identical?(source, destination).must be_true
@@ -45,18 +27,18 @@ describe Thor::Actions::Directory do
 
   describe "#invoke!" do
     it "copies the whole directory to the default destination" do
-      directory "doc"
-      valid? invoke!, "doc"
+      capture(:stdout){ invoker.directory("doc") }
+      exists_and_identical?("doc", "doc")
     end
 
     it "copies the whole directory to the specified destination" do
-      directory "doc", "docs"
-      valid? invoke!, "docs"
+      capture(:stdout){ invoker.directory("doc", "docs") }
+      exists_and_identical?("doc", "docs")
     end
 
-    it "copies and evaluate templates" do
-      directory "doc", "docs"
-      invoke!
+    it "copies and evaluates templates" do
+
+      capture(:stdout){ invoker.directory("doc", "docs") }
 
       file = File.join(destination_root, "docs", "rdoc.rb")
       File.exists?(file).must be_true
@@ -64,8 +46,7 @@ describe Thor::Actions::Directory do
     end
 
     it "copies directories" do
-      directory "doc", "docs"
-      invoke!
+      capture(:stdout){ invoker.directory("doc", "docs") }
 
       file = File.join(destination_root, "docs", "components")
       File.exists?(file).must be_true
@@ -73,20 +54,28 @@ describe Thor::Actions::Directory do
     end
 
     it "does not copy .empty_diretories files" do
-      directory "doc", "docs"
-      invoke!
+      capture(:stdout){ invoker.directory("doc", "docs") }
 
       file = File.join(destination_root, "docs", "components", ".empty_directory")
       File.exists?(file).must be_false
     end
+
+    it "logs status" do
+      content = capture(:stdout){ invoker.directory("doc") }
+      content.must =~ /\[CREATE\] doc\/README/
+      content.must =~ /\[CREATE\] doc\/config\.rb/
+      content.must =~ /\[CREATE\] doc\/rdoc\.rb/
+      content.must =~ /\[CREATE\] doc\/components/
+    end
   end
 
   describe "#revoke!" do
-    it "removes the destination directory" do
-      directory "doc"
-      invoke!
-      revoke!
-      File.exists?(@action.destination).must be_false
+    it "removes the destination file" do
+      capture(:stdout){ invoker.directory("doc") }
+      capture(:stdout){ revoker.directory("doc") }
+
+      file = File.join(destination_root, "doc")
+      File.exists?(file).must be_false
     end
   end
 end

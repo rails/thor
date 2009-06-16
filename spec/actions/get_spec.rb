@@ -6,91 +6,58 @@ describe Thor::Actions::Get do
     ::FileUtils.rm_rf(destination_root)
   end
 
-  def get(source, destination=nil, options={}, &block)
-    @base = begin
-      base = Object.new
-      stub(base).source_root{ source_root }
-      stub(base).destination_root{ destination_root }
-      stub(base).relative_to_absolute_root{ |p| p.gsub(destination_root, '.')[2..-1] }
-      stub(base).options{ options }
-      stub(base).shell{ @shell = Thor::Shell::Basic.new }
-      base
-    end
-
-    @action = Thor::Actions::Get.new(base, source, block || destination)
+  def invoker
+    @invoker ||= MyCounter.new([], {}, { :root => destination_root })
   end
 
-  def invoke!
-    capture(:stdout){ @action.invoke! }
+  def revoker
+    @revoker ||= MyCounter.new([], {}, { :root => destination_root, :behavior => :revoke })
   end
 
-  def revoke!
-    capture(:stdout){ @action.revoke! }
-  end
+  def exists_and_identical?(source, destination)
+   destination = File.join(destination_root, destination)
+   File.exists?(destination).must be_true
 
-  def file
-    File.join(source_root, "doc", "README")
-  end
-
-  def valid?(content, path)
-    content.must == "    [CREATE] #{path}\n"
-    File.exists?(File.join(destination_root, path)).must be_true
-    FileUtils.identical?(@action.source, @action.destination).must be_true
+   source = File.join(source_root, source)
+   FileUtils.must be_identical(source, destination)
   end
 
   describe "#invoke!" do
-    it "copies the file to the given destination" do
-      get(file, "doc/README")
-      valid?(invoke!, "doc/README")
+    it "copies file from source to the specified destination" do
+      capture(:stdout){ invoker.get("doc/README", "docs/README") }
+      exists_and_identical?("doc/README", "docs/README")
     end
 
-    it "uses the source basename if no destination is given" do
-      get(file)
-      valid?(invoke!, "README")
+    it "uses just the source basename as destination if none is specified" do
+      capture(:stdout){ invoker.get("doc/README") }
+      exists_and_identical?("doc/README", "README")
     end
 
-    it "allows the destination to be given as a block" do
-      get(file) { "doc/README" }
-      valid?(invoke!, "doc/README")
+    it "allows the destination to be set as a block result" do
+      capture(:stdout){ invoker.get("doc/README"){ |c| "docs/README" } }
+      exists_and_identical?("doc/README", "docs/README")
     end
 
-    it "yields file content to the block" do
-      get(file) do |content|
-        content.must == File.read(File.join(source_root, "doc/README"))
+    it "yields file content to a block" do
+      capture(:stdout) do
+        invoker.get("doc/README") do |content|
+          content.must == "__start__\nREADME\n__end__\n"
+        end
       end
+    end
+
+    it "logs status" do
+      capture(:stdout){ invoker.get("doc/README", "docs/README") }.must == "    [CREATE] docs/README\n"
     end
   end
 
   describe "#revoke!" do
     it "removes the destination file" do
-      get(file)
-      invoke!
-      revoke!
-      File.exists?(@action.destination).must be_false
-    end
-  end
+      capture(:stdout){ invoker.get("doc/README", "doc/README") }
+      capture(:stdout){ revoker.get("doc/README", "doc/README") }
 
-  describe "#render" do
-    it "shows file content" do
-      get(file).render.must == File.read(File.join(source_root, "doc/README"))
-    end
-  end
-
-  describe "#exists?" do
-    it "returns true if the destination file exists" do
-      get(file)
-      @action.exists?.must be_false
-      invoke!
-      @action.exists?.must be_true
-    end
-  end
-
-  describe "#identical?" do
-    it "returns true if the destination file and is identical" do
-      get(file)
-      @action.identical?.must be_false
-      invoke!
-      @action.identical?.must be_true
+      file = File.join(destination_root, "doc/README")
+      File.exists?(file).must be_false
     end
   end
 end
