@@ -135,6 +135,11 @@ describe Thor::Actions::Template do
       revoke!
       File.exists?(@action.destination).must be_false
     end
+
+    it "does not log if there is nothing to be removed" do
+      template("doc/config.rb")
+      revoke!.must be_empty
+    end
   end
 
   describe "#render" do

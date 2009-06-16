@@ -65,8 +65,10 @@ class Thor
       # Revokes the action.
       #
       def revoke!
-        say_status :deleted, :green
-        ::FileUtils.rm_rf(destination) unless pretend?
+        if exists?
+          say_status :deleted, :green
+          ::FileUtils.rm_rf(destination) unless pretend?
+        end
       end
 
       protected
