@@ -157,6 +157,10 @@ describe Thor::Option do
     option("--foo").human_name.must == "foo"
   end
 
+  it "converts underscores to dashes" do
+    option("foo_bar").switch_name.must == "--foo-bar"
+  end
+
   it "is not an argument" do
     option(:task).must_not be_argument
   end

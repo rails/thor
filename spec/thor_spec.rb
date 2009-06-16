@@ -16,7 +16,7 @@ describe Thor do
 
       describe "and the target is on the parent class" do
         it "updates an already defined task" do
-          args = ["example_default_task", "my_param", "--new_option=verified"]
+          args = ["example_default_task", "my_param", "--new-option=verified"]
           options = Scripts::MyGrandChildScript.start(args)
           options[:new_option].must == "verified"
         end

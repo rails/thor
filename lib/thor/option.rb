@@ -118,7 +118,7 @@ class Thor
     end
 
     def dasherize(str)
-      (str.length > 1 ? "--" : "-") + str
+      (str.length > 1 ? "--" : "-") + str.gsub('_', '-')
     end
 
     def usage(use_default=true)
