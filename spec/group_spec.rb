@@ -25,7 +25,7 @@ describe Thor::Group do
     end
 
     it "raises an error when a Thor group task expects arguments" do
-      lambda { WhinyGenerator.start }.must raise_error
+      lambda { WhinyGenerator.start }.must raise_error(ArgumentError, /Are you sure it has arity equals to 0\?/)
     end
 
     it "invokes help message if any of the shortcuts is given" do

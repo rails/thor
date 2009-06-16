@@ -28,8 +28,12 @@ class Thor
     rescue ArgumentError => e
       backtrace = sans_backtrace(e.backtrace, caller)
 
-      if instance.is_a?(Thor) && backtrace.empty?
-        raise InvocationError, "'#{name}' was called incorrectly. Call as '#{formatted_usage(instance.class, true)}'"
+      if backtrace.empty? && e.message =~ /wrong number of arguments/
+        if instance.is_a?(Thor::Group)
+          raise e, "'#{name}' was called incorrectly. Are you sure it has arity equals to 0?"
+        else
+          raise InvocationError, "'#{name}' was called incorrectly. Call as '#{formatted_usage(instance.class, true)}'"
+        end
       else
         raise e
       end

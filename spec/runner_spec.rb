@@ -80,6 +80,16 @@ describe Thor::Runner do
       ARGV.replace ["my_script:call_unexistent_method"]
       lambda { Thor::Runner.start }.must raise_error(NoMethodError)
     end
+
+    it "does not swallow Thor::Group ArgumentError" do
+      ARGV.replace ["whiny_generator"]
+      lambda { Thor::Runner.start }.must raise_error(ArgumentError, /Are you sure it has arity equals to 0\?/)
+    end
+
+    it "does not swallow Thor ArgumentError" do
+      ARGV.replace ["my_script:animal"]
+      capture(:stderr) { Thor::Runner.start }.must =~ /'animal' was called incorrectly\. Call as 'my_script:animal TYPE'/
+    end
   end
 
   describe "tasks" do
