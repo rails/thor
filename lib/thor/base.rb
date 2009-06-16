@@ -391,7 +391,12 @@ class Thor
         end
 
         def from_superclass(method, default=nil)
-          self == baseclass ? default : superclass.send(method).dup
+          if self == baseclass
+            default
+          else
+            value = superclass.send(method)
+            value.dup if value
+          end
         end
 
         # SIGNATURE: Sets the baseclass. This is where the superclass lookup
