@@ -20,7 +20,7 @@ class Thor
     #   template "doc/README"
     #
     def template(source, destination=nil, log_status=true)
-      destination ||= source.gsub('.tt$', '')
+      destination ||= source.gsub(/.tt$/, '')
       action Template.new(self, source, destination, log_status)
     end
 

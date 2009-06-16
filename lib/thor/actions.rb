@@ -132,7 +132,7 @@ class Thor
     #
     #   chmod "script/*", 0755
     #
-    def chmod(mode, path, log_status=true)
+    def chmod(path, mode, log_status=true)
       path = File.expand_path(path, root)
       say_status_if_log :chmod, relative_to_absolute_root(path), log_status
       FileUtils.chmod_R(mode, path) unless options[:pretend]

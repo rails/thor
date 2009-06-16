@@ -21,7 +21,7 @@ class Thor
     #   create_file "config/apach.conf", "your apache config"
     #
     def create_file(destination, data=nil, log_status=true, &block)
-      action AddFile.new(self, destination, block || data.to_s, log_status)
+      action CreateFile.new(self, destination, block || data.to_s, log_status)
     end
 
     # AddFile is a subset of Template, which instead of rendering a file with

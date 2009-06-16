@@ -1,6 +1,10 @@
 class MyCounter < Thor::Group
   include Thor::Actions
 
+  def self.source_root
+    File.join(File.dirname(__FILE__))
+  end
+
   argument :first,     :type => :numeric
   argument :second,    :type => :numeric, :default => 2
   class_option :third, :type => :numeric, :desc => "The third argument."

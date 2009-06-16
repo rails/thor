@@ -77,8 +77,11 @@ describe Thor::Actions do
 
     describe "#source_root" do
       it "raises an error if source root is not specified" do
+        runner = Object.new
+        runner.extend Thor::Actions
+
         lambda {
-          runner.send(:source_root)
+          runner.source_root
         }.must raise_error(NoMethodError, "You have to specify the class method source_root in your thor class.")
       end
     end
@@ -131,22 +134,22 @@ describe Thor::Actions do
     describe "#chmod" do
       it "executes the command given" do
         mock(FileUtils).chmod_R(0755, file)
-        capture(:stdout) { runner.chmod(0755, "foo") }
+        capture(:stdout) { runner.chmod("foo", 0755) }
       end
 
       it "does not execute the command if pretending given" do
         dont_allow(FileUtils).chmod_R(0755, file)
-        capture(:stdout) { runner(:behavior => :pretend).chmod(0755, "foo") }
+        capture(:stdout) { runner(:behavior => :pretend).chmod("foo", 0755) }
       end
 
       it "logs status" do
         mock(FileUtils).chmod_R(0755, file)
-        capture(:stdout) { runner.chmod(0755, "foo") }.must == "     [CHMOD] foo\n"
+        capture(:stdout) { runner.chmod("foo", 0755) }.must == "     [CHMOD] foo\n"
       end
 
       it "does not log status if required" do
         mock(FileUtils).chmod_R(0755, file)
-        capture(:stdout) { runner.chmod(0755, "foo", false) }.must be_empty
+        capture(:stdout) { runner.chmod("foo", 0755, false) }.must be_empty
       end
     end
 
@@ -215,6 +218,7 @@ describe Thor::Actions do
       end
     end
   end
+
   describe 'file manipulation' do
     before(:each) do
       ::FileUtils.rm_rf(destination_root)
@@ -317,6 +321,47 @@ describe Thor::Actions do
           runner.prepend_file("doc/README", nil, false){ "START" }
         end.must be_empty
       end
+    end
+  end
+
+  describe "invokable" do
+    before(:each) do
+      ::FileUtils.rm_rf(destination_root)
+    end
+
+    it "copies a file from source to destination" do
+      capture(:stdout){ runner.copy_file("task.thor") }.must == "    [CREATE] task.thor\n"
+    end
+
+    it "creates a file" do
+      capture(:stdout){ runner.create_file("foo.rb") }.must == "    [CREATE] foo.rb\n"
+    end
+
+    it "copies a directory" do
+      capture(:stdout){ runner.directory("doc") }.must =~ /\[CREATE\] doc\/components/
+    end
+
+    it "creates an empty directory" do
+      capture(:stdout){ runner.empty_directory("doc") }.must == "    [CREATE] doc\n"
+    end
+
+    it "gets the content of a file and move it to another location" do
+      capture(:stdout){ runner.get("task.thor"){ |c| "foo.thor" } }.must == "    [CREATE] foo.thor\n"
+    end
+
+    it "injects content into a file" do
+      capture(:stdout){ runner.copy_file("doc/README") }
+      capture(:stdout){ runner.inject_into_file("doc/README", "START", :after => "__start__") }.must == "    [INJECT] doc/README\n"
+    end
+
+    it "injects content given by a block into a file" do
+      capture(:stdout){ runner.copy_file("doc/README") }
+      capture(:stdout){ runner.inject_into_file("doc/README", :after => "__start__"){ "START" } }.must == "    [INJECT] doc/README\n"
+    end
+
+    it "creates a template" do
+      mock(runner).file_name{ "rdoc" }
+      capture(:stdout){ runner.template("doc/%file_name%.rb.tt") }.must == "    [CREATE] doc/rdoc.rb\n"
     end
   end
 end
