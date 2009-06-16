@@ -160,7 +160,7 @@ class Thor
           when :numeric
             default.to_s
           when :string, :default
-            default.empty? ? formatted_value : default.to_s
+            default.to_s.empty? ? formatted_value : default.to_s
           when :hash
             if default.empty?
               formatted_value
