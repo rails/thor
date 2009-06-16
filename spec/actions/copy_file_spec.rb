@@ -42,7 +42,7 @@ describe Thor::Actions::CopyFile do
     end
 
     it "logs status" do
-      capture(:stdout){ invoker.copy_file("task.thor") }.must == "    [CREATE] task.thor\n"
+      capture(:stdout){ invoker.copy_file("task.thor") }.must == "      create  task.thor\n"
     end
   end
 

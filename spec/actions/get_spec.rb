@@ -47,7 +47,7 @@ describe Thor::Actions::Get do
     end
 
     it "logs status" do
-      capture(:stdout){ invoker.get("doc/README", "docs/README") }.must == "    [CREATE] docs/README\n"
+      capture(:stdout){ invoker.get("doc/README", "docs/README") }.must == "      create  docs/README\n"
     end
   end
 

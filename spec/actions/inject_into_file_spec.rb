@@ -49,7 +49,7 @@ describe Thor::Actions::InjectIntoFile do
     it "logs status" do
       capture(:stdout) do 
         invoker.inject_into_file "doc/README", "\nmore content", :after => "__start__"
-      end.must == "    [INJECT] doc/README\n"
+      end.must == "      inject  doc/README\n"
     end
 
     it "does not change the file if pretending" do
@@ -83,7 +83,7 @@ describe Thor::Actions::InjectIntoFile do
 
       capture(:stdout) do
         revoker.inject_into_file("doc/README", "\nmore content", :after => "__start__")
-      end.must == "  [DEINJECT] doc/README\n"
+      end.must == "    deinject  doc/README\n"
     end
   end
 end

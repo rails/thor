@@ -153,7 +153,7 @@ describe Thor::Actions do
 
       it "logs status" do
         mock(FileUtils).chmod_R(0755, file)
-        capture(:stdout) { runner.chmod("foo", 0755) }.must == "     [CHMOD] foo\n"
+        capture(:stdout) { runner.chmod("foo", 0755) }.must == "       chmod  foo\n"
       end
 
       it "does not log status if required" do
@@ -175,7 +175,7 @@ describe Thor::Actions do
 
       it "logs status" do
         mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
-        capture(:stdout) { runner.run('ls') }.must == "       [RUN] ls from .\n"
+        capture(:stdout) { runner.run('ls') }.must == "         run  ls from .\n"
       end
 
       it "does not log status if required" do
@@ -262,7 +262,7 @@ describe Thor::Actions do
 
       it "logs status" do
         content = capture(:stdout){ runner.gsub_file("doc/README", "__start__", "START") }
-        content.must == "      [GSUB] doc/README\n"
+        content.must == "        gsub  doc/README\n"
       end
 
       it "does not log status if required" do
@@ -292,7 +292,7 @@ describe Thor::Actions do
 
       it "logs status" do
         content = capture(:stdout){ runner.append_file("doc/README", "END") }
-        content.must == "    [APPEND] doc/README\n"
+        content.must == "      append  doc/README\n"
       end
 
       it "does not log status if required" do
@@ -322,7 +322,7 @@ describe Thor::Actions do
 
       it "logs status" do
         content = capture(:stdout){ runner.prepend_file("doc/README", "START") }
-        content.must == "   [PREPEND] doc/README\n"
+        content.must == "     prepend  doc/README\n"
       end
 
       it "does not log status if required" do

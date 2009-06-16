@@ -69,10 +69,10 @@ describe Thor::Actions::Directory do
 
     it "logs status" do
       content = capture(:stdout){ invoker.directory("doc") }
-      content.must =~ /\[CREATE\] doc\/README/
-      content.must =~ /\[CREATE\] doc\/config\.rb/
-      content.must =~ /\[CREATE\] doc\/rdoc\.rb/
-      content.must =~ /\[CREATE\] doc\/components/
+      content.must =~ /create  doc\/README/
+      content.must =~ /create  doc\/config\.rb/
+      content.must =~ /create  doc\/rdoc\.rb/
+      content.must =~ /create  doc\/components/
     end
   end
 

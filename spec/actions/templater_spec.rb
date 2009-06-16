@@ -81,7 +81,7 @@ describe Thor::Actions::Templater do
 
     it "shows created status to the user" do
       templater("doc/config.rb")
-      invoke!.must == "    [CREATE] doc/config.rb\n"
+      invoke!.must == "      create  doc/config.rb\n"
     end
 
     it "does not show any information if log status is false" do
@@ -112,7 +112,7 @@ describe Thor::Actions::Templater do
         it "shows identical status" do
           templater("doc/config.rb")
           invoke!
-          invoke!.must == " [IDENTICAL] doc/config.rb\n"
+          invoke!.must == "   identical  doc/config.rb\n"
         end
       end
 
@@ -123,12 +123,12 @@ describe Thor::Actions::Templater do
 
         it "shows forced status to the user if force is given" do
           templater("doc/config.rb", "doc/config.rb", :force => true).must_not be_identical
-          invoke!.must == "     [FORCE] doc/config.rb\n"
+          invoke!.must == "       force  doc/config.rb\n"
         end
 
         it "shows skipped status to the user if skip is given" do
           templater("doc/config.rb", "doc/config.rb", :skip => true).must_not be_identical
-          invoke!.must == "      [SKIP] doc/config.rb\n"
+          invoke!.must == "        skip  doc/config.rb\n"
         end
 
         it "shows conflict status to ther user" do
@@ -137,21 +137,21 @@ describe Thor::Actions::Templater do
           file = File.join(destination_root, 'doc/config.rb')
 
           content = invoke!
-          content.must =~ /\[CONFLICT\] doc\/config\.rb/
+          content.must =~ /conflict  doc\/config\.rb/
           content.must =~ /Overwrite #{file}\? \(enter "h" for help\) \[Ynaqdh\]/
-          content.must =~ /\[SKIP\] doc\/config\.rb/
+          content.must =~ /skip  doc\/config\.rb/
         end
 
         it "creates the file if the file collision menu returns true" do
           templater("doc/config.rb")
           mock($stdin).gets{ 'y' }
-          invoke!.must =~ /\[FORCE\] doc\/config\.rb/
+          invoke!.must =~ /force  doc\/config\.rb/
         end
 
         it "skips the file if the file collision menu returns false" do
           templater("doc/config.rb")
           mock($stdin).gets{ 'n' }
-          invoke!.must =~ /\[SKIP\] doc\/config\.rb/
+          invoke!.must =~ /skip  doc\/config\.rb/
         end
 
         it "executes the block given to show file content" do

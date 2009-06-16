@@ -51,13 +51,13 @@ describe Thor::Shell::Basic do
 
   describe "#say_status" do
     it "prints a message to the user with status" do
-      mock($stdout).puts("   [CREATED] ~/.thor/task.thor")
-      shell.say_status(:created, "~/.thor/task.thor")
+      mock($stdout).puts("      create  ~/.thor/task.thor")
+      shell.say_status(:create, "~/.thor/task.thor")
     end
 
     it "always use new line" do
-      mock($stdout).puts("   [CREATED] ")
-      shell.say_status(:created, "")
+      mock($stdout).puts("      create  ")
+      shell.say_status(:create, "")
     end
 
     it "does not print a message if base is set to quiet" do

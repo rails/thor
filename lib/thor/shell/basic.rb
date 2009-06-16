@@ -38,9 +38,7 @@ class Thor
       #
       def say_status(status, message, color=nil)
         return if base && base.options[:quiet]
-
-        status_flag = "[#{status.to_s.upcase}]".rjust(12)
-        say "#{status_flag} #{message}", color, true
+        say "#{status.to_s.rjust(12)}  #{message}", color, true
       end
 
       # Make a question the to user and returns true if the user replies "y" or

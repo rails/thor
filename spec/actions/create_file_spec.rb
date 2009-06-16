@@ -35,7 +35,7 @@ describe Thor::Actions::CreateFile do
     end
 
     it "logs status" do
-      capture(:stdout){ invoker.create_file("foo.thor") }.must == "    [CREATE] foo.thor\n"
+      capture(:stdout){ invoker.create_file("foo.thor") }.must == "      create  foo.thor\n"
     end
   end
 

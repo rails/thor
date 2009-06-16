@@ -36,14 +36,14 @@ describe Thor::Actions::EmptyDirectory do
 
     it "shows created status to the user" do
       empty_directory("doc")
-      invoke!.must == "    [CREATE] doc\n"
+      invoke!.must == "      create  doc\n"
     end
 
     describe "when directory exists" do
       it "shows exist status" do
         empty_directory("doc")
         invoke!
-        invoke!.must == "     [EXIST] doc\n"
+        invoke!.must == "       exist  doc\n"
       end
     end
   end

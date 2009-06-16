@@ -39,7 +39,7 @@ describe Thor::Actions::Template do
     end
 
     it "logs status" do
-      capture(:stdout){ invoker.template("doc/config.rb") }.must == "    [CREATE] doc/config.rb\n"
+      capture(:stdout){ invoker.template("doc/config.rb") }.must == "      create  doc/config.rb\n"
     end
   end
 
