@@ -33,6 +33,14 @@ describe Thor::Actions::CopyFile do
       exists_and_identical?("task.thor", "foo.thor")
     end
 
+    it "copies file from the source relative to the current path" do
+      invoker.inside("doc") do
+        capture(:stdout){ invoker.copy_file("README") }
+      end
+
+      exists_and_identical?("doc/README", "doc/README")
+    end
+
     it "logs status" do
       capture(:stdout){ invoker.copy_file("task.thor") }.must == "    [CREATE] task.thor\n"
     end

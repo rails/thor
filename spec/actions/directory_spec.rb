@@ -36,8 +36,15 @@ describe Thor::Actions::Directory do
       exists_and_identical?("doc", "docs")
     end
 
-    it "copies and evaluates templates" do
+    it "copies files from the source relative to the current path" do
+      invoker.inside "doc" do
+        capture(:stdout){ invoker.directory(".") }
+      end
 
+      exists_and_identical?("doc", "doc")
+    end
+
+    it "copies and evaluates templates" do
       capture(:stdout){ invoker.directory("doc", "docs") }
 
       file = File.join(destination_root, "docs", "rdoc.rb")

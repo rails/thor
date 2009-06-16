@@ -82,12 +82,22 @@ class Thor
       @root_stack[0] = File.expand_path(root || '')
     end
 
+    # Gets the current root relative to the absolute root.
+    #
+    #   inside "foo" do
+    #     relative_root #=> "foo"
+    #   end
+    #
+    def relative_root(remove_dot=true)
+      relative_to_absolute_root(root, remove_dot)
+    end
+
     # Returns the given path relative to the absolute root (ie, root where
     # the script started).
     #
     def relative_to_absolute_root(path, remove_dot=true)
       path = path.gsub(@root_stack[0], '.')
-      remove_dot ? path[2..-1] : path
+      remove_dot ? (path[2..-1] || '') : path
     end
 
     # Get the source root in the class. Raises an error if a source root is

@@ -60,6 +60,14 @@ describe Thor::Actions do
       end
     end
 
+    describe "#relative_root" do
+      it "returns the current root relative to the absolute root" do
+        runner.inside "foo" do
+          runner.relative_root.must == "foo"
+        end
+      end
+    end
+
     describe "#relative_to_absolute_root" do
       it "returns the path relative to the absolute root" do
         runner.relative_to_absolute_root(file).must == "foo"

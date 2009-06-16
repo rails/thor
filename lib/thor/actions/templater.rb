@@ -8,7 +8,7 @@ class Thor
     # by Jonas Nicklas and Michael S. Klishin under MIT LICENSE.
     #
     class Templater #:nodoc:
-      attr_reader :base, :source, :destination, :relative_destination
+      attr_reader :base, :source, :destination, :given_destination, :relative_destination
 
       # Initializes given the source and destination.
       #
@@ -86,20 +86,45 @@ class Thor
           !respond_to?(:render)
         end
 
-        # Sets the source value from a relative source value.
+        # Sets the absolute source value from a relative source value. Notice
+        # that we need to take into consideration both the source_root as the
+        # relative_root.
+        #
+        # Let's suppose that we are on the directory "dest", with source root set
+        # to "source" and with the following scenario:
+        #
+        #   inside "bar" do
+        #     copy_file "baz.rb"
+        #   end
+        #
+        # In this case, the user wants to copy the file at "source/bar/baz.rb"
+        # to "dest/bar/baz.rb". If we don't take into account the relative_root
+        # (in this case, "bar"), it would copy the contents at "source/baz.rb".
         #
         def source=(source)
           if source
-            @source = ::File.expand_path(source.to_s, base.source_root)
+            @source = ::File.expand_path(source.to_s, File.join(base.source_root, base.relative_root))
           end
         end
 
-        # Sets the destination value from a relative destination value. The
-        # relative destination is kept to be used in output messages.
+        # Sets the absolute destination value from a relative destination value.
+        # It also stores the given and relative destination. Let's suppose our
+        # script is being executed on "dest", it sets the destination root to
+        # "dest". The destination, given_destination and relative_destination
+        # are related in the following way:
+        #
+        #   inside "bar" do
+        #     empty_directory "baz"
+        #   end
+        #
+        #   destination          #=> dest/bar/baz
+        #   relative_destination #=> bar/baz
+        #   given_destination    #=> baz
         #
         def destination=(destination)
           if destination
-            @destination = ::File.expand_path(convert_encoded_instructions(destination.to_s), base.destination_root)
+            @given_destination = convert_encoded_instructions(destination.to_s)
+            @destination = ::File.expand_path(@given_destination, base.destination_root)
             @relative_destination = base.relative_to_absolute_root(@destination)
           end
         end
