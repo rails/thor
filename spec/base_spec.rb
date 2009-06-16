@@ -100,6 +100,30 @@ describe Thor::Base do
     end
   end
 
+  describe "#class_options_help" do
+    before(:each) do
+      @content = capture(:stdout) { MyCounter.help(Thor::Shell::Basic.new) }
+    end
+
+    it "shows options description" do
+      @content.must =~ /# The third argument\./
+    end
+
+    it "does not show usage with default values inside" do
+      @content.must =~ /\[\-\-third=N\]/
+    end
+
+    it "shows default values below description" do
+      @content.must =~ /# Default: 3/
+    end
+
+    it "shows options in different groups" do
+      @content.must =~ /Options\:/
+      @content.must =~ /Runtime options\:/
+      @content.must =~ /\-p, \[\-\-pretend\]/
+    end
+  end
+
   describe "#namespace" do
     it "returns the default class namespace" do
       Scripts::MyGrandChildScript.namespace.must == "scripts:my_grand_child_script"

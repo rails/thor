@@ -301,12 +301,14 @@ class Thor
 
             printer = lambda do |group_name, options|
               unless options.empty?
-                options.map! do |option|
-                  next if option.argument?
-                  [ option.usage, option.description || '' ]
-                end
+                list = []
 
-                options.compact!
+                options.each do |option|
+                  next if option.argument?
+
+                  list << [ option.usage(false), option.description || "" ]
+                  list << [ "", "Default: #{option.default}" ] if option.description && option.default
+                end
 
                 if group_name
                   shell.say "#{group_name} options:"
@@ -314,7 +316,7 @@ class Thor
                   shell.say "Options:"
                 end
 
-                shell.print_table(options, :emphasize_last => true, :ident => 2)
+                shell.print_table(list, :emphasize_last => true, :ident => 2)
                 shell.say ""
               end
             end

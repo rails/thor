@@ -7,7 +7,7 @@ class MyCounter < Thor::Group
 
   argument :first,     :type => :numeric
   argument :second,    :type => :numeric, :default => 2
-  class_option :third, :type => :numeric, :desc => "The third argument."
+  class_option :third, :type => :numeric, :desc => "The third argument.", :default => 3
 
   desc <<-FOO
 Description:

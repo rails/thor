@@ -11,9 +11,10 @@ describe Thor::Actions do
 
   describe "on include" do
     it "adds runtime options to the base class" do
-      content = capture(:stdout) { MyCounter.help(Thor::Shell::Basic.new) }
-      content.must =~ /Runtime options\:/
-      content.must =~ /\-p, \[\-\-pretend\]/
+      MyCounter.class_options.keys.must include(:pretend)
+      MyCounter.class_options.keys.must include(:force)
+      MyCounter.class_options.keys.must include(:quiet)
+      MyCounter.class_options.keys.must include(:skip)
     end
   end
 

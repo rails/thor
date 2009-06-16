@@ -121,8 +121,12 @@ class Thor
       (str.length > 1 ? "--" : "-") + str
     end
 
-    def usage
-      sample = formatted_default || formatted_value
+    def usage(use_default=true)
+      sample = if use_default
+        formatted_default || formatted_value
+      else
+        formatted_value
+      end
 
       sample = if sample
         "#{switch_name}=#{sample}"
@@ -204,7 +208,7 @@ class Thor
       true
     end
 
-    def usage
+    def usage(use_default=true)
       required? ? formatted_value : "[#{formatted_value}]"
     end
   end
