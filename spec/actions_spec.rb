@@ -248,6 +248,29 @@ describe Thor::Actions do
       File.join(destination_root, "doc", "README")
     end
 
+    describe "#remove_file" do
+      it "removes the file given" do
+        capture(:stdout){ runner.remove_file("doc/README") }
+        File.exists?(file).must be_false
+      end
+
+      it "does not remove if pretending" do
+        capture(:stdout){ runner(:behavior => :pretend).remove_file("doc/README") }
+        File.exists?(file).must be_true
+      end
+
+      it "logs status" do
+        content = capture(:stdout){ runner(:behavior => :pretend).remove_file("doc/README") }
+        content.must == "      remove  doc/README\n"
+      end
+
+      it "does not log status if required" do
+        capture(:stdout) do
+          runner.remove_file("doc/README", false)
+        end.must be_empty
+      end
+    end
+
     describe "#gsub_file" do
       it "replaces the content in the file" do
         capture(:stdout){ runner.gsub_file("doc/README", "__start__", "START") }

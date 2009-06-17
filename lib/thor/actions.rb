@@ -213,6 +213,25 @@ class Thor
       end
     end
 
+    # Removes a file at the given location.
+    #
+    # ==== Parameters
+    # path<String>:: path of the file to be changed
+    # log_status<Boolean>:: if false, does not log the status. True by default.
+    #                       If a symbol is given, uses it as the output color.
+    #
+    # ==== Example
+    #
+    #   remove_file 'README'
+    #   remove_file 'app/controllers/application_controller.rb'
+    #
+    def remove_file(path, log_status=true)
+      path = File.expand_path(path, root)
+      say_status :remove, relative_to_absolute_root(path), log_status
+
+      ::FileUtils.rm_rf(path) if !options[:pretend] && File.exists?(path)
+    end
+
     # Run a regular expression replacement on a file.
     #
     # ==== Parameters
