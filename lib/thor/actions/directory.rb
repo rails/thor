@@ -32,20 +32,30 @@ class Thor
     # ==== Parameters
     # source<String>:: the relative path to the source root
     # destination<String>:: the relative path to the destination root
+    # recursive<Boolean>:: if the directory must be copied recursively, true by default
     # log_status<Boolean>:: if false, does not log the status. True by default.
     #
     # ==== Examples
     #
     #   directory "doc"
+    #   directory "doc", "docs", false
     #
-    def directory(source, destination=nil, log_status=true)
-      action Directory.new(self, source, destination || source, log_status)
+    def directory(source, destination=nil, recursive=true, log_status=true)
+      action Directory.new(self, source, destination || source, recursive, log_status)
     end
 
     class Directory < Templater #:nodoc:
+      attr_reader :recursive
+
+      def initialize(base, source, destination=nil, recursive=true, log_status=true)
+        @recursive = recursive
+        super(base, source, destination, log_status)
+      end
 
       def invoke!
-        Dir[File.join(source, '**', '*')].each do |file_source|
+        lookup = recursive ? File.join(source, '**', '*') : File.join(source, '*')
+
+        Dir[lookup].each do |file_source|
           file_destination = File.join(given_destination, file_source.gsub(source, '.'))
 
           if File.directory?(file_source)

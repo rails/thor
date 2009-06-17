@@ -4,7 +4,7 @@ require 'thor/actions'
 describe Thor::Actions::Directory do
   before(:each) do
     ::FileUtils.rm_rf(destination_root)
-    mock(invoker).file_name{ "rdoc" }
+    stub(invoker).file_name{ "rdoc" }
   end
 
   def invoker
@@ -26,14 +26,27 @@ describe Thor::Actions::Directory do
   end
 
   describe "#invoke!" do
-    it "copies the whole directory to the default destination" do
+    it "copies the whole directory recursively to the default destination" do
       capture(:stdout){ invoker.directory("doc") }
       exists_and_identical?("doc", "doc")
     end
 
-    it "copies the whole directory to the specified destination" do
+    it "copies the whole directory recursively to the specified destination" do
       capture(:stdout){ invoker.directory("doc", "docs") }
       exists_and_identical?("doc", "docs")
+    end
+
+    it "copies only the directory first level" do
+      capture(:stdout){ invoker.directory(".", "tasks", false) }
+
+      file = File.join(destination_root, "tasks", "group.thor")
+      File.exists?(file).must be_true
+
+      file = File.join(destination_root, "tasks", "doc")
+      File.exists?(file).must be_true
+
+      file = File.join(destination_root, "tasks", "doc", "README")
+      File.exists?(file).must be_false
     end
 
     it "copies files from the source relative to the current path" do
