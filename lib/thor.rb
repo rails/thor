@@ -157,13 +157,13 @@ class Thor
         raise UndefinedTaskError, "task '#{meth}' could not be found in namespace '#{self.namespace}'" unless task
 
         shell.say "Usage:"
-        shell.say "  #{task.formatted_usage(self, options[:namespace])}"
+        shell.say "  #{banner(task, options[:namespace])}"
         shell.say
         class_options_help(shell, "Class")
         shell.say task.description
       else
         list = (options[:short] ? tasks : all_tasks).map do |_, task|
-          [ task.formatted_usage(self, options[:namespace]), task.short_description || '' ]
+          [ banner(task, options[:namespace]), task.short_description || '' ]
         end
 
         if options[:short]
@@ -179,6 +179,15 @@ class Thor
     end
 
     protected
+
+      # The banner for this class. You can customize it if you are invoking the
+      # thor class by another means which is not the Thor::Runner. It receives
+      # the task that is going to be invoked and if the namespace should be
+      # displayed.
+      #
+      def banner(task, namespace=true) #:nodoc:
+        task.formatted_usage(self, namespace)
+      end
 
       def baseclass #:nodoc:
         Thor

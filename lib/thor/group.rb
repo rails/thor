@@ -47,10 +47,10 @@ class Thor::Group
     #
     def help(shell, options={})
       if options[:short]
-        shell.say "#{self.namespace} #{self.arguments.map {|o| o.usage }.join(' ')}"
+        shell.say banner
       else
         shell.say "Usage:"
-        shell.say "  #{self.namespace} #{self.arguments.map {|o| o.usage }.join(' ')}"
+        shell.say "  #{banner}"
         shell.say
         class_options_help(shell)
         shell.say self.desc if self.desc
@@ -58,6 +58,13 @@ class Thor::Group
     end
 
     protected
+
+      # The banner for this class. You can customize it if you are invoking the
+      # thor class by another means which is not the Thor::Runner.
+      #
+      def banner #:nodoc:
+        "#{self.namespace} #{self.arguments.map {|o| o.usage }.join(' ')}"
+      end
 
       def baseclass #:nodoc:
         Thor::Group
