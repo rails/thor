@@ -2,18 +2,21 @@ class Thor::Group
 
   class << self
 
-    # The descrition for this Thor::Group as a whole.
+    # The descrition for this Thor::Group. If none is provided, but a source root
+    # exists and we have an USAGE inside, this file is used as description. This
+    # is good because we will load such files only when we need it.
     #
     # ==== Parameters
     # description<String>:: The description for this Thor::Group.
     #
     def desc(description=nil)
       case description
-        # TODO When a symbol is given, read a file in the current directory
-        # when Symbol
-        #   @desc = File.read
         when nil
-          @desc ||= from_superclass(:desc, nil)
+          @desc ||= if respond_to?(:source_root) && File.exist?(File.join(source_root, "USAGE"))
+            File.read(File.join(source_root, "USAGE"))
+          else
+            from_superclass(:desc, nil)
+          end
         else
           @desc = description
       end

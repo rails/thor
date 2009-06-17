@@ -31,6 +31,10 @@ class BrokenCounter < MyCounter
   namespace "app:broken:counter"
   class_option :fail, :type => :boolean, :default => false
 
+  class << self
+    undef_method :source_root
+  end
+
   def one
     options[:first]
   end
@@ -45,6 +49,10 @@ class BrokenCounter < MyCounter
 end
 
 class WhinyGenerator < Thor::Group
+  def self.source_root
+    File.join(File.dirname(__FILE__))
+  end
+
   def wrong_arity(required)
   end
 end

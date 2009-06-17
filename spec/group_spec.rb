@@ -34,6 +34,20 @@ describe Thor::Group do
     end
   end
 
+  describe "#desc" do
+    it "sets the description for a given class" do
+      MyCounter.desc.must == "Description:\n  This generator run three tasks: one, two and three.\n"
+    end
+
+    it "can be inherited" do
+      BrokenCounter.desc.must == "Description:\n  This generator run three tasks: one, two and three.\n"
+    end
+
+    it "loads an USAGE file if it exists in the source root" do
+      WhinyGenerator.desc.must == File.read(File.join(source_root, "USAGE"))
+    end
+  end
+
   describe "#help" do
     before(:each) do
       @content = capture(:stdout){ MyCounter.help(Thor::Base.shell.new) }
@@ -44,12 +58,6 @@ describe Thor::Group do
     end
 
     it "shows description" do
-      @content.must =~ /Description:/
-      @content.must =~ /This generator run three tasks: one, two and three./
-    end
-
-    it "shows inherited description" do
-      @content = capture(:stdout){ BrokenCounter.help(Thor::Base.shell.new) }
       @content.must =~ /Description:/
       @content.must =~ /This generator run three tasks: one, two and three./
     end
