@@ -172,9 +172,10 @@ describe Thor::Actions::Templater do
       File.exists?(@action.destination).must be_false
     end
 
-    it "does not log if there is nothing to be removed" do
+    it "does not raise an error if the file does not exist" do
       templater("doc/config.rb")
-      revoke!.must be_empty
+      revoke!
+      File.exists?(@action.destination).must be_false
     end
   end
 
