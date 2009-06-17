@@ -248,7 +248,7 @@ class Thor
       #
       def check_requirement!(switch, option)
         if option.input_required?
-          raise RequiredArgumentMissingError, "no value provided for argument '#{switch}'"  if peek.nil?
+          raise RequiredArgumentMissingError, "no value provided for required argument '#{switch}'" if peek.nil?
           raise MalformattedArgumentError, "cannot pass switch '#{peek}' as an argument" if switch?(peek)
         end
       end
@@ -257,8 +257,11 @@ class Thor
       #
       def check_validity!
         unless @non_assigned_required.empty?
-          switch_names = @non_assigned_required.map{ |o| o.switch_name }.join(', ')
-          raise RequiredArgumentMissingError, "no value provided for required arguments '#{switch_names}'" 
+          names = @non_assigned_required.map do |o|
+            o.argument? ? o.human_name : o.switch_name
+          end.join("', '")
+
+          raise RequiredArgumentMissingError, "no value provided for required arguments '#{names}'"
         end
       end
 
