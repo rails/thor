@@ -135,16 +135,16 @@ describe Thor::Base do
   end
 
   describe "#group" do
-    it "sets a group name" do
-      MyScript.group_name.must == "script"
+    it "sets a group" do
+      MyScript.group.must == "script"
     end
 
-    it "inherits the group name from parent" do
-      MyChildScript.group_name.must == "script"
+    it "inherits the group from parent" do
+      MyChildScript.group.must == "script"
     end
 
-    it "defaults to standard if no group name is given" do
-      Amazing.group_name.must == "standard"
+    it "defaults to standard if no group is given" do
+      Amazing.group.must == "standard"
     end
   end
 

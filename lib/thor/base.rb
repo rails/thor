@@ -165,17 +165,13 @@ class Thor
       # ==== Parameters
       # name<String|Symbol>
       #
-      def group(name)
-        @group_name = name.to_s
-      end
-
-      # Returns the group name.
-      #
-      # ==== Returns
-      # String
-      #
-      def group_name
-        @group_name ||= from_superclass(:group_name, 'standard')
+      def group(name=nil)
+        case name
+          when nil
+            @group ||= from_superclass(:group, 'standard')
+          else
+            @group = name.to_s
+        end
       end
 
       # Returns the tasks for this Thor class.

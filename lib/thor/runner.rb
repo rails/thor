@@ -141,7 +141,7 @@ class Thor::Runner < Thor
     group  = options[:group] || "standard"
 
     klasses = Thor::Base.subclasses.select do |k|
-      (options[:all] || k.group_name == group) && k.namespace =~ search
+      (options[:all] || k.group == group) && k.namespace =~ search
     end
 
     display_klasses(false, klasses)
