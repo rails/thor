@@ -93,6 +93,12 @@ describe Thor::Actions do
           runner.source_root
         }.must raise_error(NoMethodError, "You have to specify the class method source_root in your thor class.")
       end
+
+      it "is cached on initialization" do
+        runner = MyCounter.new
+        dont_allow(File).dirname
+        runner.source_root.must =~ /spec\/fixtures$/
+      end
     end
   end
 

@@ -2,7 +2,7 @@ class MyCounter < Thor::Group
   include Thor::Actions
 
   def self.source_root
-    File.join(File.dirname(__FILE__))
+    @source_root ||= File.expand_path(File.dirname(__FILE__))
   end
 
   argument :first,     :type => :numeric
