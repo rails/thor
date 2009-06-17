@@ -151,7 +151,7 @@ class Thor
     #
     def chmod(path, mode, log_status=true)
       path = File.expand_path(path, root)
-      say_status_if_log :chmod, relative_to_absolute_root(path), log_status
+      say_status :chmod, relative_to_absolute_root(path), log_status
       FileUtils.chmod_R(mode, path) unless options[:pretend]
     end
 
@@ -169,7 +169,7 @@ class Thor
     #   end
     #
     def run(command, log_status=true)
-      say_status_if_log :run, "#{command} from #{relative_to_absolute_root(root, false)}", log_status
+      say_status :run, "#{command} from #{relative_to_absolute_root(root, false)}", log_status
       `#{command}` unless options[:pretend]
     end
 
@@ -234,7 +234,7 @@ class Thor
       log_status = args.last.is_a?(Symbol) || [ true, false ].include?(args.last) ? args.pop : true
 
       path = File.expand_path(path, root)
-      say_status_if_log :gsub, relative_to_absolute_root(path), log_status
+      say_status :gsub, relative_to_absolute_root(path), log_status
 
       unless options[:pretend]
         content = File.read(path)
@@ -257,7 +257,7 @@ class Thor
     #
     def append_file(path, data=nil, log_status=true, &block)
       path = File.expand_path(path, root)
-      say_status_if_log :append, relative_to_absolute_root(path), log_status
+      say_status :append, relative_to_absolute_root(path), log_status
 
       File.open(path, 'ab') { |file| file.write(data || block.call) } unless options[:pretend]
     end
@@ -276,7 +276,7 @@ class Thor
     #
     def prepend_file(path, data=nil, log_status=true, &block)
       path = File.expand_path(path, root)
-      say_status_if_log :prepend, relative_to_absolute_root(path), log_status
+      say_status :prepend, relative_to_absolute_root(path), log_status
 
       unless options[:pretend]
         content = data || block.call
@@ -284,13 +284,6 @@ class Thor
         File.open(path, 'wb') { |file| file.write(content) }
       end
     end
-
-    protected
-
-      def say_status_if_log(status, message, log_status)
-        color = log_status.is_a?(Symbol) ? log_status : :green
-        shell.say_status status, message, color if log_status
-      end
 
   end
 end

@@ -72,10 +72,10 @@ class Thor
           end
         end
 
-        # Shortcut to say_status base method.
+        # Shortcut to say_status shell method.
         #
         def say_status(status)
-          base.send :say_status_if_log, status, relative_destination, @log_status
+          base.shell.say_status status, relative_destination, @log_status
         end
 
         # Adds the content to the file.

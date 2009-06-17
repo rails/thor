@@ -64,8 +64,14 @@ describe Thor::Shell::Basic do
       base = MyCounter.new
       mock(base).options { Hash.new(:quiet => true) }
 
+      dont_allow($stdout).puts
       shell.base = base
-      capture(:stdout) { shell.say_status(:created, "~/.thor/task.thor") }.must be_empty
+      shell.say_status(:created, "~/.thor/task.thor")
+    end
+
+    it "does not print a message if log status is set to false" do
+      dont_allow($stdout).puts
+      shell.say_status(:created, "~/.thor/task.thor", false)
     end
   end
 

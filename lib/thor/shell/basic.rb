@@ -33,12 +33,16 @@ class Thor
         end
       end
 
-      # Say a status with the given color and appends the message.
-      # It does not show the status if the base is set to quiet.
+      # Say a status with the given color and appends the message. Since this
+      # method is used frequently by actions, it allows nil or false to be given
+      # in log_status, avoiding the message from being shown. If a Symbol is
+      # given in log_status, it's used as the color.
       #
-      def say_status(status, message, color=nil)
+      def say_status(status, message, log_status=true)
         return if base && base.options[:quiet]
-        say "#{status.to_s.rjust(12)}  #{message}", color, true
+
+        color = log_status.is_a?(Symbol) ? log_status : :green
+        say "#{status.to_s.rjust(12)}  #{message}", color, true if log_status
       end
 
       # Make a question the to user and returns true if the user replies "y" or
