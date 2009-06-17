@@ -3,7 +3,7 @@ require 'rubygems/specification'
 require 'thor/tasks'
 
 GEM = "thor"
-GEM_VERSION = "0.10.4"
+GEM_VERSION = "0.10.5"
 AUTHOR = "Yehuda Katz"
 EMAIL = "wycats@gmail.com"
 HOMEPAGE = "http://yehudakatz.com"
