@@ -15,16 +15,16 @@ class Thor
         super()
 
         hash.each do |key, value|
-          if key.is_a?(Symbol)
-            self[key.to_s] = value
-          else
-            self[key] = value
-          end
+          self[convert_key(key)] = value
         end
       end
 
       def [](key)
         super(convert_key(key))
+      end
+
+      def []=(key, value)
+        super(convert_key(key), value)
       end
 
       def delete(key)

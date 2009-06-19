@@ -5,6 +5,10 @@ describe Thor::Actions do
     @runner ||= MyCounter.new([], {}, { :root => destination_root }.merge(config))
   end
 
+  def action(*args, &block)
+    capture(:stdout){ runner.send(*args, &block) }
+  end
+
   def file
     File.join(destination_root, "foo")
   end
@@ -110,10 +114,8 @@ describe Thor::Actions do
     end
 
     it "changes the base root" do
-      capture(:stdout) do
-        runner.inside("foo") do
-          runner.root.must == file
-        end
+      runner.inside("foo") do
+        runner.root.must == file
       end
     end
 
@@ -149,87 +151,88 @@ describe Thor::Actions do
     describe "#chmod" do
       it "executes the command given" do
         mock(FileUtils).chmod_R(0755, file)
-        capture(:stdout) { runner.chmod("foo", 0755) }
+        action :chmod, "foo", 0755
       end
 
       it "does not execute the command if pretending given" do
         dont_allow(FileUtils).chmod_R(0755, file)
-        capture(:stdout) { runner(:behavior => :pretend).chmod("foo", 0755) }
+        runner(:behavior => :pretend)
+        action :chmod, "foo", 0755
       end
 
       it "logs status" do
         mock(FileUtils).chmod_R(0755, file)
-        capture(:stdout) { runner.chmod("foo", 0755) }.must == "       chmod  foo\n"
+        action(:chmod, "foo", 0755).must == "       chmod  foo\n"
       end
 
       it "does not log status if required" do
         mock(FileUtils).chmod_R(0755, file)
-        capture(:stdout) { runner.chmod("foo", 0755, false) }.must be_empty
+        action(:chmod, "foo", 0755, false).must be_empty
       end
     end
 
     describe "#run" do
       it "executes the command given" do
         mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
-        capture(:stdout) { runner.run('ls') }
+        action :run, "ls"
       end
 
       it "does not execute the command if pretend given" do
         dont_allow(runner(:behavior => :pretend)).`("cd ./") # To avoid highlighting issues `
-        capture(:stdout) { runner.run('cd ./') }
+        action :run, "cd ./"
       end
 
       it "logs status" do
         mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
-        capture(:stdout) { runner.run('ls') }.must == "         run  ls from .\n"
+        action(:run, "ls").must == "         run  ls from .\n"
       end
 
       it "does not log status if required" do
         mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
-        capture(:stdout) { runner.run('ls', false) }.must be_empty
+        action(:run, "ls", false).must be_empty
       end
 
       it "accepts a color as status" do
         mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
         mock(runner.shell).say_status(:run, "ls from .", :yellow)
-        runner.run('ls', :yellow)
+        action :run, 'ls', :yellow
       end
     end
 
     describe "#run_ruby_script" do
       it "executes the ruby script" do
         mock(runner).run("ruby script.rb", true)
-        runner.run_ruby_script("script.rb")
+        action :run_ruby_script, "script.rb"
       end
 
       it "does not log status if required" do
         mock(runner).run("ruby script.rb", false)
-        runner.run_ruby_script("script.rb", false)
+        action :run_ruby_script, "script.rb", false
       end
     end
 
     describe "#thor" do
       it "executes the thor command" do
         mock(runner).run("thor list", true)
-        runner.thor(:list, true)
+        action :thor, :list, true
       end
 
       it "converts extra arguments to command arguments" do
         mock(runner).run("thor list foo bar", true)
-        runner.thor(:list, "foo", "bar")
+        action :thor, :list, "foo", "bar"
       end
 
       it "converts options hash to switches" do
         mock(runner).run("thor list foo bar --foo", true)
-        runner.thor(:list, "foo", "bar", :foo => true)
+        action :thor, :list, "foo", "bar", :foo => true
 
         mock(runner).run("thor list --foo 1 2 3", true)
-        runner.thor(:list, :foo => [1,2,3])
+        action :thor, :list, :foo => [1,2,3]
       end
 
       it "does not log status if required" do
         mock(runner).run("thor list --foo 1 2 3", false)
-        runner.thor(:list, { :foo => [1,2,3] }, false)
+        action :thor, :list, { :foo => [1,2,3] }, false
       end
     end
   end
@@ -250,114 +253,100 @@ describe Thor::Actions do
 
     describe "#remove_file" do
       it "removes the file given" do
-        capture(:stdout){ runner.remove_file("doc/README") }
+        action :remove_file, "doc/README"
         File.exists?(file).must be_false
       end
 
       it "does not remove if pretending" do
-        capture(:stdout){ runner(:behavior => :pretend).remove_file("doc/README") }
+        runner(:behavior => :pretend)
+        action :remove_file, "doc/README"
         File.exists?(file).must be_true
       end
 
       it "logs status" do
-        content = capture(:stdout){ runner(:behavior => :pretend).remove_file("doc/README") }
-        content.must == "      remove  doc/README\n"
+        action(:remove_file, "doc/README").must == "      remove  doc/README\n"
       end
 
       it "does not log status if required" do
-        capture(:stdout) do
-          runner.remove_file("doc/README", false)
-        end.must be_empty
+        action(:remove_file, "doc/README", false).must be_empty
       end
     end
 
     describe "#gsub_file" do
       it "replaces the content in the file" do
-        capture(:stdout){ runner.gsub_file("doc/README", "__start__", "START") }
+        action :gsub_file, "doc/README", "__start__", "START"
         File.open(file).read.must == "START\nREADME\n__end__\n"
       end
 
       it "does not replace if pretending" do
-        capture(:stdout){ runner(:behavior => :pretend).gsub_file("doc/README", "__start__", "START") }
+        runner(:behavior => :pretend)
+        action :gsub_file, "doc/README", "__start__", "START"
         File.open(file).read.must == "__start__\nREADME\n__end__\n"
       end
 
       it "accepts a block" do
-        capture(:stdout) do
-          runner.gsub_file("doc/README", "__start__"){ |match| match.gsub('__', '').upcase  }
-        end
+        action(:gsub_file, "doc/README", "__start__"){ |match| match.gsub('__', '').upcase  }
         File.open(file).read.must == "START\nREADME\n__end__\n"
       end
 
       it "logs status" do
-        content = capture(:stdout){ runner.gsub_file("doc/README", "__start__", "START") }
-        content.must == "        gsub  doc/README\n"
+        action(:gsub_file, "doc/README", "__start__", "START").must == "        gsub  doc/README\n"
       end
 
       it "does not log status if required" do
-        capture(:stdout) do
-          runner.gsub_file(file, "__", false){ |match| match * 2 }
-        end.must be_empty
+        action(:gsub_file, file, "__", false){ |match| match * 2 }.must be_empty
       end
     end
 
     describe "#append_file" do
       it "appends content to the file" do
-        capture(:stdout){ runner.append_file("doc/README", "END\n") }
+        action :append_file, "doc/README", "END\n"
         File.open(file).read.must == "__start__\nREADME\n__end__\nEND\n"
       end
 
       it "does not append if pretending" do
-        capture(:stdout){ runner(:behavior => :pretend).append_file("doc/README", "END\n") }
+        runner(:behavior => :pretend)
+        action :append_file, "doc/README", "END\n"
         File.open(file).read.must == "__start__\nREADME\n__end__\n"
       end
 
       it "accepts a block" do
-        capture(:stdout) do
-          runner.append_file("doc/README"){ "END\n" }
-        end
+        action(:append_file, "doc/README"){ "END\n" }
         File.open(file).read.must == "__start__\nREADME\n__end__\nEND\n"
       end
 
       it "logs status" do
-        content = capture(:stdout){ runner.append_file("doc/README", "END") }
-        content.must == "      append  doc/README\n"
+        action(:append_file, "doc/README", "END").must == "      append  doc/README\n"
       end
 
       it "does not log status if required" do
-        capture(:stdout) do
-          runner.append_file("doc/README", nil, false){ "END" }
-        end.must be_empty
+        action(:append_file, "doc/README", nil, false){ "END" }.must be_empty
       end
     end
 
     describe "#prepend_file" do
       it "prepends content to the file" do
-        capture(:stdout){ runner.prepend_file("doc/README", "START\n") }
+        action :prepend_file, "doc/README", "START\n"
         File.open(file).read.must == "START\n__start__\nREADME\n__end__\n"
       end
 
       it "does not prepend if pretending" do
-        capture(:stdout){ runner(:behavior => :pretend).prepend_file("doc/README", "START\n") }
+        runner(:behavior => :pretend)
+        action :prepend_file, "doc/README", "START\n"
         File.open(file).read.must == "__start__\nREADME\n__end__\n"
       end
 
       it "accepts a block" do
-        capture(:stdout) do
-          runner.prepend_file("doc/README"){ "START\n" }
-        end
+        action(:prepend_file, "doc/README"){ "START\n" }
         File.open(file).read.must == "START\n__start__\nREADME\n__end__\n"
       end
 
       it "logs status" do
-        content = capture(:stdout){ runner.prepend_file("doc/README", "START") }
-        content.must == "     prepend  doc/README\n"
+        action(:prepend_file, "doc/README", "START").must == "     prepend  doc/README\n"
       end
 
       it "does not log status if required" do
-        capture(:stdout) do
-          runner.prepend_file("doc/README", nil, false){ "START" }
-        end.must be_empty
+        action(:prepend_file, "doc/README", "START", false).must be_empty
       end
     end
   end
