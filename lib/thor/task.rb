@@ -22,7 +22,7 @@ class Thor
     # By default, a task invokes a method in the thor class. You can change this
     # implementation to create custom tasks.
     #
-    def run(instance, *args)
+    def run(instance, args=[])
       raise UndefinedTaskError, "the '#{name}' task of #{instance.class} is private" unless public_method?(instance)
       instance.send(name, *args)
     rescue ArgumentError => e
@@ -86,7 +86,8 @@ class Thor
       # Given a target, checks if this class name is not a private/protected method.
       #
       def public_method?(instance)
-        !(instance.private_methods + instance.protected_methods).include?(name.to_s)
+        collection = instance.private_methods + instance.protected_methods
+        !(collection).include?(name.to_s) && !(collection).include?(name.to_sym) # For Ruby 1.9
       end
 
       # Clean everything that comes from the Thor gempath and remove the caller.

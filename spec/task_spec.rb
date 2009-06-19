@@ -53,7 +53,7 @@ describe Thor::Task do
   describe "#run" do
     it "runs a task by calling a method in the given instance" do
       mock = mock!.send(:can_has, 1, 2, 3).subject
-      task.run(mock, 1, 2, 3)
+      task.run(mock, [1, 2, 3])
     end
 
     it "raises an error if the method to be invoked is private" do

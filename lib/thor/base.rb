@@ -485,15 +485,103 @@ class Thor
         @shell = shell
       end
 
-      # Finds a task with the name given and invokes it with the given arguments.
-      # This is the default interface to invoke tasks. You can always run a task
-      # directly, but the invocation system will be implemented in a fashion
-      # that a same task cannot be invoked twice (a la rake).
+      # Receives a name and invokes it. The name can be either a namespaced name,
+      # a current class task or even a class. Arguments are given in an array and
+      # options given are merged with the invoker options.
       #
-      def invoke(name, *args)
-        self.class[name].run(self, *args)
+      # ==== Examples
+      #
+      #   class A < Thor
+      #     def foo
+      #       invoke :bar
+      #       invoke "b:lib", ["merb", "rails"]
+      #     end
+      #
+      #     def bar
+      #       invoke "b:lib", ["merb", "rails"]
+      #       # magic
+      #     end
+      #   end
+      #
+      #   class B < Thor
+      #     argument :preferred_framework, :type => :string
+      #
+      #     def lib(second_framework)
+      #       # magic
+      #     end
+      #   end
+      #
+      # You can notice that the method "foo" above invokes two tasks: "bar",
+      # which belongs to the same class and "lib" that belongs to the class B.
+      #
+      # By using an invocation system you ensure that a task is invoked only once.
+      # In the example above, invoking foo will invoke "b:lib" just once, even if
+      # it's invoked later by "bar" method.
+      #
+      # When invoking another class, there are a few things to keep in mind:
+      #
+      #   1) Class arguments are parsed first. In the example above, preferred
+      #      framework is going to consume "merb" and second framework is going
+      #      to be set to "rails".
+      #
+      #   2) All options and configurations are sent to the invoked class.
+      #      So the invoked class is going to use the same shell instance, will
+      #      have the same behavior (:invoke or :revoke) and so on.
+      #
+      # Invoking a Thor::Group happens in the same away as above:
+      #
+      #   class C < Thor::Group
+      #     def one
+      #     end
+      #   end
+      #
+      # Is invoked as:
+      #
+      #   invoke "c"
+      #
+      # Or even as:
+      #
+      #   invoke C
+      #
+      def invoke(name, method_args=[], options={})
+        case name
+          when Class
+            klass, task = name, nil
+          when Thor::Task
+            klass, task = self.class, name.name
+          else
+            name = name.to_s
+
+            unless self.class.all_tasks[name]
+              klass, task = Thor::Util.namespace_to_thor_class(name) rescue Thor::Error
+            end
+        end
+
+        klass, task = self.class, name unless klass
+        raise ScriptError, "You gave me #{klass}, but no task to invoke from it." if task.nil? && klass <= Thor
+
+        if klass === self
+          self.class[task].run(self, method_args)
+        elsif klass <= Thor::Base
+          size       = klass.arguments.size
+          class_args = method_args.slice!(0, size)
+          instance   = klass.new(class_args, self.options.merge(options), dump_config) # TODO This merge won't work.
+
+          if klass <= Thor
+            instance.invoke(task, method_args)
+          else
+            instance.invoke_all
+          end
+        else
+          raise ScriptError, "Expected Thor class, got #{klass}"
+        end
+      end
+
+      # Dump the configuration values for this current class.
+      #
+      def dump_config
+        { :shell => self.shell }
       end
     end
-
   end
 end

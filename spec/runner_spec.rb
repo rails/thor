@@ -51,11 +51,6 @@ describe Thor::Runner do
       Thor::Runner.start.must == "default task"
     end
 
-    it "invokes the default task from a specific Thor class if none is specified" do
-      ARGV.replace ["my_script"]
-      Thor::Runner.start.must == "default task"
-    end
-
     it "forwads arguments to the invoked task" do
       ARGV.replace ["my_script:animal", "horse"]
       Thor::Runner.start.must == ["horse"]

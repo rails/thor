@@ -134,7 +134,7 @@ class Thor
       opts.parse(args)
 
       instance = new(opts.arguments, opts.options, config)
-      instance.invoke(task.name, *opts.trailing)
+      instance.invoke(task, opts.trailing)
     rescue Thor::Error => e
       config[:shell].error e.message
     end
