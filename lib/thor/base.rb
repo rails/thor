@@ -215,19 +215,6 @@ class Thor
         end
       end
 
-      # Retrieve a specific task from this Thor class. If the desired Task cannot
-      # be found, returns a dynamic Thor::Task that will map to the given method.
-      #
-      # ==== Parameters
-      # meth<Symbol>:: the name of the task to be retrieved
-      #
-      # ==== Returns
-      # Task
-      #
-      def [](meth)
-        all_tasks[meth.to_s] || Thor::Task.dynamic(meth)
-      end
-
       # All methods defined inside the given block are not added as tasks.
       #
       # So you can do:
@@ -462,16 +449,6 @@ class Thor
         self.shell.base = self if self.shell.respond_to?(:base)
       end
 
-      # Common methods that are delegated to the shell.
-      #
-      SHELL_DELEGATED_METHODS.each do |method|
-        module_eval <<-METHOD, __FILE__, __LINE__
-          def #{method}(*args)
-            shell.#{method}(*args)
-          end
-        METHOD
-      end
-
       # Holds the shell for the given Thor instance. If no shell is given,
       # it gets a default shell from Thor::Base.shell.
       #
@@ -544,44 +521,67 @@ class Thor
       #   invoke C
       #
       def invoke(name, method_args=[], options={})
-        case name
-          when Class
-            klass, task = name, nil
-          when Thor::Task
-            klass, task = self.class, name.name
+        instance, task = setup_for_invoke(name, method_args, options)
+
+        if task
+          if instance == self
+            task = self.class.all_tasks[task.to_s] || Task.dynamic(task) unless task.is_a?(Thor::Task)
+            task.run(self, method_args)
           else
-            name = name.to_s
-
-            unless self.class.all_tasks[name]
-              klass, task = Thor::Util.namespace_to_thor_class(name) rescue Thor::Error
-            end
-        end
-
-        klass, task = self.class, name unless klass
-        raise ScriptError, "You gave me #{klass}, but no task to invoke from it." if task.nil? && klass <= Thor
-
-        if klass === self
-          self.class[task].run(self, method_args)
-        elsif klass <= Thor::Base
-          size       = klass.arguments.size
-          class_args = method_args.slice!(0, size)
-          instance   = klass.new(class_args, self.options.merge(options), dump_config) # TODO This merge won't work.
-
-          if klass <= Thor
             instance.invoke(task, method_args)
-          else
-            instance.invoke_all
           end
         else
-          raise ScriptError, "Expected Thor class, got #{klass}"
+          instance.invoke_all
         end
       end
 
-      # Dump the configuration values for this current class.
-      #
-      def dump_config
-        { :shell => self.shell }
-      end
+      protected
+
+        # Common methods that are delegated to the shell.
+        #
+        SHELL_DELEGATED_METHODS.each do |method|
+          module_eval <<-METHOD, __FILE__, __LINE__
+            def #{method}(*args)
+              shell.#{method}(*args)
+            end
+          METHOD
+        end
+
+        # This is the method responsable for retrieving and setting up an
+        # instance to be used in invoke.
+        #
+        def setup_for_invoke(name, method_args, options)
+          if name.is_a?(Thor::Task)
+            # Do nothing, we already have what we want.
+          elsif name.is_a?(Class)
+            klass = name
+          elsif self.class.all_tasks[name.to_s].nil?
+            klass, task = Thor::Util.namespace_to_thor_class(name.to_s) rescue Thor::Error
+          end
+
+          case klass
+            when Thor::Base
+              size       = klass.arguments.size
+              class_args = method_args.slice!(0, size)
+              instance   = klass.new(class_args, self.options.merge(options), dump_config) # TODO This merge won't work.
+
+              task ||= klass.default_task if klass.is_a?(Thor)
+
+              return instance, task
+            when nil
+              return self, name
+            else
+              raise ScriptError, "Expected Thor class, got #{klass}"
+          end
+        end
+
+        # Dump the configuration values for this current class.
+        # TODO Overwrite this in Actions...
+        #
+        def dump_config
+          { :shell => self.shell }
+        end
+
     end
   end
 end

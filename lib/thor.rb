@@ -127,7 +127,7 @@ class Thor
       config[:shell] ||= Thor::Base.shell.new
 
       meth = normalize_task_name(args.shift)
-      task = self[meth]
+      task = all_tasks[meth] || Task.dynamic(meth)
 
       options = class_options.merge(task.options)
       opts = Thor::Options.new(options)
@@ -153,7 +153,7 @@ class Thor
       meth, options = nil, meth if meth.is_a?(Hash)
 
       if meth
-        task = self.all_tasks[meth]
+        task = all_tasks[meth]
         raise UndefinedTaskError, "task '#{meth}' could not be found in namespace '#{self.namespace}'" unless task
 
         shell.say "Usage:"

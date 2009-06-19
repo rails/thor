@@ -193,17 +193,4 @@ describe Thor::Base do
       MyChildScript.new.must_not respond_to("boom")
     end
   end
-
-  describe "#[]" do
-    it "retrieves an specific task object" do
-      MyScript[:foo].class.must == Thor::Task
-      MyChildScript[:foo].class.must == Thor::Task
-      Scripts::MyGrandChildScript[:foo].class.must == Thor::Task
-    end
-
-    it "returns a dynamic task to allow method missing invocation" do
-      MyScript[:none].class.must == Thor::Task
-      MyScript[:none].description =~ /dynamic/
-    end
-  end
 end
