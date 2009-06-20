@@ -110,11 +110,7 @@ class Thor #:nodoc:
       end
 
       def merge(other)
-        new = clone
-        other.each do |key, value|
-          new[key] = value
-        end
-        new
+        dup.merge!(other)
       end
 
       def merge!(other)
