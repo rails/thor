@@ -198,7 +198,7 @@ class Thor
       end
 
       def create_task(meth) #:nodoc:
-        tasks[meth.to_s] = Thor::Task.new(meth, @desc, @usage, method_options, nil)
+        tasks[meth.to_s] = Thor::Task.new(meth, @desc, @usage, method_options)
         @usage, @desc, @method_options = nil
       end
 

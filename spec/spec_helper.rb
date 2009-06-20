@@ -12,7 +12,6 @@ load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "group.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "invoke.thor")
-load File.join(File.dirname(__FILE__), "fixtures", "conditions.thor")
 
 Kernel.module_eval do
   alias_method :must, :should

@@ -22,71 +22,6 @@ class Thor::Group
       end
     end
 
-    # Sets the condition for some task to be executed in the class level. Why
-    # is this important? Setting the conditions in the class level allows to
-    # an inherited class change the conditions and customize the Thor::Group as
-    # it wishes.
-    #
-    # The conditions given are retrieved from the options hash. Let's suppose
-    # that a task is only executed if --test-framework is rspec. You could do
-    # this:
-    #
-    #   class_option :test_framework, :type => :string
-    #
-    #   conditions :test_framework => :rspec
-    #   def create_rspec_files
-    #     # magic
-    #   end
-    #
-    # Later someone creates a framework on top of rspec and need rspec files to
-    # generated as well. He could then change the conditions:
-    #
-    #   conditions :test_framework => [ :rspec, :remarkable ], :for => :create_rspec_files
-    #
-    # He could also use remove_conditions and remove previous set conditions:
-    #
-    #   remove_conditions :test_framework, :for => :create_rspec_files
-    #
-    # Conditions only work with the class option to be comparead to is a boolean,
-    # string or numeric (no array or hash comparisions).
-    #
-    # ==== Parameters
-    # conditions<Hash>:: the conditions for the task. The key is the option name
-    #                    and the value is the condition to be checked. If the
-    #                    condition is an array, it checkes if the current value
-    #                    is included in the array. If a regexp, checks if the
-    #                    value matches, all other values are simply compared (==).
-    #
-    def conditions(conditions=nil)
-      subject = if conditions && conditions[:for]
-        find_and_refresh_task(conditions.delete(:for)).conditions
-      else
-        @conditions ||= {}
-      end
-
-      subject.merge!(conditions) if conditions
-      subject
-    end
-
-    # Remove a previous specified condition. Check <tt>conditions</tt> above for
-    # a complete example.
-    #
-    # ==== Parameters
-    # conditions<Array>:: An array of conditions to be removed.
-    # for<Hash>:: A hash with :for as key indicating the task to remove the conditions from.
-    #
-    # ==== Examples
-    #
-    #   remove_conditions :test_framework, :orm, :for => :create_app_skeleton
-    #
-    def remove_conditions(*conditions)
-      subject = find_and_refresh_task(conditions.pop[:for]).conditions
-      conditions.each do |condition|
-        subject.delete(condition)
-      end
-      subject
-    end
-
     # Start in Thor::Group works differently. It invokes all tasks inside the
     # class and does not have to parse task options.
     #
@@ -140,8 +75,7 @@ class Thor::Group
       end
 
       def create_task(meth) #:nodoc:
-        tasks[meth.to_s] = Thor::Task.new(meth, nil, nil, nil, @conditions)
-        @conditions = nil
+        tasks[meth.to_s] = Thor::Task.new(meth, nil, nil, nil)
       end
   end
 

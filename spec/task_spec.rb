@@ -48,12 +48,6 @@ describe Thor::Task do
       task.dup.options.delete(:foo)
       task.options[:foo].must_not be_nil
     end
-
-    it "dup conditions hash" do
-      task = Thor::Task.new("can_has", nil, nil, {}, :foo => true, :bar => :required)
-      task.dup.conditions.delete(:foo)
-      task.conditions[:foo].must_not be_nil
-    end
   end
 
   describe "#run" do
@@ -77,80 +71,6 @@ describe Thor::Task do
 
     it "returns the whole description if it's one line" do
       Thor::Task.new(:task, "I can has cheezburger", "can_has").short_description == "I can has cheezburger"
-    end
-  end
-
-  describe "#valid_conditions?" do
-    def run(instance, conditions={})
-      Thor::Task.new(:can_has, "I can has cheezburger", "can_has", nil, conditions).run(instance)
-    end
-
-    def stub!(options={})
-      instance = Object.new
-      stub(instance).options{ options }
-      instance
-    end
-
-    it "runs the task if no conditions are given" do
-      instance = stub!
-      mock(instance).can_has
-      run(instance)
-    end
-
-    it "runs the task if conditions are met" do
-      instance = stub!(:with_conditions => true)
-      mock(instance).can_has
-      run(instance, :with_conditions => true)
-    end
-
-    it "does not run the task if conditions are not met" do
-      instance = stub!(:with_conditions => true)
-      dont_allow(instance).can_has
-      run(instance, :with_conditions => false)
-    end
-
-    it "runs the task if symbol is equivalent to the given string" do
-      instance = stub!(:framework => :rails)
-      mock(instance).can_has
-      run(instance, :framework => "rails")
-
-      instance = stub!(:framework => "rails")
-      mock(instance).can_has
-      run(instance, :framework => :rails)
-
-      instance = stub!(:framework => :rails)
-      mock(instance).can_has
-      run(instance, :framework => :rails)
-    end
-
-    it "does not run the task if strings does not match" do
-      instance = stub!(:framework => "merb")
-      dont_allow(instance).can_has
-      run(instance, :framework => "rails")
-    end
-
-    it "runs the task if regexp matches" do
-      instance = stub!(:framework => "rails")
-      mock(instance).can_has
-      run(instance, :framework => /rails/)
-    end
-
-    it "does not run the task if regexp matches" do
-      instance = stub!(:framework => "merb")
-      dont_allow(instance).can_has
-      run(instance, :framework => /rails/)
-    end
-
-    it "runs the task if value is included in array" do
-      instance = stub!(:framework => "rails")
-      mock(instance).can_has
-      run(instance, :framework => [:rails, :merb])
-    end
-
-    it "does not run the task if value is not included in array" do
-      instance = stub!(:framework => "sinatra")
-      dont_allow(instance).can_has
-      run(instance, :framework => [:rails, :merb])
     end
   end
 end

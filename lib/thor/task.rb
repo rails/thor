@@ -1,5 +1,5 @@
 class Thor
-  class Task < Struct.new(:name, :description, :usage, :options, :conditions)
+  class Task < Struct.new(:name, :description, :usage, :options)
 
     # Creates a dynamic task. Dynamic tasks are created on demand to allow method
     # missing calls (since a method missing does not have a task object for it).
@@ -8,16 +8,15 @@ class Thor
       new(name, "A dynamically-generated task", name.to_s)
     end
 
-    def initialize(name, description, usage, options=nil, conditions=nil)
-      super(name.to_s, description, usage, options || {}, conditions || {})
+    def initialize(name, description, usage, options=nil)
+      super(name.to_s, description, usage, options || {})
     end
 
     # Dup the options hash on clone.
     #
     def initialize_copy(other)
       super(other)
-      self.options    = other.options.dup    if other.options
-      self.conditions = other.conditions.dup if other.conditions
+      self.options = other.options.dup if other.options
     end
 
     # By default, a task invokes a method in the thor class. You can change this
@@ -25,7 +24,7 @@ class Thor
     #
     def run(instance, args=[])
       raise UndefinedTaskError, "the '#{name}' task of #{instance.class} is private" unless public_method?(instance)
-      instance.send(name, *args) if valid_conditions?(instance)
+      instance.send(name, *args)
     rescue ArgumentError => e
       backtrace = sans_backtrace(e.backtrace, caller)
 
@@ -91,47 +90,12 @@ class Thor
         !(collection).include?(name.to_s) && !(collection).include?(name.to_sym) # For Ruby 1.9
       end
 
-      # Check if the task conditions are met before invoking.
-      #
-      def valid_conditions?(instance)
-        return true if conditions.empty?
-
-        conditions.each do |key, expected|
-          actual   = stringify!(instance.options[key])
-          expected = stringify!(expected)
-
-          return false if case expected
-            when Regexp
-              actual !~ expected
-            when Array
-              !expected.include?(actual)
-            else
-              actual != expected
-          end
-        end
-
-        true
-      end
-
       # Clean everything that comes from the Thor gempath and remove the caller.
       #
       def sans_backtrace(backtrace, caller)
         dirname = /^#{Regexp.escape(File.dirname(__FILE__))}/
         saned  = backtrace.reject { |frame| frame =~ dirname }
         saned -= caller
-      end
-
-      # Receives an object and convert any symbol to string.
-      #
-      def stringify!(duck)
-        case duck
-          when Array
-            duck.map!{ |i| i.is_a?(Symbol) ? i.to_s : i }
-          when Symbol
-            duck.to_s
-          else
-            duck
-        end
       end
 
   end

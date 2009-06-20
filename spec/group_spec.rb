@@ -77,23 +77,4 @@ describe Thor::Group do
       content.must_not =~ /Options/
     end
   end
-
-  describe "#conditions" do
-    it "invoke only tasks where conditions met" do
-      Conditional.start([]).must == [nil, nil, nil, nil]
-      Conditional.start(["--test-framework", "rspec"]).must == [1, 2, nil, nil]
-      Conditional.start(["--test-framework", "remarkable"]).must == [nil, 2, 3, nil]
-      Conditional.start(["--with-dispatchers"]).must == [nil, nil, nil, 4]
-    end
-
-    it "when supplied with :for changes the conditions for a previous task" do
-      Simplified.start(["--test-framework", "remarkable"]).must == [1, 2, 3, 4]
-    end
-  end
-
-  describe "#remove_conditions" do
-    it "removes conditions from a previous specified task" do
-      Simplified.start([]).must == [nil, nil, nil, 4]
-    end
-  end
 end
