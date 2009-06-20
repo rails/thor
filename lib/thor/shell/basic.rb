@@ -125,30 +125,28 @@ class Thor
       #
       def file_collision(destination)
         return true if @always_force
-
         options = block_given? ? "[Ynaqdh]" : "[Ynaqh]"
-        answer  = ask %[Overwrite #{destination}? (enter "h" for help) #{options}]
 
-        case answer
-          when is?(:yes), is?(:force)
-            true
-          when is?(:no), is?(:skip)
-            false
-          when is?(:always)
-            @always_force = true
-          when is?(:quit)
-            say 'Aborting...'
-            raise SystemExit
-          when is?(:diff)
-            show_diff(destination, yield) if block_given?
-            say 'Retrying...'
-            raise ScriptError
-          else
-            say file_collision_help
-            raise ScriptError
+        while true
+          answer = ask %[Overwrite #{destination}? (enter "h" for help) #{options}]
+
+          case answer
+            when is?(:yes), is?(:force)
+              return true
+            when is?(:no), is?(:skip)
+              return false
+            when is?(:always)
+              return @always_force = true
+            when is?(:quit)
+              say 'Aborting...'
+              raise SystemExit
+            when is?(:diff)
+              show_diff(destination, yield) if block_given?
+              say 'Retrying...'
+            else
+              say file_collision_help
+          end
         end
-      rescue ScriptError
-        retry
       end
 
       # Called if something goes wrong during the execution. This is used by Thor

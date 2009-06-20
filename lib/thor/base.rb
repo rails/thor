@@ -621,7 +621,7 @@ class Thor
 
             return instance, task
           else
-            raise ScriptError, "Expected Thor class, got #{klass}"
+            raise "Expected Thor class, got #{klass}"
           end
         end
 

@@ -110,6 +110,18 @@ describe Thor::Base do
     it "does not invoke another tasks if they were already invoke even when invoking all" do
       capture(:stdout){ A.new.invoke(:e) }.must == "1\n2\n3\n"
     end
+
+    it "raises Thor::UndefinedTaskError if the task can't be found" do
+      lambda do
+        A.new.invoke("foo:bar")
+      end.must raise_error(Thor::UndefinedTaskError)
+    end
+
+    it "raises an error if a non Thor class is given" do
+      lambda do
+        A.new.invoke(Object)
+      end.must raise_error(RuntimeError, "Expected Thor class, got Object")
+    end
   end
 
   describe "#shell" do
