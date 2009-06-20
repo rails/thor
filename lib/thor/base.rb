@@ -8,7 +8,7 @@ require 'thor/util'
 
 class Thor
   HELP_MAPPINGS       = %w(-h -? --help -D)
-  RESERVED_TASK_NAMES = %w(all invoke shell behavior root destination_root relative_root source_root)
+  RESERVED_TASK_NAMES = %w(all invoke shell options behavior root destination_root relative_root source_root)
 
   class Maxima < Struct.new(:usage, :options, :class_options)
   end
@@ -468,6 +468,16 @@ class Thor
         @shell = shell
       end
 
+      # Common methods that are delegated to the shell.
+      #
+      SHELL_DELEGATED_METHODS.each do |method|
+        module_eval <<-METHOD, __FILE__, __LINE__
+          def #{method}(*args)
+            shell.#{method}(*args)
+          end
+        METHOD
+      end
+
       # Receives a name and invokes it. The name can be either a namespaced name,
       # a current class task or even a class. Arguments are given in an array and
       # options given are merged with the invoker options.
@@ -541,21 +551,11 @@ class Thor
           task.run(instance, method_args)
         else
           current << "all"
-          instance.invoke_all
+          instance.class.all_tasks.map { |_, task| task.run(self) }
         end
       end
 
       protected
-
-        # Common methods that are delegated to the shell.
-        #
-        SHELL_DELEGATED_METHODS.each do |method|
-          module_eval <<-METHOD, __FILE__, __LINE__
-            def #{method}(*args)
-              shell.#{method}(*args)
-            end
-          METHOD
-        end
 
         # This is the method responsable for retrieving and setting up an
         # instance to be used in invoke.
@@ -563,6 +563,8 @@ class Thor
         def _setup_for_invoke(name, method_args, options) #:nodoc:
           if name.is_a?(Thor::Task)
             # Do nothing, we already have what we want.
+          elsif self.is_a?(Thor::Group) && name.to_s == 'all'
+            name = nil # Use self with no task
           elsif name.is_a?(Class)
             klass = name
           elsif self.class.all_tasks[name.to_s].nil?

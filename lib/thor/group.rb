@@ -34,7 +34,7 @@ class Thor::Group
         opts = Thor::Options.new(class_options)
         opts.parse(args)
 
-        new(opts.arguments, opts.options, config).invoke_all
+        new(opts.arguments, opts.options, config).invoke(:all)
       end
     rescue Thor::Error => e
       config[:shell].error e.message
@@ -77,13 +77,6 @@ class Thor::Group
       def create_task(meth) #:nodoc:
         tasks[meth.to_s] = Thor::Task.new(meth, nil, nil, nil)
       end
-  end
-
-  # Invokes all tasks in the instance.
-  # TODO Make this pass through normal invokation process.
-  #
-  def invoke_all
-    self.class.all_tasks.map { |_, task| task.run(self) }
   end
 
   include Thor::Base
