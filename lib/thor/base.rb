@@ -7,7 +7,8 @@ require 'thor/task'
 require 'thor/util'
 
 class Thor
-  HELP_MAPPINGS = ["-h", "-?", "--help", "-D"]
+  HELP_MAPPINGS       = %w(-h -? --help -D)
+  RESERVED_TASK_NAMES = %w(all invoke shell behavior root destination_root relative_root source_root)
 
   class Maxima < Struct.new(:usage, :options, :class_options)
   end
@@ -371,6 +372,11 @@ class Thor
           end
 
           return if @no_tasks || !valid_task?(meth)
+
+          if RESERVED_TASK_NAMES.include?(meth)
+            raise ScriptError, "'#{meth}' is a Thor reserved word and cannot be defined as task"
+          end
+
           Thor::Base.register_klass_file(self)
           create_task(meth)
         end
@@ -521,7 +527,7 @@ class Thor
       #   invoke C
       #
       def invoke(name, method_args=[], options={})
-        instance, task = setup_for_invoke(name, method_args, options)
+        instance, task = _setup_for_invoke(name, method_args, options)
 
         @invocations ||= Hash.new { |h,k| h[k] = [] }
         current = @invocations[instance.class]
@@ -554,7 +560,7 @@ class Thor
         # This is the method responsable for retrieving and setting up an
         # instance to be used in invoke.
         #
-        def setup_for_invoke(name, method_args, options) #:nodoc:
+        def _setup_for_invoke(name, method_args, options) #:nodoc:
           if name.is_a?(Thor::Task)
             # Do nothing, we already have what we want.
           elsif name.is_a?(Class)
@@ -567,7 +573,7 @@ class Thor
             when Thor::Base
               size       = klass.arguments.size
               class_args = method_args.slice!(0, size)
-              instance   = klass.new(class_args, self.options.merge(options), dump_config)
+              instance   = klass.new(class_args, self.options.merge(options), _dump_config)
 
               task ||= klass.default_task if klass.is_a?(Thor)
               instance.instance_variable_set("@invocations", @invocations)
@@ -582,7 +588,7 @@ class Thor
 
         # Dump the configuration values for this current class.
         #
-        def dump_config #:nodoc:
+        def _dump_config #:nodoc:
           { :shell => self.shell }
         end
 

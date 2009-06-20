@@ -182,6 +182,12 @@ describe Thor::Base do
       MyChildScript.new.must respond_to("animal")
       MyChildScript.tasks.keys.must include("animal")
     end
+
+    it "raises an error if a task with reserved word is defined" do
+      lambda {
+        MyCounter.class_eval "def all; end"
+      }.must raise_error(ScriptError, /'all' is a Thor reserved word and cannot be defined as task/)
+    end
   end
 
   describe "#all_tasks" do

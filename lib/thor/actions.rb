@@ -308,7 +308,7 @@ class Thor
 
       # Update dump_config to dump also behavior and root.
       #
-      def dump_config #:nodoc:
+      def _dump_config #:nodoc:
         super.merge!(:behavior => self.behavior, :root => @root_stack[0])
       end
 
