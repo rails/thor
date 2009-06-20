@@ -59,7 +59,7 @@ class Thor::Group
     #
     def conditions(conditions=nil)
       subject = if conditions && conditions[:for]
-        find_and_refresh_task(options[:for]).conditions
+        find_and_refresh_task(conditions.delete(:for)).conditions
       else
         @conditions ||= {}
       end

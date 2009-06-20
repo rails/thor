@@ -16,7 +16,8 @@ class Thor
     #
     def initialize_copy(other)
       super(other)
-      self.options = other.options.dup if other.options
+      self.options    = other.options.dup    if other.options
+      self.conditions = other.conditions.dup if other.conditions
     end
 
     # By default, a task invokes a method in the thor class. You can change this

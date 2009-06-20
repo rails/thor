@@ -42,11 +42,17 @@ describe Thor::Task do
     end
   end
 
-  describe "#clone" do
-    it "clones options hash" do
-      new_task = task(:foo => true, :bar => :required).clone
-      new_task.options.delete(:foo)
+  describe "#dup" do
+    it "dup options hash" do
+      task = Thor::Task.new("can_has", nil, nil, :foo => true, :bar => :required)
+      task.dup.options.delete(:foo)
       task.options[:foo].must_not be_nil
+    end
+
+    it "dup conditions hash" do
+      task = Thor::Task.new("can_has", nil, nil, {}, :foo => true, :bar => :required)
+      task.dup.conditions.delete(:foo)
+      task.conditions[:foo].must_not be_nil
     end
   end
 
