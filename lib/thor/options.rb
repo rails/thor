@@ -60,7 +60,7 @@ class Thor
 
         if option.argument?
           @non_assigned_arguments << option
-        elsif option.default
+        elsif !option.default.nil?
           @options[option.human_name] = option.default
         end
 

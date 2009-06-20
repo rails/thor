@@ -152,15 +152,15 @@ describe Thor::Options do
 
     describe "with default values" do
       before(:each) do
-        create "--branch" => "master"
+        create "--branch" => "master", "--force" => false
       end
 
       it "must get the specified value" do
-        parse("--branch", "bugfix").must == { "branch" => "bugfix" }
+        parse("--branch", "bugfix", "--force").must == { "branch" => "bugfix", "force" => true }
       end
 
       it "must get the default value when not specified" do
-        parse.must == { "branch" => "master" }
+        parse.must == { "branch" => "master", "force" => false }
       end
     end
 
