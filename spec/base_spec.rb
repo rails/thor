@@ -47,7 +47,11 @@ describe Thor::Base do
 
   describe "#invoke" do
     it "invokes an specific task" do
-      MyScript.new.invoke(:animal, "fish").must == ["fish"]
+      MyScript.new.invoke(:animal, ["fish"]).must == ["fish"]
+    end
+
+    it "invokes a task inside another task" do
+      capture(:stdout){ A.new.invoke(:two) }.must == "2\n3\n"
     end
   end
 

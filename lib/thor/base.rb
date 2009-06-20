@@ -572,7 +572,6 @@ class Thor
         end
 
         # Dump the configuration values for this current class.
-        # TODO Overwrite this in Actions...
         #
         def dump_config
           { :shell => self.shell }
