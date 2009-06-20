@@ -27,6 +27,11 @@ FOO
   end
 end
 
+class ClearCounter < MyCounter
+  remove_argument :first, :second, :undefine => true
+  remove_class_option :third
+end
+
 class BrokenCounter < MyCounter
   namespace "app:broken:counter"
   class_option :fail, :type => :boolean, :default => false

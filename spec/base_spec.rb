@@ -161,6 +161,23 @@ describe Thor::Base do
     end
   end
 
+  describe "#remove_argument" do
+    it "removes previous defined arguments from class" do
+      ClearCounter.arguments.must be_empty
+    end
+
+    it "undefine accessors if required" do
+      ClearCounter.new.must_not respond_to(:first)
+      ClearCounter.new.must_not respond_to(:second)
+    end
+  end
+
+  describe "#remove_class_option" do
+    it "removes previous defined class option" do
+      ClearCounter.class_options[:third].must be_nil
+    end
+  end
+
   describe "#class_options_help" do
     before(:each) do
       @content = capture(:stdout) { MyCounter.help(Thor::Shell::Basic.new) }

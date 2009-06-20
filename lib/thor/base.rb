@@ -160,6 +160,42 @@ class Thor
         build_option(name, options, class_options)
       end
 
+      # Removes a previous defined argument. If :undefine is given, undefine
+      # accessors as well.
+      #
+      # ==== Paremeters
+      # names<Array>:: Arguments to be removed
+      #
+      # ==== Examples
+      #
+      #   remove_argument :foo
+      #   remove_argument :foo, :bar, :baz, :undefine => true
+      #
+      def remove_argument(*names)
+        options = names.last.is_a?(Hash) ? names.pop : {}
+
+        names.each do |name|
+          class_options.delete(name)
+          undef_method name, "#{name}=" if options[:undefine]
+        end
+      end
+
+      # Removes a previous defined class option.
+      #
+      # ==== Paremeters
+      # names<Array>:: Class options to be removed
+      #
+      # ==== Examples
+      #
+      #   remove_class_option :foo
+      #   remove_class_option :foo, :bar, :baz
+      #
+      def remove_class_option(*names)
+        names.each do |name|
+          class_options.delete(name)
+        end
+      end
+
       # Defines the group. This is used when thor list is invoked so you can specify
       # that only tasks from a pre-defined group will be shown. Defaults to standard.
       #
