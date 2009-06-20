@@ -53,6 +53,10 @@ describe Thor::Base do
     it "invokes a task inside another task" do
       capture(:stdout){ A.new.invoke(:two) }.must == "2\n3\n"
     end
+
+    it "invokes a task just once" do
+      capture(:stdout){ A.new.invoke(:one) }.must == "1\n2\n3\n"
+    end
   end
 
   describe "#shell" do

@@ -9,7 +9,7 @@ class Thor
     end
 
     def initialize(name, description, usage, options)
-      super(name, description, usage, options || {})
+      super(name.to_s, description, usage, options || {})
     end
 
     # Dup the options hash on clone.

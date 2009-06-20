@@ -13,13 +13,7 @@ load File.join(File.dirname(__FILE__), "fixtures", "group.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "invoke.thor")
 
-undefinable = if defined?(Spec::Expectations::ObjectExpectations) # rspec <= 1.2.0
-  Spec::Expectations::ObjectExpectations
-else
-  Kernel
-end
-
-undefinable.module_eval do
+Kernel.module_eval do
   alias_method :must, :should
   alias_method :must_not, :should_not
   undef_method :should

@@ -80,6 +80,7 @@ class Thor::Group
   end
 
   # Invokes all tasks in the instance.
+  # TODO Make this pass through normal invokation process.
   #
   def invoke_all
     self.class.all_tasks.map { |_, task| task.run(self) }

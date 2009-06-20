@@ -443,10 +443,10 @@ class Thor
         end
 
         self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
-        self.shell   = config[:shell]
 
-        # Add base to shell if an accessor is provided.
-        self.shell.base = self if self.shell.respond_to?(:base)
+        # Configure shell and set base if not already
+        self.shell = config[:shell]
+        self.shell.base ||= self if self.shell.respond_to?(:base)
       end
 
       # Holds the shell for the given Thor instance. If no shell is given,
@@ -523,10 +523,18 @@ class Thor
       def invoke(name, method_args=[], options={})
         instance, task = setup_for_invoke(name, method_args, options)
 
+        @invocations ||= Hash.new { |h,k| h[k] = [] }
+        current = @invocations[instance.class]
+        return if current.include?("all")
+
         if task
           task = self.class.all_tasks[task.to_s] || Task.dynamic(task) unless task.is_a?(Thor::Task)
+          return if current.include?(task.name)
+
+          current << task.name
           task.run(instance, method_args)
         else
+          current << "all"
           instance.invoke_all
         end
       end
@@ -546,7 +554,7 @@ class Thor
         # This is the method responsable for retrieving and setting up an
         # instance to be used in invoke.
         #
-        def setup_for_invoke(name, method_args, options)
+        def setup_for_invoke(name, method_args, options) #:nodoc:
           if name.is_a?(Thor::Task)
             # Do nothing, we already have what we want.
           elsif name.is_a?(Class)
@@ -562,6 +570,7 @@ class Thor
               instance   = klass.new(class_args, self.options.merge(options), dump_config)
 
               task ||= klass.default_task if klass.is_a?(Thor)
+              instance.instance_variable_set("@invocations", @invocations)
 
               return instance, task
             when nil
@@ -573,7 +582,7 @@ class Thor
 
         # Dump the configuration values for this current class.
         #
-        def dump_config
+        def dump_config #:nodoc:
           { :shell => self.shell }
         end
 
