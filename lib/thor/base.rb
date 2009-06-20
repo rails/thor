@@ -524,12 +524,8 @@ class Thor
         instance, task = setup_for_invoke(name, method_args, options)
 
         if task
-          if instance == self
-            task = self.class.all_tasks[task.to_s] || Task.dynamic(task) unless task.is_a?(Thor::Task)
-            task.run(self, method_args)
-          else
-            instance.invoke(task, method_args)
-          end
+          task = self.class.all_tasks[task.to_s] || Task.dynamic(task) unless task.is_a?(Thor::Task)
+          task.run(instance, method_args)
         else
           instance.invoke_all
         end
@@ -563,7 +559,7 @@ class Thor
             when Thor::Base
               size       = klass.arguments.size
               class_args = method_args.slice!(0, size)
-              instance   = klass.new(class_args, self.options.merge(options), dump_config) # TODO This merge won't work.
+              instance   = klass.new(class_args, self.options.merge(options), dump_config)
 
               task ||= klass.default_task if klass.is_a?(Thor)
 

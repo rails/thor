@@ -29,4 +29,15 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
     @hash.foo.must == @hash['foo']
   end
 
+  it "merges keys independent if they are symbols or strings" do
+    @hash.merge!('force' => false, :baz => "boom")
+    @hash[:force].must == false
+    @hash[:baz].must == "boom"
+  end
+
+  it "creates a new hash by merging keys independent if they are symbols or strings" do
+    other = @hash.merge('force' => false, :baz => "boom")
+    other[:force].must == false
+    other[:baz].must == "boom"
+  end
 end
