@@ -80,4 +80,15 @@ class Thor::Group
   end
 
   include Thor::Base
+
+  protected
+
+    # Overwrite _setup_for_invoke to force invocation of all tasks when :all is
+    # supplied.
+    #
+    def _setup_for_invoke(name, method_args, options)
+      name = nil if name.to_s == "all"
+      super(name, method_args, options)
+    end
+
 end

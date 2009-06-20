@@ -537,10 +537,10 @@ class Thor
       #   invoke C
       #
       def invoke(name, method_args=[], options={})
+        @_invocations ||= Hash.new { |h,k| h[k] = [] }
         instance, task = _setup_for_invoke(name, method_args, options)
 
-        @invocations ||= Hash.new { |h,k| h[k] = [] }
-        current = @invocations[instance.class]
+        current = @_invocations[instance.class]
         return if current.include?("all")
 
         if task
@@ -551,7 +551,7 @@ class Thor
           task.run(instance, method_args)
         else
           current << "all"
-          instance.class.all_tasks.map { |_, task| task.run(self) }
+          instance.class.all_tasks.collect { |_, task| task.run(instance) }
         end
       end
 
@@ -561,30 +561,31 @@ class Thor
         # instance to be used in invoke.
         #
         def _setup_for_invoke(name, method_args, options) #:nodoc:
-          if name.is_a?(Thor::Task)
-            # Do nothing, we already have what we want.
-          elsif self.is_a?(Thor::Group) && name.to_s == 'all'
-            name = nil # Use self with no task
-          elsif name.is_a?(Class)
-            klass = name
-          elsif self.class.all_tasks[name.to_s].nil?
-            klass, task = Thor::Util.namespace_to_thor_class(name.to_s) rescue Thor::Error
+          case name
+            when NilClass, Thor::Task
+              # Do nothing, we already have what we want
+            when Class
+              klass = name
+            else
+              name = name.to_s
+              unless self.class.all_tasks[name]
+                klass, task = Thor::Util.namespace_to_thor_class(name) rescue Thor::Error
+              end
           end
 
-          case klass
-            when Thor::Base
-              size       = klass.arguments.size
-              class_args = method_args.slice!(0, size)
-              instance   = klass.new(class_args, self.options.merge(options), _dump_config)
+          if klass.nil?
+            return self, name
+          elsif klass <= Thor::Base
+            size       = klass.arguments.size
+            class_args = method_args.slice!(0, size)
+            instance   = klass.new(class_args, self.options.merge(options), _dump_config)
 
-              task ||= klass.default_task if klass.is_a?(Thor)
-              instance.instance_variable_set("@invocations", @invocations)
+            task ||= klass.default_task if klass <= Thor
+            instance.instance_variable_set("@_invocations", @_invocations)
 
-              return instance, task
-            when nil
-              return self, name
-            else
-              raise ScriptError, "Expected Thor class, got #{klass}"
+            return instance, task
+          else
+            raise ScriptError, "Expected Thor class, got #{klass}"
           end
         end
 

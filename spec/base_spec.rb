@@ -57,6 +57,59 @@ describe Thor::Base do
     it "invokes a task just once" do
       capture(:stdout){ A.new.invoke(:one) }.must == "1\n2\n3\n"
     end
+
+    it "invokes a task just once even if they belongs to different classes" do
+      capture(:stdout){ D.new.invoke(:one) }.must == "1\n2\n3\n4\n5\n"
+    end
+
+    it "invokes another class with arguments" do
+      capture(:stdout){ A.new.invoke("b:one", ["Valim", "José"]) }.must == "Valim, José\n"
+    end
+
+    it "invokes the default task if none is given to a Thor class" do
+      content = capture(:stdout){ A.new.invoke("b") }
+      content.must =~ /Tasks/
+      content.must =~ /LAST_NAME/
+    end
+
+    it "accepts a class as argument" do
+      content = capture(:stdout){ A.new.invoke(B) }
+      content.must =~ /Tasks/
+      content.must =~ /LAST_NAME/
+    end
+
+    it "sends options hash to invoked class" do
+      A.new([], :foo => :bar).invoke("b:two").must == { "foo" => :bar }
+    end
+
+    it "merges given hash with base hash" do
+      A.new([], :foo => :bar).invoke("b:two", [], :foo => "baz").must == { "foo" => "baz" }
+    end
+
+    it "shares configuration values" do
+      base = A.new
+      base.invoke("b:three")[:shell].must == base.shell
+    end
+
+    it "invokes a Thor::Group and all of its tasks" do
+      capture(:stdout){ A.new.invoke(:c) }.must == "1\n2\n3\n"
+    end
+
+    it "does not invoke a Thor::Group twice" do
+      base = A.new
+      silence(:stdout){ base.invoke(:c) }
+      capture(:stdout){ base.invoke(:c) }.must be_empty
+    end
+
+    it "does not invoke any of Thor::Group tasks twice" do
+      base = A.new
+      silence(:stdout){ base.invoke(:c) }
+      capture(:stdout){ base.invoke("c:one") }.must be_empty
+    end
+
+    it "does not invoke another tasks if they were already invoke even when invoking all" do
+      capture(:stdout){ A.new.invoke(:e) }.must == "1\n2\n3\n"
+    end
   end
 
   describe "#shell" do
