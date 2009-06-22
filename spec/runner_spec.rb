@@ -118,6 +118,7 @@ describe Thor::Runner do
       it "can filter a list of the available tasks by --group" do
         ARGV.replace ["list", "--group", "standard"]
         capture(:stdout) { Thor::Runner.start }.must =~ /amazing:describe NAME/
+        ARGV.replace []
         capture(:stdout) { Thor::Runner.start }.must_not =~ /my_script:animal TYPE/
         ARGV.replace ["list", "--group", "script"]
         capture(:stdout) { Thor::Runner.start }.must =~ /my_script:animal TYPE/

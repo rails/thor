@@ -140,8 +140,8 @@ class Thor
       opts = Thor::Options.new(options)
       opts.parse(args)
 
-      instance = new(opts.arguments, opts.options, config) do |klass, invoke|
-        klass.prepare(invoke, args, config)
+      instance = new(opts.arguments, opts.options, config) do |klass, invoke, overrides|
+        klass.prepare(invoke, args, config.merge(overrides))
       end
 
       return instance, opts.trailing

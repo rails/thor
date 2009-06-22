@@ -24,14 +24,19 @@ class A < Thor
     p 4
     invoke "d:five"
   end
+
+  desc "five N", "check if number is equal 5"
+  def five(number)
+    number == 5
+  end
 end
 
 class B < Thor
-  argument :last_name, :type => :string
+  class_option :last_name, :type => :string
 
   desc "one FIRST_NAME", "invoke one"
   def one(first_name)
-    puts "#{last_name}, #{first_name}"
+    puts "#{options.last_name}, #{first_name}"
   end
 
   desc "two", "invoke two"
@@ -41,7 +46,7 @@ class B < Thor
 
   desc "three", "invoke three"
   def three
-    _dump_config
+    self
   end
 end
 
@@ -77,21 +82,3 @@ class D < Thor
   end
 end
 
-class E < Thor::Group
-  include Thor::Actions
-
-  def one
-    p 1
-    invoke :two
-    invoke :three
-  end
-
-  def two
-    p 2
-    invoke :three
-  end
-
-  def three
-    p 3
-  end
-end

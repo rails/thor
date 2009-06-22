@@ -60,5 +60,12 @@ class Thor
       METHOD
     end
 
+    protected
+
+      # Send the current shell to be used by the invoked class.
+      #
+      def _overrides_config #:nodoc:
+        super.merge!(:shell => self.shell)
+      end
   end
 end

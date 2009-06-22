@@ -2,8 +2,9 @@ class Thor
   module Invocation
 
     def initialize(args=[], options={}, config={}, &block)
-      @_initializer = block || lambda do |klass, invoke|
-        klass.new(args, options, config)
+      @_invocations = config[:invocations] || Hash.new { |h,k| h[k] = [] }
+      @_initializer = block || lambda do |klass, invoke, overrides|
+        klass.new(args, options, config.merge(overrides))
       end
       super
     end
@@ -67,26 +68,25 @@ class Thor
     #   invoke C
     #
     def invoke(object, method_args=nil)
-      @_invocations ||= Hash.new { |h,k| h[k] = [] }
-
       object, task = _setup_for_invoke(object)
-
-      if object.is_a?(Class)
-        klass = object
-        instance, trailing = @_initializer.call(klass, task)
-        instance.instance_variable_set('@_invocations', @_invocations)
-        method_args ||= trailing
-      else
-        klass, instance = object.class, object
-      end
+      klass = object.is_a?(Class) ? object : object.class
 
       current = @_invocations[klass]
       return if current.include?("all")
 
+      if object.is_a?(Class)
+        instance, trailing = @_initializer.call(klass, task, _overrides_config)
+        method_args ||= trailing
+      else
+        instance = object
+      end
+
+      method_args ||= []
+
       if task
         return if current.include?(task.name)
         current << task.name
-        task.run(instance, method_args || [])
+        task.run(instance, method_args)
       else
         current << "all"
         klass.all_tasks.collect { |_, task| task.run(instance) }
@@ -94,6 +94,12 @@ class Thor
     end
 
     protected
+
+      # Values that are sent to overwrite defined configuration values.
+      #
+      def _overrides_config #:nodoc:
+        { :invocations => @_invocations }
+      end
 
       # This is the method responsable for retrieving and setting up an
       # instance to be used in invoke.
@@ -115,13 +121,11 @@ class Thor
         end
 
         object ||= self
-
         klass = object.is_a?(Class) ? object : object.class
         raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
 
         task ||= klass.default_task if klass <= Thor
         task = klass.all_tasks[task.to_s] || Task.dynamic(task) if task && !task.is_a?(Thor::Task)
-
         return object, task
       end
 

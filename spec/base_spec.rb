@@ -46,10 +46,6 @@ describe Thor::Base do
   end
 
   describe "#invoke" do
-    it "invokes an specific task" do
-      MyScript.new.invoke(:animal, ["fish"]).must == ["fish"]
-    end
-
     it "invokes a task inside another task" do
       capture(:stdout){ A.new.invoke(:two) }.must == "2\n3\n"
     end
@@ -62,8 +58,9 @@ describe Thor::Base do
       capture(:stdout){ D.new.invoke(:one) }.must == "1\n2\n3\n4\n5\n"
     end
 
-    xit "invokes another class with arguments" do
-      capture(:stdout){ A.new.invoke("b:one", ["Valim", "José"]) }.must == "Valim, José\n"
+    it "invokes a task with arguments" do
+      A.new.invoke(:five, [5]).must be_true
+      A.new.invoke(:five, [7]).must be_false
     end
 
     it "invokes the default task if none is given to a Thor class" do
@@ -78,13 +75,20 @@ describe Thor::Base do
       content.must =~ /LAST_NAME/
     end
 
-    it "sends options hash to invoked class" do
+    xit "accepts a Thor instance as argument" do
+      capture(:stdout){ A.new.invoke("b:one", ["Valim", "José"]) }.must == "Valim, José\n"
+    end
+
+    xit "reparses options in the new class" do
+    end
+
+    it "shares initialize options with invoked class" do
       A.new([], :foo => :bar).invoke("b:two").must == { "foo" => :bar }
     end
 
-    xit "shares configuration values" do
+    it "dump configuration values to be used in the invoked class" do
       base = A.new
-      base.invoke("b:three")[:shell].must == base.shell
+      base.invoke("b:three").shell.must == base.shell
     end
 
     it "invokes a Thor::Group and all of its tasks" do
@@ -101,10 +105,6 @@ describe Thor::Base do
       base = A.new
       silence(:stdout){ base.invoke(:c) }
       capture(:stdout){ base.invoke("c:one") }.must be_empty
-    end
-
-    it "does not invoke another tasks if they were already invoke even when invoking all" do
-      capture(:stdout){ A.new.invoke(:e) }.must == "1\n2\n3\n"
     end
 
     it "raises Thor::UndefinedTaskError if the task can't be found" do
