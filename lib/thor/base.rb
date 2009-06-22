@@ -1,7 +1,8 @@
 require 'thor/core_ext/hash_with_indifferent_access'
 require 'thor/core_ext/ordered_hash'
-require 'thor/shell/basic'
 require 'thor/error'
+require 'thor/shell'
+require 'thor/invocation'
 require 'thor/options'
 require 'thor/task'
 require 'thor/util'
@@ -14,51 +15,67 @@ class Thor
   end
 
   module Base
+    attr_accessor :options
 
-    def self.included(base) #:nodoc:
-      base.send :extend,  ClassMethods
-      base.send :include, SingletonMethods
+    # It receives arguments in an Array and two hashes, one for options and
+    # other for configuration.
+    #
+    # Notice that it does not check arguments type neither if all required
+    # arguments were supplied. It should be done by the parser.
+    #
+    # ==== Parameters
+    # args<Array[Object]>:: An array of objects. The objects are applied to their
+    #                       respective accessors declared with <tt>argument</tt>.
+    #
+    # options<Hash>:: An options hash that will be available as self.options.
+    #                 The hash given is converted to a hash with indifferent
+    #                 access, magic predicates (options.skip?) and then frozen.
+    #
+    # config<Hash>:: Configuration for this Thor class.
+    #
+    def initialize(args=[], options={}, config={})
+      self.class.arguments.zip(args).each do |argument, value|
+        send("#{argument.human_name}=", value)
+      end
+
+      self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
     end
 
-    # Returns the classes that inherits from Thor or Thor::Group.
-    #
-    # ==== Returns
-    # Array[Class]
-    #
-    def self.subclasses
-      @subclasses ||= []
-    end
+    class << self
+      def included(base) #:nodoc:
+        base.send :extend,  ClassMethods
+        base.send :include, Invocation
+        base.send :include, Shell
+      end
 
-    # Returns the files where the subclasses are kept.
-    #
-    # ==== Returns
-    # Hash[path<String> => Class]
-    #
-    def self.subclass_files
-      @subclass_files ||= Hash.new{ |h,k| h[k] = [] }
-    end
+      # Returns the classes that inherits from Thor or Thor::Group.
+      #
+      # ==== Returns
+      # Array[Class]
+      #
+      def subclasses
+        @subclasses ||= []
+      end
 
-    # Returns the shell used in all Thor classes.
-    #
-    def self.shell
-      @shell || Thor::Shell::Basic
-    end
+      # Returns the files where the subclasses are kept.
+      #
+      # ==== Returns
+      # Hash[path<String> => Class]
+      #
+      def subclass_files
+        @subclass_files ||= Hash.new{ |h,k| h[k] = [] }
+      end
 
-    # Sets the shell used in all Thor classes.
-    #
-    def self.shell=(klass)
-      @shell = klass
-    end
+      # Whenever a class inherits from Thor or Thor::Group, we should track the
+      # class and the file on Thor::Base. This is the method responsable for it.
+      #
+      def register_klass_file(klass) #:nodoc:
+        file = caller[1].match(/(.*):\d+/)[1]
+        Thor::Base.subclasses << klass unless Thor::Base.subclasses.include?(klass)
 
-    # Whenever a class inherits from Thor or Thor::Group, we should track the
-    # class and the file on Thor::Base. This is the method responsable for it.
-    #
-    def self.register_klass_file(klass) #:nodoc:
-      file = caller[1].match(/(.*):\d+/)[1]
-      Thor::Base.subclasses << klass unless Thor::Base.subclasses.include?(klass)
-
-      file_subclasses = Thor::Base.subclass_files[File.expand_path(file)]
-      file_subclasses << klass unless file_subclasses.include?(klass)
+        file_subclasses = Thor::Base.subclass_files[File.expand_path(file)]
+        file_subclasses << klass unless file_subclasses.include?(klass)
+      end
     end
 
     module ClassMethods
@@ -445,192 +462,6 @@ class Thor
         # class.
         def initialize_added #:nodoc:
         end
-    end
-
-    module SingletonMethods
-      attr_accessor :options
-
-      SHELL_DELEGATED_METHODS = [:ask, :yes?, :no?, :say, :say_status, :print_list, :print_table]
-
-      # It receives arguments in an Array and two hashes, one for options and
-      # other for configuration.
-      #
-      # Notice that it does not check arguments type neither if all required
-      # arguments were supplied. It should be done by the parser.
-      #
-      # ==== Parameters
-      # args<Array[Object]>:: An array of objects. The objects are applied to their
-      #                       respective accessors declared with <tt>argument</tt>.
-      #
-      # options<Hash>:: An options hash that will be available as self.options.
-      #                 The hash given is converted to a hash with indifferent
-      #                 access, magic predicates (options.skip?) and then frozen.
-      #
-      # config<Hash>:: Configuration for this Thor class.
-      #
-      # ==== Configuration
-      # shell<Object>:: An instance of the shell to be used.
-      #
-      # ==== Examples
-      #
-      #   class MyScript < Thor
-      #     argument :first, :type => :numeric
-      #   end
-      #
-      #   MyScript.new [1.0], { :foo => :bar }, :shell => Thor::Shell::Basic.new
-      #
-      def initialize(args=[], options={}, config={})
-        self.class.arguments.zip(args).each do |argument, value|
-          send("#{argument.human_name}=", value)
-        end
-
-        self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
-
-        # Configure shell and set base if not already
-        self.shell = config[:shell]
-        self.shell.base ||= self if self.shell.respond_to?(:base)
-      end
-
-      # Holds the shell for the given Thor instance. If no shell is given,
-      # it gets a default shell from Thor::Base.shell.
-      #
-      def shell
-        @shell ||= Thor::Base.shell.new
-      end
-
-      # Sets the shell for this thor class.
-      #
-      def shell=(shell)
-        @shell = shell
-      end
-
-      # Common methods that are delegated to the shell.
-      #
-      SHELL_DELEGATED_METHODS.each do |method|
-        module_eval <<-METHOD, __FILE__, __LINE__
-          def #{method}(*args)
-            shell.#{method}(*args)
-          end
-        METHOD
-      end
-
-      # Receives a name and invokes it. The name can be either a namespaced name,
-      # a current class task or even a class. Arguments are given in an array and
-      # options given are merged with the invoker options.
-      #
-      # ==== Examples
-      #
-      #   class A < Thor
-      #     def foo
-      #       invoke :bar
-      #       invoke "b:lib", ["merb", "rails"]
-      #     end
-      #
-      #     def bar
-      #       invoke "b:lib", ["merb", "rails"]
-      #       # magic
-      #     end
-      #   end
-      #
-      #   class B < Thor
-      #     argument :preferred_framework, :type => :string
-      #
-      #     def lib(second_framework)
-      #       # magic
-      #     end
-      #   end
-      #
-      # You can notice that the method "foo" above invokes two tasks: "bar",
-      # which belongs to the same class and "lib" that belongs to the class B.
-      #
-      # By using an invocation system you ensure that a task is invoked only once.
-      # In the example above, invoking foo will invoke "b:lib" just once, even if
-      # it's invoked later by "bar" method.
-      #
-      # When invoking another class, there are a few things to keep in mind:
-      #
-      #   1) Class arguments are parsed first. In the example above, preferred
-      #      framework is going to consume "merb" and second framework is going
-      #      to be set to "rails".
-      #
-      #   2) All options and configurations are sent to the invoked class.
-      #      So the invoked class is going to use the same shell instance, will
-      #      have the same behavior (:invoke or :revoke) and so on.
-      #
-      # Invoking a Thor::Group happens in the same away as above:
-      #
-      #   class C < Thor::Group
-      #     def one
-      #     end
-      #   end
-      #
-      # Is invoked as:
-      #
-      #   invoke "c"
-      #
-      # Or even as:
-      #
-      #   invoke C
-      #
-      def invoke(name, method_args=[], options={})
-        @_invocations ||= Hash.new { |h,k| h[k] = [] }
-        instance, task = _setup_for_invoke(name, method_args, options)
-
-        current = @_invocations[instance.class]
-        return if current.include?("all")
-
-        if task
-          task = self.class.all_tasks[task.to_s] || Task.dynamic(task) unless task.is_a?(Thor::Task)
-          return if current.include?(task.name)
-
-          current << task.name
-          task.run(instance, method_args)
-        else
-          current << "all"
-          instance.class.all_tasks.collect { |_, task| task.run(instance) }
-        end
-      end
-
-      protected
-
-        # This is the method responsable for retrieving and setting up an
-        # instance to be used in invoke.
-        #
-        def _setup_for_invoke(name, method_args, options) #:nodoc:
-          case name
-            when NilClass, Thor::Task
-              # Do nothing, we already have what we want
-            when Class
-              klass = name
-            else
-              name = name.to_s
-              unless self.class.all_tasks[name]
-                klass, task = Thor::Util.namespace_to_thor_class(name) rescue Thor::Error
-              end
-          end
-
-          if klass.nil?
-            return self, name
-          elsif klass <= Thor::Base
-            size       = klass.arguments.size
-            class_args = method_args.slice!(0, size)
-            instance   = klass.new(class_args, self.options.merge(options), _dump_config)
-
-            task ||= klass.default_task if klass <= Thor
-            instance.instance_variable_set("@_invocations", @_invocations)
-
-            return instance, task
-          else
-            raise "Expected Thor class, got #{klass}"
-          end
-        end
-
-        # Dump the configuration values for this current class.
-        #
-        def _dump_config #:nodoc:
-          { :shell => self.shell }
-        end
-
     end
   end
 end
