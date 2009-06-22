@@ -77,7 +77,7 @@ class Thor
     end
 
     def parse(args)
-      @pile, @trailing = args, []
+      @pile, @trailing = args.dup, []
 
       while peek
         if current_is_switch?

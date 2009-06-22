@@ -9,7 +9,7 @@ require 'thor/util'
 
 class Thor
   HELP_MAPPINGS       = %w(-h -? --help -D)
-  RESERVED_TASK_NAMES = %w(all invoke shell options behavior root destination_root relative_root source_root)
+  THOR_RESERVED_WORDS = %w(all invoke shell options behavior root destination_root relative_root source_root)
 
   class Maxima < Struct.new(:usage, :options, :class_options)
   end
@@ -114,6 +114,7 @@ class Thor
       # ArgumentError:: Raised if you supply a required argument after a non required one.
       #
       def argument(name, options={})
+        is_thor_reserved_word?(name, :argument)
         no_tasks { attr_accessor name }
 
         required = if options.key?(:optional)
@@ -325,6 +326,26 @@ class Thor
         end
       end
 
+      # Parses the task and options from the given args, instantiate the class
+      # and invoke the task. This method is used when the arguments must be parsed
+      # from an array. If you are inside Ruby and want to use a Thor class, you
+      # can simply initialize it:
+      #
+      #   script = MyScript.new(args, options, config)
+      #   script.invoke(:task, first_arg, second_arg, third_arg)
+      #
+      def start(args=ARGV, config={})
+        config[:shell] ||= Thor::Base.shell.new
+
+        task = yield(args)
+        return unless task
+
+        instance, trailing = prepare(task, args, config)
+        instance.invoke(task, trailing)
+      rescue Thor::Error => e
+        config[:shell].error e.message
+      end
+
       protected
 
         # Prints the class optins per group. If a class options does not belong
@@ -365,6 +386,13 @@ class Thor
             # Print all others
             groups.each(&printer)
           end
+        end
+
+        # Raises an error if the word given is a Thor reserved word.
+        #
+        def is_thor_reserved_word?(word, type)
+          return false unless THOR_RESERVED_WORDS.include?(word.to_s)
+          raise ScriptError, "'#{word}' is a Thor reserved word and cannot be defined as #{type}"
         end
 
         # Build an option and adds it to the given scope.
@@ -425,11 +453,7 @@ class Thor
           end
 
           return if @no_tasks || !valid_task?(meth)
-
-          if RESERVED_TASK_NAMES.include?(meth)
-            raise ScriptError, "'#{meth}' is a Thor reserved word and cannot be defined as task"
-          end
-
+          is_thor_reserved_word?(meth, :task)
           Thor::Base.register_klass_file(self)
           create_task(meth)
         end
