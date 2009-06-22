@@ -62,7 +62,7 @@ describe Thor::Base do
       capture(:stdout){ D.new.invoke(:one) }.must == "1\n2\n3\n4\n5\n"
     end
 
-    it "invokes another class with arguments" do
+    xit "invokes another class with arguments" do
       capture(:stdout){ A.new.invoke("b:one", ["Valim", "José"]) }.must == "Valim, José\n"
     end
 
@@ -82,11 +82,7 @@ describe Thor::Base do
       A.new([], :foo => :bar).invoke("b:two").must == { "foo" => :bar }
     end
 
-    it "merges given hash with base hash" do
-      A.new([], :foo => :bar).invoke("b:two", [], :foo => "baz").must == { "foo" => "baz" }
-    end
-
-    it "shares configuration values" do
+    xit "shares configuration values" do
       base = A.new
       base.invoke("b:three")[:shell].must == base.shell
     end

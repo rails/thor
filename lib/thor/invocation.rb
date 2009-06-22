@@ -1,6 +1,13 @@
 class Thor
   module Invocation
 
+    def initialize(args=[], options={}, config={}, &block)
+      @_initializer = block || lambda do |klass, invoke|
+        klass.new(args, options, config)
+      end
+      super
+    end
+
     # Receives a name and invokes it. The name can be either a namespaced name,
     # a current class task or even a class. Arguments are given in an array and
     # options given are merged with the invoker options.
@@ -59,22 +66,30 @@ class Thor
     #
     #   invoke C
     #
-    def invoke(name, method_args=[], options={})
+    def invoke(object, method_args=nil)
       @_invocations ||= Hash.new { |h,k| h[k] = [] }
-      instance, task = _setup_for_invoke(name, method_args, options)
 
-      current = @_invocations[instance.class]
+      object, task = _setup_for_invoke(object)
+
+      if object.is_a?(Class)
+        klass = object
+        instance, trailing = @_initializer.call(klass, task)
+        instance.instance_variable_set('@_invocations', @_invocations)
+        method_args ||= trailing
+      else
+        klass, instance = object.class, object
+      end
+
+      current = @_invocations[klass]
       return if current.include?("all")
 
       if task
-        task = self.class.all_tasks[task.to_s] || Task.dynamic(task) unless task.is_a?(Thor::Task)
         return if current.include?(task.name)
-
         current << task.name
-        task.run(instance, method_args)
+        task.run(instance, method_args || [])
       else
         current << "all"
-        instance.class.all_tasks.collect { |_, task| task.run(instance) }
+        klass.all_tasks.collect { |_, task| task.run(instance) }
       end
     end
 
@@ -83,39 +98,31 @@ class Thor
       # This is the method responsable for retrieving and setting up an
       # instance to be used in invoke.
       #
-      def _setup_for_invoke(name, method_args, options) #:nodoc:
+      def _setup_for_invoke(name) #:nodoc:
         case name
-          when NilClass, Thor::Task
-            # Do nothing, we already have what we want
-          when Class
-            klass = name
-          else
-            name = name.to_s
-            unless self.class.all_tasks[name]
-              klass, task = Thor::Util.namespace_to_thor_class(name) rescue Thor::Error
+          when Thor::Task
+            task = name
+          when Symbol, String
+            task = name.to_s
+
+            if thor_task = self.class.all_tasks[task]
+              object, task = self, thor_task
+            else
+              object, task = Thor::Util.namespace_to_thor_class(task) rescue Thor::Error
             end
+          else
+            object = name
         end
 
-        if klass.nil?
-          return self, name
-        elsif klass <= Thor::Base
-          size       = klass.arguments.size
-          class_args = method_args.slice!(0, size)
-          instance   = klass.new(class_args, self.options.merge(options), _dump_config)
+        object ||= self
 
-          task ||= klass.default_task if klass <= Thor
-          instance.instance_variable_set("@_invocations", @_invocations)
+        klass = object.is_a?(Class) ? object : object.class
+        raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
 
-          return instance, task
-        else
-          raise "Expected Thor class, got #{klass}"
-        end
-      end
+        task ||= klass.default_task if klass <= Thor
+        task = klass.all_tasks[task.to_s] || Task.dynamic(task) if task && !task.is_a?(Thor::Task)
 
-      # Dump the configuration values for this current class.
-      #
-      def _dump_config #:nodoc:
-        { :shell => self.shell }
+        return object, task
       end
 
   end

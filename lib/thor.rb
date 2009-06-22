@@ -129,14 +129,22 @@ class Thor
       meth = normalize_task_name(args.shift)
       task = all_tasks[meth] || Task.dynamic(meth)
 
+      instance, trailing = prepare(task, args, config)
+      instance.invoke(task, trailing)
+    rescue Thor::Error => e
+      config[:shell].error e.message
+    end
+
+    def prepare(task, args, config)
       options = class_options.merge(task.options)
       opts = Thor::Options.new(options)
       opts.parse(args)
 
-      instance = new(opts.arguments, opts.options, config)
-      instance.invoke(task, opts.trailing)
-    rescue Thor::Error => e
-      config[:shell].error e.message
+      instance = new(opts.arguments, opts.options, config) do |klass, invoke|
+        klass.prepare(invoke, args, config)
+      end
+
+      return instance, opts.trailing
     end
 
     # Prints help information. If a task name is given, it shows information

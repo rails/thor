@@ -31,13 +31,22 @@ class Thor::Group
       if Thor::HELP_MAPPINGS.include?(args.first)
         help(config[:shell])
       else
-        opts = Thor::Options.new(class_options)
-        opts.parse(args)
-
-        new(opts.arguments, opts.options, config).invoke(:all)
+        instance, trailing = prepare(nil, args, config)
+        instance.invoke(:all, trailing)
       end
     rescue Thor::Error => e
       config[:shell].error e.message
+    end
+
+    def prepare(task, args, config)
+      opts = Thor::Options.new(class_options)
+      opts.parse(args)
+
+      instance = new(opts.arguments, opts.options, config) do |klass, invoke|
+        klass.prepare(invoke, args, config)
+      end
+
+      return instance, nil
     end
 
     # Prints help information.
@@ -86,9 +95,8 @@ class Thor::Group
     # Overwrite _setup_for_invoke to force invocation of all tasks when :all is
     # supplied.
     #
-    def _setup_for_invoke(name, method_args, options)
-      name = nil if name.to_s == "all"
-      super(name, method_args, options)
+    def _setup_for_invoke(object, task=nil)
+      super(object.to_s == "all" ? nil : object)
     end
 
 end
