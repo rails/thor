@@ -56,12 +56,6 @@ class Thor
       super
 
       self.root = config[:root]
-
-      # For last, invoke source root to allow the result to be cached. This is
-      # needed because source root depends on the file location (__FILE__) which
-      # returns the wrong value if invoked after FileUtils#cd.
-      #
-      self.source_root if self.class.respond_to?(:source_root)
     end
 
     # Wraps an action object and call it accordingly to the thor class behavior.

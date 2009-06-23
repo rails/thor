@@ -358,16 +358,15 @@ class Thor
             groups = self.class_options.group_values_by { |o| o.group }
 
             printer = lambda do |group_name, options|
-              unless options.empty?
-                list = []
+              list = []
 
-                options.each do |option|
-                  next if option.argument?
+              options.each do |option|
+                next if option.argument?
+                list << [ option.usage(false), option.description || "" ]
+                list << [ "", "Default: #{option.default}" ] if option.description && option.default
+              end
 
-                  list << [ option.usage(false), option.description || "" ]
-                  list << [ "", "Default: #{option.default}" ] if option.description && option.default
-                end
-
+              unless list.empty?
                 if group_name
                   shell.say "#{group_name} options:"
                 else
@@ -380,7 +379,7 @@ class Thor
             end
 
             # Deal with default group
-            global_options = groups.delete(nil)
+            global_options = groups.delete(nil) || []
             printer.call(ungrouped_name, global_options) if global_options
 
             # Print all others
@@ -435,10 +434,13 @@ class Thor
         end
 
         # Everytime someone inherits from a Thor class, register the klass
-        # and file into baseclass.
+        # and file into baseclass. Also invoke the source_root if the klass
+        # respond to it. This is needed to ensure that the source_root does 
+        # not change after FileUtils#cd is called.
         #
         def inherited(klass)
           Thor::Base.register_klass_file(klass)
+          klass.source_root if klass.respond_to?(:source_root)
         end
 
         # Fire this callback whenever a method is added. Added methods are
