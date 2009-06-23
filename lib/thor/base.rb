@@ -337,7 +337,7 @@ class Thor
       def start(args=ARGV, config={})
         config[:shell] ||= Thor::Base.shell.new
 
-        task = yield(args)
+        task = normalize_arguments(args, config)
         return unless task
 
         instance, trailing = prepare(task, args, config)
@@ -485,6 +485,18 @@ class Thor
         # SIGNATURE: Defines behavior when the initialize method is added to the
         # class.
         def initialize_added #:nodoc:
+        end
+
+        # SIGNATURE: Normalize arguments when invoked through start. Should
+        # return the name of the task to be invoked. Returning nil makes the
+        # start process to exist without error message.
+        def normalize_arguments(args, config) #:nodoc:
+        end
+
+        # SIGNATURE: Receives a task, arguments to be parsed and configuration
+        # values and initializes the current class. Trailing arguments are
+        # returned to be sent to the invoked task.
+        def prepare(task, args, config) #:nodoc:
         end
     end
   end

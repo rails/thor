@@ -22,23 +22,9 @@ class Thor::Group
       end
     end
 
-    # Start in Thor::Group works differently. It invokes all tasks inside the
-    # class and does not have to parse task options.
+    # Implements the prepare interface being used by start.
     #
-    def start(args=ARGV, config={})
-      config[:shell] ||= Thor::Base.shell.new
-
-      if Thor::HELP_MAPPINGS.include?(args.first)
-        help(config[:shell])
-      else
-        instance, trailing = prepare(nil, args, config)
-        instance.invoke(:all, trailing)
-      end
-    rescue Thor::Error => e
-      config[:shell].error e.message
-    end
-
-    def prepare(task, args, config)
+    def prepare(task, args, config) #:nodoc:
       opts = Thor::Options.new(class_options)
       opts.parse(args)
 
@@ -85,6 +71,15 @@ class Thor::Group
 
       def create_task(meth) #:nodoc:
         tasks[meth.to_s] = Thor::Task.new(meth, nil, nil, nil)
+      end
+
+      def normalize_arguments(args, config) #:nodoc:
+        if Thor::HELP_MAPPINGS.include?(args.first)
+          help(config[:shell])
+          nil
+        else
+          :all
+        end
       end
   end
 
