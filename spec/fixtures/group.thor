@@ -55,7 +55,7 @@ end
 
 class WhinyGenerator < Thor::Group
   def self.source_root
-    File.join(File.dirname(__FILE__))
+    File.join(File.dirname(__FILE__), 'doc')
   end
 
   def wrong_arity(required)

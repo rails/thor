@@ -44,7 +44,7 @@ describe Thor::Group do
     end
 
     it "loads an USAGE file if it exists in the source root" do
-      WhinyGenerator.desc.must == File.read(File.join(source_root, "USAGE"))
+      WhinyGenerator.desc.must == "Hey! USAGE from a file!\n"
     end
   end
 
