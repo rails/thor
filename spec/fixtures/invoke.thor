@@ -29,6 +29,11 @@ class A < Thor
   def five(number)
     number == 5
   end
+
+  desc "invoker", "invoke a b task"
+  def invoker(*args)
+    invoke :b, :one, ["José"]
+  end
 end
 
 class B < Thor
@@ -36,7 +41,7 @@ class B < Thor
 
   desc "one FIRST_NAME", "invoke one"
   def one(first_name)
-    puts "#{options.last_name}, #{first_name}"
+    "#{options.last_name}, #{first_name}"
   end
 
   desc "two", "invoke two"

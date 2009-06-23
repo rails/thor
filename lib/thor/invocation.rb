@@ -1,7 +1,9 @@
 class Thor
   module Invocation
 
-    def initialize(args=[], options={}, config={}, &block)
+    # Make initializer aware of invocations and the initializer proc.
+    #
+    def initialize(args=[], options={}, config={}, &block) #:nodoc:
       @_invocations = config[:invocations] || Hash.new { |h,k| h[k] = [] }
       @_initializer = block || lambda do |klass, invoke, overrides|
         klass.new(args, options, config.merge(overrides))
@@ -9,66 +11,77 @@ class Thor
       super
     end
 
-    # Receives a name and invokes it. The name can be either a namespaced name,
-    # a current class task or even a class. Arguments are given in an array and
-    # options given are merged with the invoker options.
+    # Receives a name and invokes it. The name can be a string (either "task" or
+    # "namespace:task"), a Thor::Task, a Class or a Thor instance. If the task
+    # cannot be guessed name, it can also be supplied as second argument. The
+    # arguments used to invoke the task are always supplied as the last argument.
     #
     # ==== Examples
     #
     #   class A < Thor
     #     def foo
     #       invoke :bar
-    #       invoke "b:lib", ["merb", "rails"]
+    #       invoke "b:hello", ["José"]
     #     end
     #
     #     def bar
-    #       invoke "b:lib", ["merb", "rails"]
-    #       # magic
+    #       invoke "b:hello", ["José"]
     #     end
     #   end
     #
     #   class B < Thor
-    #     argument :preferred_framework, :type => :string
-    #
-    #     def lib(second_framework)
-    #       # magic
+    #     def hello(name)
+    #       puts "hello #{name}"
     #     end
     #   end
     #
     # You can notice that the method "foo" above invokes two tasks: "bar",
-    # which belongs to the same class and "lib" that belongs to the class B.
+    # which belongs to the same class and "hello" which belongs to the class B.
     #
     # By using an invocation system you ensure that a task is invoked only once.
-    # In the example above, invoking foo will invoke "b:lib" just once, even if
-    # it's invoked later by "bar" method.
+    # In the example above, invoking "foo" will invoke "b:hello" just once, even
+    # if it's invoked later by "bar" method.
     #
-    # When invoking another class, there are a few things to keep in mind:
+    # When class A invokes class B, all arguments used on A initialization are
+    # supplied to B. This allows lazy parse of options. Let's suppose you have
+    # some rspec tasks:
     #
-    #   1) Class arguments are parsed first. In the example above, preferred
-    #      framework is going to consume "merb" and second framework is going
-    #      to be set to "rails".
+    #   class Rspec < Thor::Group
+    #     class_option :mock_framework, :type => :string, :default => :rr
     #
-    #   2) All options and configurations are sent to the invoked class.
-    #      So the invoked class is going to use the same shell instance, will
-    #      have the same behavior (:invoke or :revoke) and so on.
-    #
-    # Invoking a Thor::Group happens in the same away as above:
-    #
-    #   class C < Thor::Group
-    #     def one
+    #     def invoke_mock_framework
+    #       invoke "rspec:#{options[:mock_framework]}"
     #     end
     #   end
     #
-    # Is invoked as:
+    # As you notice, it invokes the given mock framework, which might have its
+    # own options:
     #
-    #   invoke "c"
+    #   class Rspec::RR < Thor::Group
+    #     class_option :style, :type => :string, :default => :mock
+    #   end
     #
-    # Or even as:
+    # Since it's not rspec concern to parse mock framework options, when RR
+    # is invoked all options are parsed again, so RR can extract only the options
+    # that it's going to use.
     #
-    #   invoke C
+    # If you want Rspec::RR to be initialized with its own set of options, you
+    # have to do that explicitely:
     #
-    def invoke(object, method_args=nil)
-      object, task = _setup_for_invoke(object)
+    #   invoke Rspec::RR.new([], :style => :foo)
+    #
+    # Besides giving an instance, you can also give a class to invoke:
+    #
+    #   invoke Rspec::RR
+    #
+    # Or even a class, the task to invoke from it and its arguments:
+    #
+    #   invoke Rspec::RR, :foo, [ args ]
+    #
+    def invoke(name, task=nil, method_args=nil)
+      task, method_args = nil, task if task.is_a?(Array)
+
+      object, task = _setup_for_invoke(name, task)
       klass = object.is_a?(Class) ? object : object.class
 
       current = @_invocations[klass]
@@ -104,20 +117,22 @@ class Thor
       # This is the method responsable for retrieving and setting up an
       # instance to be used in invoke.
       #
-      def _setup_for_invoke(name) #:nodoc:
+      def _setup_for_invoke(name, sent_task=nil) #:nodoc:
         case name
           when Thor::Task
             task = name
           when Symbol, String
-            task = name.to_s
+            name = name.to_s
 
-            if thor_task = self.class.all_tasks[task]
-              object, task = self, thor_task
-            else
-              object, task = Thor::Util.namespace_to_thor_class(task) rescue Thor::Error
+            begin
+              task = self.class.all_tasks[name]
+              object, task = Thor::Util.namespace_to_thor_class(name) unless task
+              task = task || sent_task
+            rescue Thor::Error
+              task = name
             end
           else
-            object = name
+            object, task = name, sent_task
         end
 
         object ||= self

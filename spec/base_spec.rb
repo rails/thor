@@ -69,17 +69,26 @@ describe Thor::Base do
       content.must =~ /LAST_NAME/
     end
 
-    it "accepts a class as argument" do
+    it "accepts a class as argument without a task to invoke" do
       content = capture(:stdout){ A.new.invoke(B) }
       content.must =~ /Tasks/
       content.must =~ /LAST_NAME/
     end
 
-    xit "accepts a Thor instance as argument" do
-      capture(:stdout){ A.new.invoke("b:one", ["Valim", "José"]) }.must == "Valim, José\n"
+    it "accepts a class as argument with a task to invoke" do
+      base = A.new([], :last_name => "Valim")
+      base.invoke(B, :one, ["José"]).must == "Valim, José"
     end
 
-    xit "reparses options in the new class" do
+    it "accepts a Thor instance as argument" do
+      invoked = B.new([], :last_name => "Valim")
+      base = A.new
+      base.invoke(invoked, :one, ["José"]).must == "Valim, José"
+      base.invoke(invoked, :one, ["José"]).must be_nil
+    end
+
+    it "reparses options in the new class" do
+      A.start(["invoker", "--last-name", "Valim"]).must == "Valim, José"
     end
 
     it "shares initialize options with invoked class" do
