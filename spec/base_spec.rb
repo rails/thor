@@ -169,8 +169,9 @@ describe Thor::Base do
 
     it "raises an error if a task with reserved word is defined" do
       lambda {
-        MyCounter.class_eval "def all; end"
-      }.must raise_error(ScriptError, /'all' is a Thor reserved word and cannot be defined as task/)
+        klass = Class.new(Thor::Group)
+        klass.class_eval "def shell; end"
+      }.must raise_error(RuntimeError, /'shell' is a Thor reserved word and cannot be defined as task/)
     end
   end
 

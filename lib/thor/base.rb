@@ -9,7 +9,7 @@ require 'thor/util'
 
 class Thor
   HELP_MAPPINGS       = %w(-h -? --help -D)
-  THOR_RESERVED_WORDS = %w(all invoke shell options behavior root destination_root relative_root source_root)
+  THOR_RESERVED_WORDS = %w(invoke shell options behavior root destination_root relative_root source_root)
 
   class Maxima < Struct.new(:usage, :options, :class_options)
   end
@@ -391,7 +391,7 @@ class Thor
         #
         def is_thor_reserved_word?(word, type)
           return false unless THOR_RESERVED_WORDS.include?(word.to_s)
-          raise ScriptError, "'#{word}' is a Thor reserved word and cannot be defined as #{type}"
+          raise "'#{word}' is a Thor reserved word and cannot be defined as #{type}"
         end
 
         # Build an option and adds it to the given scope.
