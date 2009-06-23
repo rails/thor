@@ -80,29 +80,31 @@ class Thor
     #
     def invoke(name, task=nil, method_args=nil)
       task, method_args = nil, task if task.is_a?(Array)
-
       object, task = _setup_for_invoke(name, task)
-      klass = object.is_a?(Class) ? object : object.class
-
-      current = @_invocations[klass]
-      return if current.include?("all")
 
       if object.is_a?(Class)
+        klass = object
         instance, trailing = @_initializer.call(klass, task, _overrides_config)
         method_args ||= trailing
       else
-        instance = object
+        klass, instance = object.class, object
       end
 
       method_args ||= []
+      current = @_invocations[klass]
+
+      iterator = lambda do |_, task|
+        unless current.include?(task.name)
+          current << task.name
+          task.run(instance, method_args)
+        end
+      end
 
       if task
-        return if current.include?(task.name)
-        current << task.name
-        task.run(instance, method_args)
+        iterator.call(nil, task)
       else
-        current << "all"
-        klass.all_tasks.collect { |_, task| task.run(instance) }
+        method_args = []
+        klass.all_tasks.map(&iterator)
       end
     end
 

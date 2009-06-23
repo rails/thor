@@ -79,6 +79,15 @@ describe Thor::Invocation do
       end.must raise_error(Thor::UndefinedTaskError)
     end
 
+    it "raises Thor::UndefinedTaskError if the task can't be found even if all tasks where already executed" do
+      base = C.new
+      silence(:stdout){ base.invoke(:all) }
+
+      lambda do
+        base.invoke("foo:bar")
+      end.must raise_error(Thor::UndefinedTaskError)
+    end
+
     it "raises an error if a non Thor class is given" do
       lambda do
         A.new.invoke(Object)
