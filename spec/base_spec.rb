@@ -101,8 +101,8 @@ describe Thor::Base do
       @content.must =~ /# The third argument\./
     end
 
-    it "does not show usage with default values inside" do
-      @content.must =~ /\[\-\-third=N\]/
+    it "shows usage with banner content" do
+      @content.must =~ /\[\-\-third=THREE\]/
     end
 
     it "shows default values below description" do

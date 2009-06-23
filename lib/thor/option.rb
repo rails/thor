@@ -1,10 +1,10 @@
 class Thor
   class Option
-    attr_reader :name, :description, :required, :type, :default, :aliases, :group
+    attr_reader :name, :description, :required, :type, :default, :aliases, :group, :banner
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string, :default]
 
-    def initialize(name, description=nil, required=nil, type=nil, default=nil, aliases=nil, group=nil)
+    def initialize(name, description=nil, required=nil, type=nil, default=nil, banner=nil, group=nil, aliases=nil)
       raise ArgumentError, "Option name can't be nil."                          if name.nil?
       raise ArgumentError, "Option cannot be required and have default values." if required && !default.nil?
       raise ArgumentError, "Type :#{type} is not valid for options."            if type && !VALID_TYPES.include?(type.to_sym)
@@ -15,6 +15,7 @@ class Thor
       @type        = (type || :default).to_sym
       @default     = default
       @aliases     = [*aliases].compact
+      @banner      = banner || formatted_value
       @group       = group.to_s.capitalize if group
     end
 
@@ -75,7 +76,7 @@ class Thor
           value.class.name.downcase.to_sym
       end
 
-      self.new(name.to_s, nil, required, type, default, aliases)
+      self.new(name.to_s, nil, required, type, default, nil, nil, aliases)
     end
 
     def argument?
@@ -121,15 +122,9 @@ class Thor
       (str.length > 1 ? "--" : "-") + str.gsub('_', '-')
     end
 
-    def usage(use_default=true)
-      sample = if use_default
-        formatted_default || formatted_value
-      else
-        formatted_value
-      end
-
-      sample = if sample
-        "#{switch_name}=#{sample}"
+    def usage
+      sample = if banner
+        "#{switch_name}=#{banner}"
       else
         switch_name
       end
@@ -148,30 +143,6 @@ class Thor
           0
         else
           1
-        end
-      end
-
-      def formatted_default
-        return unless default
-
-        case type
-          when :boolean
-            nil
-          when :numeric
-            default.to_s
-          when :string, :default
-            default.to_s.empty? ? formatted_value : default.to_s
-          when :hash
-            if default.empty?
-              formatted_value
-            else
-              default.inject([]) do |mem, (key, value)|
-                mem << "#{key}:#{value}".gsub(/\s/, '_')
-                mem
-              end.join(' ')
-            end
-          when :array
-            default.empty? ? formatted_value : default.join(" ")
         end
       end
 
@@ -197,19 +168,19 @@ class Thor
   class Argument < Option
     VALID_TYPES = [:numeric, :hash, :array, :string]
 
-    def initialize(name, description=nil, required=true, type=:string, default=nil)
+    def initialize(name, description=nil, required=true, type=:string, default=nil, banner=nil)
       raise ArgumentError, "Argument name can't be nil."               if name.nil?
       raise ArgumentError, "Type :#{type} is not valid for arguments." if type && !VALID_TYPES.include?(type.to_sym)
 
-      super(name, description, required, type || :string, default)
+      super(name, description, required, type || :string, default, banner)
     end
 
     def argument?
       true
     end
 
-    def usage(use_default=true)
-      required? ? formatted_value : "[#{formatted_value}]"
+    def usage
+      required? ? banner : "[#{banner}]"
     end
   end
 end

@@ -192,69 +192,24 @@ describe Thor::Option do
 
   describe "#usage" do
 
-    describe "with default values" do
-      it "returns usage for string types" do
-        parse(:foo, "bar").usage.must == "[--foo=bar]"
-      end
-
-      it "returns usage for numeric types" do
-        parse(:foo, 2.0).usage.must == "[--foo=2.0]"
-      end
-
-      it "returns usage for array types" do
-        parse(:foo, [1,2,3]).usage.must == "[--foo=1 2 3]"
-      end
-
-      it "returns usage for hash types" do
-        value = parse(:foo, { :a => :b, :c => :d }).usage
-        value.must =~ /\[-\-foo=/
-        value.must =~ /a:b/
-        value.must =~ /c:d/
-      end
-
-      it "returns usage for boolean types" do
-        parse(:foo, true).usage.must == "[--foo]"
-      end
-
-      describe "and default value is empty" do
-        it "returns usage for string types" do
-          parse(:foo, :string).usage.must == "[--foo=FOO]"
-        end
-
-        it "returns usage for numeric types" do
-          parse(:foo, :numeric).usage.must == "[--foo=N]"
-        end
-
-        it "returns usage for array types" do
-          parse(:foo, :array).usage.must == "[--foo=one two three]"
-        end
-
-        it "returns usage for hash types" do
-          parse(:foo, :hash).usage.must == "[--foo=key:value]"
-        end
-      end
+    it "returns usage for string types" do
+      parse(:foo, :string).usage.must == "[--foo=FOO]"
     end
 
-    describe "without default values" do
-      it "returns usage for string types" do
-        parse(:foo, :string).usage.must == "[--foo=FOO]"
-      end
+    it "returns usage for numeric types" do
+      parse(:foo, :numeric).usage.must == "[--foo=N]"
+    end
 
-      it "returns usage for numeric types" do
-        parse(:foo, :numeric).usage.must == "[--foo=N]"
-      end
+    it "returns usage for array types" do
+      parse(:foo, :array).usage.must == "[--foo=one two three]"
+    end
 
-      it "returns usage for array types" do
-        parse(:foo, :array).usage.must == "[--foo=one two three]"
-      end
+    it "returns usage for hash types" do
+      parse(:foo, :hash).usage.must == "[--foo=key:value]"
+    end
 
-      it "returns usage for hash types" do
-        parse(:foo, :hash).usage.must == "[--foo=key:value]"
-      end
-
-      it "returns usage for hash types" do
-        parse(:foo, :boolean).usage.must == "[--foo]"
-      end
+    it "returns usage for hash types" do
+      parse(:foo, :boolean).usage.must == "[--foo]"
     end
 
     describe "with required values" do
@@ -268,7 +223,6 @@ describe Thor::Option do
         parse([:foo, "-f", "-b"], :required).usage.must == "-f, -b, --foo=FOO"
       end
     end
-
   end
 end
 

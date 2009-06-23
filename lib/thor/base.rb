@@ -11,9 +11,6 @@ class Thor
   HELP_MAPPINGS       = %w(-h -? --help -D)
   THOR_RESERVED_WORDS = %w(invoke shell options behavior root destination_root relative_root source_root)
 
-  class Maxima < Struct.new(:usage, :options, :class_options)
-  end
-
   module Base
     attr_accessor :options
 
@@ -109,6 +106,7 @@ class Thor
       # :optional - If the argument is optional or not.
       # :type     - The type of the argument, can be :string, :hash, :array, :numeric.
       # :default  - Default value for this argument. It cannot be required and have default values.
+      # :banner   - String to show on usage notes.
       #
       # ==== Errors
       # ArgumentError:: Raised if you supply a required argument after a non required one.
@@ -131,8 +129,8 @@ class Thor
                                "the non-required argument #{option.human_name.inspect}."
         end if required
 
-        class_options[name] = Thor::Argument.new(name, options[:desc], required,
-                                                 options[:type], options[:default])
+        class_options[name] = Thor::Argument.new(name, options[:desc], required, options[:type],
+                                                       options[:default], options[:banner])
       end
 
       # Returns this class arguments, looking up in the ancestors chain.
@@ -173,6 +171,7 @@ class Thor
       # :aliases  - Aliases for this option.
       # :type     - The type of the argument, can be :string, :hash, :array, :numeric, :boolean or :default.
       #             Default accepts arguments as booleans (--switch) or as strings (--switch=VALUE).
+      # :banner   - String to show on usage notes.
       #
       def class_option(name, options)
         build_option(name, options, class_options)
@@ -362,7 +361,7 @@ class Thor
 
               options.each do |option|
                 next if option.argument?
-                list << [ option.usage(false), option.description || "" ]
+                list << [ option.usage, option.description || "" ]
                 list << [ "", "Default: #{option.default}" ] if option.description && option.default
               end
 
@@ -401,8 +400,9 @@ class Thor
         # options<Hash>:: Described in both class_option and method_option.
         #
         def build_option(name, options, scope)
-          scope[name] = Thor::Option.new(name, options[:desc], options[:required], options[:type],
-                                               options[:default], options[:aliases], options[:group])
+          scope[name] = Thor::Option.new(name, options[:desc], options[:required],
+                                               options[:type], options[:default], options[:banner],
+                                               options[:group], options[:aliases])
         end
 
         # Receives a hash of options, parse them and add to the scope. This is a

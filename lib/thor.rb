@@ -104,6 +104,8 @@ class Thor
     # :aliases  - Aliases for this option.
     # :type     - The type of the argument, can be :string, :hash, :array, :numeric, :boolean or :default.
     #             Default accepts arguments as booleans (--switch) or as strings (--switch=VALUE).
+    # :group    - The group for this options. Use by class options to output options in different levels.
+    # :banner   - String to show on usage notes.
     #
     def method_option(name, options)
       scope = if options[:for]
