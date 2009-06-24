@@ -65,9 +65,14 @@ class Thor
 
       # Whenever a class inherits from Thor or Thor::Group, we should track the
       # class and the file on Thor::Base. This is the method responsable for it.
+      # Also invoke the source_root if the klass respond to it. This is needed
+      # to ensure that the source_root does not change after FileUtils#cd is
+      # called.
       #
       def register_klass_file(klass) #:nodoc:
         file = caller[1].match(/(.*):\d+/)[1]
+
+        klass.source_root if klass.respond_to?(:source_root)
         Thor::Base.subclasses << klass unless Thor::Base.subclasses.include?(klass)
 
         file_subclasses = Thor::Base.subclass_files[File.expand_path(file)]
@@ -434,13 +439,10 @@ class Thor
         end
 
         # Everytime someone inherits from a Thor class, register the klass
-        # and file into baseclass. Also invoke the source_root if the klass
-        # respond to it. This is needed to ensure that the source_root does 
-        # not change after FileUtils#cd is called.
+        # and file into baseclass.
         #
         def inherited(klass)
           Thor::Base.register_klass_file(klass)
-          klass.source_root if klass.respond_to?(:source_root)
         end
 
         # Fire this callback whenever a method is added. Added methods are

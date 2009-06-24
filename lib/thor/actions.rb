@@ -5,6 +5,11 @@ Dir[File.join(File.dirname(__FILE__), "actions", "*.rb")].each do |action|
 end
 
 class Thor
+  # Some actions require that a class method called source root is defined in
+  # the class. Remember to always cache the source root value, because Ruby
+  # __FILE__ always return the relative path, which may lead to mistakes if you
+  # are calling an action inside the "inside(path)" method.
+  #
   module Actions
     attr_accessor :behavior
 
