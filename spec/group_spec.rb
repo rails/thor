@@ -43,8 +43,8 @@ describe Thor::Group do
       BrokenCounter.desc.must == "Description:\n  This generator run three tasks: one, two and three.\n"
     end
 
-    it "loads an USAGE file if it exists in the source root" do
-      WhinyGenerator.desc.must == "Hey! USAGE from a file!\n"
+    it "can be nil" do
+      WhinyGenerator.desc.must be_nil
     end
   end
 

@@ -12,12 +12,7 @@ class Thor::Group
     def desc(description=nil)
       case description
         when nil
-          usage = File.join(source_root, "..", "USAGE") if respond_to?(:source_root)
-          @desc ||= if usage && File.exist?(usage)
-            File.read(usage)
-          else
-            from_superclass(:desc, nil)
-          end
+          @desc ||= from_superclass(:desc, nil)
         else
           @desc = description
       end
