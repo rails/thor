@@ -42,25 +42,9 @@ class Thor
     #                as destination root.
     #
     def initialize(args=[], options={}, config={})
-      self.behavior = case config[:behavior]
-        when :force
-          options.merge!(:force => true, 'force' => true)
-          :invoke
-        when :skip
-          options.merge!(:skip => true, 'skip' => true)
-          :invoke
-        when :pretend
-          options.merge!(:pretend => true, 'pretend' => true)
-          :invoke
-        when :revoke
-          :revoke
-        else
-          :invoke
-      end
-
       super
-
-      self.root = config[:root]
+      self.root     = config[:root]
+      self.behavior = config[:behavior].to_s == "revoke" ? :revoke : :invoke
     end
 
     # Wraps an action object and call it accordingly to the thor class behavior.

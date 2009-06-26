@@ -1,8 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Thor::Actions do
-  def runner(config={})
-    @runner ||= MyCounter.new([], {}, { :root => destination_root }.merge(config))
+  def runner(options={})
+    @runner ||= MyCounter.new([], options, { :root => destination_root })
   end
 
   def action(*args, &block)
@@ -28,20 +28,7 @@ describe Thor::Actions do
     end
 
     it "can have behavior revoke" do
-      runner(:behavior => :revoke).behavior.must == :revoke
-    end
-
-    %w(skip force pretend).each do |behavior|
-      it "accepts #{behavior.to_sym} as behavior" do
-        thor = runner(:behavior => behavior.to_sym)
-        thor.behavior.must == :invoke
-        thor.options.send(:"#{behavior}?").must be_true
-      end
-
-      it "overwrites options values with configuration values" do
-        thor = MyCounter.new([], { behavior => false }, :behavior => behavior.to_sym)
-        thor.options.send(:"#{behavior}?").must be_true
-      end
+      MyCounter.new([], {}, :behavior => :revoke).behavior.must == :revoke
     end
   end
 
@@ -155,7 +142,7 @@ describe Thor::Actions do
 
       it "does not execute the command if pretending given" do
         dont_allow(FileUtils).chmod_R(0755, file)
-        runner(:behavior => :pretend)
+        runner(:pretend => true)
         action :chmod, "foo", 0755
       end
 
@@ -177,7 +164,7 @@ describe Thor::Actions do
       end
 
       it "does not execute the command if pretend given" do
-        dont_allow(runner(:behavior => :pretend)).`("cd ./") # To avoid highlighting issues `
+        dont_allow(runner(:pretend => true)).`("cd ./") # To avoid highlighting issues `
         action :run, "cd ./"
       end
 
@@ -242,8 +229,8 @@ describe Thor::Actions do
       ::FileUtils.cp_r(source_root, destination_root)
     end
 
-    def runner(config={})
-      @runner ||= MyCounter.new([], {}, { :root => destination_root }.merge(config))
+    def runner(options={})
+      @runner ||= MyCounter.new([], options, { :root => destination_root })
     end
 
     def file
@@ -257,7 +244,7 @@ describe Thor::Actions do
       end
 
       it "does not remove if pretending" do
-        runner(:behavior => :pretend)
+        runner(:pretend => true)
         action :remove_file, "doc/README"
         File.exists?(file).must be_true
       end
@@ -278,7 +265,7 @@ describe Thor::Actions do
       end
 
       it "does not replace if pretending" do
-        runner(:behavior => :pretend)
+        runner(:pretend => true)
         action :gsub_file, "doc/README", "__start__", "START"
         File.open(file).read.must == "__start__\nREADME\n__end__\n"
       end
@@ -304,7 +291,7 @@ describe Thor::Actions do
       end
 
       it "does not append if pretending" do
-        runner(:behavior => :pretend)
+        runner(:pretend => true)
         action :append_file, "doc/README", "END\n"
         File.open(file).read.must == "__start__\nREADME\n__end__\n"
       end
@@ -330,7 +317,7 @@ describe Thor::Actions do
       end
 
       it "does not prepend if pretending" do
-        runner(:behavior => :pretend)
+        runner(:pretend => true)
         action :prepend_file, "doc/README", "START\n"
         File.open(file).read.must == "__start__\nREADME\n__end__\n"
       end

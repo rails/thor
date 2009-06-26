@@ -57,12 +57,7 @@ class Thor
 
       @switches = switches.values.inject({}) do |mem, option|
         @non_assigned_required  << option if option.required?
-
-        if option.argument?
-          @non_assigned_arguments << option
-        elsif !option.default.nil?
-          @options[option.human_name] = option.default
-        end
+        @non_assigned_arguments << option if option.argument?
 
         # If there are no shortcuts specified, generate one using the first character
         shorts = option.aliases.dup
@@ -110,7 +105,6 @@ class Thor
         end
       end
 
-      assign_arguments_default_values!
       check_validity!
       @options
     end
@@ -153,8 +147,8 @@ class Thor
       # Returns the option object for the given switch.
       #
       def switch_option(arg)
-        if arg =~ /^--(no|skip)-(\w+)$/
-          @switches[arg] || @switches["--#{$1}"]
+        if arg =~ /^--(no|skip)-([-\w]+)$/
+          @switches[arg] || @switches["--#{$2}"]
         else
           @switches[arg]
         end
@@ -173,12 +167,16 @@ class Thor
       def parse_option(switch, option, hash)
         human_name = option.human_name
 
-        case option.type
-          when :default
-            hash[human_name] = peek.nil? || peek.to_s =~ /^-/ || shift
+        type = if option.type == :default
+          peek.nil? || peek.to_s =~ /^-/ ? :boolean : :string
+        else
+          option.type
+        end
+
+        case type
           when :boolean
-            if !@switches.key?(switch) && switch =~ /^--(no|skip)-(\w+)$/
-              hash[$1] = false
+            if !@switches.key?(switch) && switch =~ /^--(no|skip)-([-\w]+)$/
+              hash[$2] = false
             else
               hash[human_name] = true
             end
@@ -262,14 +260,6 @@ class Thor
           end.join("', '")
 
           raise RequiredArgumentMissingError, "no value provided for required arguments '#{names}'"
-        end
-      end
-
-      # Assign default values to the argument hash.
-      #
-      def assign_arguments_default_values!
-        @non_assigned_arguments.each do |option|
-          @arguments << option.default
         end
       end
 

@@ -150,20 +150,6 @@ describe Thor::Options do
       end
     end
 
-    describe "with default values" do
-      before(:each) do
-        create "--branch" => "master", "--force" => false
-      end
-
-      it "must get the specified value" do
-        parse("--branch", "bugfix", "--force").must == { "branch" => "bugfix", "force" => true }
-      end
-
-      it "must get the default value when not specified" do
-        parse.must == { "branch" => "master", "force" => false }
-      end
-    end
-
     describe "with arguments" do
       before(:each) do
         @ordered_hash = Thor::CoreExt::OrderedHash.new
@@ -195,7 +181,7 @@ describe Thor::Options do
         parse("3.0", "months")
 
         @opt.arguments.must == [ 3.0 ]
-        @opt.options.must == {"unit" => "days"}
+        @opt.options.must == {}
       end
 
       it "assigns switches to arguments" do
@@ -334,6 +320,13 @@ describe Thor::Options do
         parse("--foo", "--foo", "12")["foo"].must == "12"
         parse("--foo", "12", "--foo", "13")["foo"].must == "13"
       end
+
+      it "accepts --[no-|skip-]opt variant, setting false for value" do
+        create "--foo-bar" => :default
+        parse("--foo-bar")["foo-bar"].must == true
+        parse("--no-foo-bar")["foo-bar"].must == false
+        parse("--skip-foo-bar")["foo-bar"].must == false
+      end
     end
 
     describe "with :numeric type" do
@@ -343,10 +336,6 @@ describe Thor::Options do
 
       it "accepts a -nXY assignment" do
         parse("-n12")["n"].must == 12
-      end
-
-      it "supports numeric defaults" do
-        parse["m"].must == 5
       end
 
       it "converts values to numeric types" do

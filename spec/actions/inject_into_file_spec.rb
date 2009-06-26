@@ -7,8 +7,8 @@ describe Thor::Actions::InjectIntoFile do
     ::FileUtils.cp_r(source_root, destination_root)
   end
 
-  def invoker(config={})
-    @invoker ||= MyCounter.new([], {}, { :root => destination_root }.merge(config))
+  def invoker(options={})
+    @invoker ||= MyCounter.new([], options, { :root => destination_root })
   end
 
   def revoker
@@ -53,7 +53,7 @@ describe Thor::Actions::InjectIntoFile do
     end
 
     it "does not change the file if pretending" do
-      invoker(:behavior => :pretend)
+      invoker(:pretend => true)
 
       capture(:stdout) do
         invoker.inject_into_file "doc/README", "\nmore content", :after => "__start__"

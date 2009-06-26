@@ -31,8 +31,21 @@ class Thor
     # config<Hash>:: Configuration for this Thor class.
     #
     def initialize(args=[], options={}, config={})
+      # Set arguments and default values
       self.class.arguments.zip(args).each do |argument, value|
-        send("#{argument.human_name}=", value)
+        send("#{argument.human_name}=", value || argument.default)
+      end
+
+      # Stringify options
+      options.each_key do |key|
+        next unless key.is_a?(Symbol)
+        options[key.to_s] = options.delete(key)
+      end
+
+      # Set options default values
+      self.class.class_options.each do |key, option|
+        next if option.argument? || option.default.nil?
+        options[key.to_s] ||= option.default
       end
 
       self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
