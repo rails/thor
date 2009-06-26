@@ -93,11 +93,11 @@ class Thor
           next if option.nil? || option.argument?
 
           check_requirement!(switch, option)
-          parse_option(switch, option, @options)
+          @options[option.human_name] = parse_option(switch, option)
         else
           unless @non_assigned_arguments.empty?
             argument = @non_assigned_arguments.shift
-            parse_option(argument.switch_name, argument, @options)
+            @options[argument.human_name] = parse_option(argument.switch_name, argument)
             @arguments << @options.delete(argument.human_name)
           else
             @trailing << shift
@@ -164,8 +164,8 @@ class Thor
       # value to it. At the end, remove the option from the array where non
       # assigned requireds are kept.
       #
-      def parse_option(switch, option, hash)
-        human_name = option.human_name
+      def parse_option(switch, option)
+        @non_assigned_required.delete(option)
 
         type = if option.type == :default
           peek.nil? || peek.to_s =~ /^-/ ? :boolean : :string
@@ -175,22 +175,16 @@ class Thor
 
         case type
           when :boolean
-            if !@switches.key?(switch) && switch =~ /^--(no|skip)-([-\w]+)$/
-              hash[$2] = false
-            else
-              hash[human_name] = true
-            end
+            @switches.key?(switch) || switch !~ /^--(no|skip)-([-\w]+)$/
           when :string
-            hash[human_name] = shift
+            shift
           when :numeric
-            hash[human_name] = parse_numeric(switch)
+            parse_numeric(switch)
           when :hash
-            hash[human_name] = parse_hash
+            parse_hash
           when :array
-            hash[human_name] = parse_array
+            parse_array
         end
-
-        @non_assigned_required.delete(option)
       end
 
       # Runs through the argument array getting strings that contains ":" and

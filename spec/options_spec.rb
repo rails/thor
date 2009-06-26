@@ -327,6 +327,13 @@ describe Thor::Options do
         parse("--no-foo-bar")["foo-bar"].must == false
         parse("--skip-foo-bar")["foo-bar"].must == false
       end
+
+      it "accepts inputs in the human name format" do
+        create :foo_bar => :default
+        parse("--foo-bar")["foo_bar"].must == true
+        parse("--no-foo-bar")["foo_bar"].must == false
+        parse("--skip-foo-bar")["foo_bar"].must == false
+      end
     end
 
     describe "with :numeric type" do

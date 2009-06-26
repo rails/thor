@@ -362,7 +362,7 @@ class Thor
         end
 
         thor_options.each do |key, option|
-          next if option.argument? || option.default.nil?
+          next if option.argument? || option.default.nil? || options.key?(option.human_name.to_s)
           options[option.human_name.to_s] ||= option.default
         end
       end
