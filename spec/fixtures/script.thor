@@ -77,7 +77,7 @@ class MyChildScript < MyScript
   def animal(type)
     [type, options]
   end
-  method_option :other, :type => :string, :for => :animal
+  method_option :other, :type => :string, :default => "method default", :for => :animal
   desc "animal KIND", "fish around", :for => :animal
 
   desc "boom", "explodes everything"

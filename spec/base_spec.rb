@@ -10,9 +10,14 @@ end
 
 describe Thor::Base do
   describe "#initialize" do
-    it "sets values in arguments" do
+    it "sets arguments array" do
       base = MyCounter.new [1, 2]
       base.first.must == 1
+      base.second.must == 2
+    end
+
+    it "sets arguments default values" do
+      base = MyCounter.new []
       base.second.must == 2
     end
 
@@ -21,12 +26,17 @@ describe Thor::Base do
       base.options[:third].must == 3
     end
 
-    it "sets options with indifferent access" do
+    it "sets options default values" do
+      base = MyCounter.new []
+      base.options[:third].must == 3
+    end
+
+    it "creates options with indifferent access" do
       base = MyCounter.new [1, 2], :third => 3
       base.options['third'].must == 3
     end
 
-    it "sets options with magic predicates" do
+    it "creates options with magic predicates" do
       base = MyCounter.new [1, 2], :third => 3
       base.options.third.must == 3
     end

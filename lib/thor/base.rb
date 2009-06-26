@@ -17,8 +17,8 @@ class Thor
     # It receives arguments in an Array and two hashes, one for options and
     # other for configuration.
     #
-    # Notice that it does not check arguments type neither if all required
-    # arguments were supplied. It should be done by the parser.
+    # Notice that it does not check if all required arguments were supplied.
+    # It should be done by the parser.
     #
     # ==== Parameters
     # args<Array[Object]>:: An array of objects. The objects are applied to their
@@ -36,18 +36,7 @@ class Thor
         send("#{argument.human_name}=", value || argument.default)
       end
 
-      # Stringify options
-      options.each_key do |key|
-        next unless key.is_a?(Symbol)
-        options[key.to_s] = options.delete(key)
-      end
-
-      # Set options default values
-      self.class.class_options.each do |key, option|
-        next if option.argument? || option.default.nil?
-        options[key.to_s] ||= option.default
-      end
-
+      self.class.merge_with_thor_options(options, self.class.class_options)
       self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
     end
 
@@ -363,6 +352,21 @@ class Thor
         config[:shell].error e.message
       end
 
+      # Receives a hash of options, stringify keys and merge with default
+      # values from thor options.
+      #
+      def merge_with_thor_options(options, thor_options)
+        options.each_key do |key|
+          next unless key.is_a?(Symbol)
+          options[key.to_s] = options.delete(key)
+        end
+
+        thor_options.each do |key, option|
+          next if option.argument? || option.default.nil?
+          options[option.human_name.to_s] ||= option.default
+        end
+      end
+
       protected
 
         # Prints the class optins per group. If a class options does not belong
@@ -475,6 +479,9 @@ class Thor
           create_task(meth)
         end
 
+        # Retrieves a value from superclass. If it reaches the baseclass,
+        # returns nil.
+        #
         def from_superclass(method, default=nil)
           if self == baseclass
             default
