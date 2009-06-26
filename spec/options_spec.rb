@@ -257,9 +257,18 @@ describe Thor::Options do
         parse("--no-foo")["foo"].must == false
       end
 
+      it "accepts --[skip-]opt variant, setting false for value" do
+        parse("--skip-foo")["foo"].must == false
+      end
+
       it "will prefer 'no-opt' variant over inverting 'opt' if explicitly set" do
         create "--no-foo" => true
         parse("--no-foo")["no-foo"].must == true
+      end
+
+      it "will prefer 'skip-opt' variant over inverting 'opt' if explicitly set" do
+        create "--skip-foo" => true
+        parse("--skip-foo")["skip-foo"].must == true
       end
     end
 

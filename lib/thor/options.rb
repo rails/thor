@@ -153,7 +153,7 @@ class Thor
       # Returns the option object for the given switch.
       #
       def switch_option(arg)
-        if arg =~ /^--no-(\w+)$/
+        if arg =~ /^--(no|skip)-(\w+)$/
           @switches[arg] || @switches["--#{$1}"]
         else
           @switches[arg]
@@ -177,7 +177,7 @@ class Thor
           when :default
             hash[human_name] = peek.nil? || peek.to_s =~ /^-/ || shift
           when :boolean
-            if !@switches.key?(switch) && switch =~ /^--no-(\w+)$/
+            if !@switches.key?(switch) && switch =~ /^--(no|skip)-(\w+)$/
               hash[$1] = false
             else
               hash[human_name] = true
