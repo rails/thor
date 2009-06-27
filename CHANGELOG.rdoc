@@ -2,9 +2,11 @@
 
 * Improve spec coverage for Thor::Runner
 * Improve help output to list shorthand switches, too
-* Investigate and fix deep namespacing ("foo:bar:baz") issues
 
 == Current
+
+* BACKWARDS INCOMPATIBLE: aliases are not generated automatically anymore
+  since it wrong behavior to the invocation system.
 
 * thor help now show information about any class/task. All those calls are
   possible:

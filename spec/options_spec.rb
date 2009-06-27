@@ -54,16 +54,6 @@ describe Thor::Options do
   end
 
   describe "#initialize" do
-    it "automatically aliases long switches with their first letter" do
-      create "--foo" => true
-      parse("-f")["foo"].must be_true
-    end
-
-    it "doesn't auto-alias switches that have multiple names given" do
-      create ["--foo", "--bar"] => :boolean
-      parse("-f")["foo"].must_not be
-    end
-
     it "allows multiple aliases for a given switch" do
       create ["--foo", "--bar", "--baz"] => :optional
       parse("--foo", "12")["foo"].must == "12"
@@ -92,7 +82,7 @@ describe Thor::Options do
 
   describe "#parse" do
     it "accepts conjoined short switches" do
-      create "--foo" => true, "--bar" => true, "--app" => true
+      create ["--foo", "-f"] => true, ["--bar", "-b"] => true, ["--app", "-a"] => true
       opts = parse("-fba")
       opts["foo"].must be_true
       opts["bar"].must be_true
@@ -100,7 +90,7 @@ describe Thor::Options do
     end
 
     it "accepts conjoined short switches with input" do
-      create "--foo" => true, "--bar" => true, "--app" => :required
+      create ["--foo", "-f"] => true, ["--bar", "-b"] => true, ["--app", "-a"] => :required
       opts = parse "-fba", "12"
       opts["foo"].must be_true
       opts["bar"].must be_true
@@ -212,7 +202,7 @@ describe Thor::Options do
 
     describe "with :string type" do
       before(:each) do
-        create "--foo" => :required
+        create ["--foo", "-f"] => :required
       end
 
       it "accepts a switch=<value> assignment" do

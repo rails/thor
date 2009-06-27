@@ -59,10 +59,9 @@ class Thor
         @non_assigned_required  << option if option.required?
         @non_assigned_arguments << option if option.argument?
 
-        # If there are no shortcuts specified, generate one using the first character
-        shorts = option.aliases.dup
-        shorts << "-" + option.human_name[0,1] if shorts.empty? and option.human_name.length > 1
-        shorts.each { |short| @shorts[short.to_s] ||= option.switch_name }
+        option.aliases.each do |short|
+          @shorts[short.to_s] ||= option.switch_name
+        end
 
         mem[option.switch_name] = option
         mem
