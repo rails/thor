@@ -202,4 +202,10 @@ describe Thor::Base do
       MyChildScript.new.must_not respond_to("boom")
     end
   end
+
+  describe "#from_superclass" do
+    it "does not send a method to the superclass if the superclass does not respond to it" do
+      MyCounter.get_from_super.must == 13
+    end
+  end
 end

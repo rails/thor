@@ -1,6 +1,10 @@
 class MyCounter < Thor::Group
   include Thor::Actions
 
+  def self.get_from_super
+    from_superclass(:get_from_super, 13)
+  end
+
   def self.source_root
     @source_root ||= File.expand_path(File.dirname(__FILE__))
   end

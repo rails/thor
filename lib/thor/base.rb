@@ -483,7 +483,7 @@ class Thor
         # returns nil.
         #
         def from_superclass(method, default=nil)
-          if self == baseclass
+          if self == baseclass || !superclass.respond_to?(method, true)
             default
           else
             value = superclass.send(method)
