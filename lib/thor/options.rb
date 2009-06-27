@@ -137,6 +137,12 @@ class Thor
         end
       end
 
+      # Returns true if the next value exists and is not a switch.
+      #
+      def current_is_value?
+        peek && peek !~ /^-/
+      end
+
       # Check if the given argument matches with a switch.
       #
       def switch?(arg)
@@ -167,14 +173,18 @@ class Thor
         @non_assigned_required.delete(option)
 
         type = if option.type == :default
-          peek.nil? || peek.to_s =~ /^-/ ? :boolean : :string
+          current_is_value? ? :string : :boolean
         else
           option.type
         end
 
         case type
           when :boolean
-            @switches.key?(switch) || switch !~ /^--(no|skip)-([-\w]+)$/
+            if current_is_value?
+              shift == "true"
+            else
+              @switches.key?(switch) || switch !~ /^--(no|skip)-([-\w]+)$/
+            end
           when :string
             shift
           when :numeric
@@ -198,7 +208,7 @@ class Thor
       def parse_hash
         hash = {}
 
-        while peek && peek !~ /^\-/
+        while current_is_value? && peek.include?(?:)
           key, value = shift.split(':')
           hash[key] = value
         end
@@ -218,7 +228,7 @@ class Thor
       def parse_array
         array = []
 
-        while peek && peek !~ /^\-/
+        while current_is_value?
           array << shift
         end
 
@@ -240,7 +250,7 @@ class Thor
       def check_requirement!(switch, option)
         if option.input_required?
           raise RequiredArgumentMissingError, "no value provided for required argument '#{switch}'" if peek.nil?
-          raise MalformattedArgumentError, "cannot pass switch '#{peek}' as an argument" if switch?(peek)
+          raise MalformattedArgumentError, "cannot pass switch '#{peek}' as an argument" unless current_is_value?
         end
       end
 

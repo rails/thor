@@ -225,6 +225,11 @@ describe Thor::Options do
         parse("--foo")["foo"].must == true
       end
 
+      it "accepts --opt=value assignment" do
+        parse("--foo=true")["foo"].must == true
+        parse("--foo=false")["foo"].must == false
+      end
+
       it "doesn't set nonexistant switches" do
         parse("--foo")["bar"].must_not be
       end
