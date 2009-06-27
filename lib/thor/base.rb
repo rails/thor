@@ -369,12 +369,16 @@ class Thor
 
       protected
 
-        # Prints the class optins per group. If a class options does not belong
-        # to any group, it's grouped as "Class options" in Thor classes and as
-        # "Options" in Thor::Group (since Thor::Group does not have method
-        # options, there is not need to add "Class" frist).
+        # Prints the class options per group. If an option does not belong to
+        # any group, it uses the ungrouped name value. This method provide to
+        # hooks to add extra options, one of them if the third argument called
+        # extra_group that should be a Thor::CoreExt::OrderedHash in the format
+        # :group => Array[Options].
         #
-        def class_options_help(shell, ungrouped_name=nil) #:nodoc:
+        # The second is by returning a lamda used to print values. The lambda
+        # requires two options: the group name and the array of options.
+        #
+        def class_options_help(shell, ungrouped_name=nil, extra_group=nil) #:nodoc:
           unless self.class_options.empty?
             groups = self.class_options.group_values_by { |o| o.group }
 
@@ -404,7 +408,9 @@ class Thor
             printer.call(ungrouped_name, global_options) if global_options
 
             # Print all others
+            groups = extra_group.merge(groups) if extra_group
             groups.each(&printer)
+            printer
           end
         end
 

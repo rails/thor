@@ -124,6 +124,15 @@ describe Thor::Base do
       @content.must =~ /Runtime options\:/
       @content.must =~ /\-p, \[\-\-pretend\]/
     end
+
+    it "allows extra options to be given" do
+      hash = Thor::CoreExt::OrderedHash.new
+      hash["Foo"] = B.class_options.values
+
+      content = capture(:stdout) { MyCounter.send(:class_options_help, Thor::Shell::Basic.new, nil, hash) }
+      content.must =~ /Foo options\:/
+      content.must =~ /--last-name=LAST_NAME/
+    end
   end
 
   describe "#namespace" do
