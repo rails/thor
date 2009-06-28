@@ -24,10 +24,7 @@ class Thor::Group
       opts = Thor::Options.new(class_options)
       opts.parse(args)
 
-      defaults = config[:default_options] ? config[:default_options].dup : {}
-      merge_with_thor_options(defaults, {})
-
-      instance = new(opts.arguments, defaults.merge!(opts.options), config) do |klass, invoke, overrides|
+      instance = new(opts.arguments, opts.options, config) do |klass, invoke, overrides|
         klass.prepare(invoke, args, config.merge(overrides))
       end
 

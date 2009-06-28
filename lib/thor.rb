@@ -124,10 +124,8 @@ class Thor
       opts = Thor::Options.new(options)
       opts.parse(args)
 
-      defaults = config[:default_options] ? config[:default_options].dup : {}
-      merge_with_thor_options(defaults, task.options)
-
-      instance = new(opts.arguments, defaults.merge!(opts.options), config) do |klass, invoke, overrides|
+      merge_with_thor_options(opts.options, task.options)
+      instance = new(opts.arguments, opts.options, config) do |klass, invoke, overrides|
         klass.prepare(invoke, args, config.merge(overrides))
       end
 

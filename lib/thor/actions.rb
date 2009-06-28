@@ -42,9 +42,18 @@ class Thor
     #                as destination root.
     #
     def initialize(args=[], options={}, config={})
+      self.behavior = case config[:behavior].to_s
+        when "force", "skip"
+          _cleanup_options_and_set(options, config[:behavior])
+          :invoke
+        when "revoke"
+          :revoke
+        else
+          :invoke
+      end
+
       super
-      self.root     = config[:root]
-      self.behavior = config[:behavior].to_s == "revoke" ? :revoke : :invoke
+      self.root = config[:root]
     end
 
     # Wraps an action object and call it accordingly to the thor class behavior.
@@ -293,6 +302,11 @@ class Thor
       #
       def _overrides_config #:nodoc:
         super.merge!(:root => self.root)
+      end
+
+      def _cleanup_options_and_set(options, key)
+        [:force, :skip, "force", "skip"].each { |i| options.delete(i) }
+        options.merge!(key => true)
       end
 
   end

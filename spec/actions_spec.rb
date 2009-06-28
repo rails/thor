@@ -30,6 +30,20 @@ describe Thor::Actions do
     it "can have behavior revoke" do
       MyCounter.new([], {}, :behavior => :revoke).behavior.must == :revoke
     end
+
+    it "when behavior is set to force, overwrite options" do
+      runner = MyCounter.new([], { :force => false, :skip => true }, :behavior => :force)
+      runner.behavior.must == :invoke
+      runner.options.force.must be_true
+      runner.options.skip.must_not be_true
+    end
+
+    it "when behavior is set to skip, overwrite options" do
+      runner = MyCounter.new([], { :force => true, :skip => false }, :behavior => :skip)
+      runner.behavior.must == :invoke
+      runner.options.force.must_not be_true
+      runner.options.skip.must be_true
+    end
   end
 
   describe "accessors" do

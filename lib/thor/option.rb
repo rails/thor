@@ -134,6 +134,15 @@ class Thor
       sample
     end
 
+    def show_default?
+      case default
+        when Array, String, Hash
+          !default.empty?
+        else
+          default
+      end
+    end
+
     protected
 
       def position

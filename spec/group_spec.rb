@@ -10,10 +10,6 @@ describe Thor::Group do
       MyCounter.start(["1", "--third", "3"]).must == [ 1, 2, 3 ]
     end
 
-    it "allows default options to overwrite class options" do
-      MyCounter.start(["1"], :default_options => { :third => 10 }).must == [ 1, 2, 10 ]
-    end
-
     it "invokes all the tasks in the Thor group and his parents" do
       BrokenCounter.start(["1", "2", "--third", "3"]).must == [ nil, 2, 3, false, 5 ]
     end

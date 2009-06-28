@@ -388,7 +388,7 @@ class Thor
               options.each do |option|
                 next if option.argument?
                 list << [ option.usage, option.description || "" ]
-                list << [ "", "Default: #{option.default}" ] if option.description && option.default
+                list << [ "", "Default: #{option.default}" ] if option.show_default?
               end
 
               unless list.empty?

@@ -128,11 +128,6 @@ describe Thor do
       options.must == { "other" => "method default" }
     end
 
-    it "allows default options to overwrite method options" do
-      options = MyChildScript.start(["animal", "fish"], :default_options => { :other => "user default" }).last
-      options.must == { "other" => "user default" }
-    end
-
     it "raises when an exception happens within the task call" do
       lambda { MyScript.start(["call_myself_with_wrong_arity"]) }.must raise_error
     end
