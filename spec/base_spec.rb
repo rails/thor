@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require 'thor/options'
+require 'thor/base'
 
 class Amazing
   desc "hello", "say hello"
@@ -17,7 +17,7 @@ describe Thor::Base do
     end
 
     it "sets arguments default values" do
-      base = MyCounter.new []
+      base = MyCounter.new [1]
       base.second.must == 2
     end
 
@@ -27,7 +27,7 @@ describe Thor::Base do
     end
 
     it "sets options default values" do
-      base = MyCounter.new []
+      base = MyCounter.new [1, 2]
       base.options[:third].must == 3
     end
 

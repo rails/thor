@@ -62,51 +62,8 @@ class Thor
         end
       end
 
-      def current_is_switch?
-        case peek
-          when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
-            switch?($1)
-          when SHORT_SQ_RE
-            $1.split('').any? { |f| switch?("-#{f}") }
-        end
-      end
-
       def current_is_value?
         peek && peek.to_s !~ /^-/
-      end
-
-      def switch?(arg)
-        switch_option(arg) || @shorts.key?(arg)
-      end
-
-      def switch_option(arg)
-        if arg =~ /^--(no|skip)-([-\w]+)$/
-          @switches[arg] || @switches["--#{$2}"]
-        else
-          @switches[arg]
-        end
-      end
-
-      # Check if the given argument is actually a shortcut.
-      #
-      def normalize_switch(arg)
-        @shorts.key?(arg) ? @shorts[arg] : arg
-      end
-
-      # Receives switch, option and the current values hash and assign the next
-      # value to it. At the end, remove the option from the array where non
-      # assigned requireds are kept.
-      #
-      def parse_option(switch, option)
-        @non_assigned_required.delete(option)
-
-        type = if option.type == :default
-          current_is_value? ? :string : :boolean
-        else
-          option.type
-        end
-
-        send(:"parse_#{type}", switch)
       end
 
       # Runs through the argument array getting strings that contains ":" and
@@ -177,7 +134,23 @@ class Thor
         end
       end
 
-      # Raises an error if @required array is not empty after parsing.
+      # Receives switch, option and the current values hash and assign the next
+      # value to it. Also removes the option from the array where non assigned
+      # required are kept.
+      #
+      def parse_peek(switch, option)
+        @non_assigned_required.delete(option)
+
+        type = if option.type == :default
+          current_is_value? ? :string : :boolean
+        else
+          option.type
+        end
+
+        send(:"parse_#{type}", switch)
+      end
+
+      # Raises an error if @non_assigned_required array is not empty.
       #
       def check_requirement!
         unless @non_assigned_required.empty?
@@ -191,5 +164,6 @@ class Thor
 
   end
 end
+
 require 'thor/parser/options'
 require 'thor/parser/arguments'

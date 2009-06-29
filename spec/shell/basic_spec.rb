@@ -61,7 +61,7 @@ describe Thor::Shell::Basic do
     end
 
     it "does not print a message if base is set to quiet" do
-      base = MyCounter.new
+      base = MyCounter.new [1,2]
       mock(base).options { Hash.new(:quiet => true) }
 
       dont_allow($stdout).puts

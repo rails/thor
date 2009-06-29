@@ -31,8 +31,8 @@ class Thor
     # config<Hash>:: Configuration for this Thor class.
     #
     def initialize(args=[], options={}, config={})
-      opts = Thor::Options.new
-      opts.parse_arguments(self.class.arguments, args).each do |key, value|
+      opts = Thor::Arguments.new(self.class.arguments)
+      opts.parse(args).each do |key, value|
         send("#{key}=", value)
       end
 
@@ -40,8 +40,7 @@ class Thor
         parse_options = self.class.class_options
         parse_options = parse_options.merge(config[:extra_options]) if config[:extra_options]
         opts = Thor::Options.new(parse_options)
-        opts.parse(options)
-        options = opts.options
+        options = opts.parse(options)
         self.class.merge_with_thor_options(options, config[:extra_options]) if config[:extra_options]
       end
 

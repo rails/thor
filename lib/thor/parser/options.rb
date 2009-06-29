@@ -1,11 +1,7 @@
-class Thor
+require 'thor/parser/option'
 
-  # This is a modified version of Daniel Berger's Getopt::Long class, licensed
-  # under Ruby's license.
-  #
+class Thor
   class Options < Parser
-    attr_reader :arguments, :options
-  
     # Takes an array of switches. Each array consists of up to three
     # elements that indicate the name and type of switch. Returns a hash
     # containing each switch name, minus the '-', as a key. The value
@@ -24,11 +20,10 @@ class Thor
     #   ).parse(args)
     #
     def initialize(switches={})
-      @arguments, @shorts, @options = [], {}, {}
-      @non_assigned_required = []
+      @shorts, @non_assigned_required = {}, []
 
       @switches = switches.values.inject({}) do |mem, option|
-        @non_assigned_required  << option if option.required?
+        @non_assigned_required << option if option.required?
 
         option.aliases.each do |short|
           @shorts[short.to_s] ||= option.switch_name
@@ -40,7 +35,7 @@ class Thor
     end
 
     def parse(args)
-      @pile = args.dup
+      @pile, options = args.dup, {}
 
       while peek
         if current_is_switch?
@@ -63,31 +58,46 @@ class Thor
             raise MalformattedArgumentError, "cannot pass switch '#{peek}' as an argument" unless current_is_value?
           end
 
-          @options[option.human_name] = parse_option(switch, option)
+          options[option.human_name] = parse_peek(switch, option)
         else
           shift
         end
       end
 
       check_requirement!
-      @options
+      options
     end
 
-    def parse_arguments(arguments, args)
-      @pile = args.dup
-      assigns = {}
+    protected
 
-      # TODO Check validity!
-      arguments.each do |argument|
-        assigns[argument.human_name] = if peek
-          send(:"parse_#{argument.type}", argument.switch_name)
-        else
-          argument.default
+      # Returns true if the current value in peek is a registered switch.
+      #
+      def current_is_switch?
+        case peek
+          when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
+            switch?($1)
+          when SHORT_SQ_RE
+            $1.split('').any? { |f| switch?("-#{f}") }
         end
       end
 
-      assigns
-    end
+      def switch?(arg)
+        switch_option(arg) || @shorts.key?(arg)
+      end
+
+      def switch_option(arg)
+        if arg =~ /^--(no|skip)-([-\w]+)$/
+          @switches[arg] || @switches["--#{$2}"]
+        else
+          @switches[arg]
+        end
+      end
+
+      # Check if the given argument is actually a shortcut.
+      #
+      def normalize_switch(arg)
+        @shorts.key?(arg) ? @shorts[arg] : arg
+      end
 
   end
 end

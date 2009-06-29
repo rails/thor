@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require 'thor/options'
+require 'thor/parser'
 
 describe Thor::Options do
   def create(opts)

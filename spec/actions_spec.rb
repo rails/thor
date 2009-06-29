@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Thor::Actions do
   def runner(options={})
-    @runner ||= MyCounter.new([], options, { :root => destination_root })
+    @runner ||= MyCounter.new([1], options, { :root => destination_root })
   end
 
   def action(*args, &block)
@@ -28,18 +28,18 @@ describe Thor::Actions do
     end
 
     it "can have behavior revoke" do
-      MyCounter.new([], {}, :behavior => :revoke).behavior.must == :revoke
+      MyCounter.new([1], {}, :behavior => :revoke).behavior.must == :revoke
     end
 
     it "when behavior is set to force, overwrite options" do
-      runner = MyCounter.new([], { :force => false, :skip => true }, :behavior => :force)
+      runner = MyCounter.new([1], { :force => false, :skip => true }, :behavior => :force)
       runner.behavior.must == :invoke
       runner.options.force.must be_true
       runner.options.skip.must_not be_true
     end
 
     it "when behavior is set to skip, overwrite options" do
-      runner = MyCounter.new([], { :force => true, :skip => false }, :behavior => :skip)
+      runner = MyCounter.new([1], { :force => true, :skip => false }, :behavior => :skip)
       runner.behavior.must == :invoke
       runner.options.force.must_not be_true
       runner.options.skip.must be_true
@@ -49,19 +49,20 @@ describe Thor::Actions do
   describe "accessors" do
     describe "#root=" do
       it "gets the current directory and expands the path to set the root" do
-        base = MyCounter.new
+        base = MyCounter.new([1])
         base.root = "here"
         base.root.must == File.expand_path(File.join(File.dirname(__FILE__), "..", "here"))
       end
 
       it "does not use the current directory if one is given" do
-        base = MyCounter.new
+        base = MyCounter.new([1])
         base.root = "/"
         base.root.must == "/"
       end
 
       it "uses the current directory if none is given" do
-        MyCounter.new.root.must == File.expand_path(File.join(File.dirname(__FILE__), ".."))
+        base = MyCounter.new([1])
+        base.root.must == File.expand_path(File.join(File.dirname(__FILE__), ".."))
       end
     end
 
@@ -244,7 +245,7 @@ describe Thor::Actions do
     end
 
     def runner(options={})
-      @runner ||= MyCounter.new([], options, { :root => destination_root })
+      @runner ||= MyCounter.new([1], options, { :root => destination_root })
     end
 
     def file

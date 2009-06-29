@@ -7,11 +7,11 @@ describe Thor::Actions::CopyFile do
   end
 
   def invoker
-    @invoker ||= MyCounter.new([], {}, { :root => destination_root })
+    @invoker ||= MyCounter.new([1,2], {}, { :root => destination_root })
   end
 
   def revoker
-    @revoker ||= MyCounter.new([], {}, { :root => destination_root, :behavior => :revoke })
+    @revoker ||= MyCounter.new([1,2], {}, { :root => destination_root, :behavior => :revoke })
   end
 
   def exists_and_identical?(source, destination)

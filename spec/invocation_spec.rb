@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require 'thor/options'
+require 'thor/base'
 
 describe Thor::Invocation do
   describe "#invoke" do

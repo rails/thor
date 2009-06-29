@@ -17,7 +17,7 @@ describe Thor::Shell do
 
   describe "#shell" do
     it "returns the shell in use" do
-      MyCounter.new.shell.must be_kind_of(Thor::Shell::Basic)
+      MyCounter.new([1,2]).shell.must be_kind_of(Thor::Shell::Basic)
     end
   end
 end
