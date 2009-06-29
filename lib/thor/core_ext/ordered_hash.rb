@@ -62,7 +62,6 @@ class Thor #:nodoc:
         self.map { |k, v| k }
       end
 
-      # TODO Delete me
       def values
         self.map { |k, v| v }
       end

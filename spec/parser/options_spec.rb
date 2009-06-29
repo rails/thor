@@ -14,14 +14,6 @@ describe Thor::Options do
     @opt.parse(args.flatten)
   end
 
-  def usage
-    @opt.formatted_usage
-  end
-
-  def sorted_usage
-    usage.split(" ").sort.join(" ")
-  end
-
   describe "#to_switches" do
     it "turns true values into a flag" do
       Thor::Options.to_switches(:color => true).must == "--color"
@@ -44,16 +36,16 @@ describe Thor::Options do
       switches.must == ['"bar"', "--color", "--foo"]
     end
 
-    it "works with arrays" do
+    it "accepts arrays" do
       Thor::Options.to_switches(:count => [1,2,3]).must == "--count 1 2 3"
     end
 
-    it "works with hashes" do
+    it "accepts hashes" do
       Thor::Options.to_switches(:count => {:a => :b}).must == "--count a:b"
     end
   end
 
-  describe "#initialize" do
+  describe "#parse" do
     it "allows multiple aliases for a given switch" do
       create ["--foo", "--bar", "--baz"] => :optional
       parse("--foo", "12")["foo"].must == "12"
@@ -71,16 +63,6 @@ describe Thor::Options do
       parse("-f", "12").must == {"bar" => "12"}
     end
 
-    it "doesn't recognize long switch format for a switch that is originally short" do
-      create 'f' => :optional
-      parse("-f", "1").must == {"f" => "1"}
-
-      create 'f' => :optional
-      parse("--f", "1").must == {}
-    end
-  end
-
-  describe "#parse" do
     it "accepts conjoined short switches" do
       create ["--foo", "-f"] => true, ["--bar", "-b"] => true, ["--app", "-a"] => true
       opts = parse("-fba")
@@ -131,9 +113,6 @@ describe Thor::Options do
         lambda { parse("--foo", "--bar") }.must raise_error(Thor::MalformattedArgumentError, "cannot pass switch '--bar' as an argument")
       end
     end
-  end
-
-  describe "on general" do
 
     describe "with :string type" do
       before(:each) do
