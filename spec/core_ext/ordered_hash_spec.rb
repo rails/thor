@@ -34,24 +34,6 @@ describe Thor::CoreExt::OrderedHash do
       @hash[:bat] = "Bat!"
     end
 
-    it "is not same as its clone" do
-      new_hash = @hash.clone
-      new_hash[:bang] = "Bang!"
-      @hash[:bang].must be_nil
-    end
-
-    it "has different nodes from its clone" do
-      new_hash = @hash.clone
-      new_hash[:baz] = "Bang!"
-      new_hash.values.must == ["Foo!", "Bar!", "Bang!", "Bop!", "Bat!"]
-    end
-
-    it "does not set next and prev value on borders" do
-      new_hash = @hash.clone
-      new_hash.instance_variable_get("@first").prev.must be_nil
-      new_hash.instance_variable_get("@last").next.must be_nil
-    end
-
     it "returns nil for an undefined key" do
       @hash[:boom].must be_nil
     end
@@ -105,19 +87,6 @@ describe Thor::CoreExt::OrderedHash do
       other_hash[:bar] = "bar"
       @hash.merge(other_hash)[:bar].must == "bar"
       @hash[:bar].must == "Bar!"
-    end
-
-    it "changes itself on merge!" do
-      other_hash = Thor::CoreExt::OrderedHash.new
-      other_hash[:bar] = "bar"
-      @hash.merge!(other_hash)
-      @hash[:bar].must == "bar"
-    end
-
-    it "groups values by" do
-      group = @hash.group_values_by { |value| value.include?(?a) }
-      group[true].must  == ["Bar!", "Baz!", "Bat!"]
-      group[false].must == ["Foo!", "Bop!"]
     end
 
     it "converts to an array" do

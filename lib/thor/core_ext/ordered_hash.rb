@@ -10,33 +10,11 @@ class Thor #:nodoc:
     #
     class OrderedHash #:nodoc:
       include Enumerable
-      extend Forwardable
 
       Node = Struct.new(:key, :value, :next, :prev)
-      def_delegators :@hash, :empty?, :size, :length
 
       def initialize
         @hash = {}
-      end
-
-      # Called on clone. It gets all the notes from the cloned object, dup them
-      # and assign the duped objects siblings.
-      #
-      def initialize_copy(other)
-        @hash = {}
-
-        array = []
-        other.each do |key, value|
-          array << (@hash[key] = Node.new(key, value))
-        end
-
-        array.each_with_index do |node, i|
-          node.next = array[i + 1]
-          node.prev = array[i - 1] if i > 0
-        end
-
-        @first = array.first
-        @last  = array.last
       end
 
       def [](key)
@@ -44,15 +22,8 @@ class Thor #:nodoc:
       end
 
       def []=(key, value)
-        if old = @hash[key]
-          node = old.dup
+        if node = @hash[key]
           node.value = value
-
-          @first = node if @first == old
-          @last  = node if @last  == old
-
-          old.prev.next = node if old.prev
-          old.next.prev = node if old.next
         else
           node = Node.new(key, value)
 
@@ -91,6 +62,7 @@ class Thor #:nodoc:
         self.map { |k, v| k }
       end
 
+      # TODO Delete me
       def values
         self.map { |k, v| v }
       end
@@ -103,25 +75,22 @@ class Thor #:nodoc:
         self
       end
 
-      def group_values_by
-        assoc = self.class.new
-        each do |_, element|
-          key = yield(element)
-          assoc[key] ||= []
-          assoc[key] << element
-        end
-        assoc
-      end
-
       def merge(other)
-        dup.merge!(other)
+        hash = self.class.new
+
+        self.each do |key, value|
+          hash[key] = value
+        end
+
+        other.each do |key, value|
+          hash[key] = value
+        end
+
+        hash
       end
 
-      def merge!(other)
-        other.each do |key, value|
-          self[key] = value
-        end
-        self
+      def empty?
+        @hash.empty?
       end
     end
   end
