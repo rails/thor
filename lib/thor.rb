@@ -75,7 +75,7 @@ class Thor
     # is the type of the option. Can be :optional, :required, :boolean or :numeric.
     #
     def method_options(options=nil)
-      @method_options ||= Thor::CoreExt::OrderedHash.new
+      @method_options ||= {}
       build_options(options, @method_options) if options
       @method_options
     end

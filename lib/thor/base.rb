@@ -139,6 +139,8 @@ class Thor
           options[:default].nil?
         end
 
+        remove_argument name
+
         arguments.each do |argument|
           next if argument.required?
           raise ArgumentError, "You cannot have #{name.to_s.inspect} as required argument after " <<
@@ -168,7 +170,7 @@ class Thor
       # Hash[Symbol => Object]
       #
       def class_options(options=nil)
-        @class_options ||= from_superclass(:class_options, Thor::CoreExt::OrderedHash.new)
+        @class_options ||= from_superclass(:class_options, {})
         build_options(options, @class_options) if options
         @class_options
       end
@@ -208,7 +210,7 @@ class Thor
         options = names.last.is_a?(Hash) ? names.pop : {}
 
         names.each do |name|
-          arguments.delete_if{ |a| a.name == name.to_s }
+          arguments.delete_if { |a| a.name == name.to_s }
           undef_method name, "#{name}=" if options[:undefine]
         end
       end
@@ -389,7 +391,12 @@ class Thor
         #
         def class_options_help(shell, ungrouped_name=nil, extra_group=nil) #:nodoc:
           unless self.class_options.empty?
-            groups = self.class_options.group_values_by { |o| o.group }
+            groups = {}
+
+            class_options.each do |_, value|
+              groups[value.group] ||= []
+              groups[value.group] << value
+            end
 
             printer = lambda do |group_name, options|
               list = []
