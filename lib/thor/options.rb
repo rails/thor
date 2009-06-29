@@ -32,7 +32,7 @@ class Thor
       end.join(" ")
     end
 
-    attr_reader :arguments, :options, :trailing
+    attr_reader :arguments, :options
 
     # Takes an array of switches. Each array consists of up to three
     # elements that indicate the name and type of switch. Returns a hash

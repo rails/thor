@@ -15,7 +15,7 @@ class Thor
       @type        = (type || :default).to_sym
       @default     = default
       @aliases     = [*aliases].compact
-      @banner      = banner || formatted_value
+      @banner      = banner || default_banner
       @group       = group.to_s.capitalize if group
     end
 
@@ -87,17 +87,6 @@ class Thor
       required
     end
 
-    def optional?
-      !required
-    end
-
-    def <=>(other)
-      self.position <=> other.position
-    end
-
-    # Returns true if this type requires an input to be given. Just :default
-    # and :boolean does not require an input.
-    #
     def input_required?
       [ :numeric, :hash, :array, :string ].include?(type)
     end
@@ -108,18 +97,6 @@ class Thor
 
     def human_name
       @human_name ||= dasherized? ? undasherize(name) : name
-    end
-
-    def dasherized?
-      name.index('-') == 0
-    end
-
-    def undasherize(str)
-      str.sub(/^-{1,2}/, '')
-    end
-
-    def dasherize(str)
-      (str.length > 1 ? "--" : "-") + str.gsub('_', '-')
     end
 
     def usage
@@ -145,17 +122,19 @@ class Thor
 
     protected
 
-      def position
-        if argument?
-          -1
-        elsif required?
-          0
-        else
-          1
-        end
+      def dasherized?
+        name.index('-') == 0
       end
 
-      def formatted_value
+      def undasherize(str)
+        str.sub(/^-{1,2}/, '')
+      end
+
+      def dasherize(str)
+        (str.length > 1 ? "--" : "-") + str.gsub('_', '-')
+      end
+
+      def default_banner
         case type
           when :boolean
             nil
