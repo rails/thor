@@ -77,7 +77,7 @@ class Thor
     #
     #   invoke Rspec::RR, [], :style => :foo
     #
-    def invoke(name=nil, task=nil, args=nil, opts=nil, config={})
+    def invoke(name=nil, task=nil, args=nil, opts=nil, config=nil)
       task, args, opts, config = nil, task, args, opts if task.is_a?(Array)
       object, task = _setup_for_invoke(name, task)
 
@@ -87,7 +87,7 @@ class Thor
         stored_args, stored_opts, stored_config = @_initializer
         args ||= stored_args.dup
         opts ||= stored_opts.dup
-        config = stored_config.merge(config)
+        config = stored_config.merge(config || {})
 
         instance = klass.new(args, opts, config)
       else
