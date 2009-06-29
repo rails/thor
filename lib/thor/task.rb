@@ -12,8 +12,6 @@ class Thor
       super(name.to_s, description, usage, options || {})
     end
 
-    # Dup the options hash on clone.
-    #
     def initialize_copy(other)
       super(other)
       self.options = other.options.dup if other.options

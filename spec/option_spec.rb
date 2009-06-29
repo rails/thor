@@ -125,16 +125,6 @@ describe Thor::Option do
     end
   end
 
-  it "can be required" do
-    parse(:foo, :required).must be_required
-    parse(:foo, :required).must_not be_optional
-  end
-
-  it "can be optional" do
-    parse(:foo, :optional).must_not be_required
-    parse(:foo, :optional).must be_optional
-  end
-
   it "requires an input when type is a string, array, hash or numeric" do
     [:string, :array, :hash, :numeric].each do |type|
       parse(:foo, type).input_required?.must be_true
@@ -163,11 +153,6 @@ describe Thor::Option do
 
   it "is not an argument" do
     option(:task).must_not be_argument
-  end
-
-  it "has higher priority on sort when is required" do
-    array = [ Thor::Option.parse(:foo, :optional), Thor::Option.parse(:foo, :required) ]
-    array.sort.first.must be_required
   end
 
   describe "errors" do
@@ -266,9 +251,5 @@ describe Thor::Argument do
     it "returns usage for hash types" do
       argument(:foo, :hash).usage.must == "key:value"
     end
-  end
-
-  it "has higher priority than options on sort" do
-    [ Thor::Option.parse(:foo, "bar"), argument(:task) ].sort.first.must be_kind_of(Thor::Argument)
   end
 end

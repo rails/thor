@@ -97,14 +97,6 @@ describe Thor::Options do
       opts["app"].must == "12"
     end
 
-    it "extracts trailing inputs" do
-      create "--foo" => :required, "--bar" => true
-      args = [ "foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang" ]
-
-      parse(*args).must == { "foo" => "12", "bar" => true }
-      @opt.trailing.must == ["foo", "bar", "--baz", "-T", "bang"]
-    end
-
     describe "with no input" do
       it "and no switches returns an empty hash" do
         create({})
@@ -137,63 +129,6 @@ describe Thor::Options do
 
       it "raises an error if a switch name is given as the argument to the required switch" do
         lambda { parse("--foo", "--bar") }.must raise_error(Thor::MalformattedArgumentError, "cannot pass switch '--bar' as an argument")
-      end
-    end
-
-    describe "with arguments" do
-      before(:each) do
-        @ordered_hash = Thor::CoreExt::OrderedHash.new
-        @ordered_hash[:interval] = Thor::Argument.new(:interval, nil, true, :numeric, nil)
-        @ordered_hash[:unit]     = Thor::Option.new(:unit, nil, false, :string, "days", [])
-      end
-
-      it "parses leading arguments and assign them" do
-        ordered_hash = Thor::CoreExt::OrderedHash.new
-        ordered_hash[:class_name] = Thor::Argument.new(:class_name, nil, true, :string, nil)
-        ordered_hash[:attributes] = Thor::Argument.new(:attributes, nil, true, :hash, nil)
-
-        create ordered_hash
-        parse("User", "name:string", "age:integer")
-
-        @opt.arguments.must == [ "User", { "name"=>"string", "age"=>"integer" } ]
-      end
-
-      it "parses leading arguments and just then parse optionals" do
-        create @ordered_hash
-        parse("3.0", "--unit", "months")
-
-        @opt.arguments.must == [ 3.0 ]
-        @opt.options.must == {"unit" => "months"}
-      end
-
-      it "does not assign leading arguments to optionals" do
-        create @ordered_hash
-        parse("3.0", "months")
-
-        @opt.arguments.must == [ 3.0 ]
-        @opt.options.must == {}
-      end
-
-      it "assigns switches to arguments" do
-        create @ordered_hash
-        parse("--unit", "months", "--interval", "3.0")
-
-        @opt.arguments.must == [ 3.0 ]
-        @opt.options.must == {"unit" => "months"}
-      end
-
-      it "ignores switches that match arguments" do
-        create @ordered_hash
-        parse("1.0", "--unit", "months", "--interval", "3.0")
-
-        @opt.arguments.must == [ 1.0 ]
-        @opt.options.must == {"unit" => "months"}
-      end
-
-      it "raises an error if required arguments are not provided" do
-        create @ordered_hash
-        lambda { parse("--unit", "months") }.must raise_error(Thor::RequiredArgumentMissingError,
-          "no value provided for required arguments 'interval'")
       end
     end
   end
