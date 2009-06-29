@@ -3,7 +3,7 @@ require 'thor/core_ext/ordered_hash'
 require 'thor/error'
 require 'thor/shell'
 require 'thor/invocation'
-require 'thor/options'
+require 'thor/parser'
 require 'thor/task'
 require 'thor/util'
 
@@ -39,7 +39,7 @@ class Thor
       if options.is_a?(Array)
         parse_options = self.class.class_options
         parse_options = parse_options.merge(config[:extra_options]) if config[:extra_options]
-        opts = Thor::Options.new(parse_options, true)
+        opts = Thor::Options.new(parse_options)
         opts.parse(options)
         options = opts.options
         self.class.merge_with_thor_options(options, config[:extra_options]) if config[:extra_options]

@@ -27,7 +27,7 @@ class Thor
       backtrace = sans_backtrace(e.backtrace, caller)
 
       if backtrace.empty? && e.message =~ /wrong number of arguments/
-        if instance.is_a?(Thor::Group)
+        if instance.is_a?(Thor::Group) # TODO Clean me up
           raise e, "'#{name}' was called incorrectly. Are you sure it has arity equals to 0?"
         else
           raise InvocationError, "'#{name}' was called incorrectly. Call as '#{formatted_usage(instance.class, true)}'"
@@ -76,7 +76,7 @@ class Thor
     # Returns the options usage for this task.
     #
     def formatted_options
-      @formatted_options ||= options.map{ |_, o| o.usage }.join(" ")
+      @formatted_options ||= options.map{ |_, o| o.usage }.sort.join(" ")
     end
 
     protected
