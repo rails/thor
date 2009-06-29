@@ -17,6 +17,10 @@ class Thor
       self.options = other.options.dup if other.options
     end
 
+    def short_description
+      description.split("\n").first if description
+    end
+
     # By default, a task invokes a method in the thor class. You can change this
     # implementation to create custom tasks.
     #
@@ -24,32 +28,12 @@ class Thor
       raise UndefinedTaskError, "the '#{name}' task of #{instance.class} is private" unless public_method?(instance)
       instance.send(name, *args)
     rescue ArgumentError => e
-      backtrace = sans_backtrace(e.backtrace, caller)
-
-      if backtrace.empty? && e.message =~ /wrong number of arguments/
-        if instance.is_a?(Thor::Group)
-          raise e, "'#{name}' was called incorrectly. Are you sure it has arity equals to 0?"
-        else
-          raise InvocationError, "'#{name}' was called incorrectly. Call as '#{formatted_usage(instance.class, true)}'"
-        end
-      else
-        raise e
-      end
+      parse_argument_error(instance, e, caller)
     rescue NoMethodError => e
-      if e.message =~ /^undefined method `#{name}' for #{Regexp.escape(instance.to_s)}$/
-        raise UndefinedTaskError, "The #{instance.class.namespace} namespace doesn't have a '#{name}' task"
-      else
-        raise e
-      end
+      parse_no_method_error(instance, e)
     end
 
-    # Returns the first line of the given description.
-    #
-    def short_description
-      description.split("\n").first if description
-    end
-
-    # Returns the formatted usage. If a klass is given, the klass arguments are
+    # Returns the formatted usage. If a class is given, the class arguments are
     # injected in the usage.
     #
     def formatted_usage(klass=nil, namespace=false)
@@ -61,7 +45,7 @@ class Thor
       formatted
     end
 
-    # Injects the klass arguments into the defined usage.
+    # Injects the class arguments into the task usage.
     #
     def formatted_arguments(klass)
       if klass && !klass.arguments.empty?
@@ -94,6 +78,30 @@ class Thor
         dirname = /^#{Regexp.escape(File.dirname(__FILE__))}/
         saned  = backtrace.reject { |frame| frame =~ dirname }
         saned -= caller
+      end
+
+      def parse_argument_error(instance, e, caller)
+        backtrace = sans_backtrace(e.backtrace, caller)
+
+        if backtrace.empty? && e.message =~ /wrong number of arguments/
+          if instance.is_a?(Thor::Group)
+            raise e, "'#{name}' was called incorrectly. Are you sure it has arity equals to 0?"
+          else
+            raise InvocationError, "'#{name}' was called incorrectly. Call as " <<
+                                   "'#{formatted_usage(instance.class, true)}'"
+          end
+        else
+          raise e
+        end
+      end
+
+      def parse_no_method_error(instance, e)
+        if e.message =~ /^undefined method `#{name}' for #{Regexp.escape(instance.to_s)}$/
+          raise UndefinedTaskError, "The #{instance.class.namespace} namespace " <<
+                                    "doesn't have a '#{name}' task"
+        else
+          raise e
+        end
       end
 
   end

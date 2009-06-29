@@ -81,7 +81,7 @@ describe Thor::Invocation do
 
     it "raises Thor::UndefinedTaskError if the task can't be found even if all tasks where already executed" do
       base = C.new
-      silence(:stdout){ base.invoke(:all) }
+      silence(:stdout){ base.invoke }
 
       lambda do
         base.invoke("foo:bar")

@@ -117,17 +117,6 @@ class Thor
       build_option(name, options, scope)
     end
 
-    # Implements the prepare interface being used by start.
-    #
-    def prepare(task, args, config) #:nodoc:
-      split_args, split_opts = Thor::Options.split(args)
-      trailing = split_args[Range.new(arguments.size, -1)]
-
-      instance = new(split_args, split_opts, config.merge(:extra_options => task.options))
-
-      return instance, trailing
-    end
-
     # Prints help information. If a task name is given, it shows information
     # only about the specific task.
     #

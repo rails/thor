@@ -16,6 +16,10 @@ class Thor
       return arguments, args[Range.new(arguments.size, -1)]
     end
 
+    def self.parse(base, args)
+      new(base).parse(args)
+    end
+
     # Takes an array of Thor::Argument objects.
     #
     def initialize(arguments=[])

@@ -31,22 +31,39 @@ class Thor
     # config<Hash>:: Configuration for this Thor class.
     #
     def initialize(args=[], options={}, config={})
-      opts = Thor::Arguments.new(self.class.arguments)
-      opts.parse(args).each do |key, value|
+      Thor::Arguments.parse(self.class.arguments, args).each do |key, value|
         send("#{key}=", value)
       end
 
       if options.is_a?(Array)
+        task_options  = config.delete(:task_options)
         parse_options = self.class.class_options
-        parse_options = parse_options.merge(config[:extra_options]) if config[:extra_options]
-        opts = Thor::Options.new(parse_options)
-        options = opts.parse(options)
-        self.class.merge_with_thor_options(options, config[:extra_options]) if config[:extra_options]
+        parse_options = parse_options.merge(task_options) if task_options
+
+        options = Thor::Options.parse(parse_options, options)
+        _set_default_options(options, task_options) if task_options
       end
 
-      self.class.merge_with_thor_options(options, self.class.class_options)
+      _set_default_options(options, self.class.class_options)
       self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
     end
+
+    protected
+
+      # Receives a hash of options, stringify keys and merge with default
+      # values from thor options.
+      #
+      def _set_default_options(options, default_options)
+        options.each_key do |key|
+          next unless key.is_a?(Symbol)
+          options[key.to_s] = options.delete(key)
+        end
+
+        default_options.each do |key, option|
+          next if option.default.nil? || options.key?(option.human_name.to_s)
+          options[option.human_name.to_s] ||= option.default
+        end
+      end
 
     class << self
       def included(base) #:nodoc:
@@ -350,31 +367,23 @@ class Thor
       #   script = MyScript.new(args, options, config)
       #   script.invoke(:task, first_arg, second_arg, third_arg)
       #
-      def start(args=ARGV, config={})
+      def start(given_args=ARGV, config={})
         config[:shell] ||= Thor::Base.shell.new
 
-        task = normalize_arguments(args, config)
-        return unless task
+        task = normalize_arguments(given_args, config)
+        args, opts = Thor::Options.split(given_args)
 
-        instance, trailing = prepare(task, args, config)
-        instance.invoke(task, trailing)
+        if task
+          trailing = args[Range.new(arguments.size, -1)]
+          config.merge!(:task_options => task.options) 
+        elsif Thor::HELP_MAPPINGS.include?(given_args.first)
+          help(config[:shell])
+          return
+        end
+
+        new(args, opts, config).invoke(task, trailing || [])
       rescue Thor::Error => e
         config[:shell].error e.message
-      end
-
-      # Receives a hash of options, stringify keys and merge with default
-      # values from thor options.
-      #
-      def merge_with_thor_options(options, thor_options)
-        options.each_key do |key|
-          next unless key.is_a?(Symbol)
-          options[key.to_s] = options.delete(key)
-        end
-
-        thor_options.each do |key, option|
-          next if option.default.nil? || options.key?(option.human_name.to_s)
-          options[option.human_name.to_s] ||= option.default
-        end
       end
 
       protected
@@ -537,11 +546,6 @@ class Thor
         def normalize_arguments(args, config) #:nodoc:
         end
 
-        # SIGNATURE: Receives a task, arguments to be parsed and configuration
-        # values and initializes the current class. Trailing arguments are
-        # returned to be sent to the invoked task.
-        def prepare(task, args, config) #:nodoc:
-        end
     end
   end
 end

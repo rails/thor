@@ -78,7 +78,7 @@ class Thor
     #
     #   invoke Rspec::RR, :foo, [ args ]
     #
-    def invoke(name, task=nil, method_args=nil)
+    def invoke(name=nil, task=nil, method_args=nil)
       task, method_args = nil, task if task.is_a?(Array)
       object, task = _setup_for_invoke(name, task)
 
@@ -113,7 +113,7 @@ class Thor
       # Values that are sent to overwrite defined configuration values.
       #
       def _shared_config #:nodoc:
-        { :invocations => @_invocations, :extra_options => nil }
+        { :invocations => @_invocations }
       end
 
       # This is the method responsable for retrieving and setting up an
