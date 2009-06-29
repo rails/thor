@@ -1,22 +1,13 @@
 class Thor
-  class Option
-    attr_reader :name, :description, :required, :type, :default, :aliases, :group, :banner
+  class Option < Argument
+    attr_reader :aliases, :group
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string, :default]
 
     def initialize(name, description=nil, required=nil, type=nil, default=nil, banner=nil, group=nil, aliases=nil)
-      raise ArgumentError, "Option name can't be nil."                          if name.nil?
-      raise ArgumentError, "Option cannot be required and have default values." if required && !default.nil?
-      raise ArgumentError, "Type :#{type} is not valid for options."            if type && !VALID_TYPES.include?(type.to_sym)
-
-      @name        = name.to_s
-      @description = description
-      @required    = required || false
-      @type        = (type || :default).to_sym
-      @default     = default
-      @aliases     = [*aliases].compact
-      @banner      = banner || default_banner
-      @group       = group.to_s.capitalize if group
+      super(name, description, required, type || :default, default, banner)
+      @aliases = [*aliases].compact
+      @group   = group.to_s.capitalize if group
     end
 
     # This parse quick options given as method_options. It makes several
@@ -79,18 +70,6 @@ class Thor
       self.new(name.to_s, nil, required, type, default, nil, nil, aliases)
     end
 
-    def argument?
-      false
-    end
-
-    def required?
-      required
-    end
-
-    def input_required?
-      [ :numeric, :hash, :array, :string ].include?(type)
-    end
-
     def switch_name
       @switch_name ||= dasherized? ? name : dasherize(name)
     end
@@ -111,16 +90,11 @@ class Thor
       sample
     end
 
-    def show_default?
-      case default
-        when Array, String, Hash
-          !default.empty?
-        else
-          default
-      end
-    end
-
     protected
+
+      def valid_type?(type)
+        VALID_TYPES.include?(type.to_sym)
+      end
 
       def dasherized?
         name.index('-') == 0
@@ -134,19 +108,5 @@ class Thor
         (str.length > 1 ? "--" : "-") + str.gsub('_', '-')
       end
 
-      def default_banner
-        case type
-          when :boolean
-            nil
-          when :string, :default
-            human_name.upcase
-          when :numeric
-            "N"
-          when :hash
-            "key:value"
-          when :array
-            "one two three"
-        end
-      end
   end
 end

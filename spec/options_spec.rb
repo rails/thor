@@ -110,7 +110,7 @@ describe Thor::Options do
 
       it "and a required switch raises an error" do
         create "--foo" => :required
-        lambda { parse }.must raise_error(Thor::RequiredArgumentMissingError, "no value provided for required arguments '--foo'")
+        lambda { parse }.must raise_error(Thor::RequiredArgumentMissingError, "no value provided for required options '--foo'")
       end
     end
 
@@ -286,7 +286,7 @@ describe Thor::Options do
 
       it "raises error when switch is present without value" do
         lambda { parse("-n") }.must raise_error(Thor::RequiredArgumentMissingError,
-          "no value provided for required argument '-n'")
+          "no value provided for required option '-n'")
       end
     end
 

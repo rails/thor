@@ -372,7 +372,7 @@ class Thor
         end
 
         thor_options.each do |key, option|
-          next if option.argument? || option.default.nil? || options.key?(option.human_name.to_s)
+          next if option.default.nil? || options.key?(option.human_name.to_s)
           options[option.human_name.to_s] ||= option.default
         end
       end
@@ -401,7 +401,6 @@ class Thor
               list = []
 
               options.each do |option|
-                next if option.argument?
                 list << [ option.usage, option.description || "" ]
                 list << [ "", "Default: #{option.default}" ] if option.show_default?
               end

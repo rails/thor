@@ -35,8 +35,8 @@ class Thor
     end
 
     def run(instance, args=[])
-      rcov_opts = Thor::Parser.to_switches(rcov_config)
-      spec_opts = Thor::Parser.to_switches(spec_config)
+      rcov_opts = Thor::Options.to_switches(rcov_config)
+      spec_opts = Thor::Options.to_switches(spec_config)
 
       require 'rbconfig'
       cmd  = RbConfig::CONFIG['ruby_install_name'] << " "

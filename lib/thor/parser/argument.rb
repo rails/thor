@@ -1,25 +1,66 @@
-require 'thor/parser/option'
-
 class Thor
-  # Argument is a subset of option. It does not support :boolean and :default
-  # as types.
-  #
-  class Argument < Option
-    VALID_TYPES = [:numeric, :hash, :array, :string]
+  class Argument
+    VALID_TYPES = [ :numeric, :hash, :array, :string ]
+
+    attr_reader :name, :description, :required, :type, :default, :banner
+    alias :human_name :name
 
     def initialize(name, description=nil, required=true, type=:string, default=nil, banner=nil)
-      raise ArgumentError, "Argument name can't be nil."               if name.nil?
-      raise ArgumentError, "Type :#{type} is not valid for arguments." if type && !VALID_TYPES.include?(type.to_sym)
+      class_name = self.class.name.split("::").last
 
-      super(name, description, required, type || :string, default, banner)
-    end
+      raise ArgumentError, "#{class_name} name can't be nil."                         if name.nil?
+      raise ArgumentError, "#{class_name} cannot be required and have default value." if required && !default.nil?
+      raise ArgumentError, "Type :#{type} is not valid for #{class_name.downcase}s."  if type && !valid_type?(type)
 
-    def argument?
-      true
+      @name        = name.to_s
+      @description = description
+      @required    = required || false
+      @type        = (type || :default).to_sym
+      @default     = default
+      @banner      = banner || default_banner
     end
 
     def usage
       required? ? banner : "[#{banner}]"
     end
+
+    def required?
+      required
+    end
+
+    def show_default?
+      case default
+        when Array, String, Hash
+          !default.empty?
+        else
+          default
+      end
+    end
+
+    def input_required?
+      [ :numeric, :hash, :array, :string ].include?(type)
+    end
+
+    protected
+
+      def valid_type?(type)
+        VALID_TYPES.include?(type.to_sym)
+      end
+
+      def default_banner
+        case type
+          when :boolean
+            nil
+          when :string, :default
+            human_name.upcase
+          when :numeric
+            "N"
+          when :hash
+            "key:value"
+          when :array
+            "one two three"
+        end
+      end
+
   end
 end

@@ -27,7 +27,7 @@ class Thor
       backtrace = sans_backtrace(e.backtrace, caller)
 
       if backtrace.empty? && e.message =~ /wrong number of arguments/
-        if instance.is_a?(Thor::Group) # TODO Clean me up
+        if instance.is_a?(Thor::Group)
           raise e, "'#{name}' was called incorrectly. Are you sure it has arity equals to 0?"
         else
           raise InvocationError, "'#{name}' was called incorrectly. Call as '#{formatted_usage(instance.class, true)}'"

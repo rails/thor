@@ -151,10 +151,6 @@ describe Thor::Option do
     option("foo_bar").switch_name.must == "--foo-bar"
   end
 
-  it "is not an argument" do
-    option(:task).must_not be_argument
-  end
-
   describe "errors" do
     it "raises an error if name is not supplied" do
       lambda {
@@ -165,7 +161,7 @@ describe Thor::Option do
     it "raises an error if a default value is provided when required" do
       lambda {
         option(:task, nil, true, :string, "bla")
-      }.must raise_error(ArgumentError, "Option cannot be required and have default values.")
+      }.must raise_error(ArgumentError, "Option cannot be required and have default value.")
     end
 
     it "raises an error if type is unknown" do
@@ -215,10 +211,6 @@ describe Thor::Argument do
 
   def argument(name, type=:string, default=nil)
     @argument ||= Thor::Argument.new(name, nil, default.nil?, type, default)
-  end
-
-  it "is an argument" do
-    argument(:task).must be_argument
   end
 
   describe "errors" do
