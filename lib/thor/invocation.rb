@@ -5,8 +5,6 @@ class Thor
     #
     def initialize(args=[], options={}, config={}, &block) #:nodoc:
       @_invocations = config[:invocations] || Hash.new { |h,k| h[k] = [] }
-      config[:invocations] = @_invocations # Cache in the config hash to be shared
-
       @_initializer = [ args, options, config ]
       super
     end
@@ -87,8 +85,9 @@ class Thor
         stored_args, stored_opts, stored_config = @_initializer
         args ||= stored_args.dup
         opts ||= stored_opts.dup
-        config = stored_config.merge(config || {})
 
+        config ||= {}
+        config = stored_config.merge(_shared_configuration).merge!(config)
         instance = klass.new(args, opts, config)
       else
         klass, instance = object.class, object
@@ -114,6 +113,12 @@ class Thor
     end
 
     protected
+
+      # Configuration values that are shared between invocations.
+      #
+      def _shared_configuration
+        { :invocations => @_invocations }
+      end
 
       # This is the method responsable for retrieving and setting up an
       # instance to be used in invoke.

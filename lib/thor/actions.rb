@@ -52,10 +52,8 @@ class Thor
           :invoke
       end
 
-      self.root = config[:root]
-      config[:root] = self.root # Cache in the config hash to be shared
-
       super
+      self.root = config[:root]
     end
 
     # Wraps an action object and call it accordingly to the thor class behavior.
@@ -299,6 +297,12 @@ class Thor
     end
 
     protected
+
+      # Allow current root to be shared between invocations.
+      #
+      def _shared_configuration
+        super.merge!(:root => self.root)
+      end
 
       def _cleanup_options_and_set(options, key)
         [:force, :skip, "force", "skip"].each { |i| options.delete(i) }

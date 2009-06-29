@@ -32,10 +32,8 @@ class Thor
     #   MyScript.new [1.0], { :foo => :bar }, :shell => Thor::Shell::Basic.new
     #
     def initialize(args=[], options={}, config={})
-      self.shell = config[:shell]
-      config[:shell] = self.shell # Cache in the config hash to be shared
-
       super
+      self.shell = config[:shell]
       self.shell.base ||= self if self.shell.respond_to?(:base)
     end
 
@@ -61,6 +59,14 @@ class Thor
         end
       METHOD
     end
+
+    protected
+
+      # Allow shell to be shared between invocations.
+      #
+      def _shared_configuration
+        super.merge!(:shell => self.shell)
+      end
 
   end
 end
