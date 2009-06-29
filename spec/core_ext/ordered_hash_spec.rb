@@ -124,10 +124,6 @@ describe Thor::CoreExt::OrderedHash do
       @hash.to_a.must == [[:foo, "Foo!"], [:bar, "Bar!"], [:baz, "Baz!"], [:bop, "Bop!"], [:bat, "Bat!"]]
     end
 
-    it "converts to a string" do
-      @hash.to_s.must == @hash.to_a.inspect
-    end
-
     it "must not be empty" do
       @hash.must_not be_empty
     end

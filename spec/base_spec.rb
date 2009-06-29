@@ -63,8 +63,8 @@ describe Thor::Base do
   describe "#arguments" do
     it "returns the arguments for the class" do
       MyCounter.arguments.must have(2).items
-      MyCounter.arguments[0].must be_argument
-      MyCounter.arguments[1].must be_argument
+      MyCounter.arguments[:first].must be_argument
+      MyCounter.arguments[:second].must be_argument
     end
   end
 

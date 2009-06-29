@@ -125,7 +125,7 @@ class Thor
       @pile = args.dup
       assigns = {}
 
-      arguments.each do |argument|
+      arguments.each do |_, argument|
         assigns[argument.human_name] = if peek
           parse_option(argument.switch_name, argument)
         else

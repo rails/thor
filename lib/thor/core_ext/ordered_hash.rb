@@ -1,3 +1,5 @@
+require 'forwardable'
+
 class Thor #:nodoc:
   module CoreExt #:nodoc:
 
@@ -8,8 +10,10 @@ class Thor #:nodoc:
     #
     class OrderedHash #:nodoc:
       include Enumerable
+      extend Forwardable
 
       Node = Struct.new(:key, :value, :next, :prev)
+      def_delegators :@hash, :empty?, :size, :length
 
       def initialize
         @hash = {}
@@ -79,7 +83,7 @@ class Thor #:nodoc:
           value = node.value
         end
 
-        @hash[key] = nil
+        @hash.delete(key)
         value
       end
 
@@ -119,21 +123,6 @@ class Thor #:nodoc:
         end
         self
       end
-
-      def empty?
-        @hash.empty?
-      end
-
-      def to_a
-        array = []
-        each { |k, v| array << [k, v] }
-        array
-      end
-
-      def to_s
-        to_a.inspect
-      end
-      alias :inspect :to_s
     end
   end
 end
