@@ -300,7 +300,7 @@ class Thor
 
       # Allow current root to be sent as configuration value to the invoked class.
       #
-      def _overrides_config #:nodoc:
+      def _shared_config #:nodoc:
         super.merge!(:root => self.root)
       end
 

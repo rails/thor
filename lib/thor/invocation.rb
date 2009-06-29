@@ -84,7 +84,7 @@ class Thor
 
       if object.is_a?(Class)
         klass = object
-        instance, trailing = @_initializer.call(klass, task, _overrides_config)
+        instance, trailing = @_initializer.call(klass, task, _shared_config)
         method_args ||= trailing
       else
         klass, instance = object.class, object
@@ -112,7 +112,7 @@ class Thor
 
       # Values that are sent to overwrite defined configuration values.
       #
-      def _overrides_config #:nodoc:
+      def _shared_config #:nodoc:
         { :invocations => @_invocations }
       end
 

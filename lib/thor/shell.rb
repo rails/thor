@@ -64,7 +64,7 @@ class Thor
 
       # Send the current shell to be used by the invoked class.
       #
-      def _overrides_config #:nodoc:
+      def _shared_config #:nodoc:
         super.merge!(:shell => self.shell)
       end
   end
