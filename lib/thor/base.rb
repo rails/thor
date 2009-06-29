@@ -139,14 +139,14 @@ class Thor
           options[:default].nil?
         end
 
-        arguments.each do |_, argument|
+        arguments.each do |argument|
           next if argument.required?
           raise ArgumentError, "You cannot have #{name.to_s.inspect} as required argument after " <<
                                "the non-required argument #{argument.human_name.inspect}."
         end if required
 
-        arguments[name] = Thor::Argument.new(name, options[:desc], required, options[:type],
-                                                   options[:default], options[:banner])
+        arguments << Thor::Argument.new(name, options[:desc], required, options[:type],
+                                              options[:default], options[:banner])
       end
 
       # Returns this class arguments, looking up in the ancestors chain.
@@ -155,7 +155,7 @@ class Thor
       # Array[Thor::Argument]
       #
       def arguments
-        @arguments ||= from_superclass(:arguments, Thor::CoreExt::OrderedHash.new)
+        @arguments ||= from_superclass(:arguments, [])
       end
 
       # Adds a bunch of options to the set of class options.
@@ -208,7 +208,7 @@ class Thor
         options = names.last.is_a?(Hash) ? names.pop : {}
 
         names.each do |name|
-          arguments.delete(name)
+          arguments.delete_if{ |a| a.name == name.to_s }
           undef_method name, "#{name}=" if options[:undefine]
         end
       end

@@ -51,7 +51,7 @@ class Thor::Group
       # thor class by another means which is not the Thor::Runner.
       #
       def banner #:nodoc:
-        "#{self.namespace} #{self.arguments.map {|_, a| a.usage }.join(' ')}"
+        "#{self.namespace} #{self.arguments.map {|a| a.usage }.join(' ')}"
       end
 
       def baseclass #:nodoc:

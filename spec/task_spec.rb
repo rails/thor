@@ -16,19 +16,19 @@ describe Thor::Task do
 
     it "includes namespace within usage" do
       stub(Object).namespace{ "foo" }
-      stub(Object).arguments{ {} }
+      stub(Object).arguments{ [] }
       task(:bar => :required).formatted_usage(Object, true).must == "foo:can_has --bar=BAR"
     end
 
     it "removes default from namespace" do
       stub(Object).namespace{ "default:foo" }
-      stub(Object).arguments{ {} }
+      stub(Object).arguments{ [] }
       task(:bar => :required).formatted_usage(Object, true).must == ":foo:can_has --bar=BAR"
     end
 
     it "injects arguments into usage" do
       stub(Object).namespace{ "foo" }
-      stub(Object).arguments{{ :bar => Thor::Argument.new(:bar, nil, true, :string) }}
+      stub(Object).arguments{ [ Thor::Argument.new(:bar, nil, true, :string) ] }
       task(:foo => true).formatted_usage(Object).must == "can_has BAR [--foo]"
     end
   end

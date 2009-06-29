@@ -68,7 +68,7 @@ class Thor
     def formatted_arguments(klass)
       if klass && !klass.arguments.empty?
         usage.to_s.gsub(/^#{name}/) do |match|
-          match << " " << klass.arguments.map{ |_, a| a.usage }.join(' ')
+          match << " " << klass.arguments.map{ |a| a.usage }.join(' ')
         end
       else
         usage.to_s
