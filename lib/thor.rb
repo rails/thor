@@ -117,6 +117,35 @@ class Thor
       build_option(name, options, scope)
     end
 
+    # Parses the task and options from the given args, instantiate the class
+    # and invoke the task. This method is used when the arguments must be parsed
+    # from an array. If you are inside Ruby and want to use a Thor class, you
+    # can simply initialize it:
+    #
+    #   script = MyScript.new(args, options, config)
+    #   script.invoke(:task, first_arg, second_arg, third_arg)
+    #
+    def start(given_args=ARGV, config={})
+      config[:shell] ||= Thor::Base.shell.new
+
+      meth = normalize_task_name(given_args.shift)
+      task = all_tasks[meth]
+
+      if task
+        args, opts = Thor::Options.split(given_args)
+        config.merge!(:task_options => task.options)
+      else
+        args, opts = given_args, {}
+      end
+
+      task ||= Task.dynamic(meth)
+      trailing = args[Range.new(arguments.size, -1)]
+
+      new(args, opts, config).invoke(task, trailing || [])
+    rescue Thor::Error => e
+      config[:shell].error e.message
+    end
+
     # Prints help information. If a task name is given, it shows information
     # only about the specific task.
     #
@@ -183,11 +212,6 @@ class Thor
       def initialize_added #:nodoc:
         class_options.merge!(method_options)
         @method_options = nil
-      end
-
-      def normalize_arguments(args, config) #:nodoc:
-        meth = normalize_task_name(args.shift)
-        all_tasks[meth] || Task.dynamic(meth)
       end
 
       # Receives a task name (can be nil), and try to get a map from it.

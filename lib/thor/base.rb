@@ -359,33 +359,6 @@ class Thor
         end
       end
 
-      # Parses the task and options from the given args, instantiate the class
-      # and invoke the task. This method is used when the arguments must be parsed
-      # from an array. If you are inside Ruby and want to use a Thor class, you
-      # can simply initialize it:
-      #
-      #   script = MyScript.new(args, options, config)
-      #   script.invoke(:task, first_arg, second_arg, third_arg)
-      #
-      def start(given_args=ARGV, config={})
-        config[:shell] ||= Thor::Base.shell.new
-
-        task = normalize_arguments(given_args, config)
-        args, opts = Thor::Options.split(given_args)
-
-        if task
-          trailing = args[Range.new(arguments.size, -1)]
-          config.merge!(:task_options => task.options) 
-        elsif Thor::HELP_MAPPINGS.include?(given_args.first)
-          help(config[:shell])
-          return
-        end
-
-        new(args, opts, config).invoke(task, trailing || [])
-      rescue Thor::Error => e
-        config[:shell].error e.message
-      end
-
       protected
 
         # Prints the class options per group. If an option does not belong to
@@ -539,13 +512,6 @@ class Thor
         # class.
         def initialize_added #:nodoc:
         end
-
-        # SIGNATURE: Normalize arguments when invoked through start. Should
-        # return the name of the task to be invoked. Returning nil makes the
-        # start process to exist without error message.
-        def normalize_arguments(args, config) #:nodoc:
-        end
-
     end
   end
 end

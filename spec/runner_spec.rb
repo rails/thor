@@ -52,17 +52,13 @@ describe Thor::Runner do
     end
 
     it "forwads arguments to the invoked task" do
-      pending do
-        ARGV.replace ["my_script:animal", "horse"]
-        Thor::Runner.start.must == ["horse"]
-      end
+      ARGV.replace ["my_script:animal", "horse"]
+      Thor::Runner.start.must == ["horse"]
     end
 
     it "invokes tasks through shortcuts" do
-      pending do
-        ARGV.replace ["my_script", "-T", "horse"]
-        Thor::Runner.start.must == ["horse"]
-      end
+      ARGV.replace ["my_script", "-T", "horse"]
+      Thor::Runner.start.must == ["horse"]
     end
 
     it "invokes a Thor::Group" do
@@ -71,10 +67,8 @@ describe Thor::Runner do
     end
 
     it "raises an error if class/task can't be found" do
-      pending do
-        ARGV.replace ["unknown"]
-        capture(:stderr){ Thor::Runner.start }.must =~ /could not find Thor class or task 'unknown'/
-      end
+      ARGV.replace ["unknown"]
+      capture(:stderr){ Thor::Runner.start }.must =~ /could not find Thor class or task 'unknown'/
     end
 
     it "does not swallow NoMethodErrors that occur inside the called method" do
