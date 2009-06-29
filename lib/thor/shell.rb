@@ -32,8 +32,10 @@ class Thor
     #   MyScript.new [1.0], { :foo => :bar }, :shell => Thor::Shell::Basic.new
     #
     def initialize(args=[], options={}, config={})
-      super
       self.shell = config[:shell]
+      config[:shell] = self.shell # Cache in the config hash to be shared
+
+      super
       self.shell.base ||= self if self.shell.respond_to?(:base)
     end
 
@@ -60,12 +62,5 @@ class Thor
       METHOD
     end
 
-    protected
-
-      # Send the current shell to be used by the invoked class.
-      #
-      def _shared_config #:nodoc:
-        super.merge!(:shell => self.shell)
-      end
   end
 end

@@ -27,7 +27,7 @@ class Thor::Runner < Thor
     initialize_thorfiles(meth)
     klass, task = Thor::Util.namespace_to_thor_class(meth)
     args.unshift(task) if task
-    klass.start(args, _shared_config)
+    klass.start(args, :shell => shell)
   end
 
   desc "install NAME", "Install a Thor file into your system tasks, optionally named for future updates"

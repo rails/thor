@@ -5,16 +5,19 @@ class Thor
     #
     def initialize(args=[], options={}, config={}, &block) #:nodoc:
       @_invocations = config[:invocations] || Hash.new { |h,k| h[k] = [] }
-      @_initializer = block || lambda do |klass, invoke, overrides|
-        klass.new(args, options, config.merge(overrides))
-      end
+      config[:invocations] = @_invocations # Cache in the config hash to be shared
+
+      @_initializer = [ args, options, config ]
       super
     end
 
     # Receives a name and invokes it. The name can be a string (either "task" or
     # "namespace:task"), a Thor::Task, a Class or a Thor instance. If the task
-    # cannot be guessed name, it can also be supplied as second argument. The
-    # arguments used to invoke the task are always supplied as the last argument.
+    # cannot be guessed by name, it can also be supplied as second argument.
+    #
+    # You can also supply the arguments, options and configuration values for
+    # the task to be invoked, if none is given, the same values used to
+    # initialize the invoker are used to initialize the invoked.
     #
     # ==== Examples
     #
@@ -54,7 +57,7 @@ class Thor
     #     end
     #   end
     #
-    # As you notice, it invokes the given mock framework, which might have its
+    # As you noticed, it invokes the given mock framework, which might have its
     # own options:
     #
     #   class Rspec::RR < Thor::Group
@@ -68,29 +71,30 @@ class Thor
     # If you want Rspec::RR to be initialized with its own set of options, you
     # have to do that explicitely:
     #
-    #   invoke Rspec::RR.new([], :style => :foo)
+    #   invoke "rspec:rr", [], :style => :foo
     #
     # Besides giving an instance, you can also give a class to invoke:
     #
-    #   invoke Rspec::RR
+    #   invoke Rspec::RR, [], :style => :foo
     #
-    # Or even a class, the task to invoke from it and its arguments:
-    #
-    #   invoke Rspec::RR, :foo, [ args ]
-    #
-    def invoke(name=nil, task=nil, method_args=nil)
-      task, method_args = nil, task if task.is_a?(Array)
+    def invoke(name=nil, task=nil, args=nil, opts=nil, config={})
+      task, args, opts, config = nil, task, args, opts if task.is_a?(Array)
       object, task = _setup_for_invoke(name, task)
 
       if object.is_a?(Class)
         klass = object
-        instance, trailing = @_initializer.call(klass, task, _shared_config)
-        method_args ||= trailing
+
+        stored_args, stored_opts, stored_config = @_initializer
+        args ||= stored_args.dup
+        opts ||= stored_opts.dup
+        config = stored_config.merge(config)
+
+        instance = klass.new(args, opts, config)
       else
         klass, instance = object.class, object
       end
 
-      method_args ||= []
+      method_args = []
       current = @_invocations[klass]
 
       iterator = lambda do |_, task|
@@ -101,20 +105,15 @@ class Thor
       end
 
       if task
+        args ||= []
+        method_args = args[Range.new(klass.arguments.size, -1)] || []
         iterator.call(nil, task)
       else
-        method_args = []
         klass.all_tasks.map(&iterator)
       end
     end
 
     protected
-
-      # Values that are sent to overwrite defined configuration values.
-      #
-      def _shared_config #:nodoc:
-        { :invocations => @_invocations }
-      end
 
       # This is the method responsable for retrieving and setting up an
       # instance to be used in invoke.

@@ -44,6 +44,11 @@ describe Thor::Invocation do
       base.invoke(invoked, :one, ["José"]).must be_nil
     end
 
+    it "allows customized options to be given" do
+      base = A.new([], :last_name => "Wrong")
+      base.invoke(B, :one, ["José"], :last_name => "Valim").must == "Valim, José"
+    end
+
     it "reparses options in the new class" do
       A.start(["invoker", "--last-name", "Valim"]).must == "Valim, José"
     end
@@ -55,6 +60,11 @@ describe Thor::Invocation do
     it "dump configuration values to be used in the invoked class" do
       base = A.new
       base.invoke("b:three").shell.must == base.shell
+    end
+
+    it "allow extra configuration values to be given" do
+      base, shell = A.new, Thor::Shell::Basic.new
+      base.invoke("b:three", [], {}, :shell => shell).shell.must == shell
     end
 
     it "invokes a Thor::Group and all of its tasks" do
