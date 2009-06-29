@@ -120,16 +120,12 @@ class Thor
     # Implements the prepare interface being used by start.
     #
     def prepare(task, args, config) #:nodoc:
-      options = class_options.merge(task.options)
-      opts = Thor::Options.new(options)
-      opts.parse(args)
+      split_args, split_opts = Thor::Options.split(args)
+      trailing = split_args[Range.new(arguments.size, -1)]
 
-      merge_with_thor_options(opts.options, task.options)
-      instance = new(opts.arguments, opts.options, config) do |klass, invoke, overrides|
-        klass.prepare(invoke, args, config.merge(overrides))
-      end
+      instance = new(split_args, split_opts, config.merge(:extra_options => task.options))
 
-      return instance, opts.trailing
+      return instance, trailing
     end
 
     # Prints help information. If a task name is given, it shows information

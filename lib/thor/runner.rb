@@ -25,9 +25,7 @@ class Thor::Runner < Thor
   def method_missing(meth, *args)
     meth = meth.to_s
     initialize_thorfiles(meth)
-    klass, task = Thor::Util.namespace_to_thor_class(meth)
-    args.unshift(task) if task
-    klass.start(args, :shell => self.shell)
+    invoke(meth)
   end
 
   desc "install NAME", "Install a Thor file into your system tasks, optionally named for future updates"

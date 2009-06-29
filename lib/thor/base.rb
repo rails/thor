@@ -31,9 +31,18 @@ class Thor
     # config<Hash>:: Configuration for this Thor class.
     #
     def initialize(args=[], options={}, config={})
-      # Set arguments and default values
-      self.class.arguments.zip(args).each do |argument, value|
-        send("#{argument.human_name}=", value || argument.default)
+      opts = Thor::Options.new
+      opts.parse_arguments(self.class.arguments, args).each do |key, value|
+        send("#{key}=", value)
+      end
+
+      if options.is_a?(Array)
+        parse_options = self.class.class_options
+        parse_options = parse_options.merge(config[:extra_options]) if config[:extra_options]
+        opts = Thor::Options.new(parse_options, true)
+        opts.parse(options)
+        options = opts.options
+        self.class.merge_with_thor_options(options, config[:extra_options]) if config[:extra_options]
       end
 
       self.class.merge_with_thor_options(options, self.class.class_options)

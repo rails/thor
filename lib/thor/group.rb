@@ -21,12 +21,9 @@ class Thor::Group
     # Implements the prepare interface being used by start.
     #
     def prepare(task, args, config) #:nodoc:
-      opts = Thor::Options.new(class_options)
-      opts.parse(args)
+      split_args, split_opts = Thor::Options.split(args)
 
-      instance = new(opts.arguments, opts.options, config) do |klass, invoke, overrides|
-        klass.prepare(invoke, args, config.merge(overrides))
-      end
+      instance = new(split_args, split_opts, config)
 
       return instance, nil
     end

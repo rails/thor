@@ -113,7 +113,7 @@ class Thor
       # Values that are sent to overwrite defined configuration values.
       #
       def _shared_config #:nodoc:
-        { :invocations => @_invocations }
+        { :invocations => @_invocations, :extra_options => nil }
       end
 
       # This is the method responsable for retrieving and setting up an

@@ -51,19 +51,21 @@ class Thor
     #      ["--level", "-l"] => :numeric
     #   ).parse(args)
     #
-    def initialize(switches={})
+    def initialize(switches={}, skip_arguments=false)
       @arguments, @shorts, @options = [], {}, {}
       @non_assigned_required, @non_assigned_arguments, @trailing = [], [], []
 
       @switches = switches.values.inject({}) do |mem, option|
-        @non_assigned_required  << option if option.required?
-        @non_assigned_arguments << option if option.argument?
+        unless option.argument? && skip_arguments
+          @non_assigned_required  << option if option.required?
+          @non_assigned_arguments << option if option.argument?
 
-        option.aliases.each do |short|
-          @shorts[short.to_s] ||= option.switch_name
+          option.aliases.each do |short|
+            @shorts[short.to_s] ||= option.switch_name
+          end
+
+          mem[option.switch_name] = option
         end
-
-        mem[option.switch_name] = option
         mem
       end
 
@@ -106,6 +108,32 @@ class Thor
 
       check_validity!
       @options
+    end
+
+    def self.split(args)
+      arguments = []
+
+      args.each do |item|
+        break if item =~ /^-/
+        arguments << item
+      end
+
+      return arguments, args[Range.new(arguments.size, -1)]
+    end
+
+    def parse_arguments(arguments, args)
+      @pile = args.dup
+      assigns = {}
+
+      arguments.each do |argument|
+        assigns[argument.human_name] = if peek
+          parse_option(argument.switch_name, argument)
+        else
+          argument.default
+        end
+      end
+
+      assigns
     end
 
     private
@@ -206,13 +234,13 @@ class Thor
       #   { "name" => "string", "age" => "integer" }
       #
       def parse_hash
+        return shift if peek.is_a?(Hash)
         hash = {}
 
         while current_is_value? && peek.include?(?:)
           key, value = shift.split(':')
           hash[key] = value
         end
-
         hash
       end
 
@@ -226,12 +254,12 @@ class Thor
       #   ["a", "b", "c"]
       #
       def parse_array
+        return shift if peek.is_a?(Array)
         array = []
 
         while current_is_value?
           array << shift
         end
-
         array
       end
 
@@ -239,6 +267,7 @@ class Thor
       # Otherwise raises an error.
       #
       def parse_numeric(switch)
+        return shift if peek.is_a?(Numeric)
         unless peek =~ NUMERIC && $& == peek
           raise MalformattedArgumentError, "expected numeric value for '#{switch}'; got #{peek.inspect}"
         end
