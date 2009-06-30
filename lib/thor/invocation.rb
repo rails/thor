@@ -130,24 +130,30 @@ class Thor
           when Symbol, String
             name = name.to_s
 
-            begin
-              task = self.class.all_tasks[name]
-              object, task = Thor::Util.namespace_to_thor_class(name) unless task
-              task = task || sent_task
-            rescue Thor::Error
-              task = name
+            # If is not one of this class tasks, do a lookup.
+            unless task = self.class.all_tasks[name]
+              object, task = Thor::Util.namespace_to_thor_class(name, false)
+              task ||= sent_task
             end
           else
             object, task = name, sent_task
         end
 
-        object ||= self
+        # If the object was not set, use self and use the name as task.
+        object, task = self, name unless object
+        return object, _validate_klass_and_task(object, task)
+      end
+
+      # Check if the object given is a Thor class object and get a task object
+      # for it.
+      #
+      def _validate_klass_and_task(object, task)
         klass = object.is_a?(Class) ? object : object.class
         raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
 
         task ||= klass.default_task if klass <= Thor
         task = klass.all_tasks[task.to_s] || Task.dynamic(task) if task && !task.is_a?(Thor::Task)
-        return object, task
+        task
       end
 
   end

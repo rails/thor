@@ -35,8 +35,6 @@ class Thor
     # older versions of Thor. On current versions, if you need to get the
     # namespace from a class, just call namespace on it.
     #
-    # TODO Deprecate this method in the future.
-    #
     # ==== Parameters
     # constant<Object>:: The constant to be converted to the thor path.
     #
@@ -115,7 +113,7 @@ class Thor
     # Thor::Error:: raised if the namespace evals to a class which does not
     #               inherit from Thor or Thor::Group.
     #
-    def self.namespace_to_thor_class(namespace)
+    def self.namespace_to_thor_class(namespace, raise_if_nil=true)
       klass, task_name = Thor::Util.find_by_namespace(namespace), nil
 
       if klass.nil? && namespace.include?(?:)
@@ -124,7 +122,7 @@ class Thor
         klass     = Thor::Util.find_by_namespace(namespace.join(":"))
       end
 
-      raise Error, "could not find Thor class or task '#{namespace}'" unless klass
+      raise Error, "could not find Thor class or task '#{namespace}'" if raise_if_nil && klass.nil?
 
       return klass, task_name
     end
