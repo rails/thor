@@ -106,7 +106,7 @@ describe Thor::Base do
     end
 
     it "shows options description" do
-      @content.must =~ /# The third argument\./
+      @content.must =~ /# The third argument/
     end
 
     it "shows usage with banner content" do
@@ -121,6 +121,11 @@ describe Thor::Base do
       @content.must =~ /Options\:/
       @content.must =~ /Runtime options\:/
       @content.must =~ /\-p, \[\-\-pretend\]/
+    end
+
+    it "use padding in options that does not have aliases" do
+      @content.must =~ /^  -t, \[--third/
+      @content.must =~ /^      \[--fourth/
     end
 
     it "allows extra options to be given" do

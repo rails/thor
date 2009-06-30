@@ -11,7 +11,10 @@ class MyCounter < Thor::Group
 
   argument :first,     :type => :numeric
   argument :second,    :type => :numeric, :default => 2
-  class_option :third, :type => :numeric, :desc => "The third argument.", :default => 3, :banner => "THREE"
+
+  class_option :third,  :type => :numeric, :desc => "The third argument", :default => 3,
+                        :banner => "THREE", :aliases => "-t"
+  class_option :fourth, :type => :numeric, :desc => "The fourth argument"
 
   desc <<-FOO
 Description:

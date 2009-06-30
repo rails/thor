@@ -62,13 +62,9 @@ describe Thor::Group do
       @content.must =~ /This generator run three tasks: one, two and three./
     end
 
-    it "shows global options information" do
+    it "shows options information" do
       @content.must =~ /Options/
       @content.must =~ /\[\-\-third=THREE\]/
-    end
-
-    it "shows global options description" do
-      @content.must =~ /# The third argument\./
     end
 
     it "shows only usage if a short help is required" do

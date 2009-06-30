@@ -381,9 +381,10 @@ class Thor
 
             printer = lambda do |group_name, options|
               list = []
+              padding = options.collect{ |o| o.aliases.size  }.max.to_i * 4
 
               options.each do |option|
-                list << [ option.usage, option.description || "" ]
+                list << [ option.usage(padding), option.description || "" ]
                 list << [ "", "Default: #{option.default}" ] if option.show_default?
               end
 

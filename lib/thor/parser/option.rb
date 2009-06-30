@@ -78,16 +78,20 @@ class Thor
       @human_name ||= dasherized? ? undasherize(name) : name
     end
 
-    def usage
+    def usage(padding=0)
       sample = if banner
         "#{switch_name}=#{banner}"
       else
         switch_name
       end
 
-      sample = "[#{sample}]"                      unless required?
-      sample = "#{aliases.join(', ')}, #{sample}" unless aliases.empty?
-      sample
+      sample = "[#{sample}]" unless required?
+
+      if aliases.empty?
+        (" " * padding) << sample
+      else
+        "#{aliases.join(', ')}, #{sample}"
+      end
     end
 
     protected

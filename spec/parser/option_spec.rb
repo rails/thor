@@ -193,6 +193,10 @@ describe Thor::Option do
       parse(:foo, :boolean).usage.must == "[--foo]"
     end
 
+    it "uses padding when no aliases is given" do
+      parse(:foo, :boolean).usage(4).must == "    [--foo]"
+    end
+
     describe "with required values" do
       it "does not show the usage between brackets" do
         parse(:foo, :required).usage.must == "--foo=FOO"
