@@ -6,7 +6,7 @@ describe Thor::Option do
     Thor::Option.parse(key, value)
   end
 
-  def option(name, description=nil, required=false, type=:default, default=nil, aliases=[])
+  def option(name, description=nil, required=false, type=nil, default=nil, aliases=[])
     @option ||= Thor::Option.new(name, description, required, type, default, aliases)
   end
 
@@ -36,18 +36,18 @@ describe Thor::Option do
       end
 
       describe "equals to :optional" do
-        it "has type equals to :default" do
-          parse(:foo, :optional).type.must == :default
+        it "has type equals to :boolean" do
+          capture(:stderr){ parse(:foo, :optional).type.must == :boolean }
         end
 
         it "has no default value" do
-          parse(:foo, :optional).default.must be_nil
+          capture(:stderr){ parse(:foo, :optional).default.must be_nil }
         end
       end
 
       describe "and symbol is not a reserved key" do
-        it "has type equals to :default" do
-          parse(:foo, :bar).type.must == :default
+        it "has type equals to :string" do
+          parse(:foo, :bar).type.must == :string
         end
 
         it "has no default value" do
@@ -131,10 +131,8 @@ describe Thor::Option do
     end
   end
 
-  it "does not require an input when type is default or boolean" do
-    [:default, :boolean].each do |type|
-      parse(:foo, type).input_required?.must be_false
-    end
+  it "does not require an input when type is boolean" do
+    parse(:foo, :boolean).input_required?.must be_false
   end
 
   it "returns the switch name" do
@@ -152,7 +150,7 @@ describe Thor::Option do
   end
 
   it "can be required and have default values" do
-    option = option("foo", nil, true, :default, "bar")
+    option = option("foo", nil, true, :string, "bar")
     option.default.must == "bar"
     option.must be_required
   end

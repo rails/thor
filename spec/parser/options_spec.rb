@@ -47,19 +47,19 @@ describe Thor::Options do
 
   describe "#parse" do
     it "allows multiple aliases for a given switch" do
-      create ["--foo", "--bar", "--baz"] => :optional
+      create ["--foo", "--bar", "--baz"] => :string
       parse("--foo", "12")["foo"].must == "12"
       parse("--bar", "12")["foo"].must == "12"
       parse("--baz", "12")["foo"].must == "12"
     end
 
     it "allows custom short names" do
-      create "-f" => :optional
+      create "-f" => :string
       parse("-f", "12").must == {"f" => "12"}
     end
 
     it "allows custom short-name aliases" do
-      create ["--bar", "-f"] => :optional
+      create ["--bar", "-f"] => :string
       parse("-f", "12").must == {"bar" => "12"}
     end
 
@@ -91,7 +91,7 @@ describe Thor::Options do
       end
 
       it "and several switches returns an empty hash" do
-        create "--foo" => :boolean, "--bar" => :optional
+        create "--foo" => :boolean, "--bar" => :string
         parse.must == {}
       end
 
@@ -103,7 +103,7 @@ describe Thor::Options do
 
     describe "with one required and one optional switch" do
       before :each do
-        create "--foo" => :required, "--bar" => :optional
+        create "--foo" => :required, "--bar" => :boolean
       end
 
       it "raises an error if the required switch has no argument" do
@@ -119,7 +119,7 @@ describe Thor::Options do
       end
 
       it "does not raises an error if the required option has a default value" do
-        create :foo => Thor::Option.new("foo", nil, true, :string, "baz"), :bar => :optional
+        create :foo => Thor::Option.new("foo", nil, true, :string, "baz"), :bar => :boolean
         lambda { parse("--bar") }.must_not raise_error
       end
     end
@@ -213,47 +213,47 @@ describe Thor::Options do
       end
     end
 
-    describe "with :default type" do
-      before :each do
-        create "--foo" => :optional, "--bar" => :optional
-      end
+#    describe "with :default type" do
+#      before :each do
+#        create "--foo" => :optional, "--bar" => :optional
+#      end
 
-      it "sets switches without arguments to true" do
-        parse("--foo")["foo"].must be_true
-      end
+#      it "sets switches without arguments to true" do
+#        parse("--foo")["foo"].must be_true
+#      end
 
-      it "doesn't set nonexistant switches" do
-        parse("--foo")["bar"].must_not be
-      end
+#      it "doesn't set nonexistant switches" do
+#        parse("--foo")["bar"].must_not be
+#      end
 
-      it "sets switches with arguments to their arguments" do
-        parse("--foo", "12")["foo"].must == "12"
-        parse("--bar", "12")["bar"].must == "12"
-      end
+#      it "sets switches with arguments to their arguments" do
+#        parse("--foo", "12")["foo"].must == "12"
+#        parse("--bar", "12")["bar"].must == "12"
+#      end
 
-      it "assumes something that could be either a switch or an argument is a switch" do
-        parse("--foo", "--bar")["foo"].must be_true
-      end
+#      it "assumes something that could be either a switch or an argument is a switch" do
+#        parse("--foo", "--bar")["foo"].must be_true
+#      end
 
-      it "overwrites earlier values with later values" do
-        parse("--foo", "--foo", "12")["foo"].must == "12"
-        parse("--foo", "12", "--foo", "13")["foo"].must == "13"
-      end
+#      it "overwrites earlier values with later values" do
+#        parse("--foo", "--foo", "12")["foo"].must == "12"
+#        parse("--foo", "12", "--foo", "13")["foo"].must == "13"
+#      end
 
-      it "accepts --[no-|skip-]opt variant, setting false for value" do
-        create "--foo-bar" => :default
-        parse("--foo-bar")["foo-bar"].must == true
-        parse("--no-foo-bar")["foo-bar"].must == false
-        parse("--skip-foo-bar")["foo-bar"].must == false
-      end
+#      it "accepts --[no-|skip-]opt variant, setting false for value" do
+#        create "--foo-bar" => :default
+#        parse("--foo-bar")["foo-bar"].must == true
+#        parse("--no-foo-bar")["foo-bar"].must == false
+#        parse("--skip-foo-bar")["foo-bar"].must == false
+#      end
 
-      it "accepts inputs in the human name format" do
-        create :foo_bar => :default
-        parse("--foo-bar")["foo_bar"].must == true
-        parse("--no-foo-bar")["foo_bar"].must == false
-        parse("--skip-foo-bar")["foo_bar"].must == false
-      end
-    end
+#      it "accepts inputs in the human name format" do
+#        create :foo_bar => :default
+#        parse("--foo-bar")["foo_bar"].must == true
+#        parse("--no-foo-bar")["foo_bar"].must == false
+#        parse("--skip-foo-bar")["foo_bar"].must == false
+#      end
+#    end
 
     describe "with :numeric type" do
       before(:each) do

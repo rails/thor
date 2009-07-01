@@ -31,7 +31,7 @@ class Thor::Runner < Thor
   end
 
   desc "install NAME", "Install a Thor file into your system tasks, optionally named for future updates"
-  method_options :as => :optional, :relative => :boolean
+  method_options :as => :string, :relative => :boolean
   def install(name)
     initialize_thorfiles
 
@@ -132,7 +132,7 @@ class Thor::Runner < Thor
 
   desc "list [SEARCH]",
        "List the available thor tasks (--substring means SEARCH anywhere in the namespace)"
-  method_options :substring => :boolean, :group => :optional, :all => :boolean
+  method_options :substring => :boolean, :group => :string, :all => :boolean
   def list(search="")
     initialize_thorfiles
 

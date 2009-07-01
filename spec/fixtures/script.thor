@@ -90,7 +90,7 @@ end
 module Scripts
   class MyGrandChildScript < MyChildScript
     argument :accessor, :type => :string
-    class_options :force => :optional
+    class_options :force => :boolean
     method_option :new_option, :type => :string, :for => :example_default_task
 
     def zoo

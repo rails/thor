@@ -161,7 +161,7 @@ class Thor
 
       # Adds a bunch of options to the set of class options.
       #
-      #   class_options :foo => :optional, :bar => :required, :baz => :string
+      #   class_options :foo => false, :bar => :required, :baz => :string
       #
       # If you prefer more detailed declaration, check class_option.
       #
@@ -186,8 +186,7 @@ class Thor
       # :default  - Default value for this argument. It cannot be required and have default values.
       # :group    - The group for this options. Use by class options to output options in different levels.
       # :aliases  - Aliases for this option.
-      # :type     - The type of the argument, can be :string, :hash, :array, :numeric, :boolean or :default.
-      #             Default accepts arguments as booleans (--switch) or as strings (--switch=VALUE).
+      # :type     - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
       # :banner   - String to show on usage notes.
       #
       def class_option(name, options)
@@ -416,7 +415,7 @@ class Thor
         # Receives a hash of options, parse them and add to the scope. This is a
         # fast way to set a bunch of options:
         #
-        #   build_options :foo => :optional, :bar => :required, :baz => :string
+        #   build_options :foo => true, :bar => :required, :baz => :string
         #
         # ==== Parameters
         # Hash[Symbol => Object]

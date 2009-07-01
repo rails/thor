@@ -72,7 +72,8 @@ class Thor
     #
     # ==== Parameters
     # Hash[Symbol => Object]:: The hash key is the name of the option and the value
-    # is the type of the option. Can be :optional, :required, :boolean or :numeric.
+    # is the type of the option. Can be :string, :array, :hash, :boolean, :numeric
+    # or :required (string). If you give a value, the type of the value is used.
     #
     def method_options(options=nil)
       @method_options ||= {}

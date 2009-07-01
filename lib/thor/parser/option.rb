@@ -2,10 +2,10 @@ class Thor
   class Option < Argument
     attr_reader :aliases, :group
 
-    VALID_TYPES = [:boolean, :numeric, :hash, :array, :string, :default]
+    VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
     def initialize(name, description=nil, required=nil, type=nil, default=nil, banner=nil, group=nil, aliases=nil)
-      super(name, description, required, type || :default, default, banner)
+      super(name, description, required, type || :string, default, banner)
       @aliases = [*aliases].compact
       @group   = group.to_s.capitalize if group
     end
@@ -21,9 +21,6 @@ class Thor
     #
     #   parse :foo => :required
     #   #=> Required option foo without default value
-    #
-    #   parse :foo => :optional
-    #   #=> Optional foo without default value
     #
     #   parse :foo => 2
     #   #=> Option foo with default value 2 and type numeric
@@ -58,6 +55,10 @@ class Thor
             value
           elsif required = (value == :required)
             :string
+          elsif value == :optional
+            # TODO Remove this warning in the future.
+            warn "Optional type is deprecated. Choose :boolean or :string instead. Assumed to be :boolean."
+            :boolean
           end
         when TrueClass, FalseClass
           :boolean
