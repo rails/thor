@@ -183,7 +183,7 @@ class Thor
       # ==== Options
       # :desc     - Description for the argument.
       # :required - If the argument is required or not.
-      # :default  - Default value for this argument. It cannot be required and have default values.
+      # :default  - Default value for this argument.
       # :group    - The group for this options. Use by class options to output options in different levels.
       # :aliases  - Aliases for this option.
       # :type     - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.

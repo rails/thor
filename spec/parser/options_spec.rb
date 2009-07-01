@@ -107,15 +107,15 @@ describe Thor::Options do
       end
 
       it "raises an error if the required switch has no argument" do
-        lambda { parse("--foo") }.must raise_error(Thor::RequiredArgumentMissingError)
+        lambda { parse("--foo") }.must raise_error(Thor::MalformattedArgumentError)
       end
 
       it "raises an error if the required switch isn't given" do
         lambda { parse("--bar") }.must raise_error(Thor::RequiredArgumentMissingError)
       end
 
-      it "raises an error if a switch name is given as the argument to the required switch" do
-        lambda { parse("--foo", "--bar") }.must raise_error(Thor::MalformattedArgumentError, "cannot pass switch '--bar' as an argument")
+      it "raises an error if the required switch is set to nil" do
+        lambda { parse("--no-foo") }.must raise_error(Thor::RequiredArgumentMissingError)
       end
 
       it "does not raises an error if the required option has a default value" do
@@ -129,14 +129,24 @@ describe Thor::Options do
         create ["--foo", "-f"] => :required
       end
 
+      it "accepts a switch <value> assignment" do
+        parse("--foo", "12")["foo"].must == "12"
+      end
+
       it "accepts a switch=<value> assignment" do
         parse("-f=12")["foo"].must == "12"
         parse("--foo=12")["foo"].must == "12"
         parse("--foo=bar=baz")["foo"].must == "bar=baz"
       end
 
-      it "accepts a switch <value> assignment" do
-        parse("--foo", "12")["foo"].must == "12"
+      it "accepts a --no-switch format" do
+        create "--foo" => "bar"
+        parse("--no-foo")["foo"].must be_nil
+      end
+
+      it "overwrites earlier values with later values" do
+        parse("--foo=bar", "--foo", "12")["foo"].must == "12"
+        parse("--foo", "12", "--foo", "13")["foo"].must == "13"
       end
     end
 
@@ -147,15 +157,12 @@ describe Thor::Options do
 
       it "accepts --opt assignment" do
         parse("--foo")["foo"].must == true
+        parse("--foo", "--bar")["foo"].must == true
       end
 
       it "accepts --opt=value assignment" do
         parse("--foo=true")["foo"].must == true
         parse("--foo=false")["foo"].must == false
-      end
-
-      it "doesn't set nonexistant switches" do
-        parse("--foo")["bar"].must_not be
       end
 
       it "accepts --[no-]opt variant, setting false for value" do
@@ -174,6 +181,13 @@ describe Thor::Options do
       it "will prefer 'skip-opt' variant over inverting 'opt' if explicitly set" do
         create "--skip-foo" => true
         parse("--skip-foo")["skip-foo"].must == true
+      end
+
+      it "accepts inputs in the human name format" do
+        create :foo_bar => :boolean
+        parse("--foo-bar")["foo_bar"].must == true
+        parse("--no-foo-bar")["foo_bar"].must == false
+        parse("--skip-foo-bar")["foo_bar"].must == false
       end
     end
 
@@ -213,48 +227,6 @@ describe Thor::Options do
       end
     end
 
-#    describe "with :default type" do
-#      before :each do
-#        create "--foo" => :optional, "--bar" => :optional
-#      end
-
-#      it "sets switches without arguments to true" do
-#        parse("--foo")["foo"].must be_true
-#      end
-
-#      it "doesn't set nonexistant switches" do
-#        parse("--foo")["bar"].must_not be
-#      end
-
-#      it "sets switches with arguments to their arguments" do
-#        parse("--foo", "12")["foo"].must == "12"
-#        parse("--bar", "12")["bar"].must == "12"
-#      end
-
-#      it "assumes something that could be either a switch or an argument is a switch" do
-#        parse("--foo", "--bar")["foo"].must be_true
-#      end
-
-#      it "overwrites earlier values with later values" do
-#        parse("--foo", "--foo", "12")["foo"].must == "12"
-#        parse("--foo", "12", "--foo", "13")["foo"].must == "13"
-#      end
-
-#      it "accepts --[no-|skip-]opt variant, setting false for value" do
-#        create "--foo-bar" => :default
-#        parse("--foo-bar")["foo-bar"].must == true
-#        parse("--no-foo-bar")["foo-bar"].must == false
-#        parse("--skip-foo-bar")["foo-bar"].must == false
-#      end
-
-#      it "accepts inputs in the human name format" do
-#        create :foo_bar => :default
-#        parse("--foo-bar")["foo_bar"].must == true
-#        parse("--no-foo-bar")["foo_bar"].must == false
-#        parse("--skip-foo-bar")["foo_bar"].must == false
-#      end
-#    end
-
     describe "with :numeric type" do
       before(:each) do
         create "n" => :numeric, "m" => 5
@@ -271,11 +243,6 @@ describe Thor::Options do
       it "raises error when value isn't numeric" do
         lambda { parse("-n", "foo") }.must raise_error(Thor::MalformattedArgumentError,
           "expected numeric value for '-n'; got \"foo\"")
-      end
-
-      it "raises error when switch is present without value" do
-        lambda { parse("-n") }.must raise_error(Thor::RequiredArgumentMissingError,
-          "no value provided for required option '-n'")
       end
     end
 

@@ -14,9 +14,11 @@ class Thor
       @name        = name.to_s
       @description = description
       @required    = required || false
-      @type        = (type || :default).to_sym
+      @type        = (type || :string).to_sym
       @default     = default
       @banner      = banner || default_banner
+
+      validate! # Trigger specific validations
     end
 
     def usage
@@ -36,11 +38,11 @@ class Thor
       end
     end
 
-    def input_required?
-      [ :numeric, :hash, :array, :string ].include?(type)
-    end
-
     protected
+
+      def validate!
+        raise ArgumentError, "An argument cannot be required and have default value." if required? && !default.nil?
+      end
 
       def valid_type?(type)
         VALID_TYPES.include?(type.to_sym)

@@ -5,7 +5,7 @@ class Thor
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
     def initialize(name, description=nil, required=nil, type=nil, default=nil, banner=nil, group=nil, aliases=nil)
-      super(name, description, required, type || :string, default, banner)
+      super(name, description, required, type, default, banner)
       @aliases = [*aliases].compact
       @group   = group.to_s.capitalize if group
     end
@@ -95,7 +95,15 @@ class Thor
       end
     end
 
+    def input_required?
+      type != :boolean
+    end
+
     protected
+
+      def validate!
+        raise ArgumentError, "An option cannot be boolean and required." if type == :boolean && required?
+      end
 
       def valid_type?(type)
         VALID_TYPES.include?(type.to_sym)

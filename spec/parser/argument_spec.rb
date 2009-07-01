@@ -3,8 +3,8 @@ require 'thor/parser'
 
 describe Thor::Argument do
 
-  def argument(name, type=:string, default=nil)
-    @argument ||= Thor::Argument.new(name, nil, default.nil?, type, default)
+  def argument(name, type=:string, default=nil, required=nil)
+    @argument ||= Thor::Argument.new(name, nil, required || default.nil?, type, default)
   end
 
   describe "errors" do
@@ -18,6 +18,12 @@ describe Thor::Argument do
       lambda {
         argument(:task, :unknown)
       }.must raise_error(ArgumentError, "Type :unknown is not valid for arguments.")
+    end
+
+    it "raises an error if argument is required and have default values" do
+      lambda {
+        argument(:task, :string, "bar", true)
+      }.must raise_error(ArgumentError, "An argument cannot be required and have default value.")
     end
   end
 

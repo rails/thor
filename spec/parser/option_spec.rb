@@ -155,18 +155,10 @@ describe Thor::Option do
     option.must be_required
   end
 
-  describe "errors" do
-    it "raises an error if name is not supplied" do
-      lambda {
-        option(nil)
-      }.must raise_error(ArgumentError, "Option name can't be nil.")
-    end
-
-    it "raises an error if type is unknown" do
-      lambda {
-        option(:task, nil, true, :unknown)
-      }.must raise_error(ArgumentError, "Type :unknown is not valid for options.")
-    end
+  it "cannot be required and have type boolean" do
+    lambda {
+      option("foo", nil, true, :boolean)
+    }.must raise_error(ArgumentError, "An option cannot be boolean and required.")
   end
 
   describe "#usage" do

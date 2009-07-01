@@ -63,11 +63,6 @@ class Thor
           switch = normalize_switch(switch)
           next unless option = switch_option(switch)
 
-          if option.input_required?
-            raise RequiredArgumentMissingError, "no value provided for required option '#{switch}'" if peek.nil?
-            raise MalformattedArgumentError, "cannot pass switch '#{peek}' as an argument" unless current_is_value?
-          end
-
           @assigns[option.human_name] = parse_peek(switch, option)
         else
           shift
@@ -96,11 +91,16 @@ class Thor
       end
 
       def switch_option(arg)
-        if arg =~ /^--(no|skip)-([-\w]+)$/
-          @switches[arg] || @switches["--#{$2}"]
+        if match = no_or_skip?(arg)
+          @switches[arg] || @switches["--#{match}"]
         else
           @switches[arg]
         end
+      end
+
+      def no_or_skip?(arg)
+        arg =~ /^--(no|skip)-([-\w]+)$/
+        $2
       end
 
       # Check if the given argument is actually a shortcut.
@@ -115,24 +115,20 @@ class Thor
         if current_is_value?
           ["true", "TRUE", "t", "T", true].include?(shift)
         else
-          @switches.key?(switch) || switch !~ /^--(no|skip)-([-\w]+)$/
+          @switches.key?(switch) || !no_or_skip?(switch)
         end
       end
 
-      # Receives switch, option and the current values hash and assign the next
-      # value to it. Also removes the option from the array where non assigned
-      # required are kept.
+      # Parse the value at the peek analyzing if it requires an input or not.
       #
       def parse_peek(switch, option)
-        @non_assigned_required.delete(option)
-
-        type = if option.type == :default
-          current_is_value? ? :string : :boolean
-        else
-          option.type
+        if option.input_required?
+          return nil if no_or_skip?(switch)
+          raise MalformattedArgumentError, "no value provided for option '#{switch}'" unless current_is_value?
         end
 
-        send(:"parse_#{type}", switch)
+        @non_assigned_required.delete(option)
+        send(:"parse_#{option.type}", switch)
       end
 
   end
