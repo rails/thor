@@ -35,35 +35,18 @@ class Thor
         send("#{key}=", value)
       end
 
-      if options.is_a?(Array)
-        task_options  = config.delete(:task_options)
-        parse_options = self.class.class_options
-        parse_options = parse_options.merge(task_options) if task_options
+      parse_options = self.class.class_options
 
-        options = Thor::Options.parse(parse_options, options)
-        _set_default_options(options, task_options) if task_options
+      options = if options.is_a?(Array)
+        task_options  = config.delete(:task_options) # hook for start
+        parse_options = parse_options.merge(task_options) if task_options
+        Thor::Options.parse(parse_options, options)
+      else
+        Thor::Options.parse(parse_options, []).merge(options)
       end
 
-      _set_default_options(options, self.class.class_options)
       self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
     end
-
-    protected
-
-      # Receives a hash of options, stringify keys and merge with default
-      # values from thor options.
-      #
-      def _set_default_options(options, default_options)
-        options.each_key do |key|
-          next unless key.is_a?(Symbol)
-          options[key.to_s] = options.delete(key)
-        end
-
-        default_options.each do |key, option|
-          next if option.default.nil? || options.key?(option.human_name.to_s)
-          options[option.human_name.to_s] ||= option.default
-        end
-      end
 
     class << self
       def included(base) #:nodoc:

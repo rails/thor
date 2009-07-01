@@ -30,23 +30,22 @@ class Thor
 
     # Takes a hash of Thor::Option objects.
     #
-    def initialize(switches={})
-      @shorts, @non_assigned_required = {}, []
+    def initialize(options={})
+      options = options.values
+      super(options)
+      @shorts, @switches = {}, {}
 
-      @switches = switches.values.inject({}) do |mem, option|
-        @non_assigned_required << option if option.required?
+      options.each do |option|
+        @switches[option.switch_name] = option
 
         option.aliases.each do |short|
           @shorts[short.to_s] ||= option.switch_name
         end
-
-        mem[option.switch_name] = option
-        mem
       end
     end
 
     def parse(args)
-      @pile, options = args.dup, {}
+      @pile = args.dup
 
       while peek
         if current_is_switch?
@@ -69,14 +68,14 @@ class Thor
             raise MalformattedArgumentError, "cannot pass switch '#{peek}' as an argument" unless current_is_value?
           end
 
-          options[option.human_name] = parse_peek(switch, option)
+          @assigns[option.human_name] = parse_peek(switch, option)
         else
           shift
         end
       end
 
       check_requirement!
-      options
+      @assigns
     end
 
     protected

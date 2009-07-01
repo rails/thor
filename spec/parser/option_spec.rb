@@ -158,12 +158,6 @@ describe Thor::Option do
       }.must raise_error(ArgumentError, "Option name can't be nil.")
     end
 
-    it "raises an error if a default value is provided when required" do
-      lambda {
-        option(:task, nil, true, :string, "bla")
-      }.must raise_error(ArgumentError, "Option cannot be required and have default value.")
-    end
-
     it "raises an error if type is unknown" do
       lambda {
         option(:task, nil, true, :unknown)

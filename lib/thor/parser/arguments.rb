@@ -23,24 +23,29 @@ class Thor
     # Takes an array of Thor::Argument objects.
     #
     def initialize(arguments=[])
-      @arguments = arguments
-      @non_assigned_required = @arguments.select { |a| a.required? }
+      @assigns, @non_assigned_required = {}, []
+      @switches = arguments
+
+      arguments.each do |argument|
+        if argument.default
+          @assigns[argument.human_name] = argument.default
+        elsif argument.required?
+          @non_assigned_required << argument
+        end
+      end
     end
 
     def parse(args)
-      @pile, assigns = args.dup, {}
+      @pile = args.dup
 
-      @arguments.each do |argument|
-        assigns[argument.human_name] = if peek
-          @non_assigned_required.delete(argument)
-          send(:"parse_#{argument.type}", argument.human_name)
-        else
-          argument.default
-        end
+      @switches.each do |argument|
+        break unless peek
+        @non_assigned_required.delete(argument)
+        @assigns[argument.human_name] = send(:"parse_#{argument.type}", argument.human_name)
       end
 
       check_requirement!
-      assigns
+      @assigns
     end
 
     private

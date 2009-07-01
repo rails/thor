@@ -55,5 +55,10 @@ describe Thor::Arguments do
       create :string => nil, :hash => nil, :array => nil, :numeric => nil
       parse("", 0, {}, []).must == { "string" => "", "numeric" => 0, "hash" => {}, "array" => [] }
     end
+
+    it "returns the default value if none is provided" do
+      create :string => "foo", :numeric => 3.0
+      parse("bar").must == { "string" => "bar", "numeric" => 3.0 }
+    end
   end
 end

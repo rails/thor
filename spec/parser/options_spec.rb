@@ -79,6 +79,11 @@ describe Thor::Options do
       opts["app"].must == "12"
     end
 
+    it "returns the default value if none is provided" do
+      create :foo => "baz", :bar => :required
+      parse("--bar=boom")["foo"].must == "baz"
+    end
+
     describe "with no input" do
       it "and no switches returns an empty hash" do
         create({})

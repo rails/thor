@@ -9,7 +9,6 @@ class Thor
       class_name = self.class.name.split("::").last
 
       raise ArgumentError, "#{class_name} name can't be nil."                         if name.nil?
-      raise ArgumentError, "#{class_name} cannot be required and have default value." if required && !default.nil?
       raise ArgumentError, "Type :#{type} is not valid for #{class_name.downcase}s."  if type && !valid_type?(type)
 
       @name        = name.to_s
