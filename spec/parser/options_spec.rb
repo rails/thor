@@ -117,6 +117,11 @@ describe Thor::Options do
       it "raises an error if a switch name is given as the argument to the required switch" do
         lambda { parse("--foo", "--bar") }.must raise_error(Thor::MalformattedArgumentError, "cannot pass switch '--bar' as an argument")
       end
+
+      it "does not raises an error if the required option has a default value" do
+        create :foo => Thor::Option.new("foo", nil, true, :string, "baz"), :bar => :optional
+        lambda { parse("--bar") }.must_not raise_error
+      end
     end
 
     describe "with :string type" do

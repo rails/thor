@@ -151,6 +151,12 @@ describe Thor::Option do
     option("foo_bar").switch_name.must == "--foo-bar"
   end
 
+  it "can be required and have default values" do
+    option = option("foo", nil, true, :default, "bar")
+    option.default.must == "bar"
+    option.must be_required
+  end
+
   describe "errors" do
     it "raises an error if name is not supplied" do
       lambda {
