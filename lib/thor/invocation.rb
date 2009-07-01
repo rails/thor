@@ -76,9 +76,10 @@ class Thor
     #   invoke Rspec::RR, [], :style => :foo
     #
     def invoke(name=nil, task=nil, args=nil, opts=nil, config=nil)
-      task, args, opts, config = nil, task, args, opts if task.is_a?(Array)
-      object, task = _setup_for_invoke(name, task)
+      task, args, opts, config = nil, task, args, opts if task.nil? || task.is_a?(Array)
+      args, opts, config = nil, args, opts if args.is_a?(Hash)
 
+      object, task = _setup_for_invoke(name, task)
       if object.is_a?(Class)
         klass = object
 
