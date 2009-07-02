@@ -142,6 +142,7 @@ class Thor
     #   chmod "script/*", 0755
     #
     def chmod(path, mode, log_status=true)
+      return unless behavior == :invoke
       path = File.expand_path(path, root)
       say_status :chmod, relative_to_absolute_root(path), log_status
       FileUtils.chmod_R(mode, path) unless options[:pretend]
@@ -161,6 +162,7 @@ class Thor
     #   end
     #
     def run(command, log_status=true)
+      return unless behavior == :invoke
       say_status :run, "#{command} from #{relative_to_absolute_root(root, false)}", log_status
       `#{command}` unless options[:pretend]
     end
@@ -218,6 +220,7 @@ class Thor
     #   remove_file 'app/controllers/application_controller.rb'
     #
     def remove_file(path, log_status=true)
+      return unless behavior == :invoke
       path = File.expand_path(path, root)
       say_status :remove, relative_to_absolute_root(path), log_status
 
@@ -242,6 +245,7 @@ class Thor
     #   end
     #
     def gsub_file(path, flag, *args, &block)
+      return unless behavior == :invoke
       log_status = args.last.is_a?(Symbol) || [ true, false ].include?(args.last) ? args.pop : true
 
       path = File.expand_path(path, root)
@@ -267,9 +271,9 @@ class Thor
     #   append_file 'config/environments/test.rb', 'config.gem "rspec"'
     #
     def append_file(path, data=nil, log_status=true, &block)
+      return unless behavior == :invoke
       path = File.expand_path(path, root)
       say_status :append, relative_to_absolute_root(path), log_status
-
       File.open(path, 'ab') { |file| file.write(data || block.call) } unless options[:pretend]
     end
 
@@ -286,6 +290,7 @@ class Thor
     #   prepend_file 'config/environments/test.rb', 'config.gem "rspec"'
     #
     def prepend_file(path, data=nil, log_status=true, &block)
+      return unless behavior == :invoke
       path = File.expand_path(path, root)
       say_status :prepend, relative_to_absolute_root(path), log_status
 
