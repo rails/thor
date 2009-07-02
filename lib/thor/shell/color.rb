@@ -44,26 +44,17 @@ class Thor
       # Set the terminal's background ANSI color to white.
       ON_WHITE   = "\e[47m"
 
-      # Overwrite say to use color.
-      #
-      def say(statement="", color=nil, *args) #:nodoc:
-        statement = set_color(statement.to_s, color) if color
-        super(statement, color, *args)
-      end
-
-      # Overwrite say status to use color.
-      #
-      def say_status(status, message, log_status=true) #:nodoc:
-        return if quiet? || log_status == false
-
-        spaces = "  " * (padding + 1)
-        color  = log_status.is_a?(Symbol) ? log_status : :green
-        status = status.to_s.rjust(12)
-        status = set_color status, color, true if color
-        say "#{status}#{spaces}#{message}", nil, true
-      end
-
       protected
+
+        # Set color by using a string or one of the defined constants. Based
+        # on Highline implementation. CLEAR is automatically be embedded to
+        # the end of the returned String.
+        #
+        def set_color(string, color, bold=false)
+          color = self.class.const_get(color.to_s.upcase) if color.is_a?(Symbol)
+          bold  = bold ? BOLD : ""
+          "#{bold}#{color}#{string}#{CLEAR}"
+        end
 
         # Overwrite show_diff to show diff with colors if Diff::LCS is
         # available.
@@ -73,8 +64,7 @@ class Thor
             actual  = File.read(destination).to_s.split("\n")
             content = content.to_s.split("\n")
 
-            diffs = Diff::LCS.diff(actual, content).first
-            diffs.each do |diff|
+            Diff::LCS.sdiff(actual, content).each do |diff|
               output_diff_line(diff)
             end
           else
@@ -85,11 +75,14 @@ class Thor
         def output_diff_line(diff)
           case diff.action
             when '-'
-              say "- #{diff.element.chomp}", :red
+              say "- #{diff.old_element.chomp}", :red
             when '+'
-              say "+ #{diff.element.chomp}", :green
+              say "+ #{diff.new_element.chomp}", :green
+            when '!'
+              say "- #{diff.old_element.chomp}", :red
+              say "+ #{diff.new_element.chomp}", :green
             else
-              say "#{diff.action} #{diff.element.chomp}"
+              say "  #{diff.old_element.chomp}"
           end
         end
 
@@ -106,16 +99,6 @@ class Thor
           rescue LoadError
             false
           end
-        end
-
-        # Set color by using a string or one of the defined constants. Based
-        # on Highline implementation. CLEAR is automatically be embedded to
-        # the end of the returned String.
-        #
-        def set_color(string, color, bold=false)
-          color = self.class.const_get(color.to_s.upcase) if color.is_a?(Symbol)
-          bold  = bold ? BOLD : ""
-          "#{bold}#{color}#{string}#{CLEAR}"
         end
 
     end

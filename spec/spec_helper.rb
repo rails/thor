@@ -6,6 +6,7 @@ require 'thor'
 require 'stringio'
 require 'rubygems'
 require 'rr'
+require 'diff/lcs' # You need diff/lcs installed to run specs (but not to run Thor).
 
 # Load fixtures
 load File.join(File.dirname(__FILE__), "fixtures", "task.thor")

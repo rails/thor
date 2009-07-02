@@ -34,14 +34,16 @@ class Thor
       # ==== Example
       # say("I know you knew that.")
       #
-      def say(statement="", color=nil, force_new_line=false)
-        statement = statement.to_s
+      def say(message="", color=nil, force_new_line=false)
+        message  = message.to_s
+        new_line = force_new_line || !(message[-1, 1] == " " || message[-1, 1] == "\t")
+        message  = set_color(message, color) if color
 
-        if !force_new_line && (statement[-1, 1] == " " || statement[-1, 1] == "\t")
-          $stdout.print(statement)
-          $stdout.flush
+        if new_line
+          $stdout.puts(message)
         else
-          $stdout.puts(statement)
+          $stdout.print(message)
+          $stdout.flush
         end
       end
 
@@ -50,10 +52,14 @@ class Thor
       # in log_status, avoiding the message from being shown. If a Symbol is
       # given in log_status, it's used as the color.
       #
-      def say_status(status, message, log_status=true)
+      def say_status(status, message, log_status=true) #:nodoc:
         return if quiet? || log_status == false
         spaces = "  " * (padding + 1)
-        say "#{status.to_s.rjust(12)}#{spaces}#{message}", nil, true
+        color  = log_status.is_a?(Symbol) ? log_status : :green
+
+        status = status.to_s.rjust(12)
+        status = set_color status, color, true if color
+        say "#{status}#{spaces}#{message}", nil, true
       end
 
       # Make a question the to user and returns true if the user replies "y" or
@@ -170,6 +176,10 @@ class Thor
       end
 
       protected
+
+        def set_color(string, color, bold=false)
+          string
+        end
 
         def is?(value)
           value = value.to_s

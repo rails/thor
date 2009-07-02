@@ -200,7 +200,7 @@ TABLE
         mock($stdin).gets{ 'n' }
         stub(shell).`{ 'diff_output' } # Close `
 
-        capture(:stdout){ shell.file_collision('foo'){ } }.must =~ /diff_output/
+        capture(:stdout){ shell.file_collision('spec/sandbox/foo'){ } }.must =~ /diff_output/
       end
     end
   end
