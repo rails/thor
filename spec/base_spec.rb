@@ -102,7 +102,7 @@ describe Thor::Base do
 
   describe "#class_options_help" do
     before(:each) do
-      @content = capture(:stdout) { MyCounter.help(Thor::Shell::Basic.new) }
+      @content = capture(:stdout) { MyCounter.help(Thor::Base.shell.new) }
     end
 
     it "shows options description" do
@@ -132,7 +132,7 @@ describe Thor::Base do
       hash = Thor::CoreExt::OrderedHash.new
       hash["Foo"] = B.class_options.values
 
-      content = capture(:stdout) { MyCounter.send(:class_options_help, Thor::Shell::Basic.new, nil, hash) }
+      content = capture(:stdout) { MyCounter.send(:class_options_help, Thor::Base.shell.new, nil, hash) }
       content.must =~ /Foo options\:/
       content.must =~ /--last-name=LAST_NAME/
     end

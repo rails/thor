@@ -3,7 +3,19 @@ require 'tempfile'
 class Thor
   module Shell
     class Basic
-      attr_accessor :base
+      attr_accessor :base, :padding
+
+      # Initialize base and padding to nil.
+      #
+      def initialize #:nodoc:
+        @base, @padding = nil, 0
+      end
+
+      # Do not allow padding to be less than zero.
+      #
+      def padding=(value) #:nodoc:
+        @padding = [0, value].max
+      end
 
       # Ask something to the user and receives a response.
       #
@@ -39,10 +51,9 @@ class Thor
       # given in log_status, it's used as the color.
       #
       def say_status(status, message, log_status=true)
-        return if base && base.options[:quiet]
-
-        color = log_status.is_a?(Symbol) ? log_status : :green
-        say "#{status.to_s.rjust(12)}  #{message}", color, true if log_status
+        return if quiet? || log_status == false
+        spaces = "  " * (padding + 1)
+        say "#{status.to_s.rjust(12)}#{spaces}#{message}", nil, true
       end
 
       # Make a question the to user and returns true if the user replies "y" or
@@ -182,6 +193,8 @@ HELP
         end
 
         def show_diff(destination, content)
+          diff_cmd = ENV['THOR_DIFF'] || ENV['RAILS_DIFF'] || 'diff -u'
+
           Tempfile.open(File.basename(destination), File.dirname(destination)) do |temp|
             temp.write content
             temp.rewind
@@ -189,8 +202,8 @@ HELP
           end
         end
 
-        def diff_cmd
-          ENV['THOR_DIFF'] || ENV['RAILS_DIFF'] || 'diff -u'
+        def quiet?
+          base && base.options[:quiet]
         end
 
     end

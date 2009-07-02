@@ -19,8 +19,8 @@ class Amazing < Thor
     puts "Hello"
   end
 
-  desc "copy", "copy a file"
-  def copy
-    copy_file "task.thor", "foo.thor"
+  desc "create", "create a file"
+  def create
+    create_file "task.thor", Time.now.utc.to_s
   end
 end

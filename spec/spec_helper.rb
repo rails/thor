@@ -13,6 +13,9 @@ load File.join(File.dirname(__FILE__), "fixtures", "group.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "invoke.thor")
 
+# Set shell to basic
+Thor::Base.shell = Thor::Shell::Basic
+
 Kernel.module_eval do
   alias_method :must, :should
   alias_method :must_not, :should_not

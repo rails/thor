@@ -1,11 +1,11 @@
-require 'thor/shell/basic'
+require 'thor/shell/color'
 
 class Thor
   module Base
-    # Returns the shell used in all Thor classes.
+    # Returns the shell used in all Thor classes. Default to color one.
     #
     def self.shell
-      @shell || Thor::Shell::Basic
+      @shell ||= Thor::Shell::Color
     end
 
     # Sets the shell used in all Thor classes.

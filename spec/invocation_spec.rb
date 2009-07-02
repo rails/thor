@@ -63,7 +63,7 @@ describe Thor::Invocation do
     end
 
     it "allow extra configuration values to be given" do
-      base, shell = A.new, Thor::Shell::Basic.new
+      base, shell = A.new, Thor::Base.shell.new
       base.invoke("b:three", [], {}, :shell => shell).shell.must == shell
     end
 

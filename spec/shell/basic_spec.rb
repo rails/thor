@@ -5,6 +5,16 @@ describe Thor::Shell::Basic do
     @shell ||= Thor::Shell::Basic.new
   end
 
+  describe "#padding" do
+    it "cannot be set to below zero" do
+      shell.padding = 10
+      shell.padding.must == 10
+
+      shell.padding = -1
+      shell.padding.must == 0
+    end
+  end
+
   describe "#ask" do
     it "prints a message to the user and gets the response" do
       mock($stdout).print("Should I overwrite it? ")
@@ -72,6 +82,12 @@ describe Thor::Shell::Basic do
     it "does not print a message if log status is set to false" do
       dont_allow($stdout).puts
       shell.say_status(:created, "~/.thor/task.thor", false)
+    end
+
+    it "uses padding to set messages left margin" do
+      shell.padding = 2
+      mock($stdout).puts("      create      ~/.thor/task.thor")
+      shell.say_status(:create, "~/.thor/task.thor")
     end
   end
 
@@ -182,7 +198,7 @@ TABLE
         stub($stdout).print
         mock($stdin).gets{ 'd' }
         mock($stdin).gets{ 'n' }
-        stub(shell).`{ 'diff_output' }
+        stub(shell).`{ 'diff_output' } # Close `
 
         capture(:stdout){ shell.file_collision('foo'){ } }.must =~ /diff_output/
       end
