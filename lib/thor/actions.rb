@@ -222,8 +222,9 @@ class Thor
     def remove_file(path, log_status=true)
       return unless behavior == :invoke
       path = File.expand_path(path, root)
-      say_status :remove, relative_to_absolute_root(path), log_status
 
+      color  = log_status.is_a?(Symbol) ? log_status : :red
+      say_status :remove, relative_to_absolute_root(path), log_status
       ::FileUtils.rm_rf(path) if !options[:pretend] && File.exists?(path)
     end
 
