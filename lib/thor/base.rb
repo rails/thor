@@ -341,6 +341,19 @@ class Thor
         end
       end
 
+      # Default way to start generators from the command line.
+      #
+      def start(given_args=ARGV, config={}) #:nodoc:
+        config[:shell] ||= Thor::Base.shell.new
+        yield
+      rescue Thor::Error => e
+        if given_args.include?("--debug")
+          raise e
+        else
+          config[:shell].error e.message
+        end
+      end
+
       protected
 
         # Prints the class options per group. If an option does not belong to

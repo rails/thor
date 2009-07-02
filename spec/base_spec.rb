@@ -220,4 +220,12 @@ describe Thor::Base do
       MyCounter.get_from_super.must == 13
     end
   end
+
+  describe "#start" do
+    it "raises an error instead of rescueing if --debug is given" do
+      lambda {
+        MyScript.start ["what", "--debug"]
+      }.must raise_error(Thor::UndefinedTaskError, /the 'what' task of MyScript is private/)
+    end
+  end
 end

@@ -22,17 +22,15 @@ class Thor::Group
     # inside the class.
     #
     def start(given_args=ARGV, config={})
-      config[:shell] ||= Thor::Base.shell.new
+      super do
+        if Thor::HELP_MAPPINGS.include?(given_args.first)
+          help(config[:shell])
+          return
+        end
 
-      if Thor::HELP_MAPPINGS.include?(given_args.first)
-        help(config[:shell])
-        return
+        args, opts = Thor::Options.split(given_args)
+        new(args, opts, config).invoke
       end
-
-      args, opts = Thor::Options.split(given_args)
-      new(args, opts, config).invoke
-    rescue Thor::Error => e
-      config[:shell].error e.message
     end
 
     # Prints help information.

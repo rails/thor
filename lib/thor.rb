@@ -127,24 +127,21 @@ class Thor
     #   script.invoke(:task, first_arg, second_arg, third_arg)
     #
     def start(given_args=ARGV, config={})
-      config[:shell] ||= Thor::Base.shell.new
+      super do
+        meth = normalize_task_name(given_args.shift)
+        task = all_tasks[meth]
 
-      meth = normalize_task_name(given_args.shift)
-      task = all_tasks[meth]
+        if task
+          args, opts = Thor::Options.split(given_args)
+          config.merge!(:task_options => task.options)
+        else
+          args, opts = given_args, {}
+        end
 
-      if task
-        args, opts = Thor::Options.split(given_args)
-        config.merge!(:task_options => task.options)
-      else
-        args, opts = given_args, {}
+        task ||= Task.dynamic(meth)
+        trailing = args[Range.new(arguments.size, -1)]
+        new(args, opts, config).invoke(task, trailing || [])
       end
-
-      task ||= Task.dynamic(meth)
-      trailing = args[Range.new(arguments.size, -1)]
-
-      new(args, opts, config).invoke(task, trailing || [])
-    rescue Thor::Error => e
-      config[:shell].error e.message
     end
 
     # Prints help information. If a task name is given, it shows information
