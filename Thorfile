@@ -7,7 +7,7 @@ GEM_VERSION = "0.10.23"
 AUTHOR = "Yehuda Katz"
 EMAIL = "wycats@gmail.com"
 HOMEPAGE = "http://yehudakatz.com"
-SUMMARY = "A gem that maps options to a class"
+SUMMARY = "A scripting framework that replaces rake, sake and rubigen"
 PROJECT = "thor"
 
 SPEC = Gem::Specification.new do |s|
@@ -22,18 +22,17 @@ SPEC = Gem::Specification.new do |s|
   s.email = EMAIL
   s.homepage = HOMEPAGE
   s.rubyforge_project = PROJECT
-    
+
   s.require_path = 'lib'
   s.bindir = "bin"
   s.executables = %w( thor rake2thor )
-  s.files = s.extra_rdoc_files + %w(Rakefile) + Dir.glob("{bin,lib,specs}/**/*")
+  s.files = s.extra_rdoc_files + %w(Rakefile) + Dir.glob("{bin,lib,spec}/**/*")
 end
 
 class Default < Thor
   # Set up standard Thortasks
   spec_task(Dir["spec/**/*_spec.rb"])
-  spec_task(Dir["spec/**/*_spec.rb"], :name => "rcov", :rcov =>
-    {:exclude => %w(spec /Library /Users task.thor lib/getopt.rb)})
+  spec_task(Dir["spec/**/*_spec.rb"], :name => "rcov", :rcov => {:exclude => %w(spec task.thor Thorfile)})
   install_task SPEC
 
   desc "gemspec", "make a gemspec file"
