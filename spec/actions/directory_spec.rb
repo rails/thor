@@ -36,14 +36,14 @@ describe Thor::Actions::Directory do
       exists_and_identical?("doc", "docs")
     end
 
-    it "copies only the directory first level" do
+    it "copies only the first level files if recursive" do
       capture(:stdout){ invoker.directory(".", "tasks", false) }
 
       file = File.join(destination_root, "tasks", "group.thor")
       File.exists?(file).must be_true
 
       file = File.join(destination_root, "tasks", "doc")
-      File.exists?(file).must be_true
+      File.exists?(file).must be_false
 
       file = File.join(destination_root, "tasks", "doc", "README")
       File.exists?(file).must be_false
@@ -78,6 +78,13 @@ describe Thor::Actions::Directory do
 
       file = File.join(destination_root, "docs", "components", ".empty_directory")
       File.exists?(file).must be_false
+    end
+
+    it "copies directories even if they are empty" do
+      capture(:stdout){ invoker.directory("doc/components", "docs/components") }
+
+      file = File.join(destination_root, "docs", "components")
+      File.exists?(file).must be_true
     end
 
     it "logs status" do

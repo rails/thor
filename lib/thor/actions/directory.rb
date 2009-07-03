@@ -53,13 +53,14 @@ class Thor
       end
 
       def invoke!
+        base.empty_directory given_destination
         lookup = recursive ? File.join(source, '**', '*') : File.join(source, '*')
 
         Dir[lookup].each do |file_source|
           file_destination = File.join(given_destination, file_source.gsub(source, '.'))
 
           if File.directory?(file_source)
-            base.empty_directory(file_destination, @log_status)
+            base.empty_directory(file_destination, @log_status) if recursive
           elsif file_source !~ /\.empty_directory$/
             if file_source =~ /\.tt$/
               base.template(file_source, file_destination[0..-4], @log_status)
