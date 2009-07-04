@@ -1,3 +1,5 @@
+require 'rbconfig'
+
 class Thor
   module Sandbox; end
 
@@ -201,6 +203,20 @@ class Thor
     #
     def self.globs_for(path)
       ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
+    end
+
+    # Return the path to the ruby interpreter taking into account multiple
+    # installations and windows extensions.
+    #
+    def self.ruby_command #:nodoc:
+      @ruby_command ||= begin
+        ruby = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name'])
+        ruby << Config::CONFIG['EXEEXT']
+
+        # escape string in case path to ruby executable contain spaces.
+        ruby.sub!(/.*\s.*/m, '"\&"')
+        ruby
+      end
     end
 
   end

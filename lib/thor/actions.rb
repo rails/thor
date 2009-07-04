@@ -1,4 +1,3 @@
-require 'rbconfig'
 require 'fileutils'
 
 Dir[File.join(File.dirname(__FILE__), "actions", "*.rb")].each do |action|
@@ -177,8 +176,8 @@ class Thor
     #
     def run_ruby_script(command, log_status=true)
       return unless behavior == :invoke
-      say_status File.basename(_ruby_command), command, log_status
-      `#{_ruby_command} #{command}` unless options[:pretend]
+      say_status File.basename(Thor::Util.ruby_command), command, log_status
+      `#{Thor::Util.ruby_command} #{command}` unless options[:pretend]
     end
 
     # Run a thor command. A hash of options can be given and it's converted to 
@@ -322,17 +321,6 @@ class Thor
           when Hash
             [:force, :skip, "force", "skip"].each { |i| options.delete(i) }
             options.merge!(key => true)
-        end
-      end
-
-      def _ruby_command #:nodoc:
-        @ruby_command ||= begin
-          ruby = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name'])
-          ruby << Config::CONFIG['EXEEXT']
-
-          # escape string in case path to ruby executable contain spaces.
-          ruby.sub!(/.*\s.*/m, '"\&"')
-          ruby
         end
       end
 

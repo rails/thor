@@ -197,7 +197,7 @@ describe Thor::Actions do
 
     describe "#run_ruby_script" do
       before(:each) do
-        stub(runner)._ruby_command{ "/opt/jruby" }
+        stub(Thor::Util).ruby_command{ "/opt/jruby" }
         mock(runner).`("/opt/jruby script.rb") #`
       end
 
