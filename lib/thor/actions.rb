@@ -1,3 +1,4 @@
+require 'rbconfig'
 require 'fileutils'
 
 Dir[File.join(File.dirname(__FILE__), "actions", "*.rb")].each do |action|
@@ -175,7 +176,9 @@ class Thor
     #                       If a symbol is given, uses it as the output color.
     #
     def run_ruby_script(command, log_status=true)
-      run("ruby #{command}", log_status)
+      return unless behavior == :invoke
+      say_status File.basename(_ruby_command), command, log_status
+      `#{_ruby_command} #{command}` unless options[:pretend]
     end
 
     # Run a thor command. A hash of options can be given and it's converted to 
@@ -198,13 +201,14 @@ class Thor
     #
     def thor(task, *args)
       log_status = args.last.is_a?(Symbol) || [true, false].include?(args.last) ? args.pop : true
-      options = args.last.is_a?(Hash) ? args.pop : {}
+      options    = args.last.is_a?(Hash) ? args.pop : {}
 
-      in_root do
-        args.unshift "thor #{task}"
-        args.push Thor::Options.to_switches(options)
-        run args.join(' ').strip, log_status
-      end
+      args.unshift task
+      args.push Thor::Options.to_switches(options)
+      command = args.join(' ').strip
+
+      say_status :thor, command, log_status
+      run "thor #{command}", false
     end
 
     # Removes a file at the given location.
@@ -221,9 +225,9 @@ class Thor
     #
     def remove_file(path, log_status=true)
       return unless behavior == :invoke
-      path = File.expand_path(path, root)
+      path  = File.expand_path(path, root)
+      color = log_status.is_a?(Symbol) ? log_status : :red
 
-      color  = log_status.is_a?(Symbol) ? log_status : :red
       say_status :remove, relative_to_absolute_root(path), log_status
       ::FileUtils.rm_rf(path) if !options[:pretend] && File.exists?(path)
     end
@@ -306,11 +310,11 @@ class Thor
 
       # Allow current root to be shared between invocations.
       #
-      def _shared_configuration
+      def _shared_configuration #:nodoc:
         super.merge!(:root => self.root)
       end
 
-      def _cleanup_options_and_set(options, key)
+      def _cleanup_options_and_set(options, key) #:nodoc:
         case options
           when Array
             %w(--force -f --skip -s).each { |i| options.delete(i) }
@@ -318,6 +322,17 @@ class Thor
           when Hash
             [:force, :skip, "force", "skip"].each { |i| options.delete(i) }
             options.merge!(key => true)
+        end
+      end
+
+      def _ruby_command #:nodoc:
+        @ruby_command ||= begin
+          ruby = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name'])
+          ruby << Config::CONFIG['EXEEXT']
+
+          # escape string in case path to ruby executable contain spaces.
+          ruby.sub!(/.*\s.*/m, '"\&"')
+          ruby
         end
       end
 

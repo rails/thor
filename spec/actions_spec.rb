@@ -173,62 +173,69 @@ describe Thor::Actions do
     end
 
     describe "#run" do
+      before(:each) do
+        mock(runner).`("ls") #`
+      end
+
       it "executes the command given" do
-        mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
         action :run, "ls"
       end
 
-      it "does not execute the command if pretend given" do
-        dont_allow(runner(:pretend => true)).`("cd ./") # To avoid highlighting issues `
-        action :run, "cd ./"
-      end
-
       it "logs status" do
-        mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
         action(:run, "ls").must == "         run  ls from .\n"
       end
 
       it "does not log status if required" do
-        mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
         action(:run, "ls", false).must be_empty
       end
 
       it "accepts a color as status" do
-        mock(runner).`("ls"){ 'spec' } # To avoid highlighting issues `
         mock(runner.shell).say_status(:run, "ls from .", :yellow)
-        action :run, 'ls', :yellow
+        action :run, "ls", :yellow
       end
     end
 
     describe "#run_ruby_script" do
+      before(:each) do
+        stub(runner)._ruby_command{ "/opt/jruby" }
+        mock(runner).`("/opt/jruby script.rb") #`
+      end
+
       it "executes the ruby script" do
-        mock(runner).run("ruby script.rb", true)
         action :run_ruby_script, "script.rb"
       end
 
+      it "logs status" do
+        action(:run_ruby_script, "script.rb").must == "       jruby  script.rb\n"
+      end
+
       it "does not log status if required" do
-        mock(runner).run("ruby script.rb", false)
-        action :run_ruby_script, "script.rb", false
+        action(:run_ruby_script, "script.rb", false).must be_empty
       end
     end
 
     describe "#thor" do
       it "executes the thor command" do
-        mock(runner).run("thor list", true)
+        mock(runner).run("thor list", false)
         action :thor, :list, true
       end
 
       it "converts extra arguments to command arguments" do
-        mock(runner).run("thor list foo bar", true)
+        mock(runner).run("thor list foo bar", false)
         action :thor, :list, "foo", "bar"
       end
 
       it "converts options hash to switches" do
-        mock(runner).run("thor list foo bar --foo", true)
+        mock(runner).run("thor list foo bar --foo", false)
         action :thor, :list, "foo", "bar", :foo => true
 
-        mock(runner).run("thor list --foo 1 2 3", true)
+        mock(runner).run("thor list --foo 1 2 3", false)
         action :thor, :list, :foo => [1,2,3]
+      end
+
+      it "logs status" do
+        mock(runner).run("thor list", false)
+        action(:thor, :list).must == "        thor  list\n"
       end
 
       it "does not log status if required" do
