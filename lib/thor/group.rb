@@ -63,10 +63,6 @@ class Thor::Group
         Thor::Group
       end
 
-      def valid_task?(meth) #:nodoc:
-        public_instance_methods.include?(meth)
-      end
-
       def create_task(meth) #:nodoc:
         tasks[meth.to_s] = Thor::Task.new(meth, nil, nil, nil)
       end

@@ -199,7 +199,7 @@ class Thor
       end
 
       def valid_task?(meth) #:nodoc:
-        public_instance_methods.include?(meth) && @usage && @desc
+        @usage && @desc
       end
 
       def create_task(meth) #:nodoc:

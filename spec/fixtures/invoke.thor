@@ -32,7 +32,7 @@ class A < Thor
 
   desc "invoker", "invoke a b task"
   def invoker(*args)
-    invoke :b, :one, ["José"]
+    invoke :b, :one, ["Jose"]
   end
 end
 

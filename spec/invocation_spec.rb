@@ -34,23 +34,23 @@ describe Thor::Invocation do
 
     it "accepts a class as argument with a task to invoke" do
       base = A.new([], :last_name => "Valim")
-      base.invoke(B, :one, ["José"]).must == "Valim, José"
+      base.invoke(B, :one, ["Jose"]).must == "Valim, Jose"
     end
 
     it "accepts a Thor instance as argument" do
       invoked = B.new([], :last_name => "Valim")
       base = A.new
-      base.invoke(invoked, :one, ["José"]).must == "Valim, José"
-      base.invoke(invoked, :one, ["José"]).must be_nil
+      base.invoke(invoked, :one, ["Jose"]).must == "Valim, Jose"
+      base.invoke(invoked, :one, ["Jose"]).must be_nil
     end
 
     it "allows customized options to be given" do
       base = A.new([], :last_name => "Wrong")
-      base.invoke(B, :one, ["José"], :last_name => "Valim").must == "Valim, José"
+      base.invoke(B, :one, ["Jose"], :last_name => "Valim").must == "Valim, Jose"
     end
 
     it "reparses options in the new class" do
-      A.start(["invoker", "--last-name", "Valim"]).must == "Valim, José"
+      A.start(["invoker", "--last-name", "Valim"]).must == "Valim, Jose"
     end
 
     it "shares initialize options with invoked class" do

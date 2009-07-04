@@ -97,7 +97,7 @@ class Thor
       method_args = []
       current = @_invocations[klass]
 
-      iterator = lambda do |_, task|
+      iterator = proc do |_, task|
         unless current.include?(task.name)
           current << task.name
           task.run(instance, method_args)

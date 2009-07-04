@@ -374,7 +374,7 @@ class Thor
               groups[value.group] << value
             end
 
-            printer = lambda do |group_name, options|
+            printer = proc do |group_name, options|
               list = []
               padding = options.collect{ |o| o.aliases.size  }.max.to_i * 4
 
@@ -471,7 +471,13 @@ class Thor
             return
           end
 
+          # Return if it's not a public instance method
+          return unless public_instance_methods.include?(meth) ||
+                        public_instance_methods.include?(meth.to_sym)
+
+          # Return if @no_tasks is enabled or it's not a valid task
           return if @no_tasks || !valid_task?(meth)
+
           is_thor_reserved_word?(meth, :task)
           Thor::Base.register_klass_file(self)
           create_task(meth)
@@ -497,6 +503,7 @@ class Thor
         # SIGNATURE: Defines if a given method is a valid_task?. This method is
         # called before a new method is added to the class.
         def valid_task?(meth) #:nodoc:
+          true # unless otherwise given
         end
 
         # SIGNATURE: Creates a new task if valid_task? is true. This method is

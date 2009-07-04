@@ -243,8 +243,7 @@ class Thor::Runner < Thor
         v[:namespaces] && !(v[:namespaces] & lookup).empty?
       end
 
-      files.map! { |k, v| File.join(thor_root, "#{v[:filename]}") }
-      files
+      files.map { |k, v| File.join(thor_root, "#{v[:filename]}") }
     end
 
     # Display information about the given klasses. If with_module is given,
