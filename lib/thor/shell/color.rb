@@ -60,7 +60,7 @@ class Thor
         # available.
         #
         def show_diff(destination, content)
-          if diff_lcs_loaded?
+          if diff_lcs_loaded? && ENV['THOR_DIFF'].nil? && ENV['RAILS_DIFF'].nil?
             actual  = File.read(destination).to_s.split("\n")
             content = content.to_s.split("\n")
 
