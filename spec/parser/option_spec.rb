@@ -6,8 +6,8 @@ describe Thor::Option do
     Thor::Option.parse(key, value)
   end
 
-  def option(name, description=nil, required=false, type=nil, default=nil, aliases=[])
-    @option ||= Thor::Option.new(name, description, required, type, default, aliases)
+  def option(name, description=nil, required=false, type=nil, default=nil, banner=nil, group=nil, aliases=[])
+    @option ||= Thor::Option.new(name, description, required, type, default, banner, group, aliases)
   end
 
   describe "#parse" do
@@ -185,6 +185,14 @@ describe Thor::Option do
 
     it "uses padding when no aliases is given" do
       parse(:foo, :boolean).usage(4).must == "    [--foo]"
+    end
+
+    it "uses banner when supplied" do
+      option(:foo, nil, false, :string, nil, "BAR").usage.must == "[--foo=BAR]"
+    end
+
+    it "checkes when banner is an empty string" do
+      option(:foo, nil, false, :string, nil, "").usage.must == "[--foo]"
     end
 
     describe "with required values" do

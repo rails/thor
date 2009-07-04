@@ -80,7 +80,7 @@ class Thor
     end
 
     def usage(padding=0)
-      sample = if banner
+      sample = if banner && !banner.to_s.empty?
         "#{switch_name}=#{banner}"
       else
         switch_name
