@@ -3,7 +3,7 @@ require 'rubygems/specification'
 require 'thor/tasks'
 
 GEM = "thor"
-GEM_VERSION = "0.10.24"
+GEM_VERSION = "0.10.25"
 AUTHOR = "Yehuda Katz"
 EMAIL = "wycats@gmail.com"
 HOMEPAGE = "http://yehudakatz.com"
@@ -26,7 +26,7 @@ SPEC = Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.bindir = "bin"
   s.executables = %w( thor rake2thor )
-  s.files = s.extra_rdoc_files + %w(Rakefile) + Dir.glob("{bin,lib,spec}/**/*")
+  s.files = s.extra_rdoc_files + %w(Rakefile) + Dir.glob("{bin,lib}/**/*")
 end
 
 class Default < Thor
