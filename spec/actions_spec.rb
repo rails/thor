@@ -182,7 +182,7 @@ describe Thor::Actions do
       end
 
       it "logs status" do
-        action(:run, "ls").must == "         run  ls from .\n"
+        action(:run, "ls").must == "         run  \"ls\" from .\n"
       end
 
       it "does not log status if required" do
@@ -190,7 +190,7 @@ describe Thor::Actions do
       end
 
       it "accepts a color as status" do
-        mock(runner.shell).say_status(:run, "ls from .", :yellow)
+        mock(runner.shell).say_status(:run, '"ls" from .', :yellow)
         action :run, "ls", :yellow
       end
     end

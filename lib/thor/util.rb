@@ -162,26 +162,32 @@ class Thor
       yaml_changed
     end
 
+    def self.user_home
+      @@user_home ||= if ENV["HOME"]
+        ENV["HOME"]
+      elsif ENV["USERPROFILE"]
+        ENV["USERPROFILE"]
+      elsif ENV["HOMEDRIVE"] && ENV["HOMEPATH"]
+        File.join(ENV["HOMEDRIVE"], ENV["HOMEPATH"])
+      elsif ENV["APPDATA"]
+        ENV["APPDATA"]
+      else
+        begin
+          File.expand_path("~")
+        rescue
+          if File::ALT_SEPARATOR
+            "C:/"
+          else
+            "/"
+          end
+        end
+      end
+    end
+
     # Returns the root where thor files are located, dependending on the OS.
     #
     def self.thor_root
-      return File.join(ENV["HOME"], '.thor') if ENV["HOME"]
-
-      if ENV["HOMEDRIVE"] && ENV["HOMEPATH"]
-        return File.join(ENV["HOMEDRIVE"], ENV["HOMEPATH"], '.thor')
-      end
-
-      return File.join(ENV["APPDATA"], '.thor') if ENV["APPDATA"]
-
-      begin
-        File.expand_path("~")
-      rescue
-        if File::ALT_SEPARATOR
-          "C:/"
-        else
-          "/"
-        end
-      end
+      File.join(user_home, ".thor")
     end
 
     # Returns the files in the thor root. On Windows thor_root will be something

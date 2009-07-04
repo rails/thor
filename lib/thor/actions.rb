@@ -163,7 +163,7 @@ class Thor
     #
     def run(command, log_status=true)
       return unless behavior == :invoke
-      say_status :run, "#{command} from #{relative_to_absolute_root(root, false)}", log_status
+      say_status :run, "\"#{command}\" from #{relative_to_absolute_root(root, false)}", log_status
       `#{command}` unless options[:pretend]
     end
 

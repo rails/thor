@@ -1,5 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
+module Thor::Util
+  def self.clear_user_home!
+    @@user_home = nil
+  end
+end
+
 describe Thor::Util do
   describe "#find_by_namespace" do
     it "returns 'Default' if no namespace is given" do
@@ -110,20 +116,21 @@ describe Thor::Util do
     end
   end
 
-  describe "#thor_root" do
+  describe "#user_home" do
     before(:each) do
       stub(ENV)[]
+      Thor::Util.clear_user_home!
     end
 
     it "returns the user path if none variable is set on the environment" do
-      Thor::Util.thor_root.must == File.expand_path("~")
+      Thor::Util.user_home.must == File.expand_path("~")
     end
 
     it "returns the *unix system path if file cannot be expanded and separator does not exist" do
       stub(File).expand_path("~"){ raise }
       previous_value = File::ALT_SEPARATOR
       capture(:stderr){ File.const_set(:ALT_SEPARATOR, false) }
-      Thor::Util.thor_root.must == "/"
+      Thor::Util.user_home.must == "/"
       capture(:stderr){ File.const_set(:ALT_SEPARATOR, previous_value) }
     end
 
@@ -131,24 +138,24 @@ describe Thor::Util do
       stub(File).expand_path("~"){ raise }
       previous_value = File::ALT_SEPARATOR
       capture(:stderr){ File.const_set(:ALT_SEPARATOR, true) }
-      Thor::Util.thor_root.must == "C:/"
+      Thor::Util.user_home.must == "C:/"
       capture(:stderr){ File.const_set(:ALT_SEPARATOR, previous_value) }
     end
 
     it "returns HOME/.thor if set" do
-      stub(ENV)["HOME"].returns{ "/home/user" }
-      Thor::Util.thor_root.must == "/home/user/.thor"
+      stub(ENV)["HOME"].returns{ "/home/user/" }
+      Thor::Util.user_home.must == "/home/user/"
     end
 
     it "returns path with HOMEDRIVE and HOMEPATH if set" do
       stub(ENV)["HOMEDRIVE"].returns{ "D:/" }
       stub(ENV)["HOMEPATH"].returns{ "Documents and Settings/James" }
-      Thor::Util.thor_root.must == "D:/Documents and Settings/James/.thor"
+      Thor::Util.user_home.must == "D:/Documents and Settings/James"
     end
 
     it "returns APPDATA/.thor if set" do
-      stub(ENV)["APPDATA"].returns{ "/home/user" }
-      Thor::Util.thor_root.must == "/home/user/.thor"
+      stub(ENV)["APPDATA"].returns{ "/home/user/" }
+      Thor::Util.user_home.must == "/home/user/"
     end
   end
 
