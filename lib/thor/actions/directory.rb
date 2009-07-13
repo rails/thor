@@ -53,23 +53,35 @@ class Thor
       end
 
       def invoke!
-        base.empty_directory given_destination
-        lookup = recursive ? File.join(source, '**', '*') : File.join(source, '*')
+        raise "Source #{source.inspect} does not exist" unless File.exists?(source)
+        base.empty_directory given_destination, @log_status
+        execute!
+      end
 
-        Dir[lookup].each do |file_source|
-          file_destination = File.join(given_destination, file_source.gsub(source, '.'))
+      def revoke!
+        execute!
+      end
 
-          if File.directory?(file_source)
-            base.empty_directory(file_destination, @log_status) if recursive
-          elsif file_source !~ /\.empty_directory$/
-            if file_source =~ /\.tt$/
-              base.template(file_source, file_destination[0..-4], @log_status)
-            else
-              base.copy_file(file_source, file_destination, @log_status)
+      protected
+
+        def execute!
+          lookup = recursive ? File.join(source, '**') : source
+          lookup = File.join(lookup, '{*,.[a-z]*}')
+
+          Dir[lookup].each do |file_source|
+            file_destination = File.join(given_destination, file_source.gsub(source, '.'))
+            next if File.directory?(file_source)
+
+            case file_source
+              when /\.empty_directory$/
+                base.empty_directory(File.dirname(file_destination), @log_status)
+              when /\.tt$/
+                base.template(file_source, file_destination[0..-4], @log_status)
+              else
+                base.copy_file(file_source, file_destination, @log_status)
             end
           end
         end
-      end
 
     end
   end

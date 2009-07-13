@@ -26,6 +26,12 @@ describe Thor::Actions::Directory do
   end
 
   describe "#invoke!" do
+    it "raises an error if the source does not exist" do
+      lambda {
+        invoker.directory("unknown")
+      }.must raise_error(RuntimeError, /Source ".*" does not exist/)
+    end
+
     it "copies the whole directory recursively to the default destination" do
       capture(:stdout){ invoker.directory("doc") }
       exists_and_identical?("doc", "doc")
@@ -101,8 +107,9 @@ describe Thor::Actions::Directory do
       capture(:stdout){ invoker.directory("doc") }
       capture(:stdout){ revoker.directory("doc") }
 
-      file = File.join(destination_root, "doc")
-      File.exists?(file).must be_false
+      File.exists?(File.join(destination_root, "doc", "README")).must be_false
+      File.exists?(File.join(destination_root, "doc", "config.rb")).must be_false
+      File.exists?(File.join(destination_root, "doc", "components")).must be_false
     end
   end
 end
