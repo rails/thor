@@ -75,14 +75,14 @@ class Thor
         def output_diff_line(diff)
           case diff.action
             when '-'
-              say "- #{diff.old_element.chomp}", :red
+              say "- #{diff.old_element.chomp}", :red, true
             when '+'
-              say "+ #{diff.new_element.chomp}", :green
+              say "+ #{diff.new_element.chomp}", :green, true
             when '!'
-              say "- #{diff.old_element.chomp}", :red
-              say "+ #{diff.new_element.chomp}", :green
+              say "- #{diff.old_element.chomp}", :red, true
+              say "+ #{diff.new_element.chomp}", :green, true
             else
-              say "  #{diff.old_element.chomp}"
+              say "  #{diff.old_element.chomp}", nil, true
           end
         end
 
