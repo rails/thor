@@ -101,7 +101,7 @@ class Thor
         #
         def source=(source)
           if source
-            @source = ::File.expand_path(source.to_s, File.join(base.source_root, base.relative_root))
+            @source = ::File.expand_path(base.find_in_source_paths(source.to_s))
           end
         end
 

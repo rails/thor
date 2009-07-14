@@ -69,8 +69,8 @@ class Thor
           lookup = File.join(lookup, '{*,.[a-z]*}')
 
           Dir[lookup].each do |file_source|
-            file_destination = File.join(given_destination, file_source.gsub(source, '.'))
             next if File.directory?(file_source)
+            file_destination = File.join(given_destination, file_source.gsub(source, '.'))
 
             case file_source
               when /\.empty_directory$/

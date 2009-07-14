@@ -13,19 +13,10 @@ describe Thor::Actions::Templater do
   end
 
   def templater(source, destination=nil, options={})
-    @base = begin
-      base = Object.new
-      stub(base).file_name{ "rdoc" }
-      stub(base).source_root{ source_root }
-      stub(base).relative_root{ "" }
-      stub(base).destination_root{ destination_root }
-      stub(base).relative_to_absolute_root{ |p| p.gsub(destination_root, '.')[2..-1] }
-      stub(base).options{ options }
-      stub(base).shell{ @shell = Thor::Base.shell.new }
-      base
-    end
+    @base = MyCounter.new([1,2], options, { :root => destination_root })
+    stub(@base).file_name { 'rdoc' }
 
-    @action = Templater.new(base, source, destination || source, !@silence)
+    @action = Templater.new(@base, source, destination || source, !@silence)
   end
 
   def invoke!

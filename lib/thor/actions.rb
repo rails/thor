@@ -81,16 +81,6 @@ class Thor
       @root_stack[0] = File.expand_path(root || '')
     end
 
-    # Gets the current root relative to the absolute root.
-    #
-    #   inside "foo" do
-    #     relative_root #=> "foo"
-    #   end
-    #
-    def relative_root(remove_dot=true)
-      relative_to_absolute_root(root, remove_dot)
-    end
-
     # Returns the given path relative to the absolute root (ie, root where
     # the script started).
     #
@@ -106,6 +96,28 @@ class Thor
       self.class.source_root
     rescue NoMethodError => e
       raise NoMethodError, "You have to specify the class method source_root in your thor class."
+    end
+
+    # Receives a file or directory and serach for it in the source paths. Paths
+    # added for last are the one searched first.
+    #
+    def find_in_source_paths(file)
+      relative_root = relative_to_absolute_root(destination_root, false)
+      source_file   = nil
+
+      self.class.source_paths.reverse.find do |source|
+        source_file = File.expand_path(file, File.join(source, relative_root))
+        File.exists?(source_file)
+      end
+
+      return source_file if source_file
+
+      if self.class.source_paths.empty?
+        raise Error, "You don't have any source path defined for #{self.class.name} class. To fix this, " <<
+                     "you can define a source_root in your class."
+      else
+        raise Error, "Could not find #{file.inspect} in source paths."
+      end
     end
 
     # Do something in the root or on a provided subfolder. If a relative path

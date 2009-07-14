@@ -9,7 +9,7 @@ require 'thor/util'
 
 class Thor
   HELP_MAPPINGS       = %w(-h -? --help -D)
-  THOR_RESERVED_WORDS = %w(invoke shell options behavior root destination_root relative_root source_root)
+  THOR_RESERVED_WORDS = %w(invoke shell options behavior root destination_root relative_root)
 
   module Base
     attr_accessor :options
@@ -75,15 +75,15 @@ class Thor
 
       # Whenever a class inherits from Thor or Thor::Group, we should track the
       # class and the file on Thor::Base. This is the method responsable for it.
-      # Also invoke the source_root if the klass respond to it. This is needed
-      # to ensure that the source_root does not change after FileUtils#cd is
-      # called.
+      # Also adds the source root to the source paths if the klass respond to it.
       #
       def register_klass_file(klass) #:nodoc:
         file = caller[1].match(/(.*):\d+/)[1]
-
-        klass.source_root if klass.respond_to?(:source_root)
         Thor::Base.subclasses << klass unless Thor::Base.subclasses.include?(klass)
+
+        if klass.respond_to?(:source_root) && !klass.source_paths.include?(klass.source_root)
+          klass.source_paths << klass.source_root
+        end
 
         file_subclasses = Thor::Base.subclass_files[File.expand_path(file)]
         file_subclasses << klass unless file_subclasses.include?(klass)
@@ -339,6 +339,13 @@ class Thor
           else
             @namespace = name.to_s
         end
+      end
+
+      # Hold source paths used by Thor::Actions. Paths added for last are the
+      # one searched first.
+      #
+      def source_paths
+        @source_paths ||= from_superclass(:source_paths, [])
       end
 
       # Default way to start generators from the command line.
