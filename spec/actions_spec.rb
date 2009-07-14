@@ -81,6 +81,24 @@ describe Thor::Actions do
         end
       end
     end
+
+    describe "#find_in_source_paths" do
+      it "raises an error if source path is empty" do
+        lambda {
+          A.new.find_in_source_paths("foo")
+        }.must raise_error(Thor::Error, /You don't have any source path defined for class A/)
+      end
+
+      it "finds a template inside the source path" do
+        runner.find_in_source_paths("doc").must == File.expand_path("doc", source_root)
+        lambda { runner.find_in_source_paths("README") }.must raise_error
+
+        new_path = File.join(source_root, "doc")
+        runner.class.source_paths << new_path
+        runner.find_in_source_paths("README").must == File.expand_path("README", new_path)
+        runner.class.source_paths.pop
+      end
+    end
   end
 
   describe "#inside" do

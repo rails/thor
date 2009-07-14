@@ -29,7 +29,7 @@ describe Thor::Actions::Directory do
     it "raises an error if the source does not exist" do
       lambda {
         invoker.directory("unknown")
-      }.must raise_error(RuntimeError, /Source ".*" does not exist/)
+      }.must raise_error(Thor::Error, /Could not find "unknown" in source paths/)
     end
 
     it "copies the whole directory recursively to the default destination" do

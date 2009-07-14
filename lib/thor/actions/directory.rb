@@ -53,7 +53,6 @@ class Thor
       end
 
       def invoke!
-        raise "Source #{source.inspect} does not exist" unless File.exists?(source)
         base.empty_directory given_destination, @log_status
         execute!
       end

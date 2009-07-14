@@ -88,7 +88,7 @@ class MyChildScript < MyScript
 end
 
 module Scripts
-  class MyGrandChildScript < MyChildScript
+  class MyScript < MyChildScript
     argument :accessor, :type => :string
     class_options :force => :boolean
     method_option :new_option, :type => :string, :for => :example_default_task

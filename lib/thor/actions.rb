@@ -95,15 +95,13 @@ class Thor
       relative_root = relative_to_original_destination_root(destination_root, false)
       source_file   = nil
 
-      self.class.source_paths.reverse.find do |source|
+      self.class.source_paths.reverse_each do |source|
         source_file = File.expand_path(file, File.join(source, relative_root))
-        File.exists?(source_file)
+        return source_file if File.exists?(source_file)
       end
 
-      return source_file if source_file
-
       if self.class.source_paths.empty?
-        raise Error, "You don't have any source path defined for #{self.class.name} class. To fix this, " <<
+        raise Error, "You don't have any source path defined for class #{self.class.name}. To fix this, " <<
                      "you can define a source_root in your class."
       else
         raise Error, "Could not find #{file.inspect} in source paths."

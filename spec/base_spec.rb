@@ -52,7 +52,7 @@ describe Thor::Base do
   describe "#argument" do
     it "sets a value as required and creates an accessor for it" do
       MyCounter.start(["1", "2", "--third", "3"])[0].must == 1
-      Scripts::MyGrandChildScript.start(["zoo", "my_special_param", "--param=normal_param"]).must == "my_special_param"
+      Scripts::MyScript.start(["zoo", "my_special_param", "--param=normal_param"]).must == "my_special_param"
     end
 
     it "does not set a value in the options hash" do
@@ -78,7 +78,7 @@ describe Thor::Base do
 
   describe "#class_options" do
     it "sets default options overwriting superclass definitions" do
-      options = Scripts::MyGrandChildScript.class_options
+      options = Scripts::MyScript.class_options
       options[:force].must_not be_required
     end
   end
@@ -140,7 +140,7 @@ describe Thor::Base do
 
   describe "#namespace" do
     it "returns the default class namespace" do
-      Scripts::MyGrandChildScript.namespace.must == "scripts:my_grand_child_script"
+      Scripts::MyScript.namespace.must == "scripts:my_script"
     end
 
     it "sets a namespace to the class" do
@@ -166,14 +166,14 @@ describe Thor::Base do
     it "tracks its subclasses in an Array" do
       Thor::Base.subclasses.must include(MyScript)
       Thor::Base.subclasses.must include(MyChildScript)
-      Thor::Base.subclasses.must include(Scripts::MyGrandChildScript)
+      Thor::Base.subclasses.must include(Scripts::MyScript)
     end
   end
 
   describe "#subclass_files" do
     it "returns tracked subclasses, grouped by the files they come from" do
       thorfile = File.join(File.dirname(__FILE__), "fixtures", "script.thor")
-      Thor::Base.subclass_files[File.expand_path(thorfile)].must == [ MyScript, MyChildScript, Scripts::MyGrandChildScript, Scripts::MyDefaults ]
+      Thor::Base.subclass_files[File.expand_path(thorfile)].must == [ MyScript, MyChildScript, Scripts::MyScript, Scripts::MyDefaults ]
     end
 
     it "tracks a single subclass across multiple files" do
@@ -218,6 +218,12 @@ describe Thor::Base do
   describe "#from_superclass" do
     it "does not send a method to the superclass if the superclass does not respond to it" do
       MyCounter.get_from_super.must == 13
+    end
+  end
+
+  describe "#source_paths" do
+    it "add source_root to source_paths" do
+      MyCounter.source_paths.must == [ File.expand_path("fixtures", File.dirname(__FILE__)) ]
     end
   end
 

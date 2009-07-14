@@ -17,16 +17,16 @@ describe Thor do
       describe "and the target is on the parent class" do
         it "updates an already defined task" do
           args = ["example_default_task", "my_param", "--new-option=verified"]
-          options = Scripts::MyGrandChildScript.start(args)
+          options = Scripts::MyScript.start(args)
           options[:new_option].must == "verified"
         end
 
         it "adds a task to the tasks list if the updated task is on the parent class" do
-          Scripts::MyGrandChildScript.tasks["example_default_task"].must_not be_nil
+          Scripts::MyScript.tasks["example_default_task"].must_not be_nil
         end
 
         it "clones the parent task" do
-          Scripts::MyGrandChildScript.tasks["example_default_task"].must_not == MyChildScript.tasks["example_default_task"]
+          Scripts::MyScript.tasks["example_default_task"].must_not == MyChildScript.tasks["example_default_task"]
         end
       end
     end
@@ -166,7 +166,7 @@ describe Thor do
       end
 
       it "injects class arguments into default usage" do
-        content = capture(:stdout){ Scripts::MyGrandChildScript.help(shell) }
+        content = capture(:stdout){ Scripts::MyScript.help(shell) }
         content.must =~ /zoo ACCESSOR \-\-param\=PARAM/
       end
     end

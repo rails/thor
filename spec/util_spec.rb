@@ -21,7 +21,7 @@ describe Thor::Util do
     end
 
     it "matches classes default namespace" do
-      Thor::Util.find_by_namespace('scripts:my_grand_child_script').must == Scripts::MyGrandChildScript
+      Thor::Util.find_by_namespace('scripts:my_script').must == Scripts::MyScript
     end
   end
 
