@@ -22,7 +22,7 @@ class A < Thor
   desc "four", "invoke four"
   def four
     p 4
-    invoke "d:five"
+    invoke "defined:five"
   end
 
   desc "five N", "check if number is equal 5"
@@ -71,19 +71,42 @@ class C < Thor::Group
   end
 end
 
-class D < Thor
-  desc "one", "invoke one"
+class Defined < Thor::Group
+  class_option :unused, :type => :boolean, :desc => "This option has no use"
+
   def one
     p 1
     invoke "a:two"
     invoke "a:three"
     invoke "a:four"
-    invoke "d:five"
+    invoke "defined:five"
   end
 
-  desc "five", "invoke five"
   def five
     p 5
   end
+
+  def print_status
+    say_status :finished, :counting
+  end
 end
 
+class E < Thor::Group
+  invoke Defined
+end
+
+class F < Thor::Group
+  invoke "b:one" do |instance, klass, task|
+    instance.invoke klass, task, [ "Jose" ], :last_name => "Valim"
+  end
+end
+
+class G < Thor::Group
+  class_option :invoked, :type => :string, :default => "defined"
+  invoke_from_option :invoked
+end
+
+class H < Thor::Group
+  class_option :defined, :type => :boolean, :default => true
+  invoke_from_option :defined
+end

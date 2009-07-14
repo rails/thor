@@ -189,7 +189,7 @@ class Thor
       # :type     - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
       # :banner   - String to show on usage notes.
       #
-      def class_option(name, options)
+      def class_option(name, options={})
         build_option(name, options, class_options)
       end
 
@@ -372,44 +372,42 @@ class Thor
         # requires two options: the group name and the array of options.
         #
         def class_options_help(shell, ungrouped_name=nil, extra_group=nil) #:nodoc:
-          unless self.class_options.empty?
-            groups = {}
+          groups = {}
 
-            class_options.each do |_, value|
-              groups[value.group] ||= []
-              groups[value.group] << value
-            end
-
-            printer = proc do |group_name, options|
-              list = []
-              padding = options.collect{ |o| o.aliases.size  }.max.to_i * 4
-
-              options.each do |option|
-                list << [ option.usage(padding), option.description || "" ]
-                list << [ "", "Default: #{option.default}" ] if option.show_default?
-              end
-
-              unless list.empty?
-                if group_name
-                  shell.say "#{group_name} options:"
-                else
-                  shell.say "Options:"
-                end
-
-                shell.print_table(list, :emphasize_last => true, :ident => 2)
-                shell.say ""
-              end
-            end
-
-            # Deal with default group
-            global_options = groups.delete(nil) || []
-            printer.call(ungrouped_name, global_options) if global_options
-
-            # Print all others
-            groups = extra_group.merge(groups) if extra_group
-            groups.each(&printer)
-            printer
+          class_options.each do |_, value|
+            groups[value.group] ||= []
+            groups[value.group] << value
           end
+
+          printer = proc do |group_name, options|
+            list = []
+            padding = options.collect{ |o| o.aliases.size  }.max.to_i * 4
+
+            options.each do |option|
+              list << [ option.usage(padding), option.description || "" ]
+              list << [ "", "Default: #{option.default}" ] if option.show_default?
+            end
+
+            unless list.empty?
+              if group_name
+                shell.say "#{group_name} options:"
+              else
+                shell.say "Options:"
+              end
+
+              shell.print_table(list, :emphasize_last => true, :ident => 2)
+              shell.say ""
+            end
+          end
+
+          # Deal with default group
+          global_options = groups.delete(nil) || []
+          printer.call(ungrouped_name, global_options) if global_options
+
+          # Print all others
+          groups = extra_group.merge(groups) if extra_group
+          groups.each(&printer)
+          printer
         end
 
         # Raises an error if the word given is a Thor reserved word.

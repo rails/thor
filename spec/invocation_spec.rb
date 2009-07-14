@@ -12,7 +12,7 @@ describe Thor::Invocation do
     end
 
     it "invokes a task just once even if they belongs to different classes" do
-      capture(:stdout){ D.new.invoke(:one) }.must == "1\n2\n3\n4\n5\n"
+      capture(:stdout){ Defined.new.invoke(:one) }.must == "1\n2\n3\n4\n5\n"
     end
 
     it "invokes a task with arguments" do
