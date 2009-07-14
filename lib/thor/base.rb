@@ -82,7 +82,7 @@ class Thor
         Thor::Base.subclasses << klass unless Thor::Base.subclasses.include?(klass)
 
         if klass.respond_to?(:source_root) && !klass.source_paths.include?(klass.source_root)
-          klass.source_paths << klass.source_root
+          klass.source_paths.unshift(klass.source_root)
         end
 
         file_subclasses = Thor::Base.subclass_files[File.expand_path(file)]
