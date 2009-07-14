@@ -32,11 +32,19 @@ FOO
   def three
     options[:third]
   end
+
+  def self.inherited(base)
+    base.source_paths << File.expand_path(File.join(File.dirname(__FILE__), "doc"))
+  end
 end
 
 class ClearCounter < MyCounter
   remove_argument :first, :second, :undefine => true
   remove_class_option :third
+
+  def self.source_root
+    @source_root ||= File.expand_path(File.join(File.dirname(__FILE__), "bundle"))
+  end
 end
 
 class BrokenCounter < MyCounter

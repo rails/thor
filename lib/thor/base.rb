@@ -81,10 +81,6 @@ class Thor
         file = caller[1].match(/(.*):\d+/)[1]
         Thor::Base.subclasses << klass unless Thor::Base.subclasses.include?(klass)
 
-        if klass.respond_to?(:source_root) && !klass.source_paths.include?(klass.source_root)
-          klass.source_paths.unshift(klass.source_root)
-        end
-
         file_subclasses = Thor::Base.subclass_files[File.expand_path(file)]
         file_subclasses << klass unless file_subclasses.include?(klass)
       end
@@ -339,13 +335,6 @@ class Thor
           else
             @namespace = name.to_s
         end
-      end
-
-      # Hold source paths used by Thor::Actions. Paths added for last are the
-      # one searched first.
-      #
-      def source_paths
-        @source_paths ||= []
       end
 
       # Default way to start generators from the command line.

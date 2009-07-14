@@ -80,6 +80,22 @@ describe Thor::Actions do
           runner.relative_to_original_destination_root(file).must == "foo"
         end
       end
+
+      describe "#source_paths" do
+        it "add source_root to source_paths" do
+          MyCounter.source_paths.must == [ File.expand_path("fixtures", File.dirname(__FILE__)) ]
+        end
+
+        it "keeps both parent and current source root in source paths" do
+          ClearCounter.source_paths[0].must == File.expand_path("fixtures", File.dirname(__FILE__))
+          ClearCounter.source_paths[1].must == File.expand_path("fixtures/bundle", File.dirname(__FILE__))
+        end
+
+        it "customized source paths should be added after source roots" do
+          ClearCounter.source_paths[1].must == File.expand_path("fixtures/bundle", File.dirname(__FILE__))
+          ClearCounter.source_paths[2].must == File.expand_path("fixtures/doc", File.dirname(__FILE__))
+        end
+      end
     end
 
     describe "#find_in_source_paths" do

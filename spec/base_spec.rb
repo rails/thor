@@ -220,12 +220,6 @@ describe Thor::Base do
     end
   end
 
-  describe "#source_paths" do
-    it "add source_root to source_paths" do
-      MyCounter.source_paths.must == [ File.expand_path("fixtures", File.dirname(__FILE__)) ]
-    end
-  end
-
   describe "#start" do
     it "raises an error instead of rescueing if --debug is given" do
       lambda {

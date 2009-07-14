@@ -5,17 +5,13 @@ Dir[File.join(File.dirname(__FILE__), "actions", "*.rb")].each do |action|
 end
 
 class Thor
-  # Some actions require that a class method called source root is defined in
-  # the class. Remember to always cache the source root value, because Ruby
-  # __FILE__ always return the relative path, which may lead to mistakes if you
-  # are calling an action inside the "inside(path)" method.
-  #
   module Actions
     attr_accessor :behavior
 
     # On inclusion, add some options to base.
     #
     def self.included(base) #:nodoc:
+      base.extend ClassMethods
       return unless base.respond_to?(:class_option)
 
       base.class_option :pretend, :type => :boolean, :aliases => "-p", :group => :runtime,
@@ -29,6 +25,38 @@ class Thor
 
       base.class_option :quiet, :type => :boolean, :aliases => "-q", :group => :runtime,
                                 :desc => "Supress status output"
+    end
+
+    module ClassMethods
+      # Hold source paths used by Thor::Actions. Paths added for last are the
+      # one searched first.
+      #
+      def source_paths
+        @source_paths ||= from_superclass(:source_paths, [])
+      end
+
+      # Deal with source root cache source_paths cache. source_paths in the
+      # inheritance chain are tricky to implement because:
+      #
+      # 1) I have to ensure that paths from the parent class appears first in
+      #    the source paths array. This is done by using from_superclass in
+      #    both source_paths and below.
+      #
+      # 2) Whenever source_root is added, it has to be cached because __FILE__
+      #    in ruby returns relative locations.
+      #
+      # 3) If someone wants to add source paths dinamically, added paths have
+      #    to come after the source root.
+      #
+      def singleton_method_added(method) #:nodoc:
+        if method == :source_root
+          inherited_paths = from_superclass(:source_paths, [])
+
+          self.source_paths.reject!{ |path| inherited_paths.include?(path) }
+          self.source_paths.unshift(*self.source_root)
+          self.source_paths.unshift(*inherited_paths)
+        end
+      end
     end
 
     # Extends initializer to add more configuration options.
