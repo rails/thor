@@ -8,11 +8,11 @@ describe Thor::Actions::InjectIntoFile do
   end
 
   def invoker(options={})
-    @invoker ||= MyCounter.new([1,2], options, { :root => destination_root })
+    @invoker ||= MyCounter.new([1,2], options, { :destination_root => destination_root })
   end
 
   def revoker
-    @revoker ||= MyCounter.new([1,2], {}, { :root => destination_root, :behavior => :revoke })
+    @revoker ||= MyCounter.new([1,2], {}, { :destination_root => destination_root, :behavior => :revoke })
   end
 
   def file

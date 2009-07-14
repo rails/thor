@@ -13,7 +13,7 @@ describe Thor::Actions::Templater do
   end
 
   def templater(source, destination=nil, options={})
-    @base = MyCounter.new([1,2], options, { :root => destination_root })
+    @base = MyCounter.new([1,2], options, { :destination_root => destination_root })
     stub(@base).file_name { 'rdoc' }
 
     @action = Templater.new(@base, source, destination || source, !@silence)

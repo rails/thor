@@ -8,11 +8,11 @@ describe Thor::Actions::Directory do
   end
 
   def invoker
-    @invoker ||= MyCounter.new([1,2], {}, { :root => destination_root })
+    @invoker ||= MyCounter.new([1,2], {}, { :destination_root => destination_root })
   end
 
   def revoker
-    @revoker ||= MyCounter.new([1,2], {}, { :root => destination_root, :behavior => :revoke })
+    @revoker ||= MyCounter.new([1,2], {}, { :destination_root => destination_root, :behavior => :revoke })
   end
 
   def exists_and_identical?(source_path, destination_path)

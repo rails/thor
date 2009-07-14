@@ -123,7 +123,7 @@ class Thor
           if destination
             @given_destination = convert_encoded_instructions(destination.to_s)
             @destination = ::File.expand_path(@given_destination, base.destination_root)
-            @relative_destination = base.relative_to_absolute_root(@destination)
+            @relative_destination = base.relative_to_original_destination_root(@destination)
           end
         end
 

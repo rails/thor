@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Thor::Actions do
   def runner(options={})
-    @runner ||= MyCounter.new([1], options, { :root => destination_root })
+    @runner ||= MyCounter.new([1], options, { :destination_root => destination_root })
   end
 
   def action(*args, &block)
@@ -47,54 +47,38 @@ describe Thor::Actions do
   end
 
   describe "accessors" do
-    describe "#root=" do
+    describe "#destination_root=" do
       it "gets the current directory and expands the path to set the root" do
         base = MyCounter.new([1])
-        base.root = "here"
-        base.root.must == File.expand_path(File.join(File.dirname(__FILE__), "..", "here"))
+        base.destination_root = "here"
+        base.destination_root.must == File.expand_path(File.join(File.dirname(__FILE__), "..", "here"))
       end
 
       it "does not use the current directory if one is given" do
         base = MyCounter.new([1])
-        base.root = "/"
-        base.root.must == "/"
+        base.destination_root = "/"
+        base.destination_root.must == "/"
       end
 
       it "uses the current directory if none is given" do
         base = MyCounter.new([1])
-        base.root.must == File.expand_path(File.join(File.dirname(__FILE__), ".."))
+        base.destination_root.must == File.expand_path(File.join(File.dirname(__FILE__), ".."))
       end
     end
 
-    describe "#relative_to_absolute_root" do
+    describe "#relative_to_original_destination_root" do
       it "returns the path relative to the absolute root" do
-        runner.relative_to_absolute_root(file).must == "foo"
+        runner.relative_to_original_destination_root(file).must == "foo"
       end
 
       it "does not remove dot if required" do
-        runner.relative_to_absolute_root(file, false).must == "./foo"
+        runner.relative_to_original_destination_root(file, false).must == "./foo"
       end
 
       it "always use the absolute root" do
         runner.inside("foo") do
-          runner.relative_to_absolute_root(file).must == "foo"
+          runner.relative_to_original_destination_root(file).must == "foo"
         end
-      end
-    end
-
-    describe "#source_root" do
-      it "raises an error if source root is not specified" do
-        runner = Object.new
-        runner.extend Thor::Actions
-
-        lambda {
-          runner.source_root
-        }.must raise_error(NoMethodError, "You have to specify the class method source_root in your thor class.")
-      end
-
-      it "is cached on load" do
-        dont_allow(File).dirname
-        MyCounter.source_root.must =~ /spec\/fixtures$/
       end
     end
   end
@@ -108,7 +92,7 @@ describe Thor::Actions do
 
     it "changes the base root" do
       runner.inside("foo") do
-        runner.root.must == file
+        runner.destination_root.must == file
       end
     end
 
@@ -128,14 +112,14 @@ describe Thor::Actions do
 
     it "changes the base root" do
       runner.inside("foo") do
-        runner.in_root { runner.root.must == destination_root }
+        runner.in_root { runner.destination_root.must == destination_root }
       end
     end
 
     it "returns to the previous state" do
       runner.inside("foo") do
         runner.in_root { }
-        runner.root.must == file
+        runner.destination_root.must == file
       end
     end
   end
@@ -244,7 +228,7 @@ describe Thor::Actions do
     end
 
     def runner(options={})
-      @runner ||= MyCounter.new([1], options, { :root => destination_root })
+      @runner ||= MyCounter.new([1], options, { :destination_root => destination_root })
     end
 
     def file

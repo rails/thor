@@ -7,16 +7,8 @@ describe Thor::Actions::EmptyDirectory do
   end
 
   def empty_directory(destination, options={})
-    @base = begin
-      base = Object.new
-      stub(base).destination_root{ destination_root }
-      stub(base).relative_to_absolute_root{ |p| p.gsub(destination_root, '.')[2..-1] }
-      stub(base).options{ options }
-      stub(base).shell{ @shell = Thor::Base.shell.new }
-      base
-    end
-
-    @action = Thor::Actions::EmptyDirectory.new(base, nil, destination)
+    @base = MyCounter.new([1,2], options, { :destination_root => destination_root })
+    @action = Thor::Actions::EmptyDirectory.new(@base, nil, destination)
   end
 
   def invoke!
