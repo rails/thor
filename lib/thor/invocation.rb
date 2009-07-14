@@ -1,6 +1,5 @@
 class Thor
   module Invocation
-
     def self.included(base) #:nodoc:
       base.extend ClassMethods
     end
@@ -8,13 +7,13 @@ class Thor
     module ClassMethods
       # Stores invocations for this class merging with superclass values.
       #
-      def self.invocations #:nodoc:
+      def invocations #:nodoc:
         @invocations ||= from_superclass(:invocations, {})
       end
 
       # Stores invocation blocks used on invoke_from_option.
       #
-      def self.invocation_blocks #:nodoc:
+      def invocation_blocks #:nodoc:
         @invocation_blocks ||= from_superclass(:invocation_blocks, {})
       end
 
@@ -27,6 +26,37 @@ class Thor
             Thor::Util.namespace_to_thor_class(name.to_s, false)
           else
             name
+        end
+      end
+
+      # Invoke the given namespace or class given. It adds an instance
+      # method that will invoke the klass and task. You can give a block to
+      # configure how it will be invoked.
+      #
+      # The namespace/class given will have its options showed on the help
+      # usage. Check invoke_from_option for more information.
+      #
+      def invoke(*names, &block)
+        options = names.last.is_a?(Hash) ? names.pop : {}
+        verbose = options.fetch(:verbose, :white)
+
+        names.each do |name|
+          invocations[name] = false
+          invocation_blocks[name] = block if block_given?
+
+          class_eval <<-METHOD, __FILE__, __LINE__
+            def _invoke_#{name}
+              klass, task = self.class.prepare_for_invocation(nil, #{name.inspect})
+
+              if klass
+                say_status :invoke, #{name.inspect}, #{verbose.inspect}
+                block = self.class.invocation_blocks[#{name.inspect}]
+                invoke_with_padding klass, task, &block
+              else
+                say_status :error, "#{name.inspect} [not found]", :red
+              end
+            end
+          METHOD
         end
       end
 
@@ -60,7 +90,7 @@ class Thor
       # invoked. The block receives two parameters, an instance of the current
       # class and the klass to be invoked.
       #
-      def self.invoke_from_option(*names, &block)
+      def invoke_from_option(*names, &block)
         options = names.last.is_a?(Hash) ? names.pop : {}
         verbose = options.fetch(:verbose, :white)
 
@@ -73,61 +103,93 @@ class Thor
           invocations[name] = true
           invocation_blocks[name] = block if block_given?
 
-          # invoke_from_option :test_framework
-          #
-          # ==== Generates
-          #
-          # def invoke_from_option_test_framework
-          #   return unless options[:test_framework]
-          #
-          #   value = options[:test_framework]
-          #   value = :test_framework if TrueClass === value
-          #   klass = self.class.prepare_for_invocation(self, :test_framework, value)
-          #
-          #   if klass
-          #     say_status :invoke, value, :white
-          #      shell.padding += 1
-          #      if block = self.class.invocation_blocks[:test_framework]
-          #        if block.arity == 2
-          #          block.call(self, klass)
-          #        else
-          #          block.call(self, klass, task)
-          #        end
-          #      else
-          #        invoke klass
-          #      end
-          #      shell.padding -= 1
-          #   else
-          #     say_status :error, "#{value} [not found]", :red
-          #   end
-          # end
-          #
           class_eval <<-METHOD, __FILE__, __LINE__
-            def invoke_from_option_#{name}
+            def _invoke_from_option_#{name}
               return unless options[#{name.inspect}]
 
               value = options[#{name.inspect}]
               value = #{name.inspect} if TrueClass === value
-              klass = self.class.prepare_for_invocation(#{name.inspect}, value)
+              klass, task = self.class.prepare_for_invocation(#{name.inspect}, value)
 
               if klass
                 say_status :invoke, value, #{verbose.inspect}
-                shell.padding += 1
-                if block = self.class.invocation_blocks[#{name.inspect}]
-                  if block.arity == 2
-                    block.call(self, klass)
-                  else
-                    block.call(self, klass, task)
-                  end
-                else
-                  invoke klass
-                end
-                shell.padding -= 1
+                block = self.class.invocation_blocks[#{name.inspect}]
+                invoke_with_padding klass, task, &block
               else
                 say_status :error, "\#{value} [not found]", :red
               end
             end
           METHOD
+        end
+      end
+
+      # Remove a previously added hook.
+      #
+      # ==== Options
+      # :undefine - Also undefines the method created. True by default.
+      # :remove_option - Also remove the option used. True by default.
+      #
+      # ==== Examples
+      #
+      #   remove_invocation :test_framework
+      #
+      def remove_invocation(*names)
+        options = names.last.is_a?(Hash) ? names.pop : {}
+        undefine      = options.fetch(:undefine, true)
+        remove_option = options.fetch(:remove_option, true)
+
+        names.each do |name|
+          remove_task name, :undefine => undefine
+          remove_class_option name if remove_option
+          invocations.delete(name)
+          invocation_blocks.delete(name)
+        end
+      end
+
+      # Overwrite class options help to allow invoked generators options to be
+      # shown recursively when invoking a generator.
+      #
+      def class_options_help(shell, ungrouped_name=nil, extra_group=nil) #:nodoc:
+        group_options = {}
+
+        get_options_from_invocations(group_options, class_options) do |klass|
+          klass.send(:get_options_from_invocations, group_options, class_options)
+        end
+
+        group_options.merge!(extra_group) if extra_group
+        super(shell, ungrouped_name, group_options)
+      end
+
+      # Get invocations array and merge options from invocations. Those
+      # options are added to group_options hash. Options that already exists
+      # in base_options are not added twice.
+      #
+      def get_options_from_invocations(group_options, base_options) #:nodoc:
+        invocations.each do |name, from_option|
+          value = if from_option
+            option = class_options[name]
+            option.type == :boolean ? name : option.default
+          else
+            nil
+          end
+
+          klass = prepare_for_invocation(name, value)
+          next unless klass && klass.respond_to?(:class_option)
+
+          human_name = if value
+            value = value.to_s
+            value.respond_to?(:classify) ? value.classify : value
+          else
+            klass.name
+          end
+          group_options[human_name] ||= []
+
+          group_options[human_name] += klass.class_options.values.select do |option|
+            base_options[option.name.to_sym].nil? && option.group.nil? &&
+            !group_options.values.flatten.any? { |i| i.name == option.name }
+          end
+
+          yield klass if block_given?
         end
       end
     end
@@ -244,6 +306,23 @@ class Thor
       end
     end
 
+    # Shortcut for invoke with padding and status handling. Used internally by
+    # class options invoke and invoke_from_option.
+    #
+    def invoke_with_padding(klass, task=nil, *args, &block)
+      shell.padding += 1
+      if block_given?
+        if block.arity == 2
+          block.call(self, klass)
+        else
+          block.call(self, klass, task)
+        end
+      else
+        invoke klass, task, *args
+      end
+      shell.padding -= 1
+    end
+
     protected
 
       # Configuration values that are shared between invocations.
@@ -282,6 +361,5 @@ class Thor
         task = klass.all_tasks[task.to_s] || Task.dynamic(task) if task && !task.is_a?(Thor::Task)
         task
       end
-
   end
 end

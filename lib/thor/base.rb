@@ -345,7 +345,7 @@ class Thor
       # one searched first.
       #
       def source_paths
-        @source_paths ||= from_superclass(:source_paths, [])
+        @source_paths ||= []
       end
 
       # Default way to start generators from the command line.
@@ -366,8 +366,7 @@ class Thor
         # Prints the class options per group. If an option does not belong to
         # any group, it uses the ungrouped name value. This method provide to
         # hooks to add extra options, one of them if the third argument called
-        # extra_group that should be a Thor::CoreExt::OrderedHash in the format
-        # :group => Array[Options].
+        # extra_group that should be a hash in the format :group => Array[Options].
         #
         # The second is by returning a lamda used to print values. The lambda
         # requires two options: the group name and the array of options.

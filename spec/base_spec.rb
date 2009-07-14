@@ -129,8 +129,7 @@ describe Thor::Base do
     end
 
     it "allows extra options to be given" do
-      hash = Thor::CoreExt::OrderedHash.new
-      hash["Foo"] = B.class_options.values
+      hash = { "Foo" => B.class_options.values }
 
       content = capture(:stdout) { MyCounter.send(:class_options_help, Thor::Base.shell.new, nil, hash) }
       content.must =~ /Foo options\:/
