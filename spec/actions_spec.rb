@@ -214,7 +214,7 @@ describe Thor::Actions do
 
       it "does not log status if required" do
         mock(FileUtils).chmod_R(0755, file)
-        action(:chmod, "foo", 0755, false).must be_empty
+        action(:chmod, "foo", 0755, :verbose => false).must be_empty
       end
     end
 
@@ -232,12 +232,12 @@ describe Thor::Actions do
       end
 
       it "does not log status if required" do
-        action(:run, "ls", false).must be_empty
+        action(:run, "ls", :verbose => false).must be_empty
       end
 
       it "accepts a color as status" do
         mock(runner.shell).say_status(:run, '"ls" from .', :yellow)
-        action :run, "ls", :yellow
+        action :run, "ls", :verbose => :yellow
       end
     end
 
@@ -256,37 +256,37 @@ describe Thor::Actions do
       end
 
       it "does not log status if required" do
-        action(:run_ruby_script, "script.rb", false).must be_empty
+        action(:run_ruby_script, "script.rb", :verbose => false).must be_empty
       end
     end
 
     describe "#thor" do
       it "executes the thor command" do
-        mock(runner).run("thor list", false)
-        action :thor, :list, true
+        mock(runner).run("thor list", :verbose => false)
+        action :thor, :list, :verbose => true
       end
 
       it "converts extra arguments to command arguments" do
-        mock(runner).run("thor list foo bar", false)
+        mock(runner).run("thor list foo bar", :verbose => false)
         action :thor, :list, "foo", "bar"
       end
 
       it "converts options hash to switches" do
-        mock(runner).run("thor list foo bar --foo", false)
+        mock(runner).run("thor list foo bar --foo", :verbose => false)
         action :thor, :list, "foo", "bar", :foo => true
 
-        mock(runner).run("thor list --foo 1 2 3", false)
+        mock(runner).run("thor list --foo 1 2 3", :verbose => false)
         action :thor, :list, :foo => [1,2,3]
       end
 
       it "logs status" do
-        mock(runner).run("thor list", false)
+        mock(runner).run("thor list", :verbose => false)
         action(:thor, :list).must == "        thor  list\n"
       end
 
       it "does not log status if required" do
-        mock(runner).run("thor list --foo 1 2 3", false)
-        action :thor, :list, { :foo => [1,2,3] }, false
+        mock(runner).run("thor list --foo 1 2 3", :verbose => false)
+        action :thor, :list, :foo => [1,2,3], :verbose => false
       end
     end
   end
@@ -322,7 +322,7 @@ describe Thor::Actions do
       end
 
       it "does not log status if required" do
-        action(:remove_file, "doc/README", false).must be_empty
+        action(:remove_file, "doc/README", :verbose => false).must be_empty
       end
     end
 
@@ -348,7 +348,7 @@ describe Thor::Actions do
       end
 
       it "does not log status if required" do
-        action(:gsub_file, file, "__", false){ |match| match * 2 }.must be_empty
+        action(:gsub_file, file, "__", :verbose => false){ |match| match * 2 }.must be_empty
       end
     end
 
@@ -374,7 +374,7 @@ describe Thor::Actions do
       end
 
       it "does not log status if required" do
-        action(:append_file, "doc/README", nil, false){ "END" }.must be_empty
+        action(:append_file, "doc/README", nil, :verbose => false){ "END" }.must be_empty
       end
     end
 
@@ -400,7 +400,7 @@ describe Thor::Actions do
       end
 
       it "does not log status if required" do
-        action(:prepend_file, "doc/README", "START", false).must be_empty
+        action(:prepend_file, "doc/README", "START", :verbose => false).must be_empty
       end
     end
   end

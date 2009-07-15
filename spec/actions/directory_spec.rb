@@ -43,7 +43,7 @@ describe Thor::Actions::Directory do
     end
 
     it "copies only the first level files if recursive" do
-      capture(:stdout){ invoker.directory(".", "tasks", false) }
+      capture(:stdout){ invoker.directory(".", "tasks", :recursive => false) }
 
       file = File.join(destination_root, "tasks", "group.thor")
       File.exists?(file).must be_true

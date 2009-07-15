@@ -12,11 +12,11 @@ describe Thor::Actions::Templater do
     ::FileUtils.rm_rf(destination_root)
   end
 
-  def templater(source, destination=nil, options={})
+  def templater(source, destination=nil, options={}, config={})
     @base = MyCounter.new([1,2], options, { :destination_root => destination_root })
     stub(@base).file_name { 'rdoc' }
 
-    @action = Templater.new(@base, source, destination || source, !@silence)
+    @action = Templater.new(@base, source, destination || source, { :verbose => !@silence }.merge(config))
   end
 
   def invoke!
@@ -119,6 +119,16 @@ describe Thor::Actions::Templater do
 
         it "shows skipped status to the user if skip is given" do
           templater("doc/config.rb", "doc/config.rb", :skip => true).must_not be_identical
+          invoke!.must == "        skip  doc/config.rb\n"
+        end
+
+        it "shows forced status to the user if force is configured" do
+          templater("doc/config.rb", "doc/config.rb", {}, :force => true).must_not be_identical
+          invoke!.must == "       force  doc/config.rb\n"
+        end
+
+        it "shows skipped status to the user if skip is configured" do
+          templater("doc/config.rb", "doc/config.rb", {}, :skip => true).must_not be_identical
           invoke!.must == "        skip  doc/config.rb\n"
         end
 
