@@ -38,7 +38,7 @@ class Thor
       # Deal with source root cache source_paths cache. source_paths in the
       # inheritance chain are tricky to implement because:
       #
-      # 1) I have to ensure that paths from the parent class appears first in
+      # 1) We have to ensure that paths from the parent class appears later in
       #    the source paths array. This is done by using from_superclass in
       #    both source_paths and below.
       #
@@ -46,15 +46,15 @@ class Thor
       #    in ruby returns relative locations.
       #
       # 3) If someone wants to add source paths dinamically, added paths have
-      #    to come after the source root.
+      #    to come before the source root.
       #
       def singleton_method_added(method) #:nodoc:
         if method == :source_root
           inherited_paths = from_superclass(:source_paths, [])
 
           self.source_paths.reject!{ |path| inherited_paths.include?(path) }
-          self.source_paths.unshift(*self.source_root)
-          self.source_paths.unshift(*inherited_paths)
+          self.source_paths.push(*self.source_root)
+          self.source_paths.concat(inherited_paths)
         end
       end
     end
@@ -116,14 +116,13 @@ class Thor
       remove_dot ? (path[2..-1] || '') : path
     end
 
-    # Receives a file or directory and serach for it in the source paths. Paths
-    # added for last are the one searched first.
+    # Receives a file or directory and search for it in the source paths. 
     #
     def find_in_source_paths(file)
       relative_root = relative_to_original_destination_root(destination_root, false)
       source_file   = nil
 
-      self.class.source_paths.reverse_each do |source|
+      self.class.source_paths.each do |source|
         source_file = File.expand_path(file, File.join(source, relative_root))
         return source_file if File.exists?(source_file)
       end

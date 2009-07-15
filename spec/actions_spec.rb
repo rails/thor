@@ -87,13 +87,13 @@ describe Thor::Actions do
         end
 
         it "keeps both parent and current source root in source paths" do
-          ClearCounter.source_paths[0].must == File.expand_path("fixtures", File.dirname(__FILE__))
           ClearCounter.source_paths[1].must == File.expand_path("fixtures/bundle", File.dirname(__FILE__))
+          ClearCounter.source_paths[2].must == File.expand_path("fixtures", File.dirname(__FILE__))
         end
 
-        it "customized source paths should be added after source roots" do
+        it "customized source paths should be before after source roots" do
           ClearCounter.source_paths[1].must == File.expand_path("fixtures/bundle", File.dirname(__FILE__))
-          ClearCounter.source_paths[2].must == File.expand_path("fixtures/doc", File.dirname(__FILE__))
+          ClearCounter.source_paths[0].must == File.expand_path("fixtures/doc", File.dirname(__FILE__))
         end
       end
     end
@@ -110,9 +110,9 @@ describe Thor::Actions do
         lambda { runner.find_in_source_paths("README") }.must raise_error
 
         new_path = File.join(source_root, "doc")
-        runner.class.source_paths << new_path
+        runner.class.source_paths.unshift(new_path)
         runner.find_in_source_paths("README").must == File.expand_path("README", new_path)
-        runner.class.source_paths.pop
+        runner.class.source_paths.shift
       end
     end
   end
