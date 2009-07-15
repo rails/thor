@@ -21,14 +21,17 @@ describe Thor::Base do
       base.second.must == 2
     end
 
-    it "sets options hash" do
-      base = MyCounter.new [1, 2], :third => 3
-      base.options[:third].must == 3
-    end
-
     it "sets options default values" do
       base = MyCounter.new [1, 2]
       base.options[:third].must == 3
+    end
+
+    it "allows options to be given as symbols or strings" do
+      base = MyCounter.new [1, 2], :third => 4
+      base.options[:third].must == 4
+
+      base = MyCounter.new [1, 2], "third" => 4
+      base.options[:third].must == 4
     end
 
     it "creates options with indifferent access" do

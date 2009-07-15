@@ -37,15 +37,17 @@ class Thor
 
       parse_options = self.class.class_options
 
-      options = if options.is_a?(Array)
+      if options.is_a?(Array)
         task_options  = config.delete(:task_options) # hook for start
         parse_options = parse_options.merge(task_options) if task_options
-        Thor::Options.parse(parse_options, options)
+        array_options, hash_options = options, {}
       else
-        Thor::Options.parse(parse_options, []).merge(options)
+        array_options, hash_options = [], options
       end
 
-      self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).freeze
+      options = Thor::Options.parse(parse_options, array_options)
+      self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).merge!(hash_options)
+      self.options.freeze
     end
 
     class << self
