@@ -144,6 +144,11 @@ describe Thor::Options do
         parse("--no-foo")["foo"].must be_nil
       end
 
+      it "accepts a --switch format on non required types" do
+        create "--foo" => "bar"
+        parse("--foo")["foo"].must == "foo"
+      end
+
       it "overwrites earlier values with later values" do
         parse("--foo=bar", "--foo", "12")["foo"].must == "12"
         parse("--foo", "12", "--foo", "13")["foo"].must == "13"

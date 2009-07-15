@@ -125,16 +125,6 @@ describe Thor::Option do
     end
   end
 
-  it "requires an input when type is a string, array, hash or numeric" do
-    [:string, :array, :hash, :numeric].each do |type|
-      parse(:foo, type).input_required?.must be_true
-    end
-  end
-
-  it "does not require an input when type is boolean" do
-    parse(:foo, :boolean).input_required?.must be_false
-  end
-
   it "returns the switch name" do
     option("foo").switch_name.must == "--foo"
     option("--foo").switch_name.must == "--foo"
@@ -159,6 +149,18 @@ describe Thor::Option do
     lambda {
       option("foo", nil, true, :boolean)
     }.must raise_error(ArgumentError, "An option cannot be boolean and required.")
+  end
+
+  it "allows type predicates" do
+    parse(:foo, :string).must be_string
+    parse(:foo, :boolean).must be_boolean
+    parse(:foo, :numeric).must be_numeric
+  end
+
+  it "raises an error on method missing" do
+    lambda {
+      parse(:foo, :string).unknown?
+    }.must raise_error(NoMethodError)
   end
 
   describe "#usage" do
