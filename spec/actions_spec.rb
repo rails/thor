@@ -81,24 +81,23 @@ describe Thor::Actions do
         end
       end
 
-      describe "#source_paths" do
-        it "add source_root to source_paths" do
-          MyCounter.source_paths.must == [ File.expand_path("fixtures", File.dirname(__FILE__)) ]
+      describe "#source_paths_for_search" do
+        it "add source_root to source_paths_for_search" do
+          MyCounter.source_paths_for_search.must include(File.expand_path("fixtures", File.dirname(__FILE__)))
         end
 
-        it "keeps both parent and current source root in source paths" do
-          ClearCounter.source_paths[1].must == File.expand_path("fixtures/bundle", File.dirname(__FILE__))
-          ClearCounter.source_paths[2].must == File.expand_path("fixtures", File.dirname(__FILE__))
+        it "keeps only current source root in source paths" do
+          ClearCounter.source_paths_for_search.must include(File.expand_path("fixtures/bundle", File.dirname(__FILE__)))
+          ClearCounter.source_paths_for_search.must_not include(File.expand_path("fixtures", File.dirname(__FILE__)))
         end
 
-        it "customized source paths should be before after source roots" do
-          ClearCounter.source_paths[0].must == File.expand_path("fixtures/doc", File.dirname(__FILE__))
-          ClearCounter.source_paths[1].must == File.expand_path("fixtures/bundle", File.dirname(__FILE__))
+        it "customized source paths should be before source roots" do
+          ClearCounter.source_paths_for_search[0].must == File.expand_path("fixtures/doc", File.dirname(__FILE__))
+          ClearCounter.source_paths_for_search[1].must == File.expand_path("fixtures/bundle", File.dirname(__FILE__))
         end
 
-        it "should add dynamic source root to source paths" do
-          BrokenCounter.source_paths[0].must == File.expand_path("fixtures/doc", File.dirname(__FILE__))
-          BrokenCounter.source_paths[1].must == File.expand_path("fixtures/broken", File.dirname(__FILE__))
+        it "keeps inherited source paths at the end" do
+          ClearCounter.source_paths_for_search.last.must == File.expand_path("fixtures/broken", File.dirname(__FILE__))
         end
       end
     end
@@ -116,6 +115,7 @@ describe Thor::Actions do
 
         new_path = File.join(source_root, "doc")
         runner.class.source_paths.unshift(new_path)
+        runner.class.clear_source_paths_for_search
         runner.find_in_source_paths("README").must == File.expand_path("README", new_path)
         runner.class.source_paths.shift
       end

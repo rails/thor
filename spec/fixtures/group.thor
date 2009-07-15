@@ -6,12 +6,9 @@ class MyCounter < Thor::Group
   end
 
   def self.source_root
-    if name =~ /Broken/
-      File.expand_path("broken", File.dirname(__FILE__))
-    else
-      File.expand_path(File.dirname(__FILE__))
-    end
+    File.expand_path(File.dirname(__FILE__))
   end
+  source_paths << File.expand_path("broken", File.dirname(__FILE__))
 
   argument :first,     :type => :numeric
   argument :second,    :type => :numeric, :default => 2
@@ -40,6 +37,10 @@ FOO
   def self.inherited(base)
     super
     base.source_paths.unshift(File.expand_path(File.join(File.dirname(__FILE__), "doc")))
+  end
+
+  def self.clear_source_paths_for_search
+    @source_paths_for_search = nil
   end
 end
 
@@ -74,8 +75,10 @@ class BrokenCounter < MyCounter
 end
 
 class WhinyGenerator < Thor::Group
+  include Thor::Actions
+
   def self.source_root
-    File.join(File.dirname(__FILE__), 'doc')
+    File.expand_path(File.dirname(__FILE__))
   end
 
   def wrong_arity(required)
