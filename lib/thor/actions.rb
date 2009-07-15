@@ -162,6 +162,15 @@ class Thor
       @destination_stack.pop
     end
 
+    # Same as inside, but log status and use padding.
+    #
+    def inside_with_padding(dir='', log_status=true, &block)
+      say_status :inside, dir, log_status
+      shell.padding += 1
+      inside(dir, &block)
+      shell.padding -= 1
+    end
+
     # Goes to the root and execute the given block.
     #
     def in_root

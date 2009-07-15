@@ -142,6 +142,37 @@ describe Thor::Actions do
     end
   end
 
+  describe "#inside_with_padding" do
+    it "behaves like #inside" do
+      capture(:stdout) do
+        runner.inside_with_padding("foo") do
+          Dir.pwd.must == file
+        end
+      end
+    end
+
+    it "logs status" do
+      capture(:stdout) do
+        runner.inside_with_padding("foo") {}
+      end.must =~ /inside  foo/
+    end
+
+    it "uses padding in next status" do
+      capture(:stdout) do
+        runner.inside_with_padding("foo") do
+          runner.say_status :cool, :padding
+        end
+      end.must =~ /cool    padding/
+    end
+
+    it "removes padding after block" do
+      capture(:stdout) do
+        runner.inside_with_padding("foo") {}
+        runner.say_status :no, :padding
+      end.must =~ /no  padding/
+    end
+  end
+
   describe "#in_root" do
     it "executes the block in the root folder" do
       runner.inside("foo") do
