@@ -6,7 +6,11 @@ class MyCounter < Thor::Group
   end
 
   def self.source_root
-    @source_root ||= File.expand_path(File.dirname(__FILE__))
+    if name =~ /Broken/
+      File.expand_path("broken", File.dirname(__FILE__))
+    else
+      File.expand_path(File.dirname(__FILE__))
+    end
   end
 
   argument :first,     :type => :numeric
@@ -34,7 +38,8 @@ FOO
   end
 
   def self.inherited(base)
-    base.source_paths << File.expand_path(File.join(File.dirname(__FILE__), "doc"))
+    super
+    base.source_paths.unshift(File.expand_path(File.join(File.dirname(__FILE__), "doc")))
   end
 end
 
@@ -43,7 +48,7 @@ class ClearCounter < MyCounter
   remove_class_option :third
 
   def self.source_root
-    @source_root ||= File.expand_path(File.join(File.dirname(__FILE__), "bundle"))
+    File.expand_path(File.join(File.dirname(__FILE__), "bundle"))
   end
 end
 

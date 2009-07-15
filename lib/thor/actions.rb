@@ -28,25 +28,37 @@ class Thor
     end
 
     module ClassMethods
-      # Hold source paths used by Thor::Actions. Paths added for last are the
-      # one searched first.
+      # Hold source paths used by Thor::Actions.
       #
       def source_paths
         @source_paths ||= from_superclass(:source_paths, [])
       end
 
-      # Deal with source root cache source_paths cache. source_paths in the
+      # On inheritance, add source root to source paths so dynamic source_root
+      # (that depends on the class name, for example) are cached properly.
+      #
+      def inherited(base) #:nodoc:
+        super
+        base.source_paths
+        if base.respond_to?(:source_root) && !base.source_paths.include?(base.source_root)
+          base.source_paths.unshift(base.source_root)
+        end
+      end
+
+      # Deal with source root cache in source_paths. source_paths in the
       # inheritance chain are tricky to implement because:
       #
       # 1) We have to ensure that paths from the parent class appears later in
-      #    the source paths array. This is done by using from_superclass in
-      #    both source_paths and below.
+      #    the source paths array.
       #
       # 2) Whenever source_root is added, it has to be cached because __FILE__
       #    in ruby returns relative locations.
       #
       # 3) If someone wants to add source paths dinamically, added paths have
       #    to come before the source root.
+      #
+      # This method basically check if source root was added and put it between
+      # the inherited paths and the user added paths.
       #
       def singleton_method_added(method) #:nodoc:
         if method == :source_root

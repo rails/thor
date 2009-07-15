@@ -92,8 +92,13 @@ describe Thor::Actions do
         end
 
         it "customized source paths should be before after source roots" do
-          ClearCounter.source_paths[1].must == File.expand_path("fixtures/bundle", File.dirname(__FILE__))
           ClearCounter.source_paths[0].must == File.expand_path("fixtures/doc", File.dirname(__FILE__))
+          ClearCounter.source_paths[1].must == File.expand_path("fixtures/bundle", File.dirname(__FILE__))
+        end
+
+        it "should add dynamic source root to source paths" do
+          BrokenCounter.source_paths[0].must == File.expand_path("fixtures/doc", File.dirname(__FILE__))
+          BrokenCounter.source_paths[1].must == File.expand_path("fixtures/broken", File.dirname(__FILE__))
         end
       end
     end
