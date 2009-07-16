@@ -140,36 +140,28 @@ describe Thor::Actions do
         File.exists?(file).must be_true
       end
     end
-  end
 
-  describe "#inside_with_padding" do
-    it "behaves like #inside" do
-      capture(:stdout) do
-        runner.inside_with_padding("foo") do
-          Dir.pwd.must == file
-        end
+    describe "when verbose" do
+      it "logs status" do
+        capture(:stdout) do
+          runner.inside("foo", :verbose => true) {}
+        end.must =~ /inside  foo/
       end
-    end
 
-    it "logs status" do
-      capture(:stdout) do
-        runner.inside_with_padding("foo") {}
-      end.must =~ /inside  foo/
-    end
+      it "uses padding in next status" do
+        capture(:stdout) do
+          runner.inside("foo", :verbose => true) do
+            runner.say_status :cool, :padding
+          end
+        end.must =~ /cool    padding/
+      end
 
-    it "uses padding in next status" do
-      capture(:stdout) do
-        runner.inside_with_padding("foo") do
-          runner.say_status :cool, :padding
-        end
-      end.must =~ /cool    padding/
-    end
-
-    it "removes padding after block" do
-      capture(:stdout) do
-        runner.inside_with_padding("foo") {}
-        runner.say_status :no, :padding
-      end.must =~ /no  padding/
+      it "removes padding after block" do
+        capture(:stdout) do
+          runner.inside("foo", :verbose => true) {}
+          runner.say_status :no, :padding
+        end.must =~ /no  padding/
+      end
     end
   end
 
@@ -204,7 +196,7 @@ describe Thor::Actions do
     end
 
     it "logs status" do
-      action(:run, "ls").must == "         run  \"ls\" from .\n"
+      action(:run, "ls").must == "         run  ls\n"
     end
 
     it "does not log status if required" do
@@ -212,7 +204,7 @@ describe Thor::Actions do
     end
 
     it "accepts a color as status" do
-      mock(runner.shell).say_status(:run, '"ls" from .', :yellow)
+      mock(runner.shell).say_status(:run, 'ls', :yellow)
       action :run, "ls", :verbose => :yellow
     end
   end
