@@ -194,214 +194,75 @@ describe Thor::Actions do
     end
   end
 
-  describe "commands" do
-    describe "#chmod" do
-      it "executes the command given" do
-        mock(FileUtils).chmod_R(0755, file)
-        action :chmod, "foo", 0755
-      end
-
-      it "does not execute the command if pretending given" do
-        dont_allow(FileUtils).chmod_R(0755, file)
-        runner(:pretend => true)
-        action :chmod, "foo", 0755
-      end
-
-      it "logs status" do
-        mock(FileUtils).chmod_R(0755, file)
-        action(:chmod, "foo", 0755).must == "       chmod  foo\n"
-      end
-
-      it "does not log status if required" do
-        mock(FileUtils).chmod_R(0755, file)
-        action(:chmod, "foo", 0755, :verbose => false).must be_empty
-      end
+  describe "#run" do
+    before(:each) do
+      mock(runner).`("ls") #`
     end
 
-    describe "#run" do
-      before(:each) do
-        mock(runner).`("ls") #`
-      end
-
-      it "executes the command given" do
-        action :run, "ls"
-      end
-
-      it "logs status" do
-        action(:run, "ls").must == "         run  \"ls\" from .\n"
-      end
-
-      it "does not log status if required" do
-        action(:run, "ls", :verbose => false).must be_empty
-      end
-
-      it "accepts a color as status" do
-        mock(runner.shell).say_status(:run, '"ls" from .', :yellow)
-        action :run, "ls", :verbose => :yellow
-      end
+    it "executes the command given" do
+      action :run, "ls"
     end
 
-    describe "#run_ruby_script" do
-      before(:each) do
-        stub(Thor::Util).ruby_command{ "/opt/jruby" }
-        mock(runner).`("/opt/jruby script.rb") #`
-      end
-
-      it "executes the ruby script" do
-        action :run_ruby_script, "script.rb"
-      end
-
-      it "logs status" do
-        action(:run_ruby_script, "script.rb").must == "       jruby  script.rb\n"
-      end
-
-      it "does not log status if required" do
-        action(:run_ruby_script, "script.rb", :verbose => false).must be_empty
-      end
+    it "logs status" do
+      action(:run, "ls").must == "         run  \"ls\" from .\n"
     end
 
-    describe "#thor" do
-      it "executes the thor command" do
-        mock(runner).run("thor list", :verbose => false)
-        action :thor, :list, :verbose => true
-      end
+    it "does not log status if required" do
+      action(:run, "ls", :verbose => false).must be_empty
+    end
 
-      it "converts extra arguments to command arguments" do
-        mock(runner).run("thor list foo bar", :verbose => false)
-        action :thor, :list, "foo", "bar"
-      end
-
-      it "converts options hash to switches" do
-        mock(runner).run("thor list foo bar --foo", :verbose => false)
-        action :thor, :list, "foo", "bar", :foo => true
-
-        mock(runner).run("thor list --foo 1 2 3", :verbose => false)
-        action :thor, :list, :foo => [1,2,3]
-      end
-
-      it "logs status" do
-        mock(runner).run("thor list", :verbose => false)
-        action(:thor, :list).must == "        thor  list\n"
-      end
-
-      it "does not log status if required" do
-        mock(runner).run("thor list --foo 1 2 3", :verbose => false)
-        action :thor, :list, :foo => [1,2,3], :verbose => false
-      end
+    it "accepts a color as status" do
+      mock(runner.shell).say_status(:run, '"ls" from .', :yellow)
+      action :run, "ls", :verbose => :yellow
     end
   end
 
-  describe 'file manipulation' do
+  describe "#run_ruby_script" do
     before(:each) do
-      ::FileUtils.rm_rf(destination_root)
-      ::FileUtils.cp_r(source_root, destination_root)
+      stub(Thor::Util).ruby_command{ "/opt/jruby" }
+      mock(runner).`("/opt/jruby script.rb") #`
     end
 
-    def runner(options={})
-      @runner ||= MyCounter.new([1], options, { :destination_root => destination_root })
+    it "executes the ruby script" do
+      action :run_ruby_script, "script.rb"
     end
 
-    def file
-      File.join(destination_root, "doc", "README")
+    it "logs status" do
+      action(:run_ruby_script, "script.rb").must == "       jruby  script.rb\n"
     end
 
-    describe "#remove_file" do
-      it "removes the file given" do
-        action :remove_file, "doc/README"
-        File.exists?(file).must be_false
-      end
+    it "does not log status if required" do
+      action(:run_ruby_script, "script.rb", :verbose => false).must be_empty
+    end
+  end
 
-      it "does not remove if pretending" do
-        runner(:pretend => true)
-        action :remove_file, "doc/README"
-        File.exists?(file).must be_true
-      end
-
-      it "logs status" do
-        action(:remove_file, "doc/README").must == "      remove  doc/README\n"
-      end
-
-      it "does not log status if required" do
-        action(:remove_file, "doc/README", :verbose => false).must be_empty
-      end
+  describe "#thor" do
+    it "executes the thor command" do
+      mock(runner).run("thor list", :verbose => false)
+      action :thor, :list, :verbose => true
     end
 
-    describe "#gsub_file" do
-      it "replaces the content in the file" do
-        action :gsub_file, "doc/README", "__start__", "START"
-        File.open(file).read.must == "START\nREADME\n__end__\n"
-      end
-
-      it "does not replace if pretending" do
-        runner(:pretend => true)
-        action :gsub_file, "doc/README", "__start__", "START"
-        File.open(file).read.must == "__start__\nREADME\n__end__\n"
-      end
-
-      it "accepts a block" do
-        action(:gsub_file, "doc/README", "__start__"){ |match| match.gsub('__', '').upcase  }
-        File.open(file).read.must == "START\nREADME\n__end__\n"
-      end
-
-      it "logs status" do
-        action(:gsub_file, "doc/README", "__start__", "START").must == "        gsub  doc/README\n"
-      end
-
-      it "does not log status if required" do
-        action(:gsub_file, file, "__", :verbose => false){ |match| match * 2 }.must be_empty
-      end
+    it "converts extra arguments to command arguments" do
+      mock(runner).run("thor list foo bar", :verbose => false)
+      action :thor, :list, "foo", "bar"
     end
 
-    describe "#append_file" do
-      it "appends content to the file" do
-        action :append_file, "doc/README", "END\n"
-        File.open(file).read.must == "__start__\nREADME\n__end__\nEND\n"
-      end
+    it "converts options hash to switches" do
+      mock(runner).run("thor list foo bar --foo", :verbose => false)
+      action :thor, :list, "foo", "bar", :foo => true
 
-      it "does not append if pretending" do
-        runner(:pretend => true)
-        action :append_file, "doc/README", "END\n"
-        File.open(file).read.must == "__start__\nREADME\n__end__\n"
-      end
-
-      it "accepts a block" do
-        action(:append_file, "doc/README"){ "END\n" }
-        File.open(file).read.must == "__start__\nREADME\n__end__\nEND\n"
-      end
-
-      it "logs status" do
-        action(:append_file, "doc/README", "END").must == "      append  doc/README\n"
-      end
-
-      it "does not log status if required" do
-        action(:append_file, "doc/README", nil, :verbose => false){ "END" }.must be_empty
-      end
+      mock(runner).run("thor list --foo 1 2 3", :verbose => false)
+      action :thor, :list, :foo => [1,2,3]
     end
 
-    describe "#prepend_file" do
-      it "prepends content to the file" do
-        action :prepend_file, "doc/README", "START\n"
-        File.open(file).read.must == "START\n__start__\nREADME\n__end__\n"
-      end
+    it "logs status" do
+      mock(runner).run("thor list", :verbose => false)
+      action(:thor, :list).must == "        thor  list\n"
+    end
 
-      it "does not prepend if pretending" do
-        runner(:pretend => true)
-        action :prepend_file, "doc/README", "START\n"
-        File.open(file).read.must == "__start__\nREADME\n__end__\n"
-      end
-
-      it "accepts a block" do
-        action(:prepend_file, "doc/README"){ "START\n" }
-        File.open(file).read.must == "START\n__start__\nREADME\n__end__\n"
-      end
-
-      it "logs status" do
-        action(:prepend_file, "doc/README", "START").must == "     prepend  doc/README\n"
-      end
-
-      it "does not log status if required" do
-        action(:prepend_file, "doc/README", "START", :verbose => false).must be_empty
-      end
+    it "does not log status if required" do
+      mock(runner).run("thor list --foo 1 2 3", :verbose => false)
+      action :thor, :list, :foo => [1,2,3], :verbose => false
     end
   end
 end
