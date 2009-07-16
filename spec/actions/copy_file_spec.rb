@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'thor/actions'
 
-describe Thor::Actions::CopyFile do
+describe "copy_file" do
   before(:each) do
     ::FileUtils.rm_rf(destination_root)
   end

@@ -7,8 +7,7 @@ describe Thor::Actions::EmptyDirectory do
   end
 
   def empty_directory(destination, options={})
-    @base = MyCounter.new([1,2], options, { :destination_root => destination_root })
-    @action = Thor::Actions::EmptyDirectory.new(@base, nil, destination)
+    @action = Thor::Actions::EmptyDirectory.new(base, destination)
   end
 
   def invoke!
@@ -17,6 +16,38 @@ describe Thor::Actions::EmptyDirectory do
 
   def revoke!
     capture(:stdout){ @action.revoke! }
+  end
+
+  def base
+    @base ||= MyCounter.new([1,2], options, { :destination_root => destination_root })
+  end
+
+  describe "#destination" do
+    it "returns the full destination with the destination_root" do
+      empty_directory('doc').destination.must == File.join(destination_root, 'doc')
+    end
+
+    it "takes relative root into account" do
+      base.inside('doc') do
+        empty_directory('contents').destination.must == File.join(destination_root, 'doc', 'contents')
+      end
+    end
+  end
+
+  describe "#relative_destination" do
+    it "returns the relative destination to the original destination root" do
+      base.inside('doc') do
+        empty_directory('contents').relative_destination.must == 'doc/contents'
+      end
+    end
+  end
+
+  describe "#given_destination" do
+    it "returns the destination supplied by the user" do
+      base.inside('doc') do
+        empty_directory('contents').given_destination.must == 'contents'
+      end
+    end
   end
 
   describe "#invoke!" do
@@ -49,27 +80,12 @@ describe Thor::Actions::EmptyDirectory do
     end
   end
 
-  describe "#render" do
-    it "must not be available" do
-      empty_directory("doc").must_not respond_to(:render)
-    end
-  end
-
   describe "#exists?" do
     it "returns true if the destination file exists" do
       empty_directory("doc")
       @action.exists?.must be_false
       invoke!
       @action.exists?.must be_true
-    end
-  end
-
-  describe "#identical?" do
-    it "returns true if the destination file and is identical" do
-      empty_directory("doc")
-      @action.identical?.must be_false
-      invoke!
-      @action.identical?.must be_true
     end
   end
 end

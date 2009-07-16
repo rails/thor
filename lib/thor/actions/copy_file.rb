@@ -1,5 +1,3 @@
-require 'thor/actions/templater'
-
 class Thor
   module Actions
 
@@ -18,15 +16,12 @@ class Thor
     #   copy_file "doc/README"
     #
     def copy_file(source, destination=nil, config={})
-      action CopyFile.new(self, source, destination || source, config)
-    end
+      destination ||= source
+      source = File.expand_path(find_in_source_paths(source.to_s))
 
-    class CopyFile < Templater #:nodoc:
-
-      def render
-        @render ||= ::File.read(source)
+      create_file destination, nil, config do
+        File.read(source)
       end
-
     end
   end
 end

@@ -1,4 +1,3 @@
-require 'thor/actions/templater'
 require 'open-uri'
 
 class Thor
@@ -22,37 +21,16 @@ class Thor
     #   end
     #
     def get(source, destination=nil, config={}, &block)
-      action Get.new(self, source, block || destination, config)
-    end
+      source = File.expand_path(find_in_source_paths(source.to_s)) unless source =~ /^http\:\/\//
+      render = open(source).read
 
-    class Get < Templater #:nodoc:
-
-      def render
-        @render ||= open(source).read
+      destination ||= if block_given?
+        block.arity == 1 ? block.call(render) : block.call
+      else
+        File.basename(source)
       end
 
-      protected
-
-        def source=(source)
-          if source =~ /^http\:\/\//
-            @source = source
-          else
-            super(source)
-          end
-        end
-
-        def destination=(destination)
-          destination = if destination.nil?
-            File.basename(source)
-          elsif destination.is_a?(Proc)
-            destination.arity == 1 ? destination.call(render) : destination.call
-          else
-            destination
-          end
-
-          super(destination)
-        end
-
+      create_file destination, render, config
     end
   end
 end

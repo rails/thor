@@ -8,12 +8,10 @@ describe Thor::Actions::Directory do
   end
 
   def invoker
-    # Use WhinyGenerator since it does not have tweaked source paths.
     @invoker ||= WhinyGenerator.new([1,2], {}, { :destination_root => destination_root })
   end
 
   def revoker
-    # Use WhinyGenerator since it does not have tweaked source paths.
     @revoker ||= WhinyGenerator.new([1,2], {}, { :destination_root => destination_root, :behavior => :revoke })
   end
 

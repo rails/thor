@@ -1,4 +1,3 @@
-require 'thor/actions/templater'
 require 'erb'
 
 class Thor
@@ -20,19 +19,13 @@ class Thor
     #   template "doc/README"
     #
     def template(source, destination=nil, config={})
-      destination ||= source.gsub(/.tt$/, '')
-      action Template.new(self, source, destination, config)
-    end
+      destination ||= source
+      source  = File.expand_path(find_in_source_paths(source.to_s))
+      context = instance_eval('binding')
 
-    class Template < Templater #:nodoc:
-
-      def render
-        @render ||= begin
-          context = base.instance_eval('binding')
-          ERB.new(::File.read(source), nil, '-').result(context)
-        end
+      create_file destination, nil, config do
+        ERB.new(::File.read(source), nil, '-').result(context)
       end
-
     end
   end
 end

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'thor/actions'
 
-describe Thor::Actions::Template do
+describe "template" do
   before(:each) do
     ::FileUtils.rm_rf(destination_root)
   end
@@ -30,11 +30,11 @@ describe Thor::Actions::Template do
       File.exists?(file).must be_true
     end
 
-    it "removes .tt from source if no destination is given" do
+    it "converts enconded instructions" do
       mock(invoker).file_name{ "rdoc" }
       capture(:stdout){ invoker.template("doc/%file_name%.rb.tt") }
 
-      file = File.join(destination_root, "doc/rdoc.rb")
+      file = File.join(destination_root, "doc/rdoc.rb.tt")
       File.exists?(file).must be_true
     end
 
