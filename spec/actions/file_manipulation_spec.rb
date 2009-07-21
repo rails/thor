@@ -141,6 +141,11 @@ describe Thor::Actions do
         File.exists?(file).must be_false
       end
 
+      it "removes directories too" do
+        action :remove_dir, "doc"
+        File.exists?(File.join(destination_root, "doc")).must be_false
+      end
+
       it "does not remove if pretending" do
         runner(:pretend => true)
         action :remove_file, "doc/README"
