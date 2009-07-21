@@ -195,7 +195,7 @@ describe Thor::Base do
       lambda {
         klass = Class.new(Thor::Group)
         klass.class_eval "def shell; end"
-      }.must raise_error(RuntimeError, /'shell' is a Thor reserved word and cannot be defined as task/)
+      }.must raise_error(RuntimeError, /"shell" is a Thor reserved word and cannot be defined as task/)
     end
   end
 

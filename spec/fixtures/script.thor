@@ -40,16 +40,9 @@ END
     call_myself_with_wrong_arity(4)
   end
 
+  desc "call unexistent method", "Call unexistent method inside a task"
   def call_unexistent_method
     boom!
-  end
-
-  def method_missing(meth, *args)
-    if meth == :boom!
-      super
-    else
-      [meth, args]
-    end
   end
 
   method_options :all => :boolean
@@ -59,6 +52,14 @@ END
   end
 
   private
+
+    def method_missing(meth, *args)
+      if meth == :boom!
+        super
+      else
+        [meth, args]
+      end
+    end
 
     desc "what", "what"
     def what

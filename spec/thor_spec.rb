@@ -211,4 +211,20 @@ END
       end
     end
   end
+
+  describe "when creating tasks" do
+    it "prints a warning if a public method is created without description or usage" do
+      capture(:stdout) {
+        klass = Class.new(Thor)
+        klass.class_eval "def hello_from_thor; end"
+      }.must =~ /\[WARNING\] Attempted to create task "hello_from_thor" without usage or description/
+    end
+
+    it "does not print if overwriting a previous task" do
+      capture(:stdout) {
+        klass = Class.new(Thor)
+        klass.class_eval "def help; end"
+      }.must be_empty
+    end
+  end
 end
