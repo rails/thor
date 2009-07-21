@@ -107,6 +107,10 @@ describe Thor do
       MyScript.start(["animal", "fish"]).must == ["fish"]
     end
 
+    it "does not set options in attributes" do
+      MyScript.start(["with_optional", "--all"]).must == [nil, { "all" => true }]
+    end
+
     it "raises an error if a required param is not provided" do
       capture(:stderr) { MyScript.start(["animal"]) }.must =~ /'animal' was called incorrectly\. Call as 'my_script:animal TYPE'/
     end

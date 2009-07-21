@@ -52,6 +52,12 @@ END
     end
   end
 
+  method_options :all => :boolean
+  desc "with_optional NAME", "invoke with optional name"
+  def with_optional(name=nil)
+    [ name, options ]
+  end
+
   private
 
     desc "what", "what"
