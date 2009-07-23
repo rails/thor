@@ -67,12 +67,12 @@ describe Thor do
     end
 
     it "provides description for a task" do
-      @content.must =~ /zoo +# zoo around/
+      @content.must =~ /zoo\s+# zoo around/m
     end
 
     describe "when :for is supplied" do
       it "overwrites a previous defined task" do
-        capture(:stdout) { MyChildScript.start(["help"]) }.must =~ /animal KIND \[\-\-other=OTHER\] +# fish around/
+        capture(:stdout) { MyChildScript.start(["help"]) }.must =~ /animal KIND \[\-\-other=OTHER\]\s+# fish around/m
       end
     end
   end
@@ -148,19 +148,19 @@ describe Thor do
       end
 
       it "provides useful help info for the help method itself" do
-        @content.must =~ /help \[TASK\] +# Describe available tasks/
+        @content.must =~ /help \[TASK\]\s+# Describe available tasks/m
       end
 
       it "provides useful help info for a method with params" do
-        @content.must =~ /animal TYPE +# horse around/
+        @content.must =~ /animal TYPE\s+# horse around/m
       end
 
       it "provides useful help info for a method with options" do
-        @content.must =~ /foo BAR \[\-\-force\] +# do some fooing/
+        @content.must =~ /foo BAR \[\-\-force\]\s+# do some fooing/m
       end
 
       it "shows superclass tasks" do
-        capture(:stdout){ MyChildScript.help(shell) }.must =~ /foo BAR \[\-\-force\] +# do some fooing/
+        capture(:stdout){ MyChildScript.help(shell) }.must =~ /foo BAR \[\-\-force\]\s+# do some fooing/m
       end
 
       it "shows class options information" do

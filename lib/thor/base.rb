@@ -376,8 +376,16 @@ class Thor
             padding = options.collect{ |o| o.aliases.size  }.max.to_i * 4
 
             options.each do |option|
-              list << [ option.usage(padding), option.description || "" ]
-              list << [ "", "Default: #{option.default}" ] if option.show_default?
+              item = [ option.usage(padding) ]
+
+              item << if option.description
+                "# #{option.description}"
+              else
+                ""
+              end
+
+              list << item
+              list << [ "", "# Default: #{option.default}" ] if option.show_default?
             end
 
             unless list.empty?
@@ -387,7 +395,7 @@ class Thor
                 shell.say "Options:"
               end
 
-              shell.print_table(list, :emphasize_last => true, :ident => 2)
+              shell.print_table(list, :ident => 2)
               shell.say ""
             end
           end

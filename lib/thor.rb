@@ -166,16 +166,19 @@ class Thor
         shell.say task.description
       else
         list = (options[:short] ? tasks : all_tasks).map do |_, task|
-          [ banner(task, options[:namespace]), task.short_description || '' ]
+          item = [ "  " + banner(task, options[:namespace]) ]
+          item << if task.short_description
+            "\n  # #{task.short_description}\n"
+          else
+            "\n"
+          end
         end
 
         if options[:short]
-          shell.print_table(list, :emphasize_last => true)
+          shell.print_table(list)
         else
           shell.say "Tasks:"
-          shell.print_table(list, :ident => 2, :emphasize_last => true)
-          shell.say
-
+          shell.print_table(list)
           class_options_help(shell, "Class")
         end
       end

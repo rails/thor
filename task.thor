@@ -1,9 +1,9 @@
 # module: random
 
 class Amazing < Thor
-  include Actions
+  include Thor::Actions
 
-  def source_root
+  def self.source_root
     File.join(File.dirname(__FILE__), "spec", "fixtures")
   end
 

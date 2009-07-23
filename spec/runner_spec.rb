@@ -15,7 +15,7 @@ describe Thor::Runner do
 
     it "shows information about a specific Thor class" do
       content = capture(:stdout){ Thor::Runner.start(["help", "my_script"]) }
-      content.must =~ /zoo +# zoo around/
+      content.must =~ /zoo\s+# zoo around/m
     end
 
     it "shows information about an specific task from an specific Thor class" do
@@ -107,7 +107,8 @@ describe Thor::Runner do
     describe "list" do
       it "gives a list of the available tasks" do
         ARGV.replace ["list"]
-        capture(:stdout) { Thor::Runner.start }.must =~ /amazing:describe NAME \[\-\-forcefully\] +# say that someone is amazing/
+        content = capture(:stdout) { Thor::Runner.start }
+        content.must =~ /amazing:describe NAME \[\-\-forcefully\]\s+# say that someone is amazing/m
       end
 
       it "gives a list of the available Thor::Group classes" do
@@ -138,7 +139,7 @@ describe Thor::Runner do
 
       it "presents tasks in the default namespace with an empty namespace" do
         ARGV.replace ["list"]
-        capture(:stdout) { Thor::Runner.start }.must =~ /^:test +# prints 'test'/
+        capture(:stdout) { Thor::Runner.start }.must =~ /^  :test\s+# prints 'test'/m
       end
 
       it "runs tasks with an empty namespace from the default namespace" do
@@ -181,8 +182,8 @@ describe Thor::Runner do
         stdout = capture(:stdout) { Thor::Runner.start(["installed"]) }
 
         stdout.must =~ /random\s*amazing/
-        stdout.must =~ /amazing:describe NAME \[\-\-forcefully\] +# say that someone is amazing/
-        stdout.must =~ /amazing:hello +# say hello/
+        stdout.must =~ /amazing:describe NAME \[\-\-forcefully\]\s+# say that someone is amazing/m
+        stdout.must =~ /amazing:hello\s+# say hello/m
       end
     end
 
