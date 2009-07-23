@@ -162,7 +162,8 @@ class Thor
     #
     # ==== Parameters
     # command<String>:: the command to be executed.
-    # config<Hash>:: give :verbose => false to not log the status.
+    # config<Hash>:: give :verbose => false to not log the status. Specify :with
+    #                to append an executable to command executation.
     #
     # ==== Example
     #
@@ -172,7 +173,16 @@ class Thor
     #
     def run(command, config={})
       return unless behavior == :invoke
-      say_status :run, command, config.fetch(:verbose, true)
+
+      destination = relative_to_original_destination_root(destination_root, false)
+      desc = "#{command} from #{destination.inspect}"
+
+      if config[:with]
+        desc = "#{File.basename(config[:with].to_s)} #{desc}"
+        command = "#{config[:with]} #{command}"
+      end
+
+      say_status :run, desc, config.fetch(:verbose, true)
       `#{command}` unless options[:pretend]
     end
 
@@ -184,8 +194,7 @@ class Thor
     #
     def run_ruby_script(command, config={})
       return unless behavior == :invoke
-      say_status File.basename(Thor::Util.ruby_command), command, config.fetch(:verbose, true)
-      `#{Thor::Util.ruby_command} #{command}` unless options[:pretend]
+      run "#{command}", config.merge(:with => Thor::Util.ruby_command)
     end
 
     # Run a thor command. A hash of options can be given and it's converted to 
@@ -213,8 +222,7 @@ class Thor
       args.push Thor::Options.to_switches(config)
       command = args.join(' ').strip
 
-      say_status :thor, command, verbose
-      run "thor #{command}", :verbose => false
+      run command, :with => :thor, :verbose => verbose
     end
 
     protected

@@ -196,7 +196,7 @@ describe Thor::Actions do
     end
 
     it "logs status" do
-      action(:run, "ls").must == "         run  ls\n"
+      action(:run, "ls").must == "         run  ls from \".\"\n"
     end
 
     it "does not log status if required" do
@@ -204,7 +204,7 @@ describe Thor::Actions do
     end
 
     it "accepts a color as status" do
-      mock(runner.shell).say_status(:run, 'ls', :yellow)
+      mock(runner.shell).say_status(:run, 'ls from "."', :yellow)
       action :run, "ls", :verbose => :yellow
     end
   end
@@ -220,7 +220,7 @@ describe Thor::Actions do
     end
 
     it "logs status" do
-      action(:run_ruby_script, "script.rb").must == "       jruby  script.rb\n"
+      action(:run_ruby_script, "script.rb").must == "         run  jruby script.rb from \".\"\n"
     end
 
     it "does not log status if required" do
@@ -230,31 +230,31 @@ describe Thor::Actions do
 
   describe "#thor" do
     it "executes the thor command" do
-      mock(runner).run("thor list", :verbose => false)
+      mock(runner).`("thor list") #`
       action :thor, :list, :verbose => true
     end
 
     it "converts extra arguments to command arguments" do
-      mock(runner).run("thor list foo bar", :verbose => false)
+      mock(runner).`("thor list foo bar") #`
       action :thor, :list, "foo", "bar"
     end
 
     it "converts options hash to switches" do
-      mock(runner).run("thor list foo bar --foo", :verbose => false)
+      mock(runner).`("thor list foo bar --foo") #`
       action :thor, :list, "foo", "bar", :foo => true
 
-      mock(runner).run("thor list --foo 1 2 3", :verbose => false)
+      mock(runner).`("thor list --foo 1 2 3") #`
       action :thor, :list, :foo => [1,2,3]
     end
 
     it "logs status" do
-      mock(runner).run("thor list", :verbose => false)
-      action(:thor, :list).must == "        thor  list\n"
+      mock(runner).`("thor list") #`
+      action(:thor, :list).must == "         run  thor list from \".\"\n"
     end
 
     it "does not log status if required" do
-      mock(runner).run("thor list --foo 1 2 3", :verbose => false)
-      action :thor, :list, :foo => [1,2,3], :verbose => false
+      mock(runner).`("thor list --foo 1 2 3") #`
+      action(:thor, :list, :foo => [1,2,3], :verbose => false).must be_empty
     end
   end
 end
