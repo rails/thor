@@ -158,6 +158,28 @@ class Thor
       inside(@destination_stack.first) { yield }
     end
 
+    # Loads an external file and execute it in the instance binding.
+    #
+    # ==== Parameters
+    # path<String>:: The path to the file to execute. Can be a web address or
+    #                a relative path from the source root.
+    #
+    # ==== Examples
+    #
+    #   apply "http://gist.github.com/103208"
+    #
+    #   apply "recipes/jquery.rb"
+    #
+    def apply(path, config={})
+      verbose = config.fetch(:verbose, true)
+      path    = find_in_source_paths(path) unless path =~ /^http\:\/\//
+
+      say_status :apply, path, verbose
+      shell.padding += 1 if verbose
+      instance_eval(open(path).read)
+      shell.padding -= 1 if verbose
+    end
+
     # Executes a command.
     #
     # ==== Parameters

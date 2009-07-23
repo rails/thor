@@ -186,6 +186,38 @@ describe Thor::Actions do
     end
   end
 
+  describe "#apply" do
+    before(:each) do
+      @template = <<-TEMPLATE
+        @foo = "FOO"
+        say_status :cool, :padding
+      TEMPLATE
+      @template.instance_eval "def read; self; end" # Make the string respond to read
+
+      @file = "http://gist.github.com/103208.txt"
+      mock(runner).open(@file){ @template }
+    end
+
+    it "opens a file and executes its content in the instance binding" do
+      action :apply, @file
+      runner.instance_variable_get("@foo").must == "FOO"
+    end
+
+    it "applies padding to the content inside the file" do
+      action(:apply, @file).must =~ /cool    padding/
+    end
+
+    it "logs its status" do
+      action(:apply, @file).must =~ /       apply  #{@file}\n/
+    end
+
+    it "does not log status" do
+      content = action(:apply, @file, :verbose => false)
+      content.must =~ /cool  padding/
+      content.must_not =~ /apply http/
+    end
+  end
+
   describe "#run" do
     before(:each) do
       mock(runner).`("ls") #`
