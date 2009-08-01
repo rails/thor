@@ -43,13 +43,11 @@ class Thor
       #   3) Parents source paths
       #
       def source_paths_for_search
-        @source_paths_for_search ||= begin
-          paths = []
-          paths += self.source_paths
-          paths << self.source_root if self.respond_to?(:source_root)
-          paths += from_superclass(:source_paths, [])
-          paths
-        end
+        paths = []
+        paths += self.source_paths
+        paths << self.source_root if self.respond_to?(:source_root)
+        paths += from_superclass(:source_paths, [])
+        paths
       end
     end
 
@@ -110,18 +108,23 @@ class Thor
       remove_dot ? (path[2..-1] || '') : path
     end
 
+    # Holds source paths in instance so they can be manipulated.
+    #
+    def source_paths
+      @source_paths ||= self.class.source_paths_for_search
+    end
+
     # Receives a file or directory and search for it in the source paths. 
     #
     def find_in_source_paths(file)
       relative_root = relative_to_original_destination_root(destination_root, false)
-      paths = self.class.source_paths_for_search
 
-      paths.each do |source|
+      source_paths.each do |source|
         source_file = File.expand_path(file, File.join(source, relative_root))
         return source_file if File.exists?(source_file)
       end
 
-      if paths.empty?
+      if source_paths.empty?
         raise Error, "You don't have any source path defined for class #{self.class.name}. To fix this, " <<
                      "you can define a source_root in your class."
       else

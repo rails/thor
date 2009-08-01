@@ -114,10 +114,9 @@ describe Thor::Actions do
         lambda { runner.find_in_source_paths("README") }.must raise_error
 
         new_path = File.join(source_root, "doc")
-        runner.class.source_paths.unshift(new_path)
-        runner.class.clear_source_paths_for_search
+        runner.instance_variable_set(:@source_paths, nil)
+        runner.source_paths.unshift(new_path)
         runner.find_in_source_paths("README").must == File.expand_path("README", new_path)
-        runner.class.source_paths.shift
       end
     end
   end

@@ -38,10 +38,6 @@ FOO
     super
     base.source_paths.unshift(File.expand_path(File.join(File.dirname(__FILE__), "doc")))
   end
-
-  def self.clear_source_paths_for_search
-    @source_paths_for_search = nil
-  end
 end
 
 class ClearCounter < MyCounter
