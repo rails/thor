@@ -96,20 +96,8 @@ class Thor
       task, args, opts, config = nil, task, args, opts if task.nil? || task.is_a?(Array)
       args, opts, config = nil, args, opts if args.is_a?(Hash)
 
-      object, task = _prepare_for_invocation(name, task)
-      if object.is_a?(Class)
-        klass = object
-
-        stored_args, stored_opts, stored_config = @_initializer
-        args ||= stored_args.dup
-        opts ||= stored_opts.dup
-
-        config ||= {}
-        config = stored_config.merge(_shared_configuration).merge!(config)
-        instance = klass.new(args, opts, config)
-      else
-        klass, instance = object.class, object
-      end
+      object, task    = _prepare_for_invocation(name, task)
+      klass, instance = _initialize_klass_with_initializer(object, args, opts, config)
 
       method_args = []
       current = @_invocations[klass]
@@ -134,7 +122,7 @@ class Thor
 
       # Configuration values that are shared between invocations.
       #
-      def _shared_configuration
+      def _shared_configuration #:nodoc:
         { :invocations => @_invocations }
       end
 
@@ -154,19 +142,37 @@ class Thor
 
         # If the object was not set, use self and use the name as task.
         object, task = self, name unless object
-        return object, _validate_klass_and_task(object, task)
+        return object, _validate_task(object, task)
       end
 
       # Check if the object given is a Thor class object and get a task object
       # for it.
       #
-      def _validate_klass_and_task(object, task) #:nodoc:
+      def _validate_task(object, task) #:nodoc:
         klass = object.is_a?(Class) ? object : object.class
         raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
 
         task ||= klass.default_task if klass <= Thor
         task = klass.all_tasks[task.to_s] || Task.dynamic(task) if task && !task.is_a?(Thor::Task)
         task
+      end
+
+      # Initialize klass using values stored in the @_initializer.
+      #
+      def _initialize_klass_with_initializer(object, args, opts, config) #:nodoc:
+        if object.is_a?(Class)
+          klass = object
+
+          stored_args, stored_opts, stored_config = @_initializer
+          args ||= stored_args.dup
+          opts ||= stored_opts.dup
+
+          config ||= {}
+          config = stored_config.merge(_shared_configuration).merge!(config)
+          [ klass, klass.new(args, opts, config) ]
+        else
+          [ object.class, object ]
+        end
       end
   end
 end

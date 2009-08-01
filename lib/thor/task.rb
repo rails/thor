@@ -12,7 +12,7 @@ class Thor
       super(name.to_s, description, usage, options || {})
     end
 
-    def initialize_copy(other)
+    def initialize_copy(other) #:nodoc:
       super(other)
       self.options = other.options.dup if other.options
     end
@@ -67,20 +67,20 @@ class Thor
 
       # Given a target, checks if this class name is not a private/protected method.
       #
-      def public_method?(instance)
+      def public_method?(instance) #:nodoc:
         collection = instance.private_methods + instance.protected_methods
         !(collection).include?(name.to_s) && !(collection).include?(name.to_sym) # For Ruby 1.9
       end
 
       # Clean everything that comes from the Thor gempath and remove the caller.
       #
-      def sans_backtrace(backtrace, caller)
+      def sans_backtrace(backtrace, caller) #:nodoc:
         dirname = /^#{Regexp.escape(File.dirname(__FILE__))}/
         saned  = backtrace.reject { |frame| frame =~ dirname }
         saned -= caller
       end
 
-      def parse_argument_error(instance, e, caller)
+      def parse_argument_error(instance, e, caller) #:nodoc:
         backtrace = sans_backtrace(e.backtrace, caller)
 
         if backtrace.empty? && e.message =~ /wrong number of arguments/
@@ -95,7 +95,7 @@ class Thor
         end
       end
 
-      def parse_no_method_error(instance, e)
+      def parse_no_method_error(instance, e) #:nodoc:
         if e.message =~ /^undefined method `#{name}' for #{Regexp.escape(instance.to_s)}$/
           raise UndefinedTaskError, "The #{instance.class.namespace} namespace " <<
                                     "doesn't have a '#{name}' task"

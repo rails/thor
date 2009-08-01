@@ -4,7 +4,7 @@ require 'yaml'
 require 'digest/md5'
 require 'pathname'
 
-class Thor::Runner < Thor
+class Thor::Runner < Thor #:nodoc:
   map "-T" => :list, "-i" => :install, "-u" => :update
 
   # Override Thor#help so it can give information about any class and any method.

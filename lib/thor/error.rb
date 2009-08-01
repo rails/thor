@@ -1,27 +1,27 @@
 class Thor
-  # Thor::Error is raised when it's caused by the user invoking the task and
-  # only errors that inherit from it are rescued.
+  # Thor::Error is raised when it's caused by wrong usage of thor classes. Those
+  # errors have their backtrace supressed and are nicely shown to the user.
   #
-  # So, for example, if the developer declares a required argument after an
-  # option, it should raise an ::ArgumentError and not ::Thor::ArgumentError,
-  # because it was caused by the developer and not the "final user".
+  # Errors that are caused by the developer, like declaring a method which
+  # overwrites a thor keyword, it SHOULD NOT raise a Thor::Error. This way, we
+  # ensure that developer errors are shown with full backtrace.
   #
-  class Error < StandardError #:nodoc:
+  class Error < StandardError
   end
 
   # Raised when a task was not found.
   #
-  class UndefinedTaskError < Error #:nodoc:
+  class UndefinedTaskError < Error
   end
 
   # Raised when a task was found, but not invoked properly.
   #
-  class InvocationError < Error #:nodoc:
+  class InvocationError < Error
   end
 
-  class RequiredArgumentMissingError < InvocationError #:nodoc:
+  class RequiredArgumentMissingError < InvocationError
   end
 
-  class MalformattedArgumentError < InvocationError #:nodoc:
+  class MalformattedArgumentError < InvocationError
   end
 end

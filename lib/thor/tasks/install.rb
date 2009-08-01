@@ -12,7 +12,7 @@ class Thor
     tasks['install'] = Thor::InstallTask.new(spec, options)
   end
 
-  class InstallTask < Task
+  class InstallTask < Task #:nodoc:
     attr_accessor :spec, :config
 
     def initialize(gemspec, config={})

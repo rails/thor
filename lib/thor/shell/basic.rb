@@ -11,9 +11,9 @@ class Thor
         @base, @padding = nil, 0
       end
 
-      # Do not allow padding to be less than zero.
+      # Sets the output padding, not allowing less than zero values.
       #
-      def padding=(value) #:nodoc:
+      def padding=(value)
         @padding = [0, value].max
       end
 
@@ -52,7 +52,7 @@ class Thor
       # in log_status, avoiding the message from being shown. If a Symbol is
       # given in log_status, it's used as the color.
       #
-      def say_status(status, message, log_status=true) #:nodoc:
+      def say_status(status, message, log_status=true)
         return if quiet? || log_status == false
         spaces = "  " * (padding + 1)
         color  = log_status.is_a?(Symbol) ? log_status : :green
@@ -103,7 +103,6 @@ class Thor
       #
       # ==== Options
       # ident<Integer>:: Ident the first column by ident value.
-      # emphasize_last<Boolean>:: When true, add a different behavior to the last column.
       #
       def print_table(table, options={})
         return if table.empty?
@@ -131,7 +130,7 @@ class Thor
       #
       # ==== Parameters
       # destination<String>:: the destination file to solve conflicts
-      # block<Proc>:: an optional proc that returns the value to be used in diff
+      # block<Proc>:: an optional block that returns the value to be used in diff
       #
       def file_collision(destination)
         return true if @always_force
@@ -164,19 +163,20 @@ class Thor
       # wrong, you can always raise an exception. If you raise a Thor::Error, it
       # will be rescued and wrapped in the method below.
       #
-      def error(statement) #:nodoc:
+      def error(statement)
         $stderr.puts statement
       end
 
-      # Apply color to the given string with optional bold.
+      # Apply color to the given string with optional bold. Disabled in the
+      # Thor::Shell::Basic class.
       #
-      def set_color(string, color, bold=false)
+      def set_color(string, color, bold=false) #:nodoc:
         string
       end
 
       protected
 
-        def is?(value)
+        def is?(value) #:nodoc:
           value = value.to_s
 
           if value.size == 1
@@ -186,7 +186,7 @@ class Thor
           end
         end
 
-        def file_collision_help
+        def file_collision_help #:nodoc:
 <<HELP
 Y - yes, overwrite
 n - no, do not overwrite
@@ -197,7 +197,7 @@ h - help, show this help
 HELP
         end
 
-        def show_diff(destination, content)
+        def show_diff(destination, content) #:nodoc:
           diff_cmd = ENV['THOR_DIFF'] || ENV['RAILS_DIFF'] || 'diff -u'
 
           Tempfile.open(File.basename(destination), File.dirname(destination)) do |temp|
@@ -207,7 +207,7 @@ HELP
           end
         end
 
-        def quiet?
+        def quiet? #:nodoc:
           base && base.options[:quiet]
         end
 

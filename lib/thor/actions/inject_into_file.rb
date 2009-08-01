@@ -34,7 +34,7 @@ class Thor
       action InjectIntoFile.new(self, destination, data, config)
     end
 
-    class InjectIntoFile < EmptyDirectory
+    class InjectIntoFile < EmptyDirectory #:nodoc:
       attr_reader :flag, :replacement
 
       def initialize(base, destination, data, config)

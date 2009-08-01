@@ -2,7 +2,8 @@ require 'thor/shell/basic'
 
 class Thor
   module Shell
-    # Set color in the output. Got color values from HighLine.
+    # Inherit from Thor::Shell::Basic and add set_color behavior. Check
+    # Thor::Shell::Basic to see all available methods.
     #
     class Color < Basic
       # Embed in a String to clear all previous ANSI sequences.
@@ -44,9 +45,10 @@ class Thor
       # Set the terminal's background ANSI color to white.
       ON_WHITE   = "\e[47m"
 
-      # Set color by using a string or one of the defined constants. Based
-      # on Highline implementation. CLEAR is automatically be embedded to
-      # the end of the returned String.
+      # Set color by using a string or one of the defined constants. If a third
+      # option is set to true, it also adds bold to the string. This is based
+      # on Highline implementation and it automatically appends CLEAR to the end
+      # of the returned String.
       #
       def set_color(string, color, bold=false)
         color = self.class.const_get(color.to_s.upcase) if color.is_a?(Symbol)
@@ -59,7 +61,7 @@ class Thor
         # Overwrite show_diff to show diff with colors if Diff::LCS is
         # available.
         #
-        def show_diff(destination, content)
+        def show_diff(destination, content) #:nodoc:
           if diff_lcs_loaded? && ENV['THOR_DIFF'].nil? && ENV['RAILS_DIFF'].nil?
             actual  = File.read(destination).to_s.split("\n")
             content = content.to_s.split("\n")
@@ -72,7 +74,7 @@ class Thor
           end
         end
 
-        def output_diff_line(diff)
+        def output_diff_line(diff) #:nodoc:
           case diff.action
             when '-'
               say "- #{diff.old_element.chomp}", :red, true
@@ -89,7 +91,7 @@ class Thor
         # Check if Diff::LCS is loaded. If it is, use it to create pretty output
         # for diff.
         #
-        def diff_lcs_loaded?
+        def diff_lcs_loaded? #:nodoc:
           return true  if defined?(Diff::LCS)
           return @diff_lcs_loaded unless @diff_lcs_loaded.nil?
 

@@ -1,5 +1,5 @@
 class Thor
-  class Arguments
+  class Arguments #:nodoc:
     NUMERIC = /(\d*\.\d+|\d+)/
 
     # Receives an array of args and returns two arrays, one with arguments

@@ -13,7 +13,7 @@ class Thor
     tasks['package'] = Thor::PackageTask.new(spec, options)
   end
 
-  class PackageTask < Task
+  class PackageTask < Task #:nodoc:
     attr_accessor :spec, :config
 
     def initialize(gemspec, config={})

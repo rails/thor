@@ -1,5 +1,5 @@
 class Thor
-  class Option < Argument
+  class Option < Argument #:nodoc:
     attr_reader :aliases, :group
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]

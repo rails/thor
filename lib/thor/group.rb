@@ -221,9 +221,9 @@ class Thor::Group
     protected
 
       # The banner for this class. You can customize it if you are invoking the
-      # thor class by another means which is not the Thor::Runner.
+      # thor class by another ways which is not the Thor::Runner.
       #
-      def banner #:nodoc:
+      def banner
         "#{self.namespace} #{self.arguments.map {|a| a.usage }.join(' ')}"
       end
 
@@ -244,7 +244,7 @@ class Thor::Group
     # Shortcut to invoke with padding and block handling. Use internally by
     # invoke and invoke_from_option class methods.
     #
-    def _invoke_for_class_method(klass, task=nil, *args, &block)
+    def _invoke_for_class_method(klass, task=nil, *args, &block) #:nodoc:
       shell.padding += 1
 
       result = if block_given?

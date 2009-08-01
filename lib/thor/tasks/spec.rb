@@ -15,12 +15,12 @@ class Thor
   #
   # All other options are added to rspec.
   #
-  def self.spec_task(files, options={})
+  def self.spec_task(files, options={}) #:nodoc:
     name        = (options.delete(:name) || 'spec').to_s
     tasks[name] = Thor::SpecTask.new(name, files, options)
   end
 
-  class SpecTask < Task
+  class SpecTask < Task #:nodoc:
     attr_accessor :name, :files, :rcov_dir, :rcov_config, :spec_config
 
     def initialize(name, files, config={})

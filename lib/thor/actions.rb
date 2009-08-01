@@ -58,8 +58,7 @@ class Thor
     #                    It also accepts :force, :skip and :pretend to set the behavior
     #                    and the respective option.
     #
-    # destination_root<String>:: The root directory needed for some actions. It's also known
-    #                            as destination root.
+    # destination_root<String>:: The root directory needed for some actions.
     #
     def initialize(args=[], options={}, config={})
       self.behavior = case config[:behavior].to_s
@@ -78,7 +77,7 @@ class Thor
 
     # Wraps an action object and call it accordingly to the thor class behavior.
     #
-    def action(instance)
+    def action(instance) #:nodoc:
       if behavior == :revoke
         instance.revoke!
       else

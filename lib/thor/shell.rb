@@ -64,7 +64,7 @@ class Thor
 
       # Allow shell to be shared between invocations.
       #
-      def _shared_configuration
+      def _shared_configuration #:nodoc:
         super.merge!(:shell => self.shell)
       end
 

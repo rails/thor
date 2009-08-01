@@ -1,5 +1,5 @@
 class Thor
-  class Argument
+  class Argument #:nodoc:
     VALID_TYPES = [ :numeric, :hash, :array, :string ]
 
     attr_reader :name, :description, :required, :type, :default, :banner

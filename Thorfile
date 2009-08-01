@@ -2,6 +2,9 @@ require 'rubygems'
 require 'rubygems/specification'
 require 'thor/tasks'
 
+require 'rubygems'
+require 'rdoc/rdoc'
+
 GEM = "thor"
 GEM_VERSION = "0.11.3"
 AUTHOR = "Yehuda Katz"
@@ -30,6 +33,8 @@ SPEC = Gem::Specification.new do |s|
 end
 
 class Default < Thor
+  include Thor::Actions
+
   # Set up standard Thortasks
   spec_task(Dir["spec/**/*_spec.rb"])
   spec_task(Dir["spec/**/*_spec.rb"], :name => "rcov", :rcov => {:exclude => %w(spec task.thor Thorfile)})
@@ -37,8 +42,30 @@ class Default < Thor
 
   desc "gemspec", "make a gemspec file"
   def gemspec
-    File.open("#{GEM}.gemspec", "w") do |file|
-      file.puts SPEC.to_ruby
-    end
+    create_file "#{GEM}.gemspec", SPEC.to_ruby, :force => true
+  end
+
+  desc "rdoc PATH", "generate rdoc for the path passed as an argument"
+  def rdoc(path=File.dirname(__FILE__))
+    path   = File.expand_path(path)
+    readme = File.join(path, "README.rdoc")
+
+    destination = File.join(Dir.pwd, 'rdoc')
+    remove_dir(destination)
+
+    # get all the files to process
+    files = Dir.glob("#{path}/lib/**/*.rb")
+    files += ["#{path}/README.rdoc", "#{path}/CHANGELOG.rdoc", "#{path}/LICENSE"]
+
+    # rdoc args
+    project = File.basename(path)
+    arguments = [
+      "-t", project,
+      "-m", readme,
+      "--op", destination
+    ]
+
+    say_status :rdoc, "#{project} (#{files.size} files) to: #{destination}"
+    RDoc::RDoc.new.document(arguments + files)
   end
 end

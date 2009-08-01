@@ -1,7 +1,8 @@
 require 'rbconfig'
 
 class Thor
-  module Sandbox; end
+  module Sandbox #:nodoc:
+  end
 
   # This module holds several utilities:
   #
@@ -214,7 +215,7 @@ class Thor
     # Return the path to the ruby interpreter taking into account multiple
     # installations and windows extensions.
     #
-    def self.ruby_command #:nodoc:
+    def self.ruby_command
       @ruby_command ||= begin
         ruby = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name'])
         ruby << Config::CONFIG['EXEEXT']

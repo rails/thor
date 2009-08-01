@@ -1,6 +1,4 @@
-require 'forwardable'
-
-class Thor #:nodoc:
+class Thor
   module CoreExt #:nodoc:
 
     if RUBY_VERSION >= '1.9'

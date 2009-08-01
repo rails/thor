@@ -187,11 +187,11 @@ class Thor
     protected
 
       # The banner for this class. You can customize it if you are invoking the
-      # thor class by another means which is not the Thor::Runner. It receives
-      # the task that is going to be invoked and if the namespace should be
-      # displayed.
+      # thor class by another ways which is not the Thor::Runner. It receives
+      # the task that is going to be invoked and a boolean which indicates if
+      # the namespace should be displayed as arguments.
       #
-      def banner(task, namespace=true) #:nodoc:
+      def banner(task, namespace=true)
         task.formatted_usage(self, namespace)
       end
 

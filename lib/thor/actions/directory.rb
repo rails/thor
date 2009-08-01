@@ -3,7 +3,7 @@ require 'thor/actions/empty_directory'
 class Thor
   module Actions
 
-    # Copies interactively the files from source directory to root directory.
+    # Copies recursively the files from source directory to root directory.
     # If any of the files finishes with .tt, it's considered to be a template
     # and is placed in the destination without the extension .tt. If any
     # empty directory is found, it's copied and all .empty_directory files are

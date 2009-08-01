@@ -2,7 +2,7 @@ class Thor
   # This is a modified version of Daniel Berger's Getopt::Long class, licensed
   # under Ruby's license.
   #
-  class Options < Arguments
+  class Options < Arguments #:nodoc:
     LONG_RE     = /^(--\w+[-\w+]*)$/
     SHORT_RE    = /^(-[a-z])$/i
     EQ_RE       = /^(--\w+[-\w+]*|-[a-z])=(.*)$/i
