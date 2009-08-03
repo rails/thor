@@ -36,11 +36,11 @@ class Thor
     # Returns the formatted usage. If a class is given, the class arguments are
     # injected in the usage.
     #
-    def formatted_usage(klass=nil, namespace=false)
+    def formatted_usage(klass=nil, namespace=false, show_options=true)
       formatted = ''
       formatted << "#{klass.namespace.gsub(/^default/,'')}:" if klass && namespace
       formatted << formatted_arguments(klass)
-      formatted << " #{formatted_options}"
+      formatted << " #{formatted_options}" if show_options
       formatted.strip!
       formatted
     end

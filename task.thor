@@ -8,7 +8,7 @@ class Amazing < Thor
   end
 
   desc "describe NAME", "say that someone is amazing"
-  method_options :forcefully => :boolean
+  method_option :forcefully, :type => :boolean, :desc => "Do it upcased"
   def describe(name)
     ret = "#{name} is amazing"
     puts options[:forcefully] ? ret.upcase : ret

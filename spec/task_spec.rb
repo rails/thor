@@ -20,6 +20,12 @@ describe Thor::Task do
       task(:bar => :required).formatted_usage(Object, true).must == "foo:can_has --bar=BAR"
     end
 
+    it "does not show options if required" do
+      stub(Object).namespace{ "foo" }
+      stub(Object).arguments{ [] }
+      task(:bar => :required).formatted_usage(Object, true, false).must == "foo:can_has"
+    end
+
     it "removes default from namespace" do
       stub(Object).namespace{ "default:foo" }
       stub(Object).arguments{ [] }

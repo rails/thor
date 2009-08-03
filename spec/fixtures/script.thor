@@ -25,7 +25,7 @@ do some fooing
   This is more info!
   Everyone likes more info!
 END
-  method_option :force, :type => :boolean, :description => "Very cool"
+  method_option :force, :type => :boolean, :desc => "Force to do some fooing"
   def foo(bar)
     [bar, options]
   end

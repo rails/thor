@@ -159,9 +159,9 @@ class Thor
         raise UndefinedTaskError, "task '#{meth}' could not be found in namespace '#{self.namespace}'" unless task
 
         shell.say "Usage:"
-        shell.say "  #{banner(task, options[:namespace])}"
+        shell.say "  #{banner(task, options[:namespace], false)}"
         shell.say
-        class_options_help(shell, "Class")
+        class_options_help(shell, "Class", :Method => task.options.map { |_, o| o })
         shell.say task.description
       else
         list = (options[:short] ? tasks : all_tasks).map do |_, task|
@@ -187,8 +187,8 @@ class Thor
       # the task that is going to be invoked and a boolean which indicates if
       # the namespace should be displayed as arguments.
       #
-      def banner(task, namespace=true)
-        task.formatted_usage(self, namespace)
+      def banner(task, namespace=true, show_options=true)
+        task.formatted_usage(self, namespace, show_options)
       end
 
       def baseclass #:nodoc:

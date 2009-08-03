@@ -179,7 +179,10 @@ describe Thor do
       it "provides full help info when talking about a specific task" do
         capture(:stdout) { MyScript.help(shell, "foo") }.must == <<END
 Usage:
-  foo BAR [--force]
+  foo BAR
+
+Method options:
+  [--force]  # Force to do some fooing
 
 do some fooing
   This is more info!
