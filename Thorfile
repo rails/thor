@@ -6,7 +6,7 @@ require 'rubygems'
 require 'rdoc/rdoc'
 
 GEM = "thor"
-GEM_VERSION = "0.11.3"
+GEM_VERSION = "0.11.4"
 AUTHOR = "Yehuda Katz"
 EMAIL = "wycats@gmail.com"
 HOMEPAGE = "http://yehudakatz.com"
@@ -18,7 +18,7 @@ SPEC = Gem::Specification.new do |s|
   s.version = GEM_VERSION
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
-  s.extra_rdoc_files = ["README.markdown", "LICENSE", "CHANGELOG.rdoc"]
+  s.extra_rdoc_files = ["README.rdoc", "LICENSE", "CHANGELOG.rdoc"]
   s.summary = SUMMARY
   s.description = s.summary
   s.author = AUTHOR
