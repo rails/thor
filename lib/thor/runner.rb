@@ -31,7 +31,7 @@ class Thor::Runner < Thor #:nodoc:
     klass.start(args, :shell => shell)
   end
 
-  desc "install NAME", "Install a Thor file into your system tasks, optionally named for future updates"
+  desc "install NAME", "Install an optionally named Thor file into your system tasks"
   method_options :as => :string, :relative => :boolean
   def install(name)
     initialize_thorfiles
@@ -131,8 +131,7 @@ class Thor::Runner < Thor #:nodoc:
     display_klasses(true, klasses)
   end
 
-  desc "list [SEARCH]",
-       "List the available thor tasks (--substring means SEARCH anywhere in the namespace)"
+  desc "list [SEARCH]", "List the available thor tasks (--substring means .*SEARCH)"
   method_options :substring => :boolean, :group => :string, :all => :boolean
   def list(search="")
     initialize_thorfiles
@@ -290,7 +289,7 @@ class Thor::Runner < Thor #:nodoc:
         say shell.set_color(base, color, true)
         say "-" * base.length
 
-        klass.help(shell, :short => true, :ident => 0)
+        klass.help(shell, :short => true, :ident => 0, :namespace => true)
       end
     end
 end

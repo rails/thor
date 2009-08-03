@@ -210,7 +210,7 @@ END
 
     describe "instance method" do
       it "calls the class method" do
-        stub(MyScript).help(mock.instance_of(Thor::Base.shell), nil)
+        stub(MyScript).help(mock.instance_of(Thor::Base.shell), nil, :namespace => nil)
         MyScript.start(["help"])
       end
     end

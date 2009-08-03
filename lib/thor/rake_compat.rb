@@ -55,7 +55,7 @@ class Object #:nodoc:
 
   def namespace(name, &block)
     if klass = Thor::RakeCompat.rake_classes.last
-      const_name = name.to_s.capitalize.to_sym
+      const_name = Thor::Util.camel_case(name.to_s).to_sym
       klass.const_set(const_name, Class.new(Thor))
       new_klass = klass.const_get(const_name)
       Thor::RakeCompat.rake_classes << new_klass

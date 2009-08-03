@@ -95,6 +95,19 @@ class Thor
       return $+.downcase
     end
 
+    # Receives a string and convert it to camel case. camel_case returns CamelCase.
+    #
+    # ==== Parameters
+    # String
+    #
+    # ==== Returns
+    # String
+    #
+    def self.camel_case(str)
+      return str if str !~ /_/ && str =~ /[A-Z]+.*/
+      str.split('_').map { |i| i.capitalize }.join
+    end
+
     # Receives a namespace and tries to retrieve a Thor or Thor::Group class
     # from it. It first searches for a class using the all the given namespace,
     # if it's not found, removes the highest entry and searches for the class

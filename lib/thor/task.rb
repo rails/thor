@@ -38,7 +38,15 @@ class Thor
     #
     def formatted_usage(klass=nil, namespace=false, show_options=true)
       formatted = ''
-      formatted << "#{klass.namespace.gsub(/^default/,'')}:" if klass && namespace
+
+      formatted = if namespace.is_a?(String)
+        "#{namespace}:"
+      elsif klass && namespace
+        "#{klass.namespace.gsub(/^default/,'')}:"
+      else
+        ""
+      end
+
       formatted << formatted_arguments(klass)
       formatted << " #{formatted_options}" if show_options
       formatted.strip!
