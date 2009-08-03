@@ -203,7 +203,7 @@ HELP
           Tempfile.open(File.basename(destination), File.dirname(destination)) do |temp|
             temp.write content
             temp.rewind
-            say `#{diff_cmd} "#{destination}" "#{temp.path}"`
+            system %(#{diff_cmd} "#{destination}" "#{temp.path}")
           end
         end
 

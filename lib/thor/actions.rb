@@ -207,7 +207,7 @@ class Thor
       end
 
       say_status :run, desc, config.fetch(:verbose, true)
-      `#{command}` unless options[:pretend]
+      system(command) unless options[:pretend]
     end
 
     # Executes a ruby script (taking into account WIN32 platform quirks).

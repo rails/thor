@@ -219,7 +219,7 @@ describe Thor::Actions do
 
   describe "#run" do
     before(:each) do
-      mock(runner).`("ls") #`
+      mock(runner).system("ls")
     end
 
     it "executes the command given" do
@@ -243,7 +243,7 @@ describe Thor::Actions do
   describe "#run_ruby_script" do
     before(:each) do
       stub(Thor::Util).ruby_command{ "/opt/jruby" }
-      mock(runner).`("/opt/jruby script.rb") #`
+      mock(runner).system("/opt/jruby script.rb")
     end
 
     it "executes the ruby script" do
@@ -261,30 +261,30 @@ describe Thor::Actions do
 
   describe "#thor" do
     it "executes the thor command" do
-      mock(runner).`("thor list") #`
+      mock(runner).system("thor list")
       action :thor, :list, :verbose => true
     end
 
     it "converts extra arguments to command arguments" do
-      mock(runner).`("thor list foo bar") #`
+      mock(runner).system("thor list foo bar")
       action :thor, :list, "foo", "bar"
     end
 
     it "converts options hash to switches" do
-      mock(runner).`("thor list foo bar --foo") #`
+      mock(runner).system("thor list foo bar --foo")
       action :thor, :list, "foo", "bar", :foo => true
 
-      mock(runner).`("thor list --foo 1 2 3") #`
+      mock(runner).system("thor list --foo 1 2 3")
       action :thor, :list, :foo => [1,2,3]
     end
 
     it "logs status" do
-      mock(runner).`("thor list") #`
+      mock(runner).system("thor list")
       action(:thor, :list).must == "         run  thor list from \".\"\n"
     end
 
     it "does not log status if required" do
-      mock(runner).`("thor list --foo 1 2 3") #`
+      mock(runner).system("thor list --foo 1 2 3")
       action(:thor, :list, :foo => [1,2,3], :verbose => false).must be_empty
     end
   end

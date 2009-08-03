@@ -198,9 +198,8 @@ TABLE
         stub($stdout).print
         mock($stdin).gets{ 'd' }
         mock($stdin).gets{ 'n' }
-        stub(shell).`{ 'diff_output' } # Close `
-
-        capture(:stdout){ shell.file_collision('foo'){ } }.must =~ /diff_output/
+        mock(shell).system(/diff -u/)
+        capture(:stdout){ shell.file_collision('foo'){ } }
       end
     end
   end

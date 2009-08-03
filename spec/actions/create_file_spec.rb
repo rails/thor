@@ -128,7 +128,8 @@ describe Thor::Actions::CreateFile do
           create_file("doc/config.rb")
           mock($stdin).gets{ 'd' }
           mock($stdin).gets{ 'n' }
-          invoke!.must =~ /\-FOO = 3/
+          mock(@base.shell).system(/diff -u/)
+          invoke!
         end
       end
     end
