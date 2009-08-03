@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{thor}
-  s.version = "0.11.4"
+  s.version = "0.11.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Yehuda Katz", "Jos\303\251 Valim"]
@@ -49,10 +49,6 @@ Gem::Specification.new do |s|
      "lib/thor/shell/basic.rb",
      "lib/thor/shell/color.rb",
      "lib/thor/task.rb",
-     "lib/thor/tasks.rb",
-     "lib/thor/tasks/install.rb",
-     "lib/thor/tasks/package.rb",
-     "lib/thor/tasks/spec.rb",
      "lib/thor/util.rb"
   ]
   s.has_rdoc = true
@@ -63,7 +59,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.2}
   s.summary = %q{A scripting framework that replaces rake, sake and rubigen}
   s.test_files = [
-    "spec/sandbox/doc/config.rb",
+    "spec/rake_compat_spec.rb",
+     "spec/sandbox/doc/config.rb",
      "spec/sandbox/bundle/execute.rb",
      "spec/actions/directory_spec.rb",
      "spec/actions/empty_directory_spec.rb",
