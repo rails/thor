@@ -139,7 +139,7 @@ describe Thor::Runner do
 
       it "presents tasks in the default namespace with an empty namespace" do
         ARGV.replace ["list"]
-        capture(:stdout) { Thor::Runner.start }.must =~ /^  :test\s+# prints 'test'/m
+        capture(:stdout) { Thor::Runner.start }.must =~ /^:test\s+# prints 'test'/m
       end
 
       it "runs tasks with an empty namespace from the default namespace" do

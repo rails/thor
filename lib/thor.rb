@@ -101,8 +101,7 @@ class Thor
     # :required - If the argument is required or not.
     # :default  - Default value for this argument. It cannot be required and have default values.
     # :aliases  - Aliases for this option.
-    # :type     - The type of the argument, can be :string, :hash, :array, :numeric, :boolean or :default.
-    #             Default accepts arguments as booleans (--switch) or as strings (--switch=VALUE).
+    # :type     - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
     # :group    - The group for this options. Use by class options to output options in different levels.
     # :banner   - String to show on usage notes.
     #
@@ -166,12 +165,9 @@ class Thor
         shell.say task.description
       else
         list = (options[:short] ? tasks : all_tasks).map do |_, task|
-          item = [ "  " + banner(task, options[:namespace]) ]
-          item << if task.short_description
-            "\n  # #{task.short_description}\n"
-          else
-            "\n"
-          end
+          item = [ banner(task, options[:namespace]), "\n" ]
+          item.last << "# #{task.short_description}\n" if task.short_description
+          item
         end
 
         if options[:short]
