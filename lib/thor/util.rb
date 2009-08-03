@@ -8,8 +8,7 @@ class Thor
   #
   # 1) Methods to convert thor namespaces to constants and vice-versa.
   #
-  #   Thor::Utils.constant_to_namespace(Foo::Bar::Baz) #=> "foo:bar:baz"
-  #   Thor::Utils.namespace_to_constant("foo:bar:baz") #=> Foo::Bar::Baz
+  #   Thor::Utils.namespace_from_thor_class(Foo::Bar::Baz) #=> "foo:bar:baz"
   #
   # 2) Loading thor files and sandboxing:
   #
@@ -44,15 +43,15 @@ class Thor
     # ==== Returns
     # String:: If we receive Foo::Bar::Baz it returns "foo:bar:baz"
     #
-    def self.constant_to_namespace(constant, remove_default=true)
+    def self.namespace_from_thor_class(constant, remove_default=true)
       constant = constant.to_s.gsub(/^Thor::Sandbox::/, "")
       constant = snake_case(constant).squeeze(":")
       constant.gsub!(/^default/, '') if remove_default
       constant
     end
 
-    # Given the contents, evaluate it inside the sandbox and returns the thor
-    # classes defined in the sandbox.
+    # Given the contents, evaluate it inside the sandbox and returns the
+    # namespaces defined in the sandbox.
     #
     # ==== Parameters
     # contents<String>
@@ -60,7 +59,7 @@ class Thor
     # ==== Returns
     # Array[Object]
     #
-    def self.namespaces_in_contents(contents, file=__FILE__)
+    def self.namespaces_in_content(contents, file=__FILE__)
       old_constants = Thor::Base.subclasses.dup
       Thor::Base.subclasses.clear
 
@@ -72,6 +71,14 @@ class Thor
       new_constants.map!{ |c| c.namespace }
       new_constants.compact!
       new_constants
+    end
+
+    # Returns the thor classes declared inside the given class.
+    #
+    def self.thor_classes_in(klass)
+      Thor::Base.subclasses.select do |subclass|
+        klass.constants.include?(subclass.name.gsub("#{klass.name}::", ''))
+      end
     end
 
     # Receives a string and convert it to snake case. SnakeCase returns snake_case.
@@ -116,7 +123,7 @@ class Thor
     # Thor::Error:: raised if the namespace evals to a class which does not
     #               inherit from Thor or Thor::Group.
     #
-    def self.namespace_to_thor_class(namespace, raise_if_nil=true)
+    def self.namespace_to_thor_class_and_task(namespace, raise_if_nil=true)
       klass, task_name = Thor::Util.find_by_namespace(namespace), nil
 
       if klass.nil? && namespace.include?(?:)
@@ -157,7 +164,7 @@ class Thor
       yaml.each do |k, v|
         next unless v[:constants] && v[:namespaces].nil?
         yaml_changed = true
-        yaml[k][:namespaces] = v[:constants].map{|c| Thor::Util.constant_to_namespace(c)}
+        yaml[k][:namespaces] = v[:constants].map{|c| Thor::Util.namespace_from_thor_class(c)}
       end
 
       yaml_changed

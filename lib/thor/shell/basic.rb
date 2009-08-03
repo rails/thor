@@ -80,17 +80,21 @@ class Thor
       #
       # ==== Parameters
       # list<Array[String, String, ...]>
-      # mode<Symbol>:: Can be :rows or :inline. Defaults to :rows.
       #
-      def print_list(list, mode=:rows)
+      # ==== Options
+      # mode:: Can be :rows or :inline. Defaults to :rows.
+      # ident:: Ident each item with the value given.
+      #
+      def print_list(list, options={})
         return if list.empty?
 
-        content = case mode
+        ident   = " " * (options[:ident] || 0)
+        content = case options[:mode]
           when :inline
             last = list.pop
             "#{list.join(", ")}, and #{last}"
           else # rows
-            list.join("\n")
+            ident + list.join("\n#{ident}")
         end
 
         $stdout.puts content

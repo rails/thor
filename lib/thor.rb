@@ -159,24 +159,31 @@ class Thor
         raise UndefinedTaskError, "task '#{meth}' could not be found in namespace '#{self.namespace}'" unless task
 
         shell.say "Usage:"
-        shell.say "  #{banner(task, options[:namespace], false)}"
+        shell.say "  #{banner(task, task.include?(?:), false)}"
         shell.say
         class_options_help(shell, "Class", :Method => task.options.map { |_, o| o })
         shell.say task.description
       else
         list = (options[:short] ? tasks : all_tasks).map do |_, task|
-          item = [ banner(task, options[:namespace]), "\n" ]
-          item.last << "# #{task.short_description}\n" if task.short_description
-          item
+          item = [ banner(task) ]
+          item << "# #{task.short_description}" if task.short_description
+          item << " "
         end
 
+        options[:ident] ||= 2
+
         if options[:short]
-          shell.print_table(list)
+          shell.print_list(list, :ident => options[:ident])
         else
           shell.say "Tasks:"
-          shell.print_table(list)
-          class_options_help(shell, "Class")
+          shell.print_list(list, :ident => options[:ident])
         end
+
+        Thor::Util.thor_classes_in(self).each do |subclass|
+          subclass.help(shell, :short => true, :ident => options[:ident])
+        end
+
+        class_options_help(shell, "Class") unless options[:short]
       end
     end
 
@@ -231,6 +238,6 @@ class Thor
 
   desc "help [TASK]", "Describe available tasks or one specific task"
   def help(task=nil)
-    self.class.help(shell, task, :namespace => task && task.include?(?:))
+    self.class.help(shell, task)
   end
 end

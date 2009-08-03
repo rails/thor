@@ -12,8 +12,9 @@ class Thor::Runner < Thor #:nodoc:
   def help(meth=nil)
     if meth && !self.respond_to?(meth)
       initialize_thorfiles(meth)
-      klass, task = Thor::Util.namespace_to_thor_class(meth)
-      klass.start(["-h", task].compact, :shell => self.shell) # send mapping -h because it works with Thor::Group too
+      klass, task = Thor::Util.namespace_to_thor_class_and_task(meth)
+      # Send mapping -h because it works with Thor::Group too
+      klass.start(["-h", task].compact, :shell => self.shell)
     else
       super
     end
@@ -25,7 +26,7 @@ class Thor::Runner < Thor #:nodoc:
   def method_missing(meth, *args)
     meth = meth.to_s
     initialize_thorfiles(meth)
-    klass, task = Thor::Util.namespace_to_thor_class(meth)
+    klass, task = Thor::Util.namespace_to_thor_class_and_task(meth)
     args.unshift(task) if task
     klass.start(args, :shell => shell)
   end
@@ -76,7 +77,7 @@ class Thor::Runner < Thor #:nodoc:
     thor_yaml[as] = {
       :filename   => Digest::MD5.hexdigest(name + as),
       :location   => location,
-      :namespaces => Thor::Util.namespaces_in_contents(contents, base)
+      :namespaces => Thor::Util.namespaces_in_content(contents, base)
     }
 
     save_yaml(thor_yaml)
@@ -269,6 +270,10 @@ class Thor::Runner < Thor #:nodoc:
       end
 
       unless klasses.empty?
+        klasses.dup.each do |klass|
+          klasses -= Thor::Util.thor_classes_in(klass)
+        end
+
         klasses.each { |k| display_tasks(k) }
       else
         say "\033[1;34mNo Thor tasks available\033[0m"
@@ -285,7 +290,7 @@ class Thor::Runner < Thor #:nodoc:
         say shell.set_color(base, color, true)
         say "-" * base.length
 
-        klass.help(shell, :short => true, :namespace => true)
+        klass.help(shell, :short => true, :ident => 0)
       end
     end
 end

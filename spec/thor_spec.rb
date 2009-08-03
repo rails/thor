@@ -155,12 +155,13 @@ describe Thor do
         @content.must =~ /animal TYPE\s+# horse around/m
       end
 
-      it "provides useful help info for a method with options" do
-        @content.must =~ /foo BAR \[\-\-force\]\s+# do some fooing/m
+      it "provides description for tasks from classes in the same namespace" do
+        @content.must =~ /baz\s+# do some bazing/m
       end
 
       it "shows superclass tasks" do
-        capture(:stdout){ MyChildScript.help(shell) }.must =~ /foo BAR \[\-\-force\]\s+# do some fooing/m
+        content = capture(:stdout){ MyChildScript.help(shell) }
+        content.must =~ /foo BAR \[\-\-force\]\s+# do some fooing/m
       end
 
       it "shows class options information" do
@@ -209,7 +210,7 @@ END
 
     describe "instance method" do
       it "calls the class method" do
-        stub(MyScript).help(mock.instance_of(Thor::Base.shell), nil, :namespace => nil)
+        stub(MyScript).help(mock.instance_of(Thor::Base.shell), nil)
         MyScript.start(["help"])
       end
     end

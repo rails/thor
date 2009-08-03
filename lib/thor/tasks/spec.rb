@@ -6,18 +6,21 @@ class Thor
   # ==== Parameters
   # files<Array> - Array of files to spec
   #
-  # ==== Options
-  # :name     - The name of the task. It can be rcov or spec. Spec is the default.
-  # :rcov     - A hash with rcov specific options.
-  # :rcov_dir - Where rcov reports should be printed.
-  # :verbose  - Sets the default value for verbose, although it can be specified
-  #             also through the command line.
-  #
-  # All other options are added to rspec.
+  # Options are sent straight to rspec.
   #
   def self.spec_task(files, options={}) #:nodoc:
-    name        = (options.delete(:name) || 'spec').to_s
-    tasks[name] = Thor::SpecTask.new(name, files, options)
+    tasks['spec'] = Thor::SpecTask.new('spec', files, options)
+  end
+
+  # Creates a spec task.
+  #
+  # ==== Parameters
+  # files<Array> - Array of files to spec
+  #
+  # Options are sent straight to rcov.
+  #
+  def self.rcov_task(files, options={})
+    tasks['rcov'] = Thor::SpecTask.new('rcov', files, :dir => options.delete(:dir), :rcov => options)
   end
 
   class SpecTask < Task #:nodoc:
@@ -29,7 +32,7 @@ class Thor
 
       @name        = name
       @files       = files.map{ |f| %["#{f}"] }.join(" ")
-      @rcov_dir    = config.delete(:rdoc_dir) || File.join(Dir.pwd, 'coverage')
+      @rcov_dir    = config.delete(:dir) || File.join(Dir.pwd, 'rcov')
       @rcov_config = config.delete(:rcov) || {}
       @spec_config = { :format => 'specdoc', :color => true }.merge(config)
     end
@@ -39,7 +42,7 @@ class Thor
       spec_opts = Thor::Options.to_switches(spec_config)
 
       require 'rbconfig'
-      cmd  = RbConfig::CONFIG['ruby_install_name'] << " "
+      cmd = RbConfig::CONFIG['ruby_install_name'] + " "
 
       if rcov?
         FileUtils.rm_rf(rcov_dir)

@@ -175,7 +175,9 @@ describe Thor::Base do
   describe "#subclass_files" do
     it "returns tracked subclasses, grouped by the files they come from" do
       thorfile = File.join(File.dirname(__FILE__), "fixtures", "script.thor")
-      Thor::Base.subclass_files[File.expand_path(thorfile)].must == [ MyScript, MyChildScript, Scripts::MyScript, Scripts::MyDefaults ]
+      Thor::Base.subclass_files[File.expand_path(thorfile)].must == [
+        MyScript, MyScript::AnotherScript, MyChildScript, Scripts::MyScript, Scripts::MyDefaults
+      ]
     end
 
     it "tracks a single subclass across multiple files" do

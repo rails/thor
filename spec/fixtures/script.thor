@@ -51,6 +51,12 @@ END
     [ name, options ]
   end
 
+  class AnotherScript < Thor
+    desc "baz", "do some bazing"
+    def baz
+    end
+  end
+
   private
 
     def method_missing(meth, *args)

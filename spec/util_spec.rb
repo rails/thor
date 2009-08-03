@@ -25,39 +25,39 @@ describe Thor::Util do
     end
   end
 
-  describe "#constant_to_namespace" do
+  describe "#namespace_from_thor_class" do
     it "replaces constant nesting with task namespacing" do
-      Thor::Util.constant_to_namespace("Foo::Bar::Baz").must == "foo:bar:baz"
+      Thor::Util.namespace_from_thor_class("Foo::Bar::Baz").must == "foo:bar:baz"
     end
 
     it "snake-cases component strings" do
-      Thor::Util.constant_to_namespace("FooBar::BarBaz::BazBoom").must == "foo_bar:bar_baz:baz_boom"
+      Thor::Util.namespace_from_thor_class("FooBar::BarBaz::BazBoom").must == "foo_bar:bar_baz:baz_boom"
     end
 
     it "gets rid of an initial Default module" do
-      Thor::Util.constant_to_namespace("Default::Foo::Bar").must == ":foo:bar"
-      Thor::Util.constant_to_namespace("Default").must == ""
+      Thor::Util.namespace_from_thor_class("Default::Foo::Bar").must == ":foo:bar"
+      Thor::Util.namespace_from_thor_class("Default").must == ""
     end
 
     it "accepts class and module objects" do
-      Thor::Util.constant_to_namespace(Thor::CoreExt::OrderedHash).must == "thor:core_ext:ordered_hash"
-      Thor::Util.constant_to_namespace(Thor::Util).must == "thor:util"
+      Thor::Util.namespace_from_thor_class(Thor::CoreExt::OrderedHash).must == "thor:core_ext:ordered_hash"
+      Thor::Util.namespace_from_thor_class(Thor::Util).must == "thor:util"
     end
 
     it "removes Thor::Sandbox namespace" do
-      Thor::Util.constant_to_namespace("Thor::Sandbox::Package").must == "package"
+      Thor::Util.namespace_from_thor_class("Thor::Sandbox::Package").must == "package"
     end
   end
 
-  describe "#namespaces_in_contents" do
+  describe "#namespaces_in_content" do
     it "returns an array of names of constants defined in the string" do
-      list = Thor::Util.namespaces_in_contents("class Foo; class Bar < Thor; end; end; class Baz; class Bat; end; end")
+      list = Thor::Util.namespaces_in_content("class Foo; class Bar < Thor; end; end; class Baz; class Bat; end; end")
       list.must include("foo:bar")
       list.must_not include("bar:bat")
     end
 
     it "doesn't put the newly-defined constants in the enclosing namespace" do
-      Thor::Util.namespaces_in_contents("class Blat; end")
+      Thor::Util.namespaces_in_content("class Blat; end")
       defined?(Blat).must_not be
       defined?(Thor::Sandbox::Blat).must be
     end
@@ -88,31 +88,38 @@ describe Thor::Util do
     end
   end
 
-  describe "#namespace_to_thor_class" do
+  describe "#namespace_to_thor_class_and_task" do
     it "returns a Thor::Group class if full namespace matches" do
-      Thor::Util.namespace_to_thor_class("my_counter").must == [MyCounter, nil]
+      Thor::Util.namespace_to_thor_class_and_task("my_counter").must == [MyCounter, nil]
     end
 
     it "returns a Thor class if full namespace matches" do
-      Thor::Util.namespace_to_thor_class("thor").must == [Thor, nil]
+      Thor::Util.namespace_to_thor_class_and_task("thor").must == [Thor, nil]
     end
 
     it "returns a Thor class and the task name" do
-      Thor::Util.namespace_to_thor_class("thor:help").must == [Thor, "help"]
+      Thor::Util.namespace_to_thor_class_and_task("thor:help").must == [Thor, "help"]
     end
 
     it "fallbacks in the namespace:task look up even if a full namespace does not match" do
       Thor.const_set(:Help, Module.new)
-      Thor::Util.namespace_to_thor_class("thor:help").must == [Thor, "help"]
+      Thor::Util.namespace_to_thor_class_and_task("thor:help").must == [Thor, "help"]
       Thor.send :remove_const, :Help
     end
 
     describe 'errors' do
       it "raises an error if the Thor class or task can't be found" do
         lambda {
-          Thor::Util.namespace_to_thor_class("foobar")
+          Thor::Util.namespace_to_thor_class_and_task("foobar")
         }.must raise_error(Thor::Error, "could not find Thor class or task 'foobar'")
       end
+    end
+  end
+
+  describe "#thor_classes_in" do
+    it "returns thor classes inside the given class" do
+      Thor::Util.thor_classes_in(MyScript).must == [MyScript::AnotherScript]
+      Thor::Util.thor_classes_in(MyScript::AnotherScript).must be_empty
     end
   end
 

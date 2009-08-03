@@ -106,7 +106,7 @@ LIST
     end
 
     it "prints a list inline" do
-      content = capture(:stdout){ shell.print_list(@list, :inline) }
+      content = capture(:stdout){ shell.print_list(@list, :mode => :inline) }
       content.must == <<-LIST
 abc, #123, and first three
 LIST
