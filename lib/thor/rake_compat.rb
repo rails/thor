@@ -1,24 +1,34 @@
-begin
-  require 'rake'
-rescue LoadError
-  require 'rubygems'
-  gem 'rake'
-  require 'rake'
-end
+require 'rake'
 
 class Thor
+  # Adds a compatibility layer to your Thor classes which allows you to use
+  # rake package tasks. For example, to use rspec rake tasks, one can do:
+  #
+  #   require 'thor/rake_compat'
+  #
+  #   class Default < Thor
+  #     include Thor::RakeCompat
+  #
+  #     Spec::Rake::SpecTask.new(:spec) do |t|
+  #       t.spec_opts = ['--options', "spec/spec.opts"]
+  #       t.spec_files = FileList['spec/**/*_spec.rb']
+  #     end
+  #   end
+  #
   module RakeCompat
     def self.rake_classes
       @rake_classes ||= []
     end
 
     def self.included(base)
+      # Hack. Make rakefile point to invoker, so rdoc task is generated properly.
+      Rake.application.instance_variable_set(:@rakefile, caller[0].match(/(.*):\d+/)[1])
       self.rake_classes << base
     end
   end
 end
 
-class Object
+class Object #:nodoc:
   alias :rake_task :task
   alias :rake_namespace :namespace
 
