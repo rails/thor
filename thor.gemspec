@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Yehuda Katz", "Jos\303\251 Valim"]
-  s.date = %q{2009-08-03}
+  s.date = %q{2009-08-04}
   s.description = %q{A scripting framework that replaces rake, sake and rubigen}
   s.email = %q{ruby-thor@googlegroups.com}
   s.executables = ["thor", "rake2thor"]
@@ -60,8 +60,6 @@ Gem::Specification.new do |s|
   s.summary = %q{A scripting framework that replaces rake, sake and rubigen}
   s.test_files = [
     "spec/rake_compat_spec.rb",
-     "spec/sandbox/doc/config.rb",
-     "spec/sandbox/bundle/execute.rb",
      "spec/actions/directory_spec.rb",
      "spec/actions/empty_directory_spec.rb",
      "spec/actions/create_file_spec.rb",

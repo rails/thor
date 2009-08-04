@@ -48,6 +48,8 @@ class Default < Thor
       s.bindir = "bin"
       s.executables = %w( thor rake2thor )
       s.files = s.extra_rdoc_files + Dir.glob("{bin,lib}/**/*")
+      s.files.exclude 'spec/sandbox/**/*'
+      s.test_files.exclude 'spec/sandbox/**/*'
     end
   rescue LoadError
     puts "Jeweler, or one of its dependencies, is not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
