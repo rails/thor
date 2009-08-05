@@ -35,7 +35,7 @@ class Default < Thor
     Jeweler::Tasks.new do |s|
       s.name = GEM_NAME
       s.version = "0.11.4"
-      s.rubyforge_project = "thor"
+      s.rubyforge_project = "textmate"
       s.platform = Gem::Platform::RUBY
       s.summary = "A scripting framework that replaces rake, sake and rubigen"
       s.email = "ruby-thor@googlegroups.com"

@@ -22,7 +22,7 @@ class Thor
     # namespace<String>:: The namespace to search for.
     #
     def self.find_by_namespace(namespace)
-      namespace = 'default' if namespace.empty?
+      namespace = "default#{namespace}" if namespace.empty? || namespace =~ /^:/
 
       Thor::Base.subclasses.find do |klass|
         klass.namespace == namespace

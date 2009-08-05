@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Yehuda Katz", "Jos\303\251 Valim"]
-  s.date = %q{2009-08-04}
+  s.date = %q{2009-08-05}
   s.description = %q{A scripting framework that replaces rake, sake and rubigen}
   s.email = %q{ruby-thor@googlegroups.com}
   s.executables = ["thor", "rake2thor"]
@@ -55,7 +55,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://yehudakatz.com}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubyforge_project = %q{thor}
+  s.rubyforge_project = %q{textmate}
   s.rubygems_version = %q{1.3.2}
   s.summary = %q{A scripting framework that replaces rake, sake and rubigen}
   s.test_files = [

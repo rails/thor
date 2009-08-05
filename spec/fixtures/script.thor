@@ -118,5 +118,9 @@ module Scripts
       puts "test"
     end
   end
+
+  class ChildDefault < Thor
+    namespace "default:child"
+  end
 end
 

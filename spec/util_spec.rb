@@ -8,8 +8,12 @@ end
 
 describe Thor::Util do
   describe "#find_by_namespace" do
-    it "returns 'Default' if no namespace is given" do
+    it "returns 'default' if no namespace is given" do
       Thor::Util.find_by_namespace('').must == Scripts::MyDefaults
+    end
+
+    it "adds 'default' if namespace starts with :" do
+      Thor::Util.find_by_namespace(':child').must == Scripts::ChildDefault
     end
 
     it "returns nil if the namespace can't be found" do
