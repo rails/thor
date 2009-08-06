@@ -57,6 +57,11 @@ describe Thor::Shell::Basic do
       mock($stdout).print("Running... ")
       shell.say("Running... ")
     end
+
+    it "prints a message to the user without new line" do
+      mock($stdout).print("Running...")
+      shell.say("Running...", nil, false)
+    end
   end
 
   describe "#say_status" do
