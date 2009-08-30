@@ -66,10 +66,26 @@ describe Thor::Actions::InjectIntoFile do
     end
 
     it "deinjects the destination file before injection" do
-      invoke! "doc/README", "\nmore content", :before => "__start__"
-      revoke! "doc/README", "\nmore content", :before => "__start__"
+      invoke! "doc/README", "more content\n", :before => "__start__"
+      revoke! "doc/README", "more content\n", :before => "__start__"
 
       File.read(file).must == "__start__\nREADME\n__end__\n"
+    end
+
+    it "deinjects even with double after injection" do
+      invoke! "doc/README", "\nmore content", :after => "__start__"
+      invoke! "doc/README", "\nanother stuff", :after => "__start__"
+      revoke! "doc/README", "\nmore content", :after => "__start__"
+
+      File.read(file).must == "__start__\nanother stuff\nREADME\n__end__\n"
+    end
+
+    it "deinjects even with double before injection" do
+      invoke! "doc/README", "more content\n", :before => "__start__"
+      invoke! "doc/README", "another stuff\n", :before => "__start__"
+      revoke! "doc/README", "more content\n", :before => "__start__"
+
+      File.read(file).must == "another stuff\n__start__\nREADME\n__end__\n"
     end
 
     it "shows progress information to the user" do

@@ -16,11 +16,11 @@ class Thor
     # 
     # ==== Examples
     #
-    #   inject_into_file "config/environment.rb", "config.gem thor", :after => "Rails::Initializer.run do |config|\n"
+    #   inject_into_file "config/environment.rb", "config.gem :thor", :after => "Rails::Initializer.run do |config|\n"
     #
     #   inject_into_file "config/environment.rb", :after => "Rails::Initializer.run do |config|\n" do
     #     gems = ask "Which gems would you like to add?"
-    #     gems.split(" ").map{ |gem| "  config.gem #{gem}" }.join("\n")
+    #     gems.split(" ").map{ |gem| "  config.gem :#{gem}" }.join("\n")
     #   end
     #
     def inject_into_file(destination, *args, &block)
@@ -35,30 +35,39 @@ class Thor
     end
 
     class InjectIntoFile < EmptyDirectory #:nodoc:
-      attr_reader :flag, :replacement
+      attr_reader :replacement
 
       def initialize(base, destination, data, config)
         super(base, destination, { :verbose => true }.merge(config))
-
-        data = data.call if data.is_a?(Proc)
-
-        @replacement = if @config.key?(:after)
-          @flag = @config.delete(:after)
-          @flag + data
-        else
-          @flag = @config.delete(:before)
-          data + @flag
-        end
+        @replacement = data.is_a?(Proc) ? data.call : data
       end
 
       def invoke!
         say_status :inject, config[:verbose]
-        replace!(flag, replacement)
+
+        flag = if @config.key?(:after)
+          content = '\0' + replacement
+          @config[:after]
+        else
+          content = replacement + '\0'
+          @config[:before]
+        end
+
+        replace!(flag, content)
       end
 
       def revoke!
         say_status :deinject, config[:verbose]
-        replace!(replacement, flag)
+
+        flag = if @config.key?(:after)
+          content = '\1\2'
+          /(#{Regexp.escape(@config[:after])})(.*)(#{Regexp.escape(replacement)})/m
+        else
+          content = '\2\3'
+          /(#{Regexp.escape(replacement)})(.*)(#{Regexp.escape(@config[:before])})/m
+        end
+
+        replace!(flag, content)
       end
 
       protected
