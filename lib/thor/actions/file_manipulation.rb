@@ -111,14 +111,14 @@ class Thor
     #
     #   prepend_file 'config/environments/test.rb', 'config.gem "rspec"'
     #
-    def prepend_file(path, data=nil, config={}, &block)
+    #   prepend_file 'config/environments/test.rb' do
+    #     'config.gem "rspec"'
+    #   end
+    #
+    def prepend_file(path, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
       config.merge!(:after => /\A/)
-
-      if block_given?
-        inject_into_file(path, config, &block)
-      else
-        inject_into_file(path, data, config)
-      end
+      inject_into_file(path, *(args << config), &block)
     end
 
     # Append text to a file. Since it depends on inject_into_file, it's reversible.
@@ -132,14 +132,14 @@ class Thor
     #
     #   append_file 'config/environments/test.rb', 'config.gem "rspec"'
     #
-    def append_file(path, data=nil, config={}, &block)
+    #   append_file 'config/environments/test.rb' do
+    #     'config.gem "rspec"'
+    #   end
+    #
+    def append_file(path, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
       config.merge!(:before => /\z/)
-
-      if block_given?
-        inject_into_file(path, config, &block)
-      else
-        inject_into_file(path, data, config)
-      end
+      inject_into_file(path, *(args << config), &block)
     end
 
     # Injects text right after the class definition. Since it depends on
@@ -151,14 +151,18 @@ class Thor
     # data<String>:: the data to append to the class, can be also given as a block.
     # config<Hash>:: give :verbose => false to not log the status.
     #
-    def inject_into_class(path, klass, data=nil, config={}, &block)
+    # ==== Examples
+    #
+    #   inject_into_class "app/controllers/application_controller.rb", "  filter_parameter :password\n"
+    #
+    #   inject_into_class "app/controllers/application_controller.rb", ApplicationController do
+    #     "  filter_parameter :password\n"
+    #   end
+    #
+    def inject_into_class(path, klass, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
       config.merge!(:after => /class #{klass}\n|class #{klass} .*\n/)
-
-      if block_given?
-        inject_into_file(path, config, &block)
-      else
-        inject_into_file(path, data, config)
-      end
+      inject_into_file(path, *(args << config), &block)
     end
 
     # Run a regular expression replacement on a file.

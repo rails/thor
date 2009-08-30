@@ -27,8 +27,6 @@ class Thor
       else
         data, config = args.shift, args.shift
       end
-
-      log_status = args.empty? || args.pop
       action InjectIntoFile.new(self, destination, data, config)
     end
 
@@ -57,7 +55,7 @@ class Thor
           replacement + '\0'
         end
 
-        replace!(flag, content)
+        replace!(/#{flag}/, content)
       end
 
       def revoke!
