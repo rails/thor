@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{thor}
-  s.version = "0.11.5"
+  s.version = "0.11.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Yehuda Katz", "Jos\303\251 Valim"]
-  s.date = %q{2009-08-05}
+  s.date = %q{2009-08-30}
   s.description = %q{A scripting framework that replaces rake, sake and rubigen}
   s.email = %q{ruby-thor@googlegroups.com}
   s.executables = ["thor", "rake2thor"]
@@ -51,12 +51,11 @@ Gem::Specification.new do |s|
      "lib/thor/task.rb",
      "lib/thor/util.rb"
   ]
-  s.has_rdoc = true
   s.homepage = %q{http://yehudakatz.com}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{textmate}
-  s.rubygems_version = %q{1.3.2}
+  s.rubygems_version = %q{1.3.5}
   s.summary = %q{A scripting framework that replaces rake, sake and rubigen}
   s.test_files = [
     "spec/rake_compat_spec.rb",
@@ -75,6 +74,7 @@ Gem::Specification.new do |s|
      "spec/shell/color_spec.rb",
      "spec/group_spec.rb",
      "spec/thor_spec.rb",
+     "spec/fixtures/application.rb",
      "spec/fixtures/doc/config.rb",
      "spec/fixtures/bundle/execute.rb",
      "spec/util_spec.rb",
