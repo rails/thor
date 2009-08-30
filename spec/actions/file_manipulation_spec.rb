@@ -1,5 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+class Application; end
+
 describe Thor::Actions do
   def runner(options={})
     @runner ||= MyCounter.new([1], options, { :destination_root => destination_root })
@@ -193,12 +195,6 @@ describe Thor::Actions do
         File.open(file).read.must == "__start__\nREADME\n__end__\nEND\n"
       end
 
-      it "does not append if pretending" do
-        runner(:pretend => true)
-        action :append_file, "doc/README", "END\n"
-        File.open(file).read.must == "__start__\nREADME\n__end__\n"
-      end
-
       it "accepts a block" do
         action(:append_file, "doc/README"){ "END\n" }
         File.open(file).read.must == "__start__\nREADME\n__end__\nEND\n"
@@ -207,22 +203,12 @@ describe Thor::Actions do
       it "logs status" do
         action(:append_file, "doc/README", "END").must == "      append  doc/README\n"
       end
-
-      it "does not log status if required" do
-        action(:append_file, "doc/README", nil, :verbose => false){ "END" }.must be_empty
-      end
     end
 
     describe "#prepend_file" do
       it "prepends content to the file" do
         action :prepend_file, "doc/README", "START\n"
         File.open(file).read.must == "START\n__start__\nREADME\n__end__\n"
-      end
-
-      it "does not prepend if pretending" do
-        runner(:pretend => true)
-        action :prepend_file, "doc/README", "START\n"
-        File.open(file).read.must == "__start__\nREADME\n__end__\n"
       end
 
       it "accepts a block" do
@@ -233,9 +219,30 @@ describe Thor::Actions do
       it "logs status" do
         action(:prepend_file, "doc/README", "START").must == "     prepend  doc/README\n"
       end
+    end
 
-      it "does not log status if required" do
-        action(:prepend_file, "doc/README", "START", :verbose => false).must be_empty
+    describe "#inject_into_class" do
+      def file
+        File.join(destination_root, "application.rb")
+      end
+
+      it "appends content to a class" do
+        action :inject_into_class, "application.rb", Application, "  filter_parameters :password\n"
+        File.open(file).read.must == "class Application < Base\n  filter_parameters :password\nend\n"
+      end
+
+      it "accepts a block" do
+        action(:inject_into_class, "application.rb", Application){ "  filter_parameters :password\n" }
+        File.open(file).read.must == "class Application < Base\n  filter_parameters :password\nend\n"
+      end
+
+      it "logs status" do
+        action(:inject_into_class, "application.rb", Application, "  filter_parameters :password\n").must == "      inject  application.rb\n"
+      end
+
+      it "does not append if class name does not match" do
+        action :inject_into_class, "application.rb", "App", "  filter_parameters :password\n"
+        File.open(file).read.must == "class Application < Base\nend\n"
       end
     end
   end

@@ -3,10 +3,8 @@ require 'thor/actions/empty_directory'
 class Thor
   module Actions
 
-    # Injects the given content into a file. Different from append_file,
-    # prepend_file and gsub_file, this method is reversible. By this reason,
-    # the flag can only be strings. gsub_file is your friend if you need to
-    # deal with more complex cases.
+    # Injects the given content into a file. Different from gsub_file, this
+    # method is reversible.
     #
     # ==== Parameters
     # destination<String>:: Relative path to the destination root
@@ -35,42 +33,60 @@ class Thor
     end
 
     class InjectIntoFile < EmptyDirectory #:nodoc:
-      attr_reader :replacement
+      attr_reader :replacement, :flag, :behavior
 
       def initialize(base, destination, data, config)
         super(base, destination, { :verbose => true }.merge(config))
+
+        @behavior, @flag = if @config.key?(:after)
+          [:after, @config.delete(:after)]
+        else
+          [:before, @config.delete(:before)]
+        end
+
         @replacement = data.is_a?(Proc) ? data.call : data
+        @flag = Regexp.escape(@flag) unless @flag.is_a?(Regexp)
       end
 
       def invoke!
-        say_status :inject, config[:verbose]
+        say_status :invoke
 
-        flag = if @config.key?(:after)
-          content = '\0' + replacement
-          @config[:after]
+        content = if @behavior == :after
+          '\0' + replacement
         else
-          content = replacement + '\0'
-          @config[:before]
+          replacement + '\0'
         end
 
         replace!(flag, content)
       end
 
       def revoke!
-        say_status :deinject, config[:verbose]
+        say_status :revoke
 
-        flag = if @config.key?(:after)
+        regexp = if @behavior == :after
           content = '\1\2'
-          /(#{Regexp.escape(@config[:after])})(.*)(#{Regexp.escape(replacement)})/m
+          /(#{flag})(.*)(#{Regexp.escape(replacement)})/m
         else
           content = '\2\3'
-          /(#{Regexp.escape(replacement)})(.*)(#{Regexp.escape(@config[:before])})/m
+          /(#{Regexp.escape(replacement)})(.*)(#{flag})/m
         end
 
-        replace!(flag, content)
+        replace!(regexp, content)
       end
 
       protected
+
+        def say_status(behavior)
+          status = if flag == /\A/
+            behavior == :invoke ? :prepend : :unprepend
+          elsif flag == /\z/
+            behavior == :invoke ? :append : :unappend
+          else
+            behavior == :invoke ? :inject : :deinject
+          end
+
+          super(status, config[:verbose])
+        end
 
         # Adds the content to the file.
         #

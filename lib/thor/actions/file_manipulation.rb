@@ -100,7 +100,7 @@ class Thor
       FileUtils.chmod_R(mode, path) unless options[:pretend]
     end
 
-    # Prepend text to a file.
+    # Prepend text to a file. Since it depends on inject_into_file, it's reversible.
     #
     # ==== Parameters
     # path<String>:: path of the file to be changed
@@ -112,18 +112,16 @@ class Thor
     #   prepend_file 'config/environments/test.rb', 'config.gem "rspec"'
     #
     def prepend_file(path, data=nil, config={}, &block)
-      return unless behavior == :invoke
-      path = File.expand_path(path, destination_root)
-      say_status :prepend, relative_to_original_destination_root(path), config.fetch(:verbose, true)
+      config.merge!(:after => /\A/)
 
-      unless options[:pretend]
-        content = data || block.call
-        content << File.read(path)
-        File.open(path, 'wb') { |file| file.write(content) }
+      if block_given?
+        inject_into_file(path, config, &block)
+      else
+        inject_into_file(path, data, config)
       end
     end
 
-    # Append text to a file.
+    # Append text to a file. Since it depends on inject_into_file, it's reversible.
     #
     # ==== Parameters
     # path<String>:: path of the file to be changed
@@ -135,10 +133,32 @@ class Thor
     #   append_file 'config/environments/test.rb', 'config.gem "rspec"'
     #
     def append_file(path, data=nil, config={}, &block)
-      return unless behavior == :invoke
-      path = File.expand_path(path, destination_root)
-      say_status :append, relative_to_original_destination_root(path), config.fetch(:verbose, true)
-      File.open(path, 'ab') { |file| file.write(data || block.call) } unless options[:pretend]
+      config.merge!(:before => /\z/)
+
+      if block_given?
+        inject_into_file(path, config, &block)
+      else
+        inject_into_file(path, data, config)
+      end
+    end
+
+    # Injects text right after the class definition. Since it depends on
+    # inject_into_file, it's reversible.
+    #
+    # ==== Parameters
+    # path<String>:: path of the file to be changed
+    # klass<String|Class>:: the class to be manipulated
+    # data<String>:: the data to append to the class, can be also given as a block.
+    # config<Hash>:: give :verbose => false to not log the status.
+    #
+    def inject_into_class(path, klass, data=nil, config={}, &block)
+      config.merge!(:after => /class #{klass}\n|class #{klass} .*\n/)
+
+      if block_given?
+        inject_into_file(path, config, &block)
+      else
+        inject_into_file(path, data, config)
+      end
     end
 
     # Run a regular expression replacement on a file.

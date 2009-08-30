@@ -61,14 +61,12 @@ describe Thor::Actions::InjectIntoFile do
     it "deinjects the destination file after injection" do
       invoke! "doc/README", "\nmore content", :after => "__start__"
       revoke! "doc/README", "\nmore content", :after => "__start__"
-
       File.read(file).must == "__start__\nREADME\n__end__\n"
     end
 
     it "deinjects the destination file before injection" do
       invoke! "doc/README", "more content\n", :before => "__start__"
       revoke! "doc/README", "more content\n", :before => "__start__"
-
       File.read(file).must == "__start__\nREADME\n__end__\n"
     end
 
@@ -76,7 +74,6 @@ describe Thor::Actions::InjectIntoFile do
       invoke! "doc/README", "\nmore content", :after => "__start__"
       invoke! "doc/README", "\nanother stuff", :after => "__start__"
       revoke! "doc/README", "\nmore content", :after => "__start__"
-
       File.read(file).must == "__start__\nanother stuff\nREADME\n__end__\n"
     end
 
@@ -84,8 +81,21 @@ describe Thor::Actions::InjectIntoFile do
       invoke! "doc/README", "more content\n", :before => "__start__"
       invoke! "doc/README", "another stuff\n", :before => "__start__"
       revoke! "doc/README", "more content\n", :before => "__start__"
-
       File.read(file).must == "another stuff\n__start__\nREADME\n__end__\n"
+    end
+
+    it "deinjects when prepending" do
+      invoke! "doc/README", "more content\n", :after => /\A/
+      invoke! "doc/README", "another stuff\n", :after => /\A/
+      revoke! "doc/README", "more content\n", :after => /\A/
+      File.read(file).must == "another stuff\n__start__\nREADME\n__end__\n"
+    end
+
+    it "deinjects when appending" do
+      invoke! "doc/README", "more content\n", :before => /\z/
+      invoke! "doc/README", "another stuff\n", :before => /\z/
+      revoke! "doc/README", "more content\n", :before => /\z/
+      File.read(file).must == "__start__\nREADME\n__end__\nanother stuff\n"
     end
 
     it "shows progress information to the user" do
