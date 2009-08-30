@@ -30,6 +30,7 @@ describe Thor::Runner do
     end
 
     it "raises error if a class/task cannot be found" do
+      mock(Thor::Runner).exit(1)
       content = capture(:stderr){ Thor::Runner.start(["help", "unknown"]) }
       content.must =~ /could not find Thor class or task 'unknown'/
     end
@@ -67,6 +68,7 @@ describe Thor::Runner do
     end
 
     it "raises an error if class/task can't be found" do
+      mock(Thor::Runner).exit(1)
       ARGV.replace ["unknown"]
       capture(:stderr){ Thor::Runner.start }.must =~ /could not find Thor class or task 'unknown'/
     end
@@ -180,10 +182,8 @@ describe Thor::Runner do
 
       it "displays the modules installed in a pretty way" do
         stdout = capture(:stdout) { Thor::Runner.start(["installed"]) }
-
         stdout.must =~ /random\s*amazing/
         stdout.must =~ /amazing:describe NAME \[\-\-forcefully\]\s+# say that someone is amazing/m
-        stdout.must =~ /amazing:hello\s+# say hello/m
       end
     end
 
