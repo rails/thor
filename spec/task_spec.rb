@@ -41,10 +41,16 @@ describe Thor::Task do
 
   describe "#dynamic" do
     it "creates a dynamic task with the given name" do
-      Thor::Task.dynamic('task').name.must == 'task'
-      Thor::Task.dynamic('task').description.must == 'A dynamically-generated task'
-      Thor::Task.dynamic('task').usage.must == 'task'
-      Thor::Task.dynamic('task').options.must == {}
+      Thor::Task::Dynamic.new('task').name.must == 'task'
+      Thor::Task::Dynamic.new('task').description.must == 'A dynamically-generated task'
+      Thor::Task::Dynamic.new('task').usage.must == 'task'
+      Thor::Task::Dynamic.new('task').options.must == {}
+    end
+
+    it "does not invoke an existing method" do
+      lambda {
+        Thor::Task::Dynamic.new('to_s').run([])
+      }.must raise_error(Thor::Error, "could not find Thor class or task 'to_s'")
     end
   end
 
