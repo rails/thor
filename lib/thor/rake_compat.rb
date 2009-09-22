@@ -43,11 +43,9 @@ class Object #:nodoc:
       description.strip!
 
       klass.desc description, task.comment || non_namespaced_name
-      klass.class_eval <<-METHOD
-        def #{non_namespaced_name}(#{task.arg_names.join(', ')})
-          Rake::Task[#{task.name.to_sym.inspect}].invoke(#{task.arg_names.join(', ')})
-        end
-      METHOD
+      klass.send :define_method, non_namespaced_name do |*args|
+        Rake::Task[task.name.to_sym].invoke(*args)
+      end
     end
 
     task
