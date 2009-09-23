@@ -1,7 +1,5 @@
 $TESTING=true
 
-$:.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
-
 require 'thor'
 require 'stringio'
 require 'rubygems'
