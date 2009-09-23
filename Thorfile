@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'thor/rake_compat'
 require 'spec/rake/spectask'
 require 'rdoc/task'

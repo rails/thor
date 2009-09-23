@@ -2,7 +2,6 @@ $TESTING=true
 
 require 'thor'
 require 'stringio'
-require 'rubygems'
 require 'rr'
 require 'diff/lcs' # You need diff/lcs installed to run specs (but not to run Thor).
 
