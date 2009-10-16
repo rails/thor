@@ -1,3 +1,4 @@
+require 'rbconfig'
 require 'thor/shell/color'
 
 class Thor
@@ -6,7 +7,7 @@ class Thor
     # it will use a colored log, otherwise it will use a basic one without color.
     #
     def self.shell
-      @shell ||= if RUBY_PLATFORM =~ /mswin|mingw/
+      @shell ||= if Config::CONFIG['host_os'] =~ /mswin|mingw/
         Thor::Shell::Basic
       else
         Thor::Shell::Color
