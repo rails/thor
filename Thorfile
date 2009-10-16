@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'thor/rake_compat'
 require 'spec/rake/spectask'
 require 'rdoc/task'
@@ -10,11 +9,13 @@ class Default < Thor
   include Thor::RakeCompat
 
   Spec::Rake::SpecTask.new(:spec) do |t|
+    t.libs << 'lib'
     t.spec_opts = ['--options', "spec/spec.opts"]
     t.spec_files = FileList['spec/**/*_spec.rb']
   end
 
   Spec::Rake::SpecTask.new(:rcov) do |t|
+    t.libs << 'lib'
     t.spec_opts = ['--options', "spec/spec.opts"]
     t.spec_files = FileList['spec/**/*_spec.rb']
     t.rcov = true

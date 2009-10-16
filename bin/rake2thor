@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
 require 'ruby2ruby'
 require 'parse_tree'
 if Ruby2Ruby::VERSION >= "1.2.0"
