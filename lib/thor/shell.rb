@@ -2,10 +2,15 @@ require 'thor/shell/color'
 
 class Thor
   module Base
-    # Returns the shell used in all Thor classes. Default to color one.
+    # Returns the shell used in all Thor classes. If you are in a Unix platform
+    # it will use a colored log, otherwise it will use a basic one without color.
     #
     def self.shell
-      @shell ||= Thor::Shell::Color
+      @shell ||= if RUBY_PLATFORM =~ /mswin|mingw/
+        Thor::Shell::Basic
+      else
+        Thor::Shell::Color
+      end
     end
 
     # Sets the shell used in all Thor classes.
