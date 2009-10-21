@@ -1,3 +1,6 @@
+# enconding: utf-8
+
+require File.join(File.dirname(__FILE__), "lib", "thor", "version")
 require 'thor/rake_compat'
 require 'spec/rake/spectask'
 require 'rdoc/task'
@@ -35,6 +38,7 @@ class Default < Thor
     require 'jeweler'
     Jeweler::Tasks.new do |s|
       s.name = GEM_NAME
+      s.version = Thor::VERSION
       s.rubyforge_project = "textmate"
       s.platform = Gem::Platform::RUBY
       s.summary = "A scripting framework that replaces rake, sake and rubigen"
