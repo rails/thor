@@ -28,7 +28,7 @@ end
 
 describe Thor::RakeCompat do
   it "sets the rakefile application" do
-    Rake.application.rakefile.must == "rake_compat_spec.rb"
+    ["rake_compat_spec.rb", "Thorfile"].must include(Rake.application.rakefile)
   end
 
   it "adds rake tasks to thor classes too" do

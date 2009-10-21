@@ -96,6 +96,11 @@ describe Thor::Actions::Directory do
       File.exists?(file).must be_true
     end
 
+    it "does not copy empty directories twice" do
+      content = invoke!("doc/components", "docs/components")
+      content.must_not =~ /exist/
+    end
+
     it "logs status" do
       content = invoke!("doc")
       content.must =~ /create  doc\/README/
