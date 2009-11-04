@@ -32,7 +32,7 @@ class Thor::Runner < Thor #:nodoc:
   end
 
   desc "install NAME", "Install an optionally named Thor file into your system tasks"
-  method_options :as => :string, :relative => :boolean
+  method_options :as => :string, :relative => :boolean, :force => :boolean
   def install(name)
     initialize_thorfiles
 
@@ -55,7 +55,9 @@ class Thor::Runner < Thor #:nodoc:
     say "Your Thorfile contains:"
     say contents
 
-    return false if no?("Do you wish to continue [y/N]?")
+    unless options["force"]
+      return false if no?("Do you wish to continue [y/N]?")
+    end
 
     as = options["as"] || begin
       first_line = contents.split("\n")[0]
