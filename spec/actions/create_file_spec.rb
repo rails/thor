@@ -50,9 +50,9 @@ describe Thor::Actions::CreateFile do
       invoke!.must be_empty
     end
 
-    it "returns the destination" do
+    it "returns the given destination" do
       capture(:stdout) do
-        create_file("doc/config.rb").invoke!.must == File.join(destination_root, "doc/config.rb")
+        create_file("doc/config.rb").invoke!.must == "doc/config.rb"
       end
     end
 

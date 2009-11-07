@@ -108,6 +108,13 @@ describe Thor::Actions::Directory do
       content.must =~ /create  doc\/rdoc\.rb/
       content.must =~ /create  doc\/components/
     end
+
+    it "yields a block" do
+      invoke!("doc") do |f|
+        %(doc/README doc/config.rb doc/rdoc.rb).must include(f)
+        %(doc/components/).must_not include(f)
+      end
+    end
   end
 
   describe "#revoke!" do
