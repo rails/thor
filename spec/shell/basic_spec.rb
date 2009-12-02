@@ -152,6 +152,12 @@ TABLE
       shell.file_collision('foo')
     end
 
+    it "returns true if the user choose default option" do
+      stub($stdout).print
+      mock($stdin).gets{ '' }
+      shell.file_collision('foo').must be_true
+    end
+
     it "returns false if the user choose no" do
       stub($stdout).print
       mock($stdin).gets{ 'n' }
