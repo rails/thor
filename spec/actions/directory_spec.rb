@@ -110,10 +110,11 @@ describe Thor::Actions::Directory do
     end
 
     it "yields a block" do
-      invoke!("doc") do |f|
-        %(doc/README doc/config.rb doc/rdoc.rb).must include(f)
-        %(doc/components/).must_not include(f)
+      checked = false
+      invoke!("doc") do |content|
+        checked ||= !!(content =~ /FOO/)
       end
+      checked.must be_true
     end
   end
 

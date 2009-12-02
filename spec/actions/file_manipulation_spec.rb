@@ -65,12 +65,18 @@ describe Thor::Actions do
       runner.inside("doc") do
         action :copy_file, "README"
       end
-
       exists_and_identical?("doc/README", "doc/README")
     end
 
     it "logs status" do
       action(:copy_file, "task.thor").must == "      create  task.thor\n"
+    end
+
+    it "accepts a block to change output" do
+      action :copy_file, "task.thor" do |content|
+        "OMG" + content
+      end
+      File.read(File.join(destination_root, "task.thor")).must =~ /^OMG/
     end
   end
 
@@ -125,6 +131,13 @@ describe Thor::Actions do
 
     it "logs status" do
       capture(:stdout){ runner.template("doc/config.rb") }.must == "      create  doc/config.rb\n"
+    end
+
+    it "accepts a block to change output" do
+      action :template, "doc/config.rb" do |content|
+        "OMG" + content
+      end
+      File.read(File.join(destination_root, "doc/config.rb")).must =~ /^OMG/
     end
   end
 
