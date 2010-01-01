@@ -96,28 +96,6 @@ describe Thor::Shell::Basic do
     end
   end
 
-  describe "#print_list" do
-    before(:each) do
-      @list = ["abc", "#123", "first three"]
-    end
-
-    it "prints a list" do
-      content = capture(:stdout){ shell.print_list(@list) }
-      content.must == <<-LIST
-abc
-#123
-first three
-LIST
-    end
-
-    it "prints a list inline" do
-      content = capture(:stdout){ shell.print_list(@list, :mode => :inline) }
-      content.must == <<-LIST
-abc, #123, and first three
-LIST
-    end
-  end
-
   describe "#print_table" do
     before(:each) do
       @table = []

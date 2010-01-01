@@ -75,30 +75,6 @@ class Thor
         !yes?(statement, color)
       end
 
-      # Prints a list of items.
-      #
-      # ==== Parameters
-      # list<Array[String, String, ...]>
-      #
-      # ==== Options
-      # mode:: Can be :rows or :inline. Defaults to :rows.
-      # ident:: Ident each item with the value given.
-      #
-      def print_list(list, options={})
-        return if list.empty?
-
-        ident   = " " * (options[:ident] || 0)
-        content = case options[:mode]
-          when :inline
-            last = list.pop
-            "#{list.join(", ")}, and #{last}"
-          else # rows
-            ident + list.join("\n#{ident}")
-        end
-
-        $stdout.puts content
-      end
-
       # Prints a table.
       #
       # ==== Parameters
