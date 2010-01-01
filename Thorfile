@@ -53,7 +53,7 @@ class Default < Thor
       s.bindir = "bin"
       s.executables = %w( thor rake2thor )
       s.files = s.extra_rdoc_files + Dir.glob("{bin,lib}/**/*")
-      s.text_files.include 'spec/**/*'
+      s.test_files.include 'spec/**/*'
       s.test_files.exclude 'spec/sandbox/**/*'
     end
 

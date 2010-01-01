@@ -37,42 +37,43 @@ class Thor
       parse_no_method_error(instance, e)
     end
 
-    # Returns the formatted usage. If a class is given, the class arguments are
-    # injected in the usage.
-    #
-    def formatted_usage(klass=nil, namespace=nil)
+    # Returns the formatted usage by injecting given required arguments 
+    # and required options into the given usage.
+    def formatted_usage(klass, namespace=nil)
       namespace = klass.namespace if namespace.nil?
 
+      # Add namespace
       formatted = if namespace
         "#{namespace.gsub(/^(default|thor:runner:)/,'')}:"
       else
         ""
       end
 
-      formatted << formatted_arguments(klass)
-      formatted.strip!
-      formatted
-    end
-
-    # Injects the class arguments into the task usage.
-    #
-    def formatted_arguments(klass)
-      if klass && !klass.arguments.empty?
+      # Add usage with required arguments
+      formatted << if klass && !klass.arguments.empty?
         usage.to_s.gsub(/^#{name}/) do |match|
-          match << " " << klass.arguments.map{ |a| a.usage }.join(' ')
+          match << " " << required_arguments(klass)
         end
       else
         usage.to_s
       end
-    end
 
-    # Returns the options usage for this task.
-    #
-    def formatted_options
-      @formatted_options ||= options.map{ |_, o| o.usage }.sort.join(" ")
+      # Add required options
+      formatted << " #{required_options}"
+
+      # Strip and go!
+      formatted.strip
     end
 
     protected
+
+      def required_arguments(klass)
+        klass.arguments.map{ |a| a.usage if a.required? }.compact.join(' ')
+      end
+
+      def required_options
+        @required_options ||= options.map{ |_, o| o.usage if o.required? }.compact.sort.join(" ")
+      end
 
       # Given a target, checks if this class name is not a private/protected method.
       #

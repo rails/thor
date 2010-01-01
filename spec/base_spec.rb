@@ -134,7 +134,7 @@ describe Thor::Base do
     it "allows extra options to be given" do
       hash = { "Foo" => B.class_options.values }
 
-      content = capture(:stdout) { MyCounter.send(:class_options_help, Thor::Base.shell.new, nil, hash) }
+      content = capture(:stdout) { MyCounter.send(:class_options_help, Thor::Base.shell.new, hash) }
       content.must =~ /Foo options\:/
       content.must =~ /--last-name=LAST_NAME/
     end

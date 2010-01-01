@@ -78,14 +78,14 @@ class Thor
       @method_options
     end
 
-    # Adds an option to the set of class options. If :for is given as option,
+    # Adds an option to the set of method options. If :for is given as option,
     # it allows you to change the options from a previous defined task.
     #
     #   def previous_task
     #     # magic
     #   end
     #
-    #   method_options :foo => :bar, :for => :previous_task
+    #   method_option :foo => :bar, :for => :previous_task
     #
     #   def next_task
     #     # magic
@@ -101,7 +101,6 @@ class Thor
     # :default  - Default value for this argument. It cannot be required and have default values.
     # :aliases  - Aliases for this option.
     # :type     - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
-    # :group    - The group for this options. Use by class options to output options in different levels.
     # :banner   - String to show on usage notes.
     #
     def method_option(name, options={})
@@ -158,15 +157,15 @@ class Thor
         shell.say "Usage:"
         shell.say "  #{banner(task)}"
         shell.say
-        class_options_help(shell, "Method" => task.options.map { |_, o| o })
+        class_options_help(shell, nil => task.options.map { |_, o| o })
         shell.say task.description
       else
-        list, klasses = [], [self]
+        list = printable_tasks(!options[:short])
 
-        klasses += Thor::Util.thor_classes_in(self)
-        klasses.each do |klass|
-          list += klass.printable_tasks(!options[:short])
+        Thor::Util.thor_classes_in(self).each do |klass|
+          list += klass.printable_tasks(false)
         end
+
         list.sort!{ |a,b| a[0] <=> b[0] }
 
         if options[:short]

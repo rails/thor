@@ -110,7 +110,7 @@ describe Thor::Runner do
       it "gives a list of the available tasks" do
         ARGV.replace ["list"]
         content = capture(:stdout) { Thor::Runner.start }
-        content.must =~ /amazing:describe NAME \[\-\-forcefully\]\s+# say that someone is amazing/m
+        content.must =~ /amazing:describe NAME\s+# say that someone is amazing/m
       end
 
       it "gives a list of the available Thor::Group classes" do
@@ -141,7 +141,7 @@ describe Thor::Runner do
 
       it "presents tasks in the default namespace with an empty namespace" do
         ARGV.replace ["list"]
-        capture(:stdout) { Thor::Runner.start }.must =~ /^:test\s+# prints 'test'/m
+        capture(:stdout) { Thor::Runner.start }.must =~ /^thor :test\s+# prints 'test'/m
       end
 
       it "runs tasks with an empty namespace from the default namespace" do
@@ -183,7 +183,7 @@ describe Thor::Runner do
       it "displays the modules installed in a pretty way" do
         stdout = capture(:stdout) { Thor::Runner.start(["installed"]) }
         stdout.must =~ /random\s*amazing/
-        stdout.must =~ /amazing:describe NAME \[\-\-forcefully\]\s+# say that someone is amazing/m
+        stdout.must =~ /amazing:describe NAME\s+# say that someone is amazing/m
       end
     end
 

@@ -372,16 +372,16 @@ class Thor
 
           # Deal with default group
           global_options = groups.delete(nil) || []
-          print_options(shell, "Class", global_options)
+          print_options(shell, global_options)
 
           # Print all others
           groups.each do |group_name, options|
-            print_options(shell, group_name, options)
+            print_options(shell, options, group_name)
           end
         end
 
         # Receives a set of options and print them.
-        def print_options(shell, group_name, options)
+        def print_options(shell, options, group_name=nil)
           return if options.empty?
 
           list = []
@@ -395,7 +395,7 @@ class Thor
             list << [ "", "# Default: #{option.default}" ] if option.show_default?
           end
 
-          shell.say("#{group_name} options:")
+          shell.say(group_name ? "#{group_name} options:" : "Options:")
           shell.print_table(list, :ident => 2)
           shell.say ""
         end

@@ -72,7 +72,7 @@ describe Thor do
 
     describe "when :for is supplied" do
       it "overwrites a previous defined task" do
-        capture(:stdout) { MyChildScript.start(["help"]) }.must =~ /animal KIND \[\-\-other=OTHER\]\s+# fish around/m
+        capture(:stdout) { MyChildScript.start(["help"]) }.must =~ /animal KIND \s+# fish around/m
       end
     end
   end
@@ -161,12 +161,12 @@ describe Thor do
 
       it "shows superclass tasks" do
         content = capture(:stdout){ MyChildScript.help(shell) }
-        content.must =~ /foo BAR \[\-\-force\]\s+# do some fooing/m
+        content.must =~ /foo BAR \s+# do some fooing/m
       end
 
       it "shows class options information" do
         content = capture(:stdout){ MyChildScript.help(shell) }
-        content.must =~ /Class options\:/
+        content.must =~ /Options\:/
         content.must =~ /\[\-\-param=N\]/
       end
 
@@ -178,11 +178,11 @@ describe Thor do
 
     describe "for a specific task" do
       it "provides full help info when talking about a specific task" do
-        capture(:stdout) { MyScript.help(shell, "foo") }.must == <<END
+        capture(:stdout) { MyScript.help(shell, :task => "foo") }.must == <<END
 Usage:
-  foo BAR
+  thor my_script:foo BAR
 
-Method options:
+Options:
   [--force]  # Force to do some fooing
 
 do some fooing
@@ -193,24 +193,20 @@ END
 
       it "raises an error if the task can't be found" do
         lambda {
-          MyScript.help(shell, "unknown")
+          MyScript.help(shell, :task => "unknown")
         }.must raise_error(Thor::Error, "task 'unknown' could not be found in namespace 'my_script'")
       end
     end
 
     describe "options" do
-      it "shows the namespace if required" do
-        capture(:stdout){ MyScript.help(shell, nil, :namespace => true) }.must =~ /my_script:foo BAR/
-      end
-
       it "does not show superclass tasks if required" do
-        capture(:stdout){ MyScript.help(shell, nil, :short => true) }.must_not =~ /help/
+        capture(:stdout){ MyScript.help(shell, :short => true) }.must_not =~ /help/
       end
     end
 
     describe "instance method" do
       it "calls the class method" do
-        stub(MyScript).help(mock.instance_of(Thor::Base.shell), nil, :namespace => nil)
+        stub(MyScript).help(mock.instance_of(Thor::Base.shell), :task => nil)
         MyScript.start(["help"])
       end
     end
