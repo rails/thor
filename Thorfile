@@ -1,6 +1,7 @@
 # enconding: utf-8
 
 require File.join(File.dirname(__FILE__), "lib", "thor", "version")
+require 'rubygems'
 require 'thor/rake_compat'
 require 'spec/rake/spectask'
 require 'rdoc/task'
@@ -52,7 +53,7 @@ class Default < Thor
       s.bindir = "bin"
       s.executables = %w( thor rake2thor )
       s.files = s.extra_rdoc_files + Dir.glob("{bin,lib}/**/*")
-      s.files.exclude 'spec/sandbox/**/*'
+      s.text_files.include 'spec/**/*'
       s.test_files.exclude 'spec/sandbox/**/*'
     end
 
