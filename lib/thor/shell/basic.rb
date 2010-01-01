@@ -86,20 +86,26 @@ class Thor
       def print_table(table, options={})
         return if table.empty?
 
-        formats = []
+        formats, ident = [], options[:ident].to_i
+        options[:truncate] = terminal_width if options[:truncate] == true
+
         0.upto(table.first.length - 2) do |i|
           maxima = table.max{ |a,b| a[i].size <=> b[i].size }[i].size
           formats << "%-#{maxima + 2}s"
         end
 
-        formats[0] = formats[0].insert(0, " " * options[:ident]) if options[:ident]
+        formats[0] = formats[0].insert(0, " " * ident)
         formats << "%s"
 
         table.each do |row|
+          sentence = ""
+
           row.each_with_index do |column, i|
-            $stdout.print formats[i] % column.to_s
+            sentence << formats[i] % column.to_s
           end
-          $stdout.puts
+
+          sentence = truncate(sentence, options[:truncate]) if options[:truncate]
+          $stdout.puts sentence  
         end
       end
 
@@ -188,6 +194,44 @@ HELP
 
         def quiet? #:nodoc:
           base && base.options[:quiet]
+        end
+
+        # This code was copied from Rake, available under MIT-LICENSE
+        # Copyright (c) 2003, 2004 Jim Weirich
+        def terminal_width
+          if ENV['THOR_COLUMNS']
+            result = ENV['THOR_COLUMNS'].to_i
+          else
+            result = unix? ? dynamic_width : 80
+          end
+          (result < 10) ? 80 : result
+        rescue
+          80
+        end
+
+        # Calculate the dynamic width of the terminal
+        def dynamic_width
+          @dynamic_width ||= (dynamic_width_stty.nonzero? || dynamic_width_tput)
+        end
+
+        def dynamic_width_stty
+          %x{stty size 2>/dev/null}.split[1].to_i
+        end
+
+        def dynamic_width_tput
+          %x{tput cols 2>/dev/null}.to_i
+        end
+
+        def unix?
+          RUBY_PLATFORM =~ /(aix|darwin|linux|(net|free|open)bsd|cygwin|solaris|irix|hpux)/i
+        end
+
+        def truncate(string, width)
+          if string.length <= width
+            string
+          else
+            ( string[0, width-3] || "" ) + "..."
+          end
         end
 
     end

@@ -169,10 +169,10 @@ class Thor
         list.sort!{ |a,b| a[0] <=> b[0] }
 
         if options[:short]
-          shell.print_table(list)
+          shell.print_table(list, :truncate => true)
         else
           shell.say "Tasks:"
-          shell.print_table(list, :ident => 2)
+          shell.print_table(list, :ident => 2, :truncate => true)
           shell.say
           class_options_help(shell)
         end

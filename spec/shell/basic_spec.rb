@@ -121,6 +121,16 @@ TABLE
   xyz  #786  last three
 TABLE
     end
+
+    it "uses maximum terminal width" do
+      mock(shell).terminal_width { 20 }
+      content = capture(:stdout){ shell.print_table(@table, :ident => 2, :truncate => true) }
+      content.must == <<-TABLE
+  abc  #123  firs...
+       #0    empty
+  xyz  #786  last...
+TABLE
+    end
   end
 
   describe "#file_collision" do

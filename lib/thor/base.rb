@@ -92,6 +92,8 @@ class Thor
     end
 
     module ClassMethods
+      attr_accessor :debugging
+
       # Adds an argument to the class and creates an attr_accessor for it.
       #
       # Arguments are different from options in several aspects. The first one
@@ -347,10 +349,11 @@ class Thor
       # Default way to start generators from the command line.
       #
       def start(given_args=ARGV, config={})
+        self.debugging = given_args.include?("--debug")
         config[:shell] ||= Thor::Base.shell.new
         yield
       rescue Thor::Error => e
-        if given_args.include?("--debug")
+        if debugging
           raise e
         else
           config[:shell].error e.message

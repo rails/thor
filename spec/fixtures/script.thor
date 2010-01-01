@@ -40,9 +40,13 @@ END
     call_myself_with_wrong_arity(4)
   end
 
-  desc "call unexistent method", "Call unexistent method inside a task"
+  desc "call_unexistent_method", "Call unexistent method inside a task"
   def call_unexistent_method
     boom!
+  end
+
+  desc "long_description", "a" * 80
+  def long_description
   end
 
   method_options :all => :boolean

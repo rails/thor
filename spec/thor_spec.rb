@@ -133,7 +133,7 @@ describe Thor do
     end
 
     it "raises when an exception happens within the task call" do
-      lambda { MyScript.start(["call_myself_with_wrong_arity"]) }.must raise_error
+      lambda { MyScript.start(["call_myself_with_wrong_arity", "--debug"]) }.must raise_error
     end
   end
 
@@ -148,20 +148,26 @@ describe Thor do
       end
 
       it "provides useful help info for the help method itself" do
-        @content.must =~ /help \[TASK\]\s+# Describe available tasks/m
+        @content.must =~ /help \[TASK\]\s+# Describe available tasks/
       end
 
       it "provides useful help info for a method with params" do
-        @content.must =~ /animal TYPE\s+# horse around/m
+        @content.must =~ /animal TYPE\s+# horse around/
+      end
+
+      it "uses the maximum terminal size to show tasks" do
+        mock(@shell).terminal_width { 80 }
+        @content = capture(:stdout){ MyScript.help(shell) }
+        @content.must =~ /aaa\.\.\.$/
       end
 
       it "provides description for tasks from classes in the same namespace" do
-        @content.must =~ /baz\s+# do some bazing/m
+        @content.must =~ /baz\s+# do some bazing/
       end
 
       it "shows superclass tasks" do
         content = capture(:stdout){ MyChildScript.help(shell) }
-        content.must =~ /foo BAR \s+# do some fooing/m
+        content.must =~ /foo BAR \s+# do some fooing/
       end
 
       it "shows class options information" do

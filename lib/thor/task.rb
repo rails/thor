@@ -32,8 +32,10 @@ class Thor
       raise UndefinedTaskError, "the '#{name}' task of #{instance.class} is private" unless public_method?(instance)
       instance.send(name, *args)
     rescue ArgumentError => e
+      raise e if instance.class.respond_to?(:debugging) && instance.class.debugging
       parse_argument_error(instance, e, caller)
     rescue NoMethodError => e
+      raise e if instance.class.respond_to?(:debugging) && instance.class.debugging
       parse_no_method_error(instance, e)
     end
 
@@ -82,18 +84,10 @@ class Thor
         (collection & [name.to_s, name.to_sym]).empty?
       end
 
-      # Clean everything that comes from the Thor gempath and remove the caller.
-      #
-      def sans_backtrace(backtrace, caller) #:nodoc:
-        dirname = /^#{Regexp.escape(File.dirname(__FILE__))}/
-        saned  = backtrace.reject { |frame| frame =~ dirname }
-        saned -= caller
-      end
-
       def parse_argument_error(instance, e, caller) #:nodoc:
-        backtrace = sans_backtrace(e.backtrace, caller)
+        method_name = /`#{Regexp.escape(name.split(':').last)}'/
 
-        if backtrace.empty? && e.message =~ /wrong number of arguments/
+        if e.message =~ /wrong number of arguments/ && e.backtrace.first.to_s =~ method_name
           if instance.is_a?(Thor::Group)
             raise e, "'#{name}' was called incorrectly. Are you sure it has arity equals to 0?"
           else
