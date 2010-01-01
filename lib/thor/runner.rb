@@ -149,6 +149,10 @@ class Thor::Runner < Thor #:nodoc:
 
   private
 
+    def self.banner(task)
+      "thor " + task.formatted_usage(self, false)
+    end
+
     def thor_root
       Thor::Util.thor_root
     end
@@ -289,11 +293,11 @@ class Thor::Runner < Thor #:nodoc:
       unless klass.tasks.empty?
         base = klass.namespace
 
-        color = base == "default" ? :magenta : :blue
-        say shell.set_color(base, color, true)
+        say shell.set_color(base, :blue, true)
         say "-" * base.length
 
-        klass.help(shell, :short => true, :ident => 0, :namespace => true)
+        klass.help(shell, :short => true)
+        say
       end
     end
 end

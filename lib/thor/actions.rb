@@ -38,17 +38,17 @@ class Thor
       # Add runtime options that help actions execution.
       #
       def add_runtime_options!
-        class_option :pretend, :type => :boolean, :aliases => "-p", :group => :runtime,
-                               :desc => "Run but do not make any changes"
-
         class_option :force, :type => :boolean, :aliases => "-f", :group => :runtime,
                              :desc => "Overwrite files that already exist"
 
-        class_option :skip, :type => :boolean, :aliases => "-s", :group => :runtime,
-                            :desc => "Skip files that already exist"
+        class_option :pretend, :type => :boolean, :aliases => "-p", :group => :runtime,
+                               :desc => "Run but do not make any changes"
 
         class_option :quiet, :type => :boolean, :aliases => "-q", :group => :runtime,
                              :desc => "Supress status output"
+
+        class_option :skip, :type => :boolean, :aliases => "-s", :group => :runtime,
+                            :desc => "Skip files that already exist"
       end
     end
 

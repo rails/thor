@@ -25,10 +25,6 @@ class Thor
       self.options = other.options.dup if other.options
     end
 
-    def short_description
-      description.split("\n").first if description
-    end
-
     # By default, a task invokes a method in the thor class. You can change this
     # implementation to create custom tasks.
     #
@@ -44,17 +40,16 @@ class Thor
     # Returns the formatted usage. If a class is given, the class arguments are
     # injected in the usage.
     #
-    def formatted_usage(klass=nil, namespace=false, show_options=true)
-      formatted = if namespace.is_a?(String)
-        "#{namespace}:"
-      elsif klass && namespace
-        "#{klass.namespace.gsub(/^default/,'')}:"
+    def formatted_usage(klass=nil, namespace=nil)
+      namespace = klass.namespace if namespace.nil?
+
+      formatted = if namespace
+        "#{namespace.gsub(/^(default|thor:runner:)/,'')}:"
       else
         ""
       end
 
       formatted << formatted_arguments(klass)
-      formatted << " #{formatted_options}" if show_options
       formatted.strip!
       formatted
     end
@@ -102,7 +97,7 @@ class Thor
             raise e, "'#{name}' was called incorrectly. Are you sure it has arity equals to 0?"
           else
             raise InvocationError, "'#{name}' was called incorrectly. Call as " <<
-                                   "'#{formatted_usage(instance.class, true)}'"
+                                   "'#{formatted_usage(instance.class)}'"
           end
         else
           raise e

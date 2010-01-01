@@ -150,39 +150,42 @@ class Thor
     # namespace:: When true, shows the namespace in the output before the usage.
     # skip_inherited:: When true, does not show tasks from superclass.
     #
-    def help(shell, meth=nil, options={})
-      meth, options = nil, meth if meth.is_a?(Hash)
-
-      if meth
-        task = all_tasks[meth]
-        raise UndefinedTaskError, "task '#{meth}' could not be found in namespace '#{self.namespace}'" unless task
+    def help(shell, options={})
+      if options[:task]
+        task = all_tasks[options[:task]]
+        raise UndefinedTaskError, "task '#{options[:task]}' could not be found in namespace '#{self.namespace}'" unless task
 
         shell.say "Usage:"
-        shell.say "  #{banner(task, options[:namespace], false)}"
+        shell.say "  #{banner(task)}"
         shell.say
-        class_options_help(shell, "Class", :Method => task.options.map { |_, o| o })
+        class_options_help(shell, "Method" => task.options.map { |_, o| o })
         shell.say task.description
       else
-        list = (options[:short] ? tasks : all_tasks).map do |_, task|
-          item = [ banner(task, options[:namespace]) ]
-          item << "# #{task.short_description}" if task.short_description
-          item << " "
-        end
+        list, klasses = [], [self]
 
-        options[:ident] ||= 2
+        klasses += Thor::Util.thor_classes_in(self)
+        klasses.each do |klass|
+          list += klass.printable_tasks(!options[:short])
+        end
+        list.sort!{ |a,b| a[0] <=> b[0] }
+
         if options[:short]
-          shell.print_list(list, :ident => options[:ident])
+          shell.print_table(list)
         else
           shell.say "Tasks:"
-          shell.print_list(list, :ident => options[:ident])
+          shell.print_table(list, :ident => 2)
+          shell.say
+          class_options_help(shell)
         end
+      end
+    end
 
-        Thor::Util.thor_classes_in(self).each do |subclass|
-          namespace = options[:namespace] == true || subclass.namespace.gsub(/^#{self.namespace}:/, '')
-          subclass.help(shell, options.merge(:short => true, :namespace => namespace))
-        end
-
-        class_options_help(shell, "Class") unless options[:short]
+    def printable_tasks(all=true)
+      (all ? all_tasks : tasks).map do |_, task|
+        item = []
+        item << banner(task)
+        item << "# #{task.description}" if task.description
+        item
       end
     end
 
@@ -193,8 +196,8 @@ class Thor
       # the task that is going to be invoked and a boolean which indicates if
       # the namespace should be displayed as arguments.
       #
-      def banner(task, namespace=true, show_options=true)
-        task.formatted_usage(self, namespace, show_options)
+      def banner(task)
+        "thor " + task.formatted_usage(self)
       end
 
       def baseclass #:nodoc:
@@ -237,6 +240,6 @@ class Thor
 
   desc "help [TASK]", "Describe available tasks or one specific task"
   def help(task=nil)
-    self.class.help(shell, task, :namespace => task && task.include?(?:))
+    self.class.help(shell, :task => task)
   end
 end

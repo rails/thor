@@ -46,8 +46,8 @@ class Thor::Group
         shell.say banner
       else
         shell.say "Usage:"
-        shell.say "  #{banner}"
-        shell.say
+        shell.say "  #{banner}\n"
+        shell.say ""
         class_options_help(shell)
         shell.say self.desc if self.desc
       end
@@ -177,15 +177,11 @@ class Thor::Group
     # Overwrite class options help to allow invoked generators options to be
     # shown recursively when invoking a generator.
     #
-    def class_options_help(shell, ungrouped_name=nil, extra_group=nil) #:nodoc:
-      group_options = {}
-
-      get_options_from_invocations(group_options, class_options) do |klass|
-        klass.send(:get_options_from_invocations, group_options, class_options)
+    def class_options_help(shell, groups={}) #:nodoc:
+      get_options_from_invocations(groups, class_options) do |klass|
+        klass.send(:get_options_from_invocations, groups, class_options)
       end
-
-      group_options.merge!(extra_group) if extra_group
-      super(shell, ungrouped_name, group_options)
+      super(shell, groups)
     end
 
     # Get invocations array and merge options from invocations. Those
@@ -224,7 +220,7 @@ class Thor::Group
       # thor class by another ways which is not the Thor::Runner.
       #
       def banner
-        "#{self.namespace} #{self.arguments.map {|a| a.usage }.join(' ')}"
+        "thor #{self.namespace} #{self.arguments.map {|a| a.usage }.join(' ')}"
       end
 
       def baseclass #:nodoc:
