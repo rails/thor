@@ -29,23 +29,23 @@ describe Thor::Actions do
 
   describe "#chmod" do
     it "executes the command given" do
-      mock(FileUtils).chmod_R(0755, file)
+      FileUtils.should_receive(:chmod_R).with(0755, file)
       action :chmod, "foo", 0755
     end
 
     it "does not execute the command if pretending given" do
-      dont_allow(FileUtils).chmod_R(0755, file)
+      FileUtils.should_not_receive(:chmod_R)
       runner(:pretend => true)
       action :chmod, "foo", 0755
     end
 
     it "logs status" do
-      mock(FileUtils).chmod_R(0755, file)
+      FileUtils.should_receive(:chmod_R).with(0755, file)
       action(:chmod, "foo", 0755).must == "       chmod  foo\n"
     end
 
     it "does not log status if required" do
-      mock(FileUtils).chmod_R(0755, file)
+      FileUtils.should_receive(:chmod_R).with(0755, file)
       action(:chmod, "foo", 0755, :verbose => false).must be_empty
     end
   end
@@ -123,7 +123,7 @@ describe Thor::Actions do
     end
 
     it "converts enconded instructions" do
-      mock(runner).file_name{ "rdoc" }
+      runner.should_receive(:file_name).and_return("rdoc")
       action :template, "doc/%file_name%.rb.tt"
       file = File.join(destination_root, "doc/rdoc.rb.tt")
       File.exists?(file).must be_true

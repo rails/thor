@@ -8,7 +8,7 @@ describe Thor::Actions::CreateFile do
 
   def create_file(destination=nil, config={}, options={})
     @base = MyCounter.new([1,2], options, { :destination_root => destination_root })
-    stub(@base).file_name { 'rdoc' }
+    @base.stub!(:file_name).and_return('rdoc')
 
     @action = Thor::Actions::CreateFile.new(@base, destination, "CONFIGURATION",
                                             { :verbose => !@silence }.merge(config))
@@ -103,7 +103,7 @@ describe Thor::Actions::CreateFile do
 
         it "shows conflict status to ther user" do
           create_file("doc/config.rb").must_not be_identical
-          mock($stdin).gets{ 's' }
+          $stdin.should_receive(:gets).and_return('s')
           file = File.join(destination_root, 'doc/config.rb')
 
           content = invoke!
@@ -114,21 +114,21 @@ describe Thor::Actions::CreateFile do
 
         it "creates the file if the file collision menu returns true" do
           create_file("doc/config.rb")
-          mock($stdin).gets{ 'y' }
+          $stdin.should_receive(:gets).and_return('y')
           invoke!.must =~ /force  doc\/config\.rb/
         end
 
         it "skips the file if the file collision menu returns false" do
           create_file("doc/config.rb")
-          mock($stdin).gets{ 'n' }
+          $stdin.should_receive(:gets).and_return('n')
           invoke!.must =~ /skip  doc\/config\.rb/
         end
 
         it "executes the block given to show file content" do
           create_file("doc/config.rb")
-          mock($stdin).gets{ 'd' }
-          mock($stdin).gets{ 'n' }
-          mock(@base.shell).system(/diff -u/)
+          $stdin.should_receive(:gets).and_return('d')
+          $stdin.should_receive(:gets).and_return('n')
+          @base.shell.should_receive(:system).with(/diff -u/)
           invoke!
         end
       end

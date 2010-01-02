@@ -53,7 +53,7 @@ class Thor
       # Add usage with required arguments
       formatted << if klass && !klass.arguments.empty?
         usage.to_s.gsub(/^#{name}/) do |match|
-          match << " " << required_arguments(klass)
+          match << " " << klass.arguments.map{ |a| a.usage }.compact.join(' ')
         end
       else
         usage.to_s
@@ -67,10 +67,6 @@ class Thor
     end
 
     protected
-
-      def required_arguments(klass)
-        klass.arguments.map{ |a| a.usage if a.required? }.compact.join(' ')
-      end
 
       def required_options
         @required_options ||= options.map{ |_, o| o.usage if o.required? }.compact.sort.join(" ")

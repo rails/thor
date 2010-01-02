@@ -29,7 +29,7 @@ describe Thor::Group do
     end
 
     it "invokes help message if any of the shortcuts is given" do
-      stub(MyCounter).help
+      MyCounter.should_receive(:help)
       MyCounter.start(["-h"])
     end
   end
@@ -65,12 +65,6 @@ describe Thor::Group do
     it "shows options information" do
       @content.must =~ /Options/
       @content.must =~ /\[\-\-third=THREE\]/
-    end
-
-    it "shows only usage if a short help is required" do
-      content = capture(:stdout){ MyCounter.help(Thor::Base.shell.new, :short => true) }
-      content.must =~ /my_counter N \[N\]/
-      content.must_not =~ /Options/
     end
   end
 
