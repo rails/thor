@@ -30,7 +30,7 @@ describe Thor::Runner do
     end
 
     it "raises error if a class/task cannot be found" do
-      mock(Thor::Runner).exit(1)
+      mock(Thor::Runner).exit(1){ }
       content = capture(:stderr){ Thor::Runner.start(["help", "unknown"]) }
       content.must =~ /could not find Thor class or task 'unknown'/
     end
@@ -68,7 +68,7 @@ describe Thor::Runner do
     end
 
     it "raises an error if class/task can't be found" do
-      mock(Thor::Runner).exit(1)
+      mock(Thor::Runner).exit(1){ }
       ARGV.replace ["unknown"]
       capture(:stderr){ Thor::Runner.start }.must =~ /could not find Thor class or task 'unknown'/
     end

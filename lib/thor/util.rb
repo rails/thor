@@ -76,8 +76,9 @@ class Thor
     # Returns the thor classes declared inside the given class.
     #
     def self.thor_classes_in(klass)
+      stringfied_constants = klass.constants.map { |c| c.to_s }
       Thor::Base.subclasses.select do |subclass|
-        klass.constants.include?(subclass.name.gsub("#{klass.name}::", ''))
+        stringfied_constants.include?(subclass.name.gsub("#{klass.name}::", ''))
       end
     end
 

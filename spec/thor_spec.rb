@@ -156,9 +156,9 @@ describe Thor do
       end
 
       it "uses the maximum terminal size to show tasks" do
-        mock(@shell).terminal_width { 80 }
-        @content = capture(:stdout){ MyScript.help(shell) }
-        @content.must =~ /aaa\.\.\.$/
+        stub(@shell).terminal_width { 80 }
+        content = capture(:stdout){ MyScript.help(shell) }
+        content.must =~ /aaa\.\.\.$/
       end
 
       it "provides description for tasks from classes in the same namespace" do
@@ -212,8 +212,7 @@ END
 
     describe "instance method" do
       it "calls the class method" do
-        stub(MyScript).help(mock.instance_of(Thor::Base.shell), :task => nil)
-        MyScript.start(["help"])
+        capture(:stdout){ MyScript.start(["help"]) }.must =~ /Tasks:/
       end
     end
   end

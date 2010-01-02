@@ -48,5 +48,5 @@ Spec::Runner.configure do |config|
     File.join(File.dirname(__FILE__), 'sandbox')
   end
 
-  alias silence capture
+  alias :silence :capture
 end

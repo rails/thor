@@ -1,8 +1,8 @@
 class Thor
   class Task < Struct.new(:name, :description, :usage, :options)
+    FILE_REGEXP = /^#{Regexp.escape(File.expand_path(__FILE__))}:[\w:]+ `run'$/
 
     # A dynamic task that handles method missing scenarios.
-    #
     class Dynamic < Task
       def initialize(name)
         super(name.to_s, "A dynamically-generated task", name.to_s)
@@ -27,7 +27,6 @@ class Thor
 
     # By default, a task invokes a method in the thor class. You can change this
     # implementation to create custom tasks.
-    #
     def run(instance, args=[])
       raise UndefinedTaskError, "the '#{name}' task of #{instance.class} is private" unless public_method?(instance)
       instance.send(name, *args)
@@ -78,16 +77,20 @@ class Thor
       end
 
       # Given a target, checks if this class name is not a private/protected method.
-      #
       def public_method?(instance) #:nodoc:
         collection = instance.private_methods + instance.protected_methods
         (collection & [name.to_s, name.to_sym]).empty?
       end
 
-      def parse_argument_error(instance, e, caller) #:nodoc:
+      # For Ruby <= 1.8.7, we have to match the method name that we are trying to call.
+      # In Ruby >= 1.9.1, we have to match the method run in this file.
+      def backtrace_match?(backtrace) #:nodoc:
         method_name = /`#{Regexp.escape(name.split(':').last)}'/
+        backtrace =~ method_name || backtrace =~ FILE_REGEXP
+      end
 
-        if e.message =~ /wrong number of arguments/ && e.backtrace.first.to_s =~ method_name
+      def parse_argument_error(instance, e, caller) #:nodoc:
+        if e.message =~ /wrong number of arguments/ && backtrace_match?(e.backtrace.first.to_s)
           if instance.is_a?(Thor::Group)
             raise e, "'#{name}' was called incorrectly. Are you sure it has arity equals to 0?"
           else
