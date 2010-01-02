@@ -195,7 +195,7 @@ describe Thor::Actions do
       @template.instance_eval "def read; self; end" # Make the string respond to read
 
       @file = "http://gist.github.com/103208.txt"
-      mock(runner).open(@file){ @template }
+      runner.should_receive(:open).and_return(@template)
     end
 
     it "opens a file and executes its content in the instance binding" do
@@ -220,7 +220,7 @@ describe Thor::Actions do
 
   describe "#run" do
     before(:each) do
-      mock(runner).system("ls")
+      runner.should_receive(:system).with("ls")
     end
 
     it "executes the command given" do
@@ -236,15 +236,15 @@ describe Thor::Actions do
     end
 
     it "accepts a color as status" do
-      mock(runner.shell).say_status(:run, 'ls from "."', :yellow)
+      runner.shell.should_receive(:say_status).with(:run, 'ls from "."', :yellow)
       action :run, "ls", :verbose => :yellow
     end
   end
 
   describe "#run_ruby_script" do
     before(:each) do
-      stub(Thor::Util).ruby_command{ "/opt/jruby" }
-      mock(runner).system("/opt/jruby script.rb")
+      Thor::Util.stub!(:ruby_command).and_return("/opt/jruby")
+      runner.should_receive(:system).with("/opt/jruby script.rb")
     end
 
     it "executes the ruby script" do
@@ -262,30 +262,30 @@ describe Thor::Actions do
 
   describe "#thor" do
     it "executes the thor command" do
-      mock(runner).system("thor list")
+      runner.should_receive(:system).with("thor list")
       action :thor, :list, :verbose => true
     end
 
     it "converts extra arguments to command arguments" do
-      mock(runner).system("thor list foo bar")
+      runner.should_receive(:system).with("thor list foo bar")
       action :thor, :list, "foo", "bar"
     end
 
     it "converts options hash to switches" do
-      mock(runner).system("thor list foo bar --foo")
+      runner.should_receive(:system).with("thor list foo bar --foo")
       action :thor, :list, "foo", "bar", :foo => true
 
-      mock(runner).system("thor list --foo 1 2 3")
+      runner.should_receive(:system).with("thor list --foo 1 2 3")
       action :thor, :list, :foo => [1,2,3]
     end
 
     it "logs status" do
-      mock(runner).system("thor list")
+      runner.should_receive(:system).with("thor list")
       action(:thor, :list).must == "         run  thor list from \".\"\n"
     end
 
     it "does not log status if required" do
-      mock(runner).system("thor list --foo 1 2 3")
+      runner.should_receive(:system).with("thor list --foo 1 2 3")
       action(:thor, :list, :foo => [1,2,3], :verbose => false).must be_empty
     end
   end

@@ -156,7 +156,7 @@ describe Thor do
       end
 
       it "uses the maximum terminal size to show tasks" do
-        stub(@shell).terminal_width { 80 }
+        @shell.should_receive(:terminal_width).and_return(80)
         content = capture(:stdout){ MyScript.help(shell) }
         content.must =~ /aaa\.\.\.$/
       end
@@ -184,7 +184,7 @@ describe Thor do
 
     describe "for a specific task" do
       it "provides full help info when talking about a specific task" do
-        capture(:stdout) { MyScript.help(shell, :task => "foo") }.must == <<END
+        capture(:stdout) { MyScript.task_help(shell, "foo") }.must == <<END
 Usage:
   thor my_script:foo BAR
 
@@ -199,20 +199,18 @@ END
 
       it "raises an error if the task can't be found" do
         lambda {
-          MyScript.help(shell, :task => "unknown")
+          MyScript.task_help(shell, "unknown")
         }.must raise_error(Thor::Error, "task 'unknown' could not be found in namespace 'my_script'")
-      end
-    end
-
-    describe "options" do
-      it "does not show superclass tasks if required" do
-        capture(:stdout){ MyScript.help(shell, :short => true) }.must_not =~ /help/
       end
     end
 
     describe "instance method" do
       it "calls the class method" do
         capture(:stdout){ MyScript.start(["help"]) }.must =~ /Tasks:/
+      end
+
+      it "calls the class method" do
+        capture(:stdout){ MyScript.start(["help", "foo"]) }.must =~ /Usage:/
       end
     end
   end

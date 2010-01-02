@@ -4,7 +4,7 @@ require 'thor/actions'
 describe Thor::Actions::Directory do
   before(:each) do
     ::FileUtils.rm_rf(destination_root)
-    stub(invoker).file_name{ "rdoc" }
+    invoker.stub!(:file_name).and_return("rdoc")
   end
 
   def invoker

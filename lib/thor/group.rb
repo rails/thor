@@ -41,7 +41,7 @@ class Thor::Group
     # ==== Options
     # short:: When true, shows only usage.
     #
-    def help(shell, options={})
+    def help(shell)
       shell.say "Usage:"
       shell.say "  #{banner}\n"
       shell.say
@@ -210,6 +210,7 @@ class Thor::Group
       end
     end
 
+    # Returns tasks ready to be printed.
     def printable_tasks(*)
       item = []
       item << banner

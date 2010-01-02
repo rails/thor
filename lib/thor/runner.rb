@@ -253,7 +253,7 @@ class Thor::Runner < Thor #:nodoc:
     def display_klasses(with_modules=false, show_internal=false, klasses=Thor::Base.subclasses)
       klasses -= [Thor, Thor::Runner, Thor::Group] unless show_internal
 
-      raise Error, "No Thor tasks available" if klasses.empty?      
+      raise Error, "No Thor tasks available" if klasses.empty?
       show_modules if with_modules && !thor_yaml.empty?
 
       # Remove subclasses

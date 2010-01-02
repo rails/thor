@@ -78,6 +78,7 @@ class Thor
     def self.thor_classes_in(klass)
       stringfied_constants = klass.constants.map { |c| c.to_s }
       Thor::Base.subclasses.select do |subclass|
+        next unless subclass.name
         stringfied_constants.include?(subclass.name.gsub("#{klass.name}::", ''))
       end
     end

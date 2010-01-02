@@ -17,81 +17,81 @@ describe Thor::Shell::Basic do
 
   describe "#ask" do
     it "prints a message to the user and gets the response" do
-      mock($stdout).print("Should I overwrite it? ")
-      mock($stdin).gets{ "Sure" }
+      $stdout.should_receive(:print).with("Should I overwrite it? ")
+      $stdin.should_receive(:gets).and_return('Sure')
       shell.ask("Should I overwrite it?").must == "Sure"
     end
   end
 
   describe "#yes?" do
     it "asks the user and returns true if the user replies yes" do
-      mock($stdout).print("Should I overwrite it? ")
-      mock($stdin).gets{ "y" }
+      $stdout.should_receive(:print).with("Should I overwrite it? ")
+        $stdin.should_receive(:gets).and_return('y')
       shell.yes?("Should I overwrite it?").must be_true
 
-      mock($stdout).print("Should I overwrite it? ")
-      mock($stdin).gets{ "n" }
+      $stdout.should_receive(:print).with("Should I overwrite it? ")
+        $stdin.should_receive(:gets).and_return('n')
       shell.yes?("Should I overwrite it?").must_not be_true
     end
   end
 
   describe "#no?" do
     it "asks the user and returns true if the user replies no" do
-      mock($stdout).print("Should I overwrite it? ")
-      mock($stdin).gets{ "n" }
+      $stdout.should_receive(:print).with("Should I overwrite it? ")
+        $stdin.should_receive(:gets).and_return('n')
       shell.no?("Should I overwrite it?").must be_true
 
-      mock($stdout).print("Should I overwrite it? ")
-      mock($stdin).gets{ "Yes" }
+      $stdout.should_receive(:print).with("Should I overwrite it? ")
+        $stdin.should_receive(:gets).and_return('Yes')
       shell.no?("Should I overwrite it?").must be_false
     end
   end
 
   describe "#say" do
     it "prints a message to the user" do
-      mock($stdout).puts("Running...")
+      $stdout.should_receive(:puts).with("Running...")
       shell.say("Running...")
     end
 
     it "prints a message to the user without new line if it ends with a whitespace" do
-      mock($stdout).print("Running... ")
+      $stdout.should_receive(:print).with("Running... ")
       shell.say("Running... ")
     end
 
     it "prints a message to the user without new line" do
-      mock($stdout).print("Running...")
+      $stdout.should_receive(:print).with("Running...")
       shell.say("Running...", nil, false)
     end
   end
 
   describe "#say_status" do
     it "prints a message to the user with status" do
-      mock($stdout).puts("      create  ~/.thor/task.thor")
+      $stdout.should_receive(:puts).with("      create  ~/.thor/task.thor")
       shell.say_status(:create, "~/.thor/task.thor")
     end
 
     it "always use new line" do
-      mock($stdout).puts("      create  ")
+      $stdout.should_receive(:puts).with("      create  ")
       shell.say_status(:create, "")
     end
 
     it "does not print a message if base is set to quiet" do
       base = MyCounter.new [1,2]
-      mock(base).options { Hash.new(:quiet => true) }
+      base.should_receive(:options).and_return(:quiet => true)
 
-      dont_allow($stdout).puts
+      $stdout.should_not_receive(:puts)
       shell.base = base
       shell.say_status(:created, "~/.thor/task.thor")
     end
 
     it "does not print a message if log status is set to false" do
-      dont_allow($stdout).puts
+      $stdout.should_not_receive(:puts)
       shell.say_status(:created, "~/.thor/task.thor", false)
     end
 
     it "uses padding to set messages left margin" do
       shell.padding = 2
-      mock($stdout).puts("      create      ~/.thor/task.thor")
+      $stdout.should_receive(:puts).with("      create      ~/.thor/task.thor")
       shell.say_status(:create, "~/.thor/task.thor")
     end
   end
@@ -123,7 +123,7 @@ TABLE
     end
 
     it "uses maximum terminal width" do
-      mock(shell).terminal_width { 20 }
+      shell.should_receive(:terminal_width).and_return(20)
       content = capture(:stdout){ shell.print_table(@table, :ident => 2, :truncate => true) }
       content.must == <<-TABLE
   abc  #123  firs...
@@ -135,41 +135,41 @@ TABLE
 
   describe "#file_collision" do
     it "shows a menu with options" do
-      mock($stdout).print('Overwrite foo? (enter "h" for help) [Ynaqh] ')
-      mock($stdin).gets{ 'n' }
+      $stdout.should_receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqh] ')
+      $stdin.should_receive(:gets).and_return('n')
       shell.file_collision('foo')
     end
 
     it "returns true if the user choose default option" do
-      stub($stdout).print
-      mock($stdin).gets{ '' }
+      $stdout.stub!(:print)
+      $stdin.should_receive(:gets).and_return('')
       shell.file_collision('foo').must be_true
     end
 
     it "returns false if the user choose no" do
-      stub($stdout).print
-      mock($stdin).gets{ 'n' }
+      $stdout.stub!(:print)
+      $stdin.should_receive(:gets).and_return('n')
       shell.file_collision('foo').must be_false
     end
 
     it "returns true if the user choose yes" do
-      stub($stdout).print
-      mock($stdin).gets{ 'y' }
+      $stdout.stub!(:print)
+      $stdin.should_receive(:gets).and_return('y')
       shell.file_collision('foo').must be_true
     end
 
     it "shows help usage if the user choose help" do
-      stub($stdout).print
-      mock($stdin).gets{ 'h' }
-      mock($stdin).gets{ 'n' }
+      $stdout.stub!(:print)
+      $stdin.should_receive(:gets).and_return('h')
+      $stdin.should_receive(:gets).and_return('n')
       help = capture(:stdout){ shell.file_collision('foo') }
       help.must =~ /h \- help, show this help/
     end
 
     it "quits if the user choose quit" do
-      stub($stdout).print
-      mock($stdout).puts('Aborting...')
-      mock($stdin).gets{ 'q' }
+      $stdout.stub!(:print)
+      $stdout.should_receive(:puts).with('Aborting...')
+      $stdin.should_receive(:gets).and_return('q')
 
       lambda {
         shell.file_collision('foo')
@@ -177,27 +177,27 @@ TABLE
     end
 
     it "always returns true if the user choose always" do
-      mock($stdout).print('Overwrite foo? (enter "h" for help) [Ynaqh] ')
-      mock($stdin).gets{ 'a' }
+      $stdout.should_receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqh] ')
+      $stdin.should_receive(:gets).and_return('a')
 
       shell.file_collision('foo').must be_true
 
-      dont_allow($stdout).print
+      $stdout.should_not_receive(:print)
       shell.file_collision('foo').must be_true
     end
 
     describe "when a block is given" do
       it "displays diff options to the user" do
-        mock($stdout).print('Overwrite foo? (enter "h" for help) [Ynaqdh] ')
-        mock($stdin).gets{ 's' }
+        $stdout.should_receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqdh] ')
+        $stdin.should_receive(:gets).and_return('s')
         shell.file_collision('foo'){ }
       end
 
       it "invokes the diff command" do
-        stub($stdout).print
-        mock($stdin).gets{ 'd' }
-        mock($stdin).gets{ 'n' }
-        mock(shell).system(/diff -u/)
+        $stdout.stub!(:print)
+        $stdin.should_receive(:gets).and_return('d')
+        $stdin.should_receive(:gets).and_return('n')
+        shell.should_receive(:system).with(/diff -u/)
         capture(:stdout){ shell.file_collision('foo'){ } }
       end
     end

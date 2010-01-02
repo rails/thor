@@ -139,42 +139,42 @@ class Thor
       end
     end
 
-    # Prints help information. If a task name is given, it shows information
-    # only about the specific task.
+    # Prints help information for the given task.
     #
     # ==== Parameters
-    # meth<String>:: An optional task name to print usage information about.
+    # shell<Thor::Shell>
+    # task_name<String>
     #
-    # ==== Options
-    # namespace:: When true, shows the namespace in the output before the usage.
-    # skip_inherited:: When true, does not show tasks from superclass.
-    #
-    def help(shell, options={})
-      if options[:task]
-        task = all_tasks[options[:task]]
-        raise UndefinedTaskError, "task '#{options[:task]}' could not be found in namespace '#{self.namespace}'" unless task
+    def task_help(shell, task_name)
+      task = all_tasks[task_name]
+      raise UndefinedTaskError, "task '#{task_name}' could not be found in namespace '#{self.namespace}'" unless task
 
-        shell.say "Usage:"
-        shell.say "  #{banner(task)}"
-        shell.say
-        class_options_help(shell, nil => task.options.map { |_, o| o })
-        shell.say task.description
-      else
-        list = printable_tasks
-
-        Thor::Util.thor_classes_in(self).each do |klass|
-          list += klass.printable_tasks(false)
-        end
-
-        list.sort!{ |a,b| a[0] <=> b[0] }
-
-        shell.say "Tasks:"
-        shell.print_table(list, :ident => 2, :truncate => true)
-        shell.say
-        class_options_help(shell)
-      end
+      shell.say "Usage:"
+      shell.say "  #{banner(task)}"
+      shell.say
+      class_options_help(shell, nil => task.options.map { |_, o| o })
+      shell.say task.description
     end
 
+    # Prints help information for this class.
+    #
+    # ==== Parameters
+    # shell<Thor::Shell>
+    #
+    def help(shell)
+      list = printable_tasks
+      Thor::Util.thor_classes_in(self).each do |klass|
+        list += klass.printable_tasks(false)
+      end
+      list.sort!{ |a,b| a[0] <=> b[0] }
+
+      shell.say "Tasks:"
+      shell.print_table(list, :ident => 2, :truncate => true)
+      shell.say
+      class_options_help(shell)
+    end
+
+    # Returns tasks ready to be printed.
     def printable_tasks(all=true)
       (all ? all_tasks : tasks).map do |_, task|
         item = []
@@ -235,6 +235,6 @@ class Thor
 
   desc "help [TASK]", "Describe available tasks or one specific task"
   def help(task=nil)
-    self.class.help(shell, :task => task)
+    task ? self.class.task_help(shell, task) : self.class.help(shell)
   end
 end
