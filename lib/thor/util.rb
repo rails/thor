@@ -165,26 +165,6 @@ class Thor
       end
     end
 
-    # Receives a yaml (hash) and updates all constants entries to namespace.
-    # This was added to deal with deprecated versions of Thor.
-    #
-    # TODO Deprecate this method in the future.
-    #
-    # ==== Returns
-    # TrueClass|FalseClass:: Returns true if any change to the yaml file was made.
-    #
-    def self.convert_constants_to_namespaces(yaml)
-      yaml_changed = false
-
-      yaml.each do |k, v|
-        next unless v[:constants] && v[:namespaces].nil?
-        yaml_changed = true
-        yaml[k][:namespaces] = v[:constants].map{|c| Thor::Util.namespace_from_thor_class(c)}
-      end
-
-      yaml_changed
-    end
-
     def self.user_home
       @@user_home ||= if ENV["HOME"]
         ENV["HOME"]

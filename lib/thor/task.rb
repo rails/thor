@@ -4,8 +4,8 @@ class Thor
 
     # A dynamic task that handles method missing scenarios.
     class Dynamic < Task
-      def initialize(name)
-        super(name.to_s, "A dynamically-generated task", name.to_s)
+      def initialize(name, options=nil)
+        super(name.to_s, "A dynamically-generated task", name.to_s, options)
       end
 
       def run(instance, args=[])

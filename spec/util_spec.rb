@@ -169,28 +169,4 @@ describe Thor::Util do
       Thor::Util.user_home.must == "/home/user/"
     end
   end
-
-  describe "#convert_constants_to_namespaces" do
-    before(:each) do
-      @hash = {
-        :git => {
-          :constants => [Object, "Thor::Sandbox::Package", Thor::CoreExt::OrderedHash]
-        }
-      }
-    end
-
-    it "converts constants in the hash to namespaces" do
-      Thor::Util.convert_constants_to_namespaces(@hash)
-      @hash[:git][:namespaces].must == [ "object", "package", "thor:core_ext:ordered_hash" ]
-    end
-
-    it "returns true if the hash changed" do
-      Thor::Util.convert_constants_to_namespaces(@hash).must be_true
-    end
-
-    it "does not add namespaces to the hash if namespaces were already added" do
-      Thor::Util.convert_constants_to_namespaces(@hash)
-      Thor::Util.convert_constants_to_namespaces(@hash).must be_false
-    end
-  end
 end

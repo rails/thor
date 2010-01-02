@@ -26,11 +26,11 @@ describe Thor::Runner do
 
     it "shows information about a specific Thor group class" do
       content = capture(:stdout){ Thor::Runner.start(["help", "my_counter"]) }
-      content.must =~ /my_counter N \[N\]/
+      content.must =~ /my_counter N/
     end
 
     it "raises error if a class/task cannot be found" do
-      mock(Thor::Runner).exit(1){ }
+      Thor::Runner.should_receive(:exit).with(1)
       content = capture(:stderr){ Thor::Runner.start(["help", "unknown"]) }
       content.must =~ /could not find Thor class or task 'unknown'/
     end
@@ -39,7 +39,7 @@ describe Thor::Runner do
   describe "#start" do
     it "invokes a task from Thor::Runner" do
       ARGV.replace ["list"]
-      capture(:stdout){ Thor::Runner.start }.must =~ /my_counter N \[N\]/
+      capture(:stdout){ Thor::Runner.start }.must =~ /my_counter N/
     end
 
     it "invokes a task from a specific Thor class" do
@@ -68,7 +68,7 @@ describe Thor::Runner do
     end
 
     it "raises an error if class/task can't be found" do
-      mock(Thor::Runner).exit(1){ }
+      Thor::Runner.should_receive(:exit).with(1)
       ARGV.replace ["unknown"]
       capture(:stderr){ Thor::Runner.start }.must =~ /could not find Thor class or task 'unknown'/
     end
@@ -96,14 +96,16 @@ describe Thor::Runner do
         "random" => {
           :location  => @location,
           :filename  => "4a33b894ffce85d7b412fc1b36f88fe0",
-          :constants => ["Amazing"]
+          :namespaces => ["amazing"]
         }
       }
 
+      root_file = File.join(Thor::Util.thor_root, "thor.yml")
+
       # Stub load and save to avoid thor.yaml from being overwritten
-      stub(YAML).load_file { @original_yaml }
-      stub(File).exists?(File.join(Thor::Util.thor_root, "thor.yml")){ true }
-      stub(File).open(File.join(Thor::Util.thor_root, "thor.yml"), "w")
+      YAML.stub!(:load_file).and_return(@original_yaml)
+      File.stub!(:exists?).with(root_file).and_return(true)
+      File.stub!(:open).with(root_file, "w")
     end
 
     describe "list" do
@@ -115,7 +117,7 @@ describe Thor::Runner do
 
       it "gives a list of the available Thor::Group classes" do
         ARGV.replace ["list"]
-        capture(:stdout) { Thor::Runner.start }.must =~ /my_counter N \[N\]/
+        capture(:stdout) { Thor::Runner.start }.must =~ /my_counter N/
       end
 
       it "can filter a list of the available tasks by --group" do
@@ -148,26 +150,12 @@ describe Thor::Runner do
         ARGV.replace [":test"]
         capture(:stdout) { Thor::Runner.start }.must == "test\n"
       end
-
-      it "updates the yaml file when invoked" do
-        capture(:stdout) { Thor::Runner.start(["list"]) }
-        @original_yaml["random"][:namespaces].must == ["amazing"]
-      end
-    end
-
-    describe "update" do
-      it "updates existing thor files" do
-        mock.instance_of(Thor::Runner).install(@original_yaml["random"][:location]) { true }
-        stub(File).delete(File.join(Thor::Util.thor_root, @original_yaml["random"][:filename]))
-        silence(:stdout) { Thor::Runner.start(["update", "random"]) }
-      end
     end
 
     describe "uninstall" do
       before(:each) do
-        stub.instance_of(Thor::Runner).save_yaml(anything)
-        stub(File).delete(anything)
-        stub(@original_yaml).delete(anything)
+        path = File.join(Thor::Util.thor_root, @original_yaml["random"][:filename])
+        FileUtils.should_receive(:rm_rf).with(path)
       end
 
       it "uninstalls existing thor modules" do
@@ -177,7 +165,7 @@ describe Thor::Runner do
 
     describe "installed" do
       before(:each) do
-        stub(Dir).[](anything) { [] }
+        Dir.should_receive(:[]).and_return([])
       end
 
       it "displays the modules installed in a pretty way" do
@@ -187,16 +175,24 @@ describe Thor::Runner do
       end
     end
 
-    describe "install" do
+    describe "install/update" do
+      before(:each) do
+        FileUtils.stub!(:mkdir_p)
+        FileUtils.stub!(:touch)
+        $stdin.stub!(:gets).and_return("Y")
+
+        path = File.join(Thor::Util.thor_root, Digest::MD5.hexdigest(@location + "random"))
+        File.should_receive(:open).with(path, "w")
+      end
+
+      it "updates existing thor files" do
+        path = File.join(Thor::Util.thor_root, @original_yaml["random"][:filename])
+        File.should_receive(:delete).with(path)
+        silence(:stdout) { Thor::Runner.start(["update", "random"]) }
+      end
+
       it "installs thor files" do
         ARGV.replace ["install", @location]
-
-        # Stubs for the file system interactions
-        stub.instance_of(Thor::Base.shell).no? { false }
-        stub(FileUtils).mkdir_p
-        stub(FileUtils).touch
-
-        mock(File).open(File.join(Thor::Util.thor_root, Digest::MD5.hexdigest(@location + "random")), "w")
         silence(:stdout) { Thor::Runner.start }
       end
     end

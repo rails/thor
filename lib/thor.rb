@@ -160,7 +160,7 @@ class Thor
         class_options_help(shell, nil => task.options.map { |_, o| o })
         shell.say task.description
       else
-        list = printable_tasks(!options[:short])
+        list = printable_tasks
 
         Thor::Util.thor_classes_in(self).each do |klass|
           list += klass.printable_tasks(false)
@@ -168,14 +168,10 @@ class Thor
 
         list.sort!{ |a,b| a[0] <=> b[0] }
 
-        if options[:short]
-          shell.print_table(list, :truncate => true)
-        else
-          shell.say "Tasks:"
-          shell.print_table(list, :ident => 2, :truncate => true)
-          shell.say
-          class_options_help(shell)
-        end
+        shell.say "Tasks:"
+        shell.print_table(list, :ident => 2, :truncate => true)
+        shell.say
+        class_options_help(shell)
       end
     end
 
@@ -183,7 +179,7 @@ class Thor
       (all ? all_tasks : tasks).map do |_, task|
         item = []
         item << banner(task)
-        item << "# #{task.description}" if task.description
+        item << (task.description ? "# #{task.description.gsub(/\s+/m,' ')}" : "")
         item
       end
     end

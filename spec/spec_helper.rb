@@ -6,6 +6,7 @@ require 'stringio'
 
 require 'rubygems'
 require 'rr'
+require 'rdoc'
 require 'diff/lcs' # You need diff/lcs installed to run specs (but not to run Thor).
 
 # Load fixtures
@@ -25,8 +26,6 @@ Kernel.module_eval do
 end
 
 Spec::Runner.configure do |config|
-  config.mock_with :rr
-
   def capture(stream)
     begin
       stream = stream.to_s
