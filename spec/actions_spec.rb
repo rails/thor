@@ -55,9 +55,10 @@ describe Thor::Actions do
       end
 
       it "does not use the current directory if one is given" do
+        root = File.expand_path("/")
         base = MyCounter.new([1])
-        base.destination_root = "/"
-        base.destination_root.must == "/"
+        base.destination_root = root
+        base.destination_root.must == root
       end
 
       it "uses the current directory if none is given" do
