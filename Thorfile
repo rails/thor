@@ -4,7 +4,10 @@ require File.join(File.dirname(__FILE__), "lib", "thor", "version")
 require 'rubygems'
 require 'thor/rake_compat'
 require 'spec/rake/spectask'
-require 'rdoc/task'
+begin
+  require 'rdoc/task'
+rescue LoadError
+end
 
 GEM_NAME = 'thor'
 EXTRA_RDOC_FILES = ["README.rdoc", "LICENSE", "CHANGELOG.rdoc", "VERSION", "Thorfile"]
@@ -26,13 +29,15 @@ class Default < Thor
     t.rcov_dir = "rcov"
   end
 
-  RDoc::Task.new do |rdoc|
-    rdoc.main     = "README.rdoc"
-    rdoc.rdoc_dir = "rdoc"
-    rdoc.title    = GEM_NAME
-    rdoc.rdoc_files.include(*EXTRA_RDOC_FILES)
-    rdoc.rdoc_files.include('lib/**/*.rb')
-    rdoc.options << '--line-numbers' << '--inline-source'
+  if defined?(RDoc)
+    RDoc::Task.new do |rdoc|
+      rdoc.main     = "README.rdoc"
+      rdoc.rdoc_dir = "rdoc"
+      rdoc.title    = GEM_NAME
+      rdoc.rdoc_files.include(*EXTRA_RDOC_FILES)
+      rdoc.rdoc_files.include('lib/**/*.rb')
+      rdoc.options << '--line-numbers' << '--inline-source'
+    end
   end
 
   begin
