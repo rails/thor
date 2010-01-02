@@ -179,18 +179,18 @@ describe Thor::Actions do
     describe "#gsub_file" do
       it "replaces the content in the file" do
         action :gsub_file, "doc/README", "__start__", "START"
-        File.open(file).read.must == "START\nREADME\n__end__\n"
+        File.binread(file).must == "START\nREADME\n__end__\n"
       end
 
       it "does not replace if pretending" do
         runner(:pretend => true)
         action :gsub_file, "doc/README", "__start__", "START"
-        File.open(file).read.must == "__start__\nREADME\n__end__\n"
+        File.binread(file).must == "__start__\nREADME\n__end__\n"
       end
 
       it "accepts a block" do
         action(:gsub_file, "doc/README", "__start__"){ |match| match.gsub('__', '').upcase  }
-        File.open(file).read.must == "START\nREADME\n__end__\n"
+        File.binread(file).must == "START\nREADME\n__end__\n"
       end
 
       it "logs status" do
@@ -205,12 +205,12 @@ describe Thor::Actions do
     describe "#append_file" do
       it "appends content to the file" do
         action :append_file, "doc/README", "END\n"
-        File.open(file).read.must == "__start__\nREADME\n__end__\nEND\n"
+        File.binread(file).must == "__start__\nREADME\n__end__\nEND\n"
       end
 
       it "accepts a block" do
         action(:append_file, "doc/README"){ "END\n" }
-        File.open(file).read.must == "__start__\nREADME\n__end__\nEND\n"
+        File.binread(file).must == "__start__\nREADME\n__end__\nEND\n"
       end
 
       it "logs status" do
@@ -221,12 +221,12 @@ describe Thor::Actions do
     describe "#prepend_file" do
       it "prepends content to the file" do
         action :prepend_file, "doc/README", "START\n"
-        File.open(file).read.must == "START\n__start__\nREADME\n__end__\n"
+        File.binread(file).must == "START\n__start__\nREADME\n__end__\n"
       end
 
       it "accepts a block" do
         action(:prepend_file, "doc/README"){ "START\n" }
-        File.open(file).read.must == "START\n__start__\nREADME\n__end__\n"
+        File.binread(file).must == "START\n__start__\nREADME\n__end__\n"
       end
 
       it "logs status" do
@@ -241,12 +241,12 @@ describe Thor::Actions do
 
       it "appends content to a class" do
         action :inject_into_class, "application.rb", Application, "  filter_parameters :password\n"
-        File.open(file).read.must == "class Application < Base\n  filter_parameters :password\nend\n"
+        File.binread(file).must == "class Application < Base\n  filter_parameters :password\nend\n"
       end
 
       it "accepts a block" do
         action(:inject_into_class, "application.rb", Application){ "  filter_parameters :password\n" }
-        File.open(file).read.must == "class Application < Base\n  filter_parameters :password\nend\n"
+        File.binread(file).must == "class Application < Base\n  filter_parameters :password\nend\n"
       end
 
       it "logs status" do
@@ -255,7 +255,7 @@ describe Thor::Actions do
 
       it "does not append if class name does not match" do
         action :inject_into_class, "application.rb", "App", "  filter_parameters :password\n"
-        File.open(file).read.must == "class Application < Base\nend\n"
+        File.binread(file).must == "class Application < Base\nend\n"
       end
     end
   end
