@@ -155,7 +155,7 @@ class Thor
     # inside the sandbox to avoid namespacing conflicts.
     #
     def self.load_thorfile(path, content=nil)
-      content ||= File.read(path)
+      content ||= File.binread(path)
 
       begin
         Thor::Sandbox.class_eval(content, path)

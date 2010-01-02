@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'thor/core_ext/file_binary_read'
 
 Dir[File.join(File.dirname(__FILE__), "actions", "*.rb")].each do |action|
   require action
