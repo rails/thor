@@ -2,6 +2,7 @@ require 'thor/base'
 require 'thor/group'
 require 'thor/actions'
 
+# TODO: Update thor to allow for git-style CLI (git bisect run)
 class Thor
   class << self
     # Sets the default task when thor is executed without an explicit task to be called.
