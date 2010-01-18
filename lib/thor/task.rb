@@ -40,8 +40,8 @@ class Thor
 
     # Returns the formatted usage by injecting given required arguments 
     # and required options into the given usage.
-    def formatted_usage(klass, namespace=nil)
-      namespace = klass.namespace if namespace.nil?
+    def formatted_usage(klass, namespace=true)
+      namespace = klass.namespace unless namespace == false
 
       # Add namespace
       formatted = if namespace

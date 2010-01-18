@@ -4,4 +4,5 @@
 require 'thor'
 require 'thor/runner'
 
+$thor_runner = true
 Thor::Runner.start

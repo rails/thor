@@ -1,9 +1,7 @@
-== TODO
+== 0.12, released 2010-01-02
 
-* Improve spec coverage for Thor::Runner
-
-== 0.12, released 2009-11-06
-
+* Removed rr in favor to rspec mock framework
+* Improved output for thor -T
 * [#7] Do not force white color on status
 * [#8] Yield a block with the filename on directory
 

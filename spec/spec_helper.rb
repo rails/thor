@@ -8,6 +8,8 @@ require 'rubygems'
 require 'rdoc'
 require 'diff/lcs' # You need diff/lcs installed to run specs (but not to run Thor).
 
+$thor_runner = true
+
 # Load fixtures
 load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "group.thor")

@@ -224,7 +224,8 @@ class Thor::Group
       # thor class by another ways which is not the Thor::Runner.
       #
       def banner
-        "thor #{self_task.formatted_usage(self, false)}"
+        base = $thor_runner ? "thor" : File.basename($0.split(" ").first)
+        "#{base} #{self_task.formatted_usage(self, false)}"
       end
 
       # Represents the whole class as a task.
@@ -246,22 +247,25 @@ class Thor::Group
 
   protected
 
-    # Shortcut to invoke with padding and block handling. Use internally by
-    # invoke and invoke_from_option class methods.
-    def _invoke_for_class_method(klass, task=nil, *args, &block) #:nodoc:
-      shell.padding += 1
+  # Shortcut to invoke with padding and block handling. Use internally by
+  # invoke and invoke_from_option class methods.
+  def _invoke_for_class_method(klass, task=nil, *args, &block) #:nodoc:
+    shell.padding += 1
 
-      result = if block_given?
-        if block.arity == 2
-          block.call(self, klass)
-        else
-          block.call(self, klass, task)
-        end
-      else
-        invoke klass, task, *args
+    result = if block_given?
+      case block.arity
+      when 3
+        block.call(self, klass, task)
+      when 2
+        block.call(self, klass)
+      when 1
+        instance_exec(klass, &block)
       end
-
-      shell.padding -= 1
-      result
+    else
+      invoke klass, task, *args
     end
+
+    shell.padding -= 1
+    result
+  end
 end
