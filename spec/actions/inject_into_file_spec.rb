@@ -55,6 +55,35 @@ describe Thor::Actions::InjectIntoFile do
       invoke! "doc/README", "\nmore content", :after => "__start__"
       File.read(file).must == "__start__\nREADME\n__end__\n"
     end
+
+    it "does not change the file if already include content" do
+      invoke! "doc/README", :before => "__end__" do
+        "more content\n"
+      end
+
+      File.read(file).must == "__start__\nREADME\nmore content\n__end__\n"
+
+      invoke! "doc/README", :before => "__end__" do
+        "more content\n"
+      end
+
+      File.read(file).must == "__start__\nREADME\nmore content\n__end__\n"
+    end
+
+    it "does change the file if already include content and :force == true" do
+      invoke! "doc/README", :before => "__end__" do
+        "more content\n"
+      end
+
+      File.read(file).must == "__start__\nREADME\nmore content\n__end__\n"
+
+      invoke! "doc/README", :before => "__end__", :force => true do
+        "more content\n"
+      end
+
+      File.read(file).must == "__start__\nREADME\nmore content\nmore content\n__end__\n"
+    end
+
   end
 
   describe "#revoke!" do

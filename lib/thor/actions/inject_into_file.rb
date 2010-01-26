@@ -10,7 +10,8 @@ class Thor
     # destination<String>:: Relative path to the destination root
     # data<String>:: Data to add to the file. Can be given as a block.
     # config<Hash>:: give :verbose => false to not log the status and the flag
-    #                for injection (:after or :before).
+    #                for injection (:after or :before) or :force => true for 
+    #                insert two or more times the same content.
     # 
     # ==== Examples
     #
@@ -55,7 +56,7 @@ class Thor
           replacement + '\0'
         end
 
-        replace!(/#{flag}/, content)
+        replace!(/#{flag}/, content) if config[:force] || !File.binread(destination).include?(replacement)
       end
 
       def revoke!
