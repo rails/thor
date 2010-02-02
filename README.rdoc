@@ -234,7 +234,7 @@ placed. Be sure to check the documentation on actions[http://rdoc.info/rdoc/wyca
 A great use for Thor is creating custom generators. Combining Thor::Group,
 Thor::Actions and ERB templates makes this very easy. Here is an example:
 
-    class NewgemGenerator < Thor::Group
+    class Newgem < Thor::Group
       include Thor::Actions
 
       # Define arguments and options
@@ -255,7 +255,7 @@ Thor::Actions and ERB templates makes this very easy. Here is an example:
       end
 
       def copy_licence
-        if yes? "Use MIT license?"
+        if yes?("Use MIT license?")
           # Make a copy of the MITLICENSE file at the source root
           copy_file "MITLICENSE", "#{name}/MITLICENSE"
         else
@@ -265,7 +265,7 @@ Thor::Actions and ERB templates makes this very easy. Here is an example:
     end
 
 Doing a <tt>thor -T</tt> will show how to run our generator. It should read:
-<tt>thor newgem_generator NAME</tt>. This shows that we have to supply a NAME
+<tt>thor newgem NAME</tt>. This shows that we have to supply a NAME
 argument for our generator to run.
 
 The <tt>create_lib_file</tt> uses an ERB template. This is what it looks like:
@@ -277,24 +277,20 @@ The arguments that you set in your generator will automatically be passed in
 when <tt>template</tt> gets called. Be sure to read the documentation[http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor/Actions.html] for
 more options.
 
-Running the generator with <tt>thor newgem_generator remarkable</tt> will
-create two files: "remarkable/lib/remarkable.rb",
-"remarkable/test/remarkable_test.rb". The user will then be prompt (with the
+Running the generator with <tt>thor newgem devise</tt> will
+create two files: "devise/lib/devise.rb",
+"devise/test/devise_test.rb". The user will then be prompt (with the
 use of the method <tt>yes?</tt>) if he wants to copy the MITLICENSE. If you
 want to change the test framework, you can add the option:
-<tt>thor newgem_generator remarkable --test-framework=rspec</tt>
-This will generate: "remarkable/lib/remarkable.rb" and
-"remarkable/spec/remarkable_spec.rb".
+<tt>thor newgem devise --test-framework=rspec</tt>
+This will generate: "devise/lib/devise.rb" and
+"devise/spec/devise_spec.rb".
 
 == Further Reading
 
 Thor has many scripting possibilities beyond these examples. Be sure to read
 through the documentation[http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor.html] and specs[http://github.com/wycats/thor/tree/master/spec/] to get a better understanding of all the
 options Thor offers.
-
-Thor is also going to be used as the generator for Rails 3. For more
-information about creating your own Rails 3 generator please read this[http://blog.plataformatec.com.br/2010/01/discovering-rails-3-generators/]
-blog post.
 
 == License
 
