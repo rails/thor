@@ -145,7 +145,7 @@ When invoking the task one:
 
 The output is "1 2 3", which means that the three task was invoked only once.
 You can even invoke tasks from another class, so be sure to check the
-documentation.
+documentation[http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor.html].
 
 == Thor::Group
 
@@ -227,7 +227,74 @@ To use them, you just need to include Thor::Actions in your Thor classes:
 
 Some actions like copy file requires that a class method called source_root is
 defined in your class. This is the directory where your templates should be
-placed. Be sure to check the documentation.
+placed. Be sure to check the documentation on actions[http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor/Actions.html].
+
+== Generators
+
+A great use for Thor is creating custom generators. Combining Thor::Group,
+Thor::Actions and ERB templates makes this very easy. Here is an example:
+
+		class NewgemGenerator < Thor::Group
+		  include Thor::Actions
+ 
+		  # Define arguments and options
+		  argument :name
+		  class_option :test_framework, :default => :test_unit
+ 
+		  def self.source_root
+		    File.dirname(__FILE__)
+		  end
+ 
+		  def create_lib_file
+				template('templates/newgem.tt', "#{name}/lib/#{name}.rb")
+		  end
+ 
+		  def create_test_file
+		    test = options[:test_framework] == "rspec" ? :spec : :test
+		    create_file "#{name}/#{test}/#{name}_#{test}.rb"
+		  end
+ 
+		  def copy_licence
+		    if yes? "Use MIT license?"
+		      # Make a copy of the MITLICENSE file at the source root
+		      copy_file "MITLICENSE", "#{name}/MITLICENSE"
+		    else
+		      say "Shame on you…", :red
+		    end
+		  end
+		end
+
+Doing a <tt>thor -T</tt> will show how to run our generator. It should read:
+<tt>thor newgem_generator NAME</tt>. This shows that we have to supply a NAME
+argument for our generator to run.
+
+The <tt>create_lib_file</tt> uses an ERB template. This is what it looks like:
+
+		class <%= name.camelize %>
+		end
+
+The arguments that you set in your generator will automatically be passed in
+when <tt>template</tt> gets called. Be sure to read the documentation[http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor/Actions.html] for
+more options.
+
+Running the generator with <tt>thor newgem_generator remarkable</tt> will
+create two files: "remarkable/lib/remarkable.rb",
+"remarkable/test/remarkable_test.rb". The user will then be prompt (with the
+use of the method <tt>yes?</tt>) if he wants to copy the MITLICENSE. If you
+want to change the test framework, you can add the option:
+<tt>thor newgem_generator remarkable --test-framework=rspec</tt>
+This will generate: "remarkable/lib/remarkable.rb" and
+"remarkable/spec/remarkable_spec.rb".
+
+== Further Reading
+
+Thor has many scripting possibilities beyond these examples. Be sure to read
+through the documentation[http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor.html] and specs[http://github.com/wycats/thor/tree/master/spec/] to get a better understanding of all the
+options Thor offers.
+
+Thor is also going to be used as the generator for Rails 3. For more
+information about creating your own Rails 3 generator please read this[http://blog.plataformatec.com.br/2010/01/discovering-rails-3-generators/]
+blog post.
 
 == License
 
