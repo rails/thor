@@ -56,7 +56,7 @@ class Thor
           replacement + '\0'
         end
 
-        replace!(/#{flag}/, content) if config[:force] || !File.binread(destination).include?(replacement)
+        replace!(/#{flag}/, content, config[:force])
       end
 
       def revoke!
@@ -70,7 +70,7 @@ class Thor
           /(#{Regexp.escape(replacement)})(.*)(#{flag})/m
         end
 
-        replace!(regexp, content)
+        replace!(regexp, content, true)
       end
 
       protected
@@ -89,11 +89,13 @@ class Thor
 
         # Adds the content to the file.
         #
-        def replace!(regexp, string)
+        def replace!(regexp, string, force)
           unless base.options[:pretend]
             content = File.binread(destination)
-            content.gsub!(regexp, string)
-            File.open(destination, 'wb') { |file| file.write(content) }
+            if force || !content.include?(replacement)
+              content.gsub!(regexp, string)
+              File.open(destination, 'wb') { |file| file.write(content) }
+            end
           end
         end
 

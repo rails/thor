@@ -1,5 +1,6 @@
 == 0.12, released 2010-01-02
 
+* inject_into_file does not add the same content twice, unless :force is set
 * Removed rr in favor to rspec mock framework
 * Improved output for thor -T
 * [#7] Do not force white color on status
