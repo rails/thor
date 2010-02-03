@@ -1,4 +1,8 @@
 class MyScript < Thor
+  attr_accessor :some_attribute
+  attr_writer :another_attribute
+  attr_reader :another_attribute
+
   group :script
   default_task :example_default_task
 

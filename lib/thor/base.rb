@@ -97,6 +97,18 @@ class Thor
     module ClassMethods
       attr_accessor :debugging
 
+      def attr_reader(*) #:nodoc:
+        no_tasks { super }
+      end
+
+      def attr_writer(*) #:nodoc:
+        no_tasks { super }
+      end
+
+      def attr_accessor(*) #:nodoc:
+        no_tasks { super }
+      end
+
       # Adds an argument to the class and creates an attr_accessor for it.
       #
       # Arguments are different from options in several aspects. The first one
