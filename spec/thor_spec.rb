@@ -133,7 +133,7 @@ describe Thor do
     end
 
     it "raises when an exception happens within the task call" do
-      lambda { MyScript.start(["call_myself_with_wrong_arity", "--debug"]) }.must raise_error
+      lambda { MyScript.start(["call_myself_with_wrong_arity"]) }.must raise_error(ArgumentError)
     end
   end
 

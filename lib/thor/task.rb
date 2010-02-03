@@ -1,6 +1,6 @@
 class Thor
   class Task < Struct.new(:name, :description, :usage, :options)
-    FILE_REGEXP = /^#{Regexp.escape(File.expand_path(__FILE__))}:[\w:]+ `run'$/
+    FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
 
     # A dynamic task that handles method missing scenarios.
     class Dynamic < Task
@@ -78,15 +78,15 @@ class Thor
         (collection & [name.to_s, name.to_sym]).empty?
       end
 
-      # For Ruby <= 1.8.7, we have to match the method name that we are trying to call.
-      # In Ruby >= 1.9.1, we have to match the method run in this file.
-      def backtrace_match?(backtrace) #:nodoc:
-        method_name = /`#{Regexp.escape(name.split(':').last)}'/
-        backtrace =~ method_name || backtrace =~ FILE_REGEXP
+      def sans_backtrace(backtrace, caller) #:nodoc:
+        saned  = backtrace.reject { |frame| frame =~ FILE_REGEXP }
+        saned -= caller
       end
 
       def parse_argument_error(instance, e, caller) #:nodoc:
-        if e.message =~ /wrong number of arguments/ && backtrace_match?(e.backtrace.first.to_s)
+        backtrace = sans_backtrace(e.backtrace, caller)
+
+        if backtrace.empty? && e.message =~ /wrong number of arguments/
           if instance.is_a?(Thor::Group)
             raise e, "'#{name}' was called incorrectly. Are you sure it has arity equals to 0?"
           else
