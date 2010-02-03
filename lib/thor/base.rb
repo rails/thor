@@ -8,6 +8,9 @@ require 'thor/task'
 require 'thor/util'
 
 class Thor
+  autoload :Actions,    'thor/actions'
+  autoload :RakeCompat, 'thor/rake_compat'
+
   # Shortcuts for help.
   HELP_MAPPINGS       = %w(-h -? --help -D)
 

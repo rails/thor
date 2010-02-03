@@ -1,6 +1,4 @@
 require 'thor/base'
-require 'thor/group'
-require 'thor/actions'
 
 # TODO: Update thor to allow for git-style CLI (git bisect run)
 class Thor

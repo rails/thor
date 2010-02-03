@@ -1,8 +1,9 @@
+require 'thor/base'
+
 # Thor has a special class called Thor::Group. The main difference to Thor class
 # is that it invokes all tasks at once. It also include some methods that allows
 # invocations to be done at the class method, which are not available to Thor
 # tasks.
-#
 class Thor::Group
   class << self
     # The descrition for this Thor::Group. If none is provided, but a source root
