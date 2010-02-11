@@ -2,7 +2,6 @@ $TESTING=true
 
 $:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 require 'thor'
-require 'thor/group'
 require 'stringio'
 
 require 'rubygems'

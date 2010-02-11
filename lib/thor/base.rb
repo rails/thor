@@ -10,6 +10,7 @@ require 'thor/util'
 class Thor
   autoload :Actions,    'thor/actions'
   autoload :RakeCompat, 'thor/rake_compat'
+  autoload :Group,      'thor/group'
 
   # Shortcuts for help.
   HELP_MAPPINGS       = %w(-h -? --help -D)
