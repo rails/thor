@@ -1,5 +1,8 @@
-require 'fileutils'
+require 'thor'
+require 'thor/group'
 require 'thor/core_ext/file_binary_read'
+
+require 'fileutils'
 require 'open-uri'
 require 'yaml'
 require 'digest/md5'
