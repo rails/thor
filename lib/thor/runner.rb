@@ -9,7 +9,7 @@ require 'digest/md5'
 require 'pathname'
 
 class Thor::Runner < Thor #:nodoc:
-  map "-T" => :list, "-i" => :install, "-u" => :update
+  map "-T" => :list, "-i" => :install, "-u" => :update, "-v" => :version
 
   # Override Thor#help so it can give information about any class and any method.
   #
@@ -97,6 +97,12 @@ class Thor::Runner < Thor #:nodoc:
     end
 
     thor_yaml[as][:filename] # Indicate success
+  end
+
+  desc "version", "Show Thor version"
+  def version
+    require 'thor/version'
+    say "Thor #{Thor::VERSION}"
   end
 
   desc "uninstall NAME", "Uninstall a named Thor module"

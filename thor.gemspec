@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{thor}
-  s.version = "0.13.0"
+  s.version = "0.13.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Yehuda Katz", "Jos\303\251 Valim"]
-  s.date = %q{2010-02-03}
+  s.date = %q{2010-02-11}
   s.description = %q{A scripting framework that replaces rake, sake and rubigen}
   s.email = %q{ruby-thor@googlegroups.com}
   s.executables = ["thor", "rake2thor"]
