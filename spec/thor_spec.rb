@@ -202,6 +202,10 @@ END
           MyScript.task_help(shell, "unknown")
         }.must raise_error(Thor::Error, "task 'unknown' could not be found in namespace 'my_script'")
       end
+
+      it "normalizes names before claiming they don't exist" do
+        capture(:stdout) { MyScript.task_help(shell, "name-with-dashes") }.must =~ /thor my_script:name-with-dashes/
+      end
     end
 
     describe "instance method" do

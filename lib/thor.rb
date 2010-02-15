@@ -145,7 +145,8 @@ class Thor
     # task_name<String>
     #
     def task_help(shell, task_name)
-      task = all_tasks[task_name]
+      meth = normalize_task_name(task_name)
+      task = all_tasks[meth]
       raise UndefinedTaskError, "task '#{task_name}' could not be found in namespace '#{self.namespace}'" unless task
 
       shell.say "Usage:"

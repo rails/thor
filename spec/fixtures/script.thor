@@ -53,6 +53,10 @@ END
   def long_description
   end
 
+  desc "name-with-dashes", "Ensure normalization of task names"
+  def name_with_dashes
+  end
+
   method_options :all => :boolean
   desc "with_optional NAME", "invoke with optional name"
   def with_optional(name=nil)
