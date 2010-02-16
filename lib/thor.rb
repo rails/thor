@@ -192,8 +192,7 @@ class Thor
       # the namespace should be displayed as arguments.
       #
       def banner(task)
-        base = $thor_runner ? "thor" : File.basename($0.split(" ").first)
-        "#{base} #{task.formatted_usage(self, base == "thor")}"
+        "#{banner_base} #{task.formatted_usage(self, banner_base == "thor")}"
       end
 
       def baseclass #:nodoc:

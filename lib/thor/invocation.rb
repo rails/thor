@@ -5,9 +5,9 @@ class Thor
     end
 
     module ClassMethods
-      # Prepare for class methods invocations. This method must return a klass to
-      # have the invoked class options showed in help messages in generators.
-      #
+      # This method is responsible for receiving a name and find the proper
+      # class and task for it. The key is an optional parameter which is
+      # available only in class methods invocations (i.e. in Thor::Group).
       def prepare_for_invocation(key, name) #:nodoc:
         case name
           when Symbol, String
@@ -18,8 +18,7 @@ class Thor
       end
     end
 
-    # Make initializer aware of invocations and the initializer proc.
-    #
+    # Make initializer aware of invocations and the initialization args.
     def initialize(args=[], options={}, config={}, &block) #:nodoc:
       @_invocations = config[:invocations] || Hash.new { |h,k| h[k] = [] }
       @_initializer = [ args, options, config ]
@@ -33,6 +32,8 @@ class Thor
     # You can also supply the arguments, options and configuration values for
     # the task to be invoked, if none is given, the same values used to
     # initialize the invoker are used to initialize the invoked.
+    #
+    # When no name is given, it will invoke the default task of the current class.
     #
     # ==== Examples
     #
@@ -92,9 +93,9 @@ class Thor
     #
     #   invoke Rspec::RR, [], :style => :foo
     #
-    def invoke(name=nil, task=nil, args=nil, opts=nil, config=nil)
-      task, args, opts, config = nil, task, args, opts if task.nil? || task.is_a?(Array)
-      args, opts, config = nil, args, opts if args.is_a?(Hash)
+    def invoke(name=nil, *args)
+      args.unshift(nil) if Array === args.first || NilClass === args.first
+      task, args, opts, config = args
 
       object, task    = _prepare_for_invocation(name, task)
       klass, instance = _initialize_klass_with_initializer(object, args, opts, config)
@@ -121,15 +122,13 @@ class Thor
     protected
 
       # Configuration values that are shared between invocations.
-      #
       def _shared_configuration #:nodoc:
         { :invocations => @_invocations }
       end
 
-      # Prepare for invocation in the instance level. In this case, we have to
-      # take into account that a just a task name from the current class was
-      # given or even a Thor::Task object.
-      #
+      # This method can receive several different types of arguments and it's then
+      # responsible to normalize them by returning the object where the task should
+      # be invoked and a Thor::Task object.
       def _prepare_for_invocation(name, sent_task=nil) #:nodoc:
         if name.is_a?(Thor::Task)
           task = name
@@ -147,18 +146,16 @@ class Thor
 
       # Check if the object given is a Thor class object and get a task object
       # for it.
-      #
       def _validate_task(object, task) #:nodoc:
         klass = object.is_a?(Class) ? object : object.class
         raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
 
-        task ||= klass.default_task if klass <= Thor
+        task ||= klass.default_task if klass.respond_to?(:default_task)
         task = klass.all_tasks[task.to_s] || Thor::Task::Dynamic.new(task) if task && !task.is_a?(Thor::Task)
         task
       end
 
       # Initialize klass using values stored in the @_initializer.
-      #
       def _initialize_klass_with_initializer(object, args, opts, config) #:nodoc:
         if object.is_a?(Class)
           klass = object
