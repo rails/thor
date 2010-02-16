@@ -233,6 +233,12 @@ describe Thor::Base do
       }.must raise_error(Thor::UndefinedTaskError, 'Could not find task "what" in "my_script" namespace.')
     end
 
+    it "does not steal args" do
+      args = ["foo", "bar", "--force", "true"]
+      MyScript.start(args)
+      args.must == ["foo", "bar", "--force", "true"]
+    end
+
     it "checks unknown options" do
       capture(:stderr) {
         MyScript.start(["foo", "bar", "--force", "true", "--unknown", "baz"])

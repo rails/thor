@@ -120,8 +120,8 @@ class Thor
     #   script = MyScript.new(args, options, config)
     #   script.invoke(:task, first_arg, second_arg, third_arg)
     #
-    def start(given_args=ARGV, config={})
-      super do
+    def start(original_args=ARGV, config={})
+      super do |given_args|
         meth = normalize_task_name(given_args.shift)
         task = all_tasks[meth]
 

@@ -25,8 +25,8 @@ class Thor::Group
     # Start works differently in Thor::Group, it simply invokes all tasks
     # inside the class.
     #
-    def start(given_args=ARGV, config={})
-      super do
+    def start(original_args=ARGV, config={})
+      super do |given_args|
         if Thor::HELP_MAPPINGS.include?(given_args.first)
           help(config[:shell])
           return

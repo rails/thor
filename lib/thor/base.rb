@@ -375,7 +375,7 @@ class Thor
       def start(given_args=ARGV, config={})
         self.debugging = given_args.include?("--debug")
         config[:shell] ||= Thor::Base.shell.new
-        yield
+        yield(given_args.dup)
       rescue Thor::Error => e
         debugging ? (raise e) : config[:shell].error(e.message)
         exit(1) if exit_on_failure?
