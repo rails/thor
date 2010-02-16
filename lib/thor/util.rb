@@ -43,7 +43,6 @@ class Thor
     def self.namespace_from_thor_class(constant)
       constant = constant.to_s.gsub(/^Thor::Sandbox::/, "")
       constant = snake_case(constant).squeeze(":")
-      constant.gsub!(/^default/, '')
       constant
     end
 

@@ -38,11 +38,6 @@ describe Thor::Util do
       Thor::Util.namespace_from_thor_class("FooBar::BarBaz::BazBoom").must == "foo_bar:bar_baz:baz_boom"
     end
 
-    it "gets rid of an initial Default module" do
-      Thor::Util.namespace_from_thor_class("Default::Foo::Bar").must == ":foo:bar"
-      Thor::Util.namespace_from_thor_class("Default").must == ""
-    end
-
     it "accepts class and module objects" do
       Thor::Util.namespace_from_thor_class(Thor::CoreExt::OrderedHash).must == "thor:core_ext:ordered_hash"
       Thor::Util.namespace_from_thor_class(Thor::Util).must == "thor:util"
