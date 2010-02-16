@@ -55,10 +55,6 @@ class Thor
             value
           elsif required = (value == :required)
             :string
-          elsif value == :optional
-            # TODO Remove this warning in the future.
-            warn "Optional type is deprecated. Choose :boolean or :string instead. Assumed to be :boolean."
-            :boolean
           end
         when TrueClass, FalseClass
           :boolean
