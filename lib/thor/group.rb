@@ -219,6 +219,10 @@ class Thor::Group
       [item]
     end
 
+    def handle_argument_error(task, error) #:nodoc:
+      raise error, "#{task.name.inspect} was called incorrectly. Are you sure it has arity equals to 0?"
+    end
+
     protected
 
       # The banner for this class. You can customize it if you are invoking the

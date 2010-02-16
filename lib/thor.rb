@@ -147,7 +147,7 @@ class Thor
     def task_help(shell, task_name)
       meth = normalize_task_name(task_name)
       task = all_tasks[meth]
-      raise UndefinedTaskError, "task '#{task_name}' could not be found in namespace '#{self.namespace}'" unless task
+      handle_no_task_error(meth) unless task
 
       shell.say "Usage:"
       shell.say "  #{banner(task)}"
@@ -182,6 +182,10 @@ class Thor
         item << (task.description ? "# #{task.description.gsub(/\s+/m,' ')}" : "")
         item
       end
+    end
+
+    def handle_argument_error(task, error) #:nodoc:
+      raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{task.formatted_usage(self, banner_base == "thor").inspect}."
     end
 
     protected

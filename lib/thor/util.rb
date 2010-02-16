@@ -23,10 +23,7 @@ class Thor
     #
     def self.find_by_namespace(namespace)
       namespace = "default#{namespace}" if namespace.empty? || namespace =~ /^:/
-
-      Thor::Base.subclasses.find do |klass|
-        klass.namespace == namespace
-      end
+      Thor::Base.subclasses.find { |klass| klass.namespace == namespace }
     end
 
     # Receives a constant and converts it to a Thor namespace. Since Thor tasks
@@ -43,10 +40,10 @@ class Thor
     # ==== Returns
     # String:: If we receive Foo::Bar::Baz it returns "foo:bar:baz"
     #
-    def self.namespace_from_thor_class(constant, remove_default=true)
+    def self.namespace_from_thor_class(constant)
       constant = constant.to_s.gsub(/^Thor::Sandbox::/, "")
       constant = snake_case(constant).squeeze(":")
-      constant.gsub!(/^default/, '') if remove_default
+      constant.gsub!(/^default/, '')
       constant
     end
 
@@ -132,13 +129,7 @@ class Thor
     # ==== Parameters
     # namespace<String>
     #
-    # ==== Errors
-    # Thor::Error:: raised if the namespace cannot be found.
-    #
-    # Thor::Error:: raised if the namespace evals to a class which does not
-    #               inherit from Thor or Thor::Group.
-    #
-    def self.namespace_to_thor_class_and_task(namespace, raise_if_nil=true)
+    def self.find_class_and_task_by_namespace(namespace)
       if namespace.include?(?:)
         pieces = namespace.split(":")
         task   = pieces.pop
@@ -149,7 +140,14 @@ class Thor
         klass, task = Thor::Util.find_by_namespace(namespace), nil
       end
 
-      raise Error, "could not find Thor class or task '#{namespace}'" if raise_if_nil && klass.nil?
+      return klass, task
+    end
+
+    # The same as namespace_to_thor_class_and_task!, but raises an error if a klass
+    # could not be found.
+    def self.find_class_and_task_by_namespace!(namespace)
+      klass, task = find_class_and_task_by_namespace(namespace)
+      raise Error, "Could not find namespace or task #{namespace.inspect}." unless klass
       return klass, task
     end
 

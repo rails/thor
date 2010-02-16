@@ -230,22 +230,22 @@ describe Thor::Base do
     it "raises an error instead of rescueing if --debug is given" do
       lambda {
         MyScript.start ["what", "--debug"]
-      }.must raise_error(Thor::UndefinedTaskError, /the 'what' task of MyScript is private/)
+      }.must raise_error(Thor::UndefinedTaskError, 'Could not find task "what" in "my_script" namespace.')
     end
   end
 
   describe "attr_*" do
     it "should not add attr_reader as a task" do
-      capture(:stderr){ MyScript.start(["another_attribute"]) }.must =~ /could not find/
+      capture(:stderr){ MyScript.start(["another_attribute"]) }.must =~ /Could not find/
     end
 
     it "should not add attr_writer as a task" do
-      capture(:stderr){ MyScript.start(["another_attribute=", "foo"]) }.must =~ /could not find/
+      capture(:stderr){ MyScript.start(["another_attribute=", "foo"]) }.must =~ /Could not find/
     end
 
     it "should not add attr_accessor as a task" do
-      capture(:stderr){ MyScript.start(["some_attribute"]) }.must =~ /could not find/
-      capture(:stderr){ MyScript.start(["some_attribute=", "foo"]) }.must =~ /could not find/
+      capture(:stderr){ MyScript.start(["some_attribute"]) }.must =~ /Could not find/
+      capture(:stderr){ MyScript.start(["some_attribute=", "foo"]) }.must =~ /Could not find/
     end
   end
 end

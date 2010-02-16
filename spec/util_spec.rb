@@ -92,30 +92,30 @@ describe Thor::Util do
     end
   end
 
-  describe "#namespace_to_thor_class_and_task" do
+  describe "#find_class_and_task_by_namespace" do
     it "returns a Thor::Group class if full namespace matches" do
-      Thor::Util.namespace_to_thor_class_and_task("my_counter").must == [MyCounter, nil]
+      Thor::Util.find_class_and_task_by_namespace("my_counter").must == [MyCounter, nil]
     end
 
     it "returns a Thor class if full namespace matches" do
-      Thor::Util.namespace_to_thor_class_and_task("thor").must == [Thor, nil]
+      Thor::Util.find_class_and_task_by_namespace("thor").must == [Thor, nil]
     end
 
     it "returns a Thor class and the task name" do
-      Thor::Util.namespace_to_thor_class_and_task("thor:help").must == [Thor, "help"]
+      Thor::Util.find_class_and_task_by_namespace("thor:help").must == [Thor, "help"]
     end
 
     it "fallbacks in the namespace:task look up even if a full namespace does not match" do
       Thor.const_set(:Help, Module.new)
-      Thor::Util.namespace_to_thor_class_and_task("thor:help").must == [Thor, "help"]
+      Thor::Util.find_class_and_task_by_namespace("thor:help").must == [Thor, "help"]
       Thor.send :remove_const, :Help
     end
 
     describe 'errors' do
       it "raises an error if the Thor class or task can't be found" do
         lambda {
-          Thor::Util.namespace_to_thor_class_and_task("foobar")
-        }.must raise_error(Thor::Error, "could not find Thor class or task 'foobar'")
+          Thor::Util.find_class_and_task_by_namespace!("foobar")
+        }.must raise_error(Thor::Error, 'Could not find namespace or task "foobar".')
       end
     end
   end

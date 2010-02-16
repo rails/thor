@@ -32,7 +32,7 @@ describe Thor::Runner do
     it "raises error if a class/task cannot be found" do
       Thor::Runner.should_receive(:exit).with(1)
       content = capture(:stderr){ Thor::Runner.start(["help", "unknown"]) }
-      content.must =~ /could not find Thor class or task 'unknown'/
+      content.strip.must == 'Could not find namespace or task "unknown".'
     end
   end
 
@@ -70,7 +70,8 @@ describe Thor::Runner do
     it "raises an error if class/task can't be found" do
       Thor::Runner.should_receive(:exit).with(1)
       ARGV.replace ["unknown"]
-      capture(:stderr){ Thor::Runner.start }.must =~ /could not find Thor class or task 'unknown'/
+      content = capture(:stderr){ Thor::Runner.start }
+      content.strip.must == 'Could not find namespace or task "unknown".'
     end
 
     it "does not swallow NoMethodErrors that occur inside the called method" do
@@ -85,7 +86,8 @@ describe Thor::Runner do
 
     it "does not swallow Thor InvocationError" do
       ARGV.replace ["my_script:animal"]
-      capture(:stderr) { Thor::Runner.start }.must =~ /'animal' was called incorrectly\. Call as 'my_script:animal TYPE'/
+      content = capture(:stderr) { Thor::Runner.start }
+      content.strip.must == '"animal" was called incorrectly. Call as "my_script:animal TYPE".'
     end
   end
 

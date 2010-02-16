@@ -11,7 +11,7 @@ class Thor
       def prepare_for_invocation(key, name) #:nodoc:
         case name
           when Symbol, String
-            Thor::Util.namespace_to_thor_class_and_task(name.to_s, false)
+            Thor::Util.find_class_and_task_by_namespace(name.to_s)
           else
             name
         end

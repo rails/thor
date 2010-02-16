@@ -355,7 +355,7 @@ class Thor
       def namespace(name=nil)
         case name
           when nil
-            @namespace ||= Thor::Util.namespace_from_thor_class(self, false)
+            @namespace ||= Thor::Util.namespace_from_thor_class(self)
           else
             @namespace = name.to_s
         end
@@ -368,12 +368,16 @@ class Thor
         config[:shell] ||= Thor::Base.shell.new
         yield
       rescue Thor::Error => e
-        if debugging
-          raise e
-        else
-          config[:shell].error e.message
-        end
+        debugging ? (raise e) : config[:shell].error(e.message)
         exit(1) if exit_on_failure?
+      end
+
+      def handle_no_task_error(task) #:nodoc:
+        if self.banner_base == "thor"
+          raise UndefinedTaskError, "Could not find task #{task.inspect} in #{namespace.inspect} namespace."
+        else
+          raise UndefinedTaskError, "Could not find task #{task.inspect}."
+        end
       end
 
       protected

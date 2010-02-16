@@ -38,9 +38,9 @@ describe Thor::Task do
     end
 
     it "does not invoke an existing method" do
-      lambda {
-        Thor::Task::Dynamic.new('to_s').run([])
-      }.must raise_error(Thor::Error, "could not find Thor class or task 'to_s'")
+      mock = mock()
+      mock.class.should_receive(:handle_no_task_error).with("to_s")
+      Thor::Task::Dynamic.new('to_s').run(mock)
     end
   end
 
@@ -62,9 +62,8 @@ describe Thor::Task do
     it "raises an error if the method to be invoked is private" do
       mock = mock()
       mock.should_receive(:private_methods).and_return(['can_has'])
-      lambda {
-        task.run(mock)
-      }.must raise_error(Thor::UndefinedTaskError, "the 'can_has' task of Spec::Mocks::Mock is private")
+      mock.class.should_receive(:handle_no_task_error).with("can_has")
+      task.run(mock)
     end
   end
 end

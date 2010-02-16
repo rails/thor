@@ -112,11 +112,11 @@ describe Thor do
     end
 
     it "raises an error if a required param is not provided" do
-      capture(:stderr) { MyScript.start(["animal"]) }.must =~ /'animal' was called incorrectly\. Call as 'my_script:animal TYPE'/
+      capture(:stderr) { MyScript.start(["animal"]) }.strip.must == '"animal" was called incorrectly. Call as "my_script:animal TYPE".'
     end
 
     it "raises an error if the invoked task does not exist" do
-      capture(:stderr) { Amazing.start(["animal"]) }.must =~ /The amazing namespace doesn't have a 'animal' task/
+      capture(:stderr) { Amazing.start(["animal"]) }.strip.must == 'Could not find task "animal" in "amazing" namespace.'
     end
 
     it "calls method_missing if an unknown method is passed in" do
@@ -124,7 +124,7 @@ describe Thor do
     end
 
     it "does not call a private method no matter what" do
-      capture(:stderr) { MyScript.start(["what"]) }.must =~ /the 'what' task of MyScript is private/
+      capture(:stderr) { MyScript.start(["what"]) }.strip.must == 'Could not find task "what" in "my_script" namespace.'
     end
 
     it "uses task default options" do
@@ -200,7 +200,7 @@ END
       it "raises an error if the task can't be found" do
         lambda {
           MyScript.task_help(shell, "unknown")
-        }.must raise_error(Thor::Error, "task 'unknown' could not be found in namespace 'my_script'")
+        }.must raise_error(Thor::UndefinedTaskError, 'Could not find task "unknown" in "my_script" namespace.')
       end
 
       it "normalizes names before claiming they don't exist" do
