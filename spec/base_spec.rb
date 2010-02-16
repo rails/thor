@@ -232,6 +232,12 @@ describe Thor::Base do
         MyScript.start ["what", "--debug"]
       }.must raise_error(Thor::UndefinedTaskError, 'Could not find task "what" in "my_script" namespace.')
     end
+
+    it "checks unknown options" do
+      capture(:stderr) {
+        MyScript.start(["foo", "bar", "--force", "true", "--unknown", "baz"])
+      }.strip.must == "Unknown switches '--unknown'"
+    end
   end
 
   describe "attr_*" do

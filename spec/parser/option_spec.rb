@@ -35,16 +35,6 @@ describe Thor::Option do
         end
       end
 
-      describe "equals to :optional" do
-        it "has type equals to :boolean" do
-          capture(:stderr){ parse(:foo, :optional).type.must == :boolean }
-        end
-
-        it "has no default value" do
-          capture(:stderr){ parse(:foo, :optional).default.must be_nil }
-        end
-      end
-
       describe "and symbol is not a reserved key" do
         it "has type equals to :string" do
           parse(:foo, :bar).type.must == :string

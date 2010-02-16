@@ -38,9 +38,8 @@ class Thor
     # config<Hash>:: Configuration for this Thor class.
     #
     def initialize(args=[], options={}, config={})
-      Thor::Arguments.parse(self.class.arguments, args).each do |key, value|
-        send("#{key}=", value)
-      end
+      args = Thor::Arguments.parse(self.class.arguments, args)
+      args.each { |key, value| send("#{key}=", value) }
 
       parse_options = self.class.class_options
 
@@ -52,9 +51,9 @@ class Thor
         array_options, hash_options = [], options
       end
 
-      options = Thor::Options.parse(parse_options, array_options)
-      self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).merge!(hash_options)
-      self.options.freeze
+      opts = Thor::Options.new(parse_options, hash_options)
+      self.options = opts.parse(array_options)
+      opts.check_unknown! if self.class.check_unknown_options?
     end
 
     class << self
@@ -107,6 +106,16 @@ class Thor
 
       def attr_accessor(*) #:nodoc:
         no_tasks { super }
+      end
+
+      # If you want to raise an error for unknown options, call check_unknown_options!
+      # This is disabled by default to allow dynamic invocations.
+      def check_unknown_options!
+        @check_unknown_options = true
+      end
+
+      def check_unknown_options? #:nodoc:
+        @check_unknown_options || false
       end
 
       # Adds an argument to the class and creates an attr_accessor for it.

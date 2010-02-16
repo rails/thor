@@ -2,6 +2,7 @@
 
 * Several bug fixes
 * Decoupled Thor::Group and Thor, so it's easier to vendor
+* Added check_unknown_options! in case you want error messages to be raised in valid switches.
 
 == 0.12, released 2010-01-02
 

@@ -19,6 +19,9 @@ class Thor
   class InvocationError < Error
   end
 
+  class UnknownArgumentError < Error
+  end
+
   class RequiredArgumentMissingError < InvocationError
   end
 

@@ -1,4 +1,6 @@
 class MyScript < Thor
+  check_unknown_options!
+
   attr_accessor :some_attribute
   attr_writer :another_attribute
   attr_reader :another_attribute

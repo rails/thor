@@ -42,7 +42,7 @@ describe Thor::Arguments do
 
       it "and required arguments raises an error" do
         create :string => nil, :numeric => nil
-        lambda { parse }.must raise_error(Thor::RequiredArgumentMissingError, "no value provided for required arguments 'string', 'numeric'")
+        lambda { parse }.must raise_error(Thor::RequiredArgumentMissingError, "No value provided for required arguments 'string', 'numeric'")
       end
 
       it "and default arguments returns default values" do

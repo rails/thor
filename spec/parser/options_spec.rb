@@ -2,16 +2,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'thor/parser'
 
 describe Thor::Options do
-  def create(opts)
+  def create(opts, defaults={})
     opts.each do |key, value|
       opts[key] = Thor::Option.parse(key, value) unless value.is_a?(Thor::Option)
     end
 
-    @opt = Thor::Options.new(opts)
+    @opt = Thor::Options.new(opts, defaults)
   end
 
   def parse(*args)
     @opt.parse(args.flatten)
+  end
+
+  def check_unknown!
+    @opt.check_unknown!
   end
 
   describe "#to_switches" do
@@ -81,7 +85,18 @@ describe Thor::Options do
 
     it "returns the default value if none is provided" do
       create :foo => "baz", :bar => :required
-      parse("--bar=boom")["foo"].must == "baz"
+      parse("--bar", "boom")["foo"].must == "baz"
+    end
+
+    it "returns the default value from defaults hash to required arguments" do
+      create Hash[:bar => :required], Hash[:bar => "baz"]
+      parse["bar"].must == "baz"
+    end
+
+    it "raises an error for unknown switches" do
+      create :foo => "baz", :bar => :required
+      parse("--bar", "baz", "--baz", "unknown")
+      lambda { check_unknown! }.must raise_error(Thor::UnknownArgumentError, "Unknown switches '--baz'")
     end
 
     describe "with no input" do
@@ -97,7 +112,7 @@ describe Thor::Options do
 
       it "and a required switch raises an error" do
         create "--foo" => :required
-        lambda { parse }.must raise_error(Thor::RequiredArgumentMissingError, "no value provided for required options '--foo'")
+        lambda { parse }.must raise_error(Thor::RequiredArgumentMissingError, "No value provided for required options '--foo'")
       end
     end
 
@@ -247,7 +262,7 @@ describe Thor::Options do
 
       it "raises error when value isn't numeric" do
         lambda { parse("-n", "foo") }.must raise_error(Thor::MalformattedArgumentError,
-          "expected numeric value for '-n'; got \"foo\"")
+          "Expected numeric value for '-n'; got \"foo\"")
       end
     end
 

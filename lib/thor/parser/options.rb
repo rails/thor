@@ -10,7 +10,6 @@ class Thor
     SHORT_NUM   = /^(-[a-z])#{NUMERIC}$/i
 
     # Receives a hash and makes it switches.
-    #
     def self.to_switches(options)
       options.map do |key, value|
         case value
@@ -28,12 +27,18 @@ class Thor
       end.join(" ")
     end
 
-    # Takes a hash of Thor::Option objects.
-    #
-    def initialize(options={})
-      options = options.values
+    # Takes a hash of Thor::Option and a hash with defaults.
+    def initialize(hash_options={}, defaults={})
+      options = hash_options.values
       super(options)
-      @shorts, @switches = {}, {}
+
+      # Add defaults
+      defaults.each do |key, value|
+        @assigns[key] = value
+        @non_assigned_required.delete(hash_options[key])
+      end
+
+      @shorts, @switches, @unknown = {}, {}, []
 
       options.each do |option|
         @switches[option.switch_name] = option
@@ -61,16 +66,24 @@ class Thor
           end
 
           switch = normalize_switch(switch)
-          next unless option = switch_option(switch)
-
+          option = switch_option(switch)
           @assigns[option.human_name] = parse_peek(switch, option)
+        elsif peek =~ /^\-/
+          @unknown << shift
         else
           shift
         end
       end
 
       check_requirement!
-      @assigns
+
+      assigns = Thor::CoreExt::HashWithIndifferentAccess.new(@assigns)
+      assigns.freeze
+      assigns
+    end
+
+    def check_unknown!
+      raise UnknownArgumentError, "Unknown switches '#{@unknown.join(', ')}'" unless @unknown.empty?
     end
 
     protected
@@ -130,7 +143,7 @@ class Thor
           elsif option.string? && !option.required?
             return option.human_name # Return the option name
           else
-            raise MalformattedArgumentError, "no value provided for option '#{switch}'"
+            raise MalformattedArgumentError, "No value provided for option '#{switch}'"
           end
         end
 
