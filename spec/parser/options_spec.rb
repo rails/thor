@@ -93,6 +93,11 @@ describe Thor::Options do
       parse["bar"].must == "baz"
     end
 
+    it "gives higher priority to defaults given in the hash" do
+      create Hash[:bar => true], Hash[:bar => false]
+      parse["bar"].must == false
+    end
+
     it "raises an error for unknown switches" do
       create :foo => "baz", :bar => :required
       parse("--bar", "baz", "--baz", "unknown")

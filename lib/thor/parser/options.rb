@@ -34,7 +34,7 @@ class Thor
 
       # Add defaults
       defaults.each do |key, value|
-        @assigns[key] = value
+        @assigns[key.to_s] = value
         @non_assigned_required.delete(hash_options[key])
       end
 
