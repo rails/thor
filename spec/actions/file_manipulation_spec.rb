@@ -105,6 +105,15 @@ describe Thor::Actions do
     it "logs status" do
       action(:get, "doc/README", "docs/README").must == "      create  docs/README\n"
     end
+
+    it "accepts http remote sources" do
+      body = "__start__\nHTTPFILE\n__end__\n"
+      FakeWeb.register_uri(:get, 'http://example.com/file.txt', :body => body)
+      action :get, 'http://example.com/file.txt' do |content|
+        content.must == body
+      end
+      FakeWeb.clean_registry
+    end
   end
 
   describe "#template" do

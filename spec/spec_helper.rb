@@ -8,6 +8,7 @@ require 'stringio'
 require 'rubygems'
 require 'rdoc'
 require 'diff/lcs' # You need diff/lcs installed to run specs (but not to run Thor).
+require 'fakeweb'  # You need fakeweb installed to run specs (but not to run Thor).
 
 $thor_runner = true
 
