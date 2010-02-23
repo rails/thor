@@ -22,4 +22,13 @@ describe Thor::Shell do
       MyCounter.new([1,2]).shell.must be_kind_of(Thor::Base.shell)
     end
   end
+
+  describe "with_padding" do
+    it "uses padding for inside block outputs" do
+      base = MyCounter.new([1,2])
+      base.with_padding do
+        capture(:stdout){ base.say_status :padding, "cool" }.strip.must == "padding    cool"
+      end
+    end
+  end
 end

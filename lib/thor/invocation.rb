@@ -119,6 +119,11 @@ class Thor
       end
     end
 
+    # Invokes using shell padding.
+    def invoke_with_padding(*args)
+      with_padding { invoke(*args) }
+    end
+
     protected
 
       # Configuration values that are shared between invocations.

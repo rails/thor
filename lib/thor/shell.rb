@@ -45,25 +45,30 @@ class Thor
 
     # Holds the shell for the given Thor instance. If no shell is given,
     # it gets a default shell from Thor::Base.shell.
-    #
     def shell
       @shell ||= Thor::Base.shell.new
     end
 
     # Sets the shell for this thor class.
-    #
     def shell=(shell)
       @shell = shell
     end
 
     # Common methods that are delegated to the shell.
-    #
     SHELL_DELEGATED_METHODS.each do |method|
       module_eval <<-METHOD, __FILE__, __LINE__
         def #{method}(*args)
           shell.#{method}(*args)
         end
       METHOD
+    end
+
+    # Yields the given block with padding.
+    def with_padding
+      shell.padding += 1
+      yield
+    ensure
+      shell.padding -= 1
     end
 
     protected

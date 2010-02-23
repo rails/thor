@@ -253,22 +253,19 @@ class Thor::Group
   # Shortcut to invoke with padding and block handling. Use internally by
   # invoke and invoke_from_option class methods.
   def _invoke_for_class_method(klass, task=nil, *args, &block) #:nodoc:
-    shell.padding += 1
-
-    result = if block_given?
-      case block.arity
-      when 3
-        block.call(self, klass, task)
-      when 2
-        block.call(self, klass)
-      when 1
-        instance_exec(klass, &block)
+    with_padding do
+      if block
+        case block.arity
+        when 3
+          block.call(self, klass, task)
+        when 2
+          block.call(self, klass)
+        when 1
+          instance_exec(klass, &block)
+        end
+      else
+        invoke klass, task, *args
       end
-    else
-      invoke klass, task, *args
     end
-
-    shell.padding -= 1
-    result
   end
 end
