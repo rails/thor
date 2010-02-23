@@ -184,7 +184,7 @@ class Thor
       shell.padding -= 1 if verbose
     end
 
-    # Executes a command.
+    # Executes a command returning the contents of the command.
     #
     # ==== Parameters
     # command<String>:: the command to be executed.
@@ -220,7 +220,7 @@ class Thor
     #
     def run_ruby_script(command, config={})
       return unless behavior == :invoke
-      run "#{command}", config.merge(:with => Thor::Util.ruby_command)
+      run command, config.merge(:with => Thor::Util.ruby_command)
     end
 
     # Run a thor command. A hash of options can be given and it's converted to 
@@ -243,12 +243,13 @@ class Thor
     def thor(task, *args)
       config  = args.last.is_a?(Hash) ? args.pop : {}
       verbose = config.key?(:verbose) ? config.delete(:verbose) : true
+      pretend = config.key?(:pretend) ? config.delete(:pretend) : false
 
       args.unshift task
       args.push Thor::Options.to_switches(config)
       command = args.join(' ').strip
 
-      run command, :with => :thor, :verbose => verbose
+      run command, :with => :thor, :verbose => verbose, :pretend => pretend
     end
 
     protected
