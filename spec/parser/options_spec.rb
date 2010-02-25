@@ -103,6 +103,18 @@ describe Thor::Options do
       parse("--bar", "baz", "--baz", "unknown")
       lambda { check_unknown! }.must raise_error(Thor::UnknownArgumentError, "Unknown switches '--baz'")
     end
+    
+    it "skips leading non-switches" do
+      create(:foo => "baz")
+      
+      parse("asdf", "--foo", "bar").must == {"foo" => "bar"}
+    end
+
+    it "correctly recognizes things that look kind of like options, but aren't, as not options" do
+      create(:foo => "baz")
+      parse("--asdf---asdf", "baz", "--foo", "--asdf---dsf--asdf").must == {"foo" => "--asdf---dsf--asdf"}
+      check_unknown!
+    end
 
     describe "with no input" do
       it "and no switches returns an empty hash" do

@@ -3,9 +3,9 @@ class Thor
   # under Ruby's license.
   #
   class Options < Arguments #:nodoc:
-    LONG_RE     = /^(--\w+[-\w+]*)$/
+    LONG_RE     = /^(--\w+(?:-\w+)*)$/
     SHORT_RE    = /^(-[a-z])$/i
-    EQ_RE       = /^(--\w+[-\w+]*|-[a-z])=(.*)$/i
+    EQ_RE       = /^(--\w+(?:-\w+)*|-[a-z])=(.*)$/i
     SHORT_SQ_RE = /^-([a-z]{2,})$/i # Allow either -x -v or -xv style for single char args
     SHORT_NUM   = /^(-[a-z])#{NUMERIC}$/i
 
@@ -68,7 +68,7 @@ class Thor
           switch = normalize_switch(switch)
           option = switch_option(switch)
           @assigns[option.human_name] = parse_peek(switch, option)
-        elsif peek =~ /^\-/
+        elsif current_is_switch_formatted?
           @unknown << shift
         else
           shift
@@ -97,6 +97,19 @@ class Thor
           when SHORT_SQ_RE
             $1.split('').any? { |f| switch?("-#{f}") }
         end
+      end
+
+      def switch_formatted?(arg)
+        case arg
+        when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM, SHORT_SQ_RE
+          true
+        else
+          false
+        end
+      end
+
+      def current_is_switch_formatted?
+        switch_formatted? peek
       end
 
       def switch?(arg)
@@ -135,7 +148,7 @@ class Thor
       # Parse the value at the peek analyzing if it requires an input or not.
       #
       def parse_peek(switch, option)
-        unless current_is_value?
+        if current_is_switch_formatted?
           if option.boolean?
             # No problem for boolean types
           elsif no_or_skip?(switch)
