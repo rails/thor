@@ -154,7 +154,8 @@ class Thor
           elsif no_or_skip?(switch)
             return nil # User set value to nil
           elsif option.string? && !option.required?
-            return option.human_name # Return the option name
+            # Return the default if there is one, else the human name
+            return option.default || option.human_name
           else
             raise MalformattedArgumentError, "No value provided for option '#{switch}'"
           end

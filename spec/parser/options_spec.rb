@@ -177,8 +177,13 @@ describe Thor::Options do
       end
 
       it "accepts a --switch format on non required types" do
-        create "--foo" => "bar"
+        create "--foo" => :string
         parse("--foo")["foo"].must == "foo"
+      end
+      
+      it "accepts a --switch format on non required types with default values" do
+        create "--foo" => "bar"
+        parse("--foo")["foo"].must == "bar"
       end
 
       it "overwrites earlier values with later values" do
