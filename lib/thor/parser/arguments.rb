@@ -51,6 +51,10 @@ class Thor
 
     private
 
+      def last?
+        @pile.empty?
+      end
+
       def peek
         @pile.first
       end

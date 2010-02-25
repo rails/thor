@@ -148,7 +148,7 @@ class Thor
       # Parse the value at the peek analyzing if it requires an input or not.
       #
       def parse_peek(switch, option)
-        if current_is_switch_formatted?
+        if current_is_switch_formatted? || last?
           if option.boolean?
             # No problem for boolean types
           elsif no_or_skip?(switch)
