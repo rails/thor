@@ -100,18 +100,14 @@ describe Thor::Util do
       Thor::Util.find_class_and_task_by_namespace("thor:help").must == [Thor, "help"]
     end
 
-    it "fallbacks in the namespace:task look up even if a full namespace does not match" do
+    it "falls back in the namespace:task look up even if a full namespace does not match" do
       Thor.const_set(:Help, Module.new)
       Thor::Util.find_class_and_task_by_namespace("thor:help").must == [Thor, "help"]
       Thor.send :remove_const, :Help
     end
 
-    describe 'errors' do
-      it "raises an error if the Thor class or task can't be found" do
-        lambda {
-          Thor::Util.find_class_and_task_by_namespace!("foobar")
-        }.must raise_error(Thor::Error, 'Could not find namespace or task "foobar".')
-      end
+    it "falls back on the default namespace class if nothing else matches" do
+      Thor::Util.find_class_and_task_by_namespace("test").must == [Scripts::MyDefaults, "test"]
     end
   end
 

@@ -16,7 +16,7 @@ class Thor::Runner < Thor #:nodoc:
   def help(meth=nil)
     if meth && !self.respond_to?(meth)
       initialize_thorfiles(meth)
-      klass, task = Thor::Util.find_class_and_task_by_namespace!(meth)
+      klass, task = Thor::Util.find_class_and_task_by_namespace(meth)
       klass.start(["-h", task].compact, :shell => self.shell)
     else
       super
@@ -29,7 +29,7 @@ class Thor::Runner < Thor #:nodoc:
   def method_missing(meth, *args)
     meth = meth.to_s
     initialize_thorfiles(meth)
-    klass, task = Thor::Util.find_class_and_task_by_namespace!(meth)
+    klass, task = Thor::Util.find_class_and_task_by_namespace(meth)
     args.unshift(task) if task
     klass.start(args, :shell => self.shell)
   end

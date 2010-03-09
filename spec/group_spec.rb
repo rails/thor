@@ -36,11 +36,11 @@ describe Thor::Group do
 
   describe "#desc" do
     it "sets the description for a given class" do
-      MyCounter.desc.must == "Description:\n  This generator run three tasks: one, two and three.\n"
+      MyCounter.desc.must == "Description:\n  This generator runs three tasks: one, two and three.\n"
     end
 
     it "can be inherited" do
-      BrokenCounter.desc.must == "Description:\n  This generator run three tasks: one, two and three.\n"
+      BrokenCounter.desc.must == "Description:\n  This generator runs three tasks: one, two and three.\n"
     end
 
     it "can be nil" do
@@ -59,7 +59,7 @@ describe Thor::Group do
 
     it "shows description" do
       @content.must =~ /Description:/
-      @content.must =~ /This generator run three tasks: one, two and three./
+      @content.must =~ /This generator runs three tasks: one, two and three./
     end
 
     it "shows options information" do

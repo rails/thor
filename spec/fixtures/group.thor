@@ -20,7 +20,7 @@ class MyCounter < Thor::Group
 
   desc <<-FOO
 Description:
-  This generator run three tasks: one, two and three.
+  This generator runs three tasks: one, two and three.
 FOO
 
   def one
@@ -79,5 +79,12 @@ class WhinyGenerator < Thor::Group
   end
 
   def wrong_arity(required)
+  end
+end
+
+class TaskConflict < Thor::Group
+  desc "A group with the same name as a default task"
+  def group
+    puts "group"
   end
 end

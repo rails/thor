@@ -30,9 +30,8 @@ describe Thor::Runner do
     end
 
     it "raises error if a class/task cannot be found" do
-      Thor::Runner.should_receive(:exit).with(1)
       content = capture(:stderr){ Thor::Runner.start(["help", "unknown"]) }
-      content.strip.must == 'Could not find namespace or task "unknown".'
+      content.strip.must == 'Could not find task "unknown" in "default" namespace.'
     end
   end
 
@@ -68,10 +67,9 @@ describe Thor::Runner do
     end
 
     it "raises an error if class/task can't be found" do
-      Thor::Runner.should_receive(:exit).with(1)
       ARGV.replace ["unknown"]
       content = capture(:stderr){ Thor::Runner.start }
-      content.strip.must == 'Could not find namespace or task "unknown".'
+      content.strip.must == 'Could not find task "unknown" in "default" namespace.'
     end
 
     it "does not swallow NoMethodErrors that occur inside the called method" do
@@ -145,12 +143,22 @@ describe Thor::Runner do
 
       it "presents tasks in the default namespace with an empty namespace" do
         ARGV.replace ["list"]
-        capture(:stdout) { Thor::Runner.start }.must =~ /^thor :test\s+# prints 'test'/m
+        capture(:stdout) { Thor::Runner.start }.must =~ /^thor :cow\s+# prints 'moo'/m
       end
 
       it "runs tasks with an empty namespace from the default namespace" do
-        ARGV.replace [":test"]
-        capture(:stdout) { Thor::Runner.start }.must == "test\n"
+        ARGV.replace [":task_conflict"]
+        capture(:stdout) { Thor::Runner.start }.must == "task\n"
+      end
+
+      it "runs groups even when there is a task with the same name" do
+        ARGV.replace ["task_conflict"]
+        capture(:stdout) { Thor::Runner.start }.must == "group\n"
+      end
+
+      it "runs tasks with no colon in the default namespace" do
+        ARGV.replace ["cow"]
+        capture(:stdout) { Thor::Runner.start }.must == "moo\n"
       end
     end
 

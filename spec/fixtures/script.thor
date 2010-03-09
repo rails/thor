@@ -127,9 +127,14 @@ module Scripts
 
   class MyDefaults < Thor
     namespace :default
-    desc "test", "prints 'test'"
-    def test
-      puts "test"
+    desc "cow", "prints 'moo'"
+    def cow
+      puts "moo"
+    end
+
+    desc "task_conflict", "only gets called when prepended with a colon"
+    def task_conflict
+      puts "task"
     end
   end
 

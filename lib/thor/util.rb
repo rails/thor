@@ -128,25 +128,19 @@ class Thor
     # ==== Parameters
     # namespace<String>
     #
-    def self.find_class_and_task_by_namespace(namespace)
-      if namespace.include?(?:)
+    def self.find_class_and_task_by_namespace(namespace, fallback = true)
+      if namespace.include?(?:) # look for a namespaced task
         pieces = namespace.split(":")
         task   = pieces.pop
         klass  = Thor::Util.find_by_namespace(pieces.join(":"))
       end
-
-      unless klass
+      unless klass # look for a Thor::Group with the right name
         klass, task = Thor::Util.find_by_namespace(namespace), nil
       end
-
-      return klass, task
-    end
-
-    # The same as namespace_to_thor_class_and_task!, but raises an error if a klass
-    # could not be found.
-    def self.find_class_and_task_by_namespace!(namespace)
-      klass, task = find_class_and_task_by_namespace(namespace)
-      raise Error, "Could not find namespace or task #{namespace.inspect}." unless klass
+      if !klass && fallback # try a task in the default namespace
+        task = namespace
+        klass = Thor::Util.find_by_namespace('')
+      end
       return klass, task
     end
 
