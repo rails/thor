@@ -129,7 +129,7 @@ class Thor
         raise Error, "You don't have any source path defined for class #{self.class.name}. To fix this, " <<
                      "you can define a source_root in your class."
       else
-        raise Error, "Could not find #{file.inspect} in source paths."
+        raise Error, "Could not find #{file.inspect} in source paths: \n#{source_paths.join("\n")}"
       end
     end
 
