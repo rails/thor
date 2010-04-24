@@ -270,7 +270,7 @@ argument for our generator to run.
 
 The <tt>create_lib_file</tt> uses an ERB template. This is what it looks like:
 
-    class <%= name.camelize %>
+    class <%= name.capitalize %>
     end
 
 The arguments that you set in your generator will automatically be passed in
