@@ -180,7 +180,7 @@ class Thor
 
       say_status :apply, path, verbose
       shell.padding += 1 if verbose
-      instance_eval(open(path).read, path)
+      instance_eval(open(path) {|input| input.read }, path)
       shell.padding -= 1 if verbose
     end
 
