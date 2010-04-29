@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'uri'
 require 'thor/core_ext/file_binary_read'
 
 Dir[File.join(File.dirname(__FILE__), "actions", "*.rb")].each do |action|
@@ -115,7 +116,7 @@ class Thor
       @source_paths ||= self.class.source_paths_for_search
     end
 
-    # Receives a file or directory and search for it in the source paths. 
+    # Receives a file or directory and search for it in the source paths.
     #
     def find_in_source_paths(file)
       relative_root = relative_to_original_destination_root(destination_root, false)
@@ -180,7 +181,14 @@ class Thor
 
       say_status :apply, path, verbose
       shell.padding += 1 if verbose
-      instance_eval(open(path) {|input| input.read }, path)
+
+      if URI(path).is_a?(URI::HTTP)
+        contents = open(path, "Accept" => "application/x-thor-template") {|io| io.read }
+      else
+        contents = open(path) {|io| io.read }
+      end
+
+      instance_eval(contents, path)
       shell.padding -= 1 if verbose
     end
 
@@ -223,7 +231,7 @@ class Thor
       run command, config.merge(:with => Thor::Util.ruby_command)
     end
 
-    # Run a thor command. A hash of options can be given and it's converted to 
+    # Run a thor command. A hash of options can be given and it's converted to
     # switches.
     #
     # ==== Parameters

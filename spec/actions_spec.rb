@@ -195,7 +195,7 @@ describe Thor::Actions do
       @template.instance_eval "def read; self; end" # Make the string respond to read
 
       @file = "http://gist.github.com/103208.txt"
-      runner.should_receive(:open).and_return(@template)
+      runner.should_receive(:open).with(@file, "Accept" => "application/x-thor-template").and_return(@template)
     end
 
     it "opens a file and executes its content in the instance binding" do
