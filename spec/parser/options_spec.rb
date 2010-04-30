@@ -176,6 +176,11 @@ describe Thor::Options do
         parse("--no-foo")["foo"].must be_nil
       end
 
+      it "does not consume an argument for --no-switch format" do
+        create "--cheese" => :string
+        parse('burger', '--no-cheese', 'fries')["cheese"].must be_nil
+      end
+
       it "accepts a --switch format on non required types" do
         create "--foo" => :string
         parse("--foo")["foo"].must == "foo"

@@ -124,11 +124,6 @@ class Thor
         end
       end
 
-      def no_or_skip?(arg)
-        arg =~ /^--(no|skip)-([-\w]+)$/
-        $2
-      end
-
       # Check if the given argument is actually a shortcut.
       #
       def normalize_switch(arg)
