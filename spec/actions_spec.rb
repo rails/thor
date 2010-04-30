@@ -107,7 +107,7 @@ describe Thor::Actions do
       it "raises an error if source path is empty" do
         lambda {
           A.new.find_in_source_paths("foo")
-        }.must raise_error(Thor::Error, /You don't have any source path defined for class A/)
+        }.must raise_error(Thor::Error, /Currently you have no source paths/)
       end
 
       it "finds a template inside the source path" do

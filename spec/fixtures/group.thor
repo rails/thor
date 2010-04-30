@@ -6,9 +6,7 @@ class MyCounter < Thor::Group
     from_superclass(:get_from_super, 13)
   end
 
-  def self.source_root
-    File.expand_path(File.dirname(__FILE__))
-  end
+  source_root File.expand_path(File.dirname(__FILE__))
   source_paths << File.expand_path("broken", File.dirname(__FILE__))
 
   argument :first,     :type => :numeric

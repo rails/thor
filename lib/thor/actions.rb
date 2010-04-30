@@ -20,7 +20,13 @@ class Thor
       # inherited paths and the source root.
       #
       def source_paths
-        @source_paths ||= []
+        @_source_paths ||= []
+      end
+
+      # Stores and return the source root for this class
+      def source_root(path=nil)
+        @_source_root = path if path
+        @_source_root
       end
 
       # Returns the source paths in the following order:
@@ -32,7 +38,7 @@ class Thor
       def source_paths_for_search
         paths = []
         paths += self.source_paths
-        paths << self.source_root if self.respond_to?(:source_root)
+        paths << self.source_root if self.source_root
         paths += from_superclass(:source_paths, [])
         paths
       end
@@ -126,12 +132,19 @@ class Thor
         return source_file if File.exists?(source_file)
       end
 
-      if source_paths.empty?
-        raise Error, "You don't have any source path defined for class #{self.class.name}. To fix this, " <<
-                     "you can define a source_root in your class."
-      else
-        raise Error, "Could not find #{file.inspect} in source paths: \n#{source_paths.join("\n")}"
+      message = "Could not find #{file.inspect} in any of your source paths. "
+
+      unless self.class.source_root
+        message << "Please invoke #{self.class.name}.source_root(PATH) with the PATH containing your templates. "
       end
+
+      if source_paths.empty?
+        message << "Currently you have no source paths."
+      else
+        message << "Your current source paths are: \n#{source_paths.join("\n")}"
+      end
+
+      raise Error, message
     end
 
     # Do something in the root or on a provided subfolder. If a relative path

@@ -37,7 +37,7 @@ describe Thor::Actions::Directory do
     it "raises an error if the source does not exist" do
       lambda {
         invoke! "unknown"
-      }.must raise_error(Thor::Error, /Could not find "unknown" in source paths/)
+      }.must raise_error(Thor::Error, /Could not find "unknown" in any of your source paths/)
     end
 
     it "copies the whole directory recursively to the default destination" do
