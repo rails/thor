@@ -20,7 +20,9 @@ class Thor
     #
     #   create_file "config/apach.conf", "your apache config"
     #
-    def create_file(destination, data=nil, config={}, &block)
+    def create_file(destination, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
+      data = args.first
       action CreateFile.new(self, destination, block || data.to_s, config)
     end
     alias :add_file :create_file

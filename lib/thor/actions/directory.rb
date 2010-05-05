@@ -43,7 +43,6 @@ class Thor
     def directory(source, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
       destination = args.first || source
-
       action Directory.new(self, source, destination || source, config, &block)
     end
 

@@ -18,8 +18,9 @@ class Thor
     #
     #   copy_file "doc/README"
     #
-    def copy_file(source, destination=nil, config={}, &block)
-      destination ||= source
+    def copy_file(source, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
+      destination = args.first || source
       source = File.expand_path(find_in_source_paths(source.to_s))
 
       create_file destination, nil, config do
@@ -46,7 +47,10 @@ class Thor
     #     content.split("\n").first
     #   end
     #
-    def get(source, destination=nil, config={}, &block)
+    def get(source, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
+      destination = args.first
+
       source = File.expand_path(find_in_source_paths(source.to_s)) unless source =~ /^http\:\/\//
       render = open(source) {|input| input.binmode.read }
 
@@ -74,8 +78,10 @@ class Thor
     #
     #   template "doc/README"
     #
-    def template(source, destination=nil, config={}, &block)
-      destination ||= source
+    def template(source, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
+      destination = args.first || source
+
       source  = File.expand_path(find_in_source_paths(source.to_s))
       context = instance_eval('binding')
 
