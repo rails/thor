@@ -40,7 +40,10 @@ class Thor
     #   directory "doc"
     #   directory "doc", "docs", :recursive => false
     #
-    def directory(source, destination=nil, config={}, &block)
+    def directory(source, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
+      destination = args.first || source
+
       action Directory.new(self, source, destination || source, config, &block)
     end
 
