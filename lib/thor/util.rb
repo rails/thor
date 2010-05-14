@@ -147,13 +147,18 @@ class Thor
     # Receives a path and load the thor file in the path. The file is evaluated
     # inside the sandbox to avoid namespacing conflicts.
     #
-    def self.load_thorfile(path, content=nil)
+    def self.load_thorfile(path, content=nil, debug=false)
       content ||= File.binread(path)
 
       begin
         Thor::Sandbox.class_eval(content, path)
       rescue Exception => e
         $stderr.puts "WARNING: unable to load thorfile #{path.inspect}: #{e.message}"
+        if debug
+          $stderr.puts *e.backtrace
+        else
+          $stderr.puts e.backtrace.first
+        end
       end
     end
 

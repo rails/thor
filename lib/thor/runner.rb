@@ -39,7 +39,7 @@ class Thor::Runner < Thor #:nodoc:
   def install(name)
     initialize_thorfiles
 
-    # If a directory name is provided as the argument, look for a 'main.thor' 
+    # If a directory name is provided as the argument, look for a 'main.thor'
     # task in said directory.
     begin
       if File.directory?(File.expand_path(name))
@@ -139,7 +139,7 @@ class Thor::Runner < Thor #:nodoc:
   end
 
   desc "list [SEARCH]", "List the available thor tasks (--substring means .*SEARCH)"
-  method_options :substring => :boolean, :group => :string, :all => :boolean
+  method_options :substring => :boolean, :group => :string, :all => :boolean, :debug => :boolean
   def list(search="")
     initialize_thorfiles
 
@@ -199,7 +199,7 @@ class Thor::Runner < Thor #:nodoc:
     #
     def initialize_thorfiles(relevant_to=nil, skip_lookup=false)
       thorfiles(relevant_to, skip_lookup).each do |f|
-        Thor::Util.load_thorfile(f) unless Thor::Base.subclass_files.keys.include?(File.expand_path(f))
+        Thor::Util.load_thorfile(f, nil, options[:debug]) unless Thor::Base.subclass_files.keys.include?(File.expand_path(f))
       end
     end
 
