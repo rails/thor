@@ -6,7 +6,7 @@ describe Thor::Task do
       options[key] = Thor::Option.parse(key, value)
     end
 
-    @task ||= Thor::Task.new(:can_has, "I can has cheezburger", "can_has", options)
+    @task ||= Thor::Task.new(:can_has, "I can has cheezburger", "I can has cheezburger\nLots and lots of it", "can_has", options)
   end
 
   describe "#formatted_usage" do
@@ -46,7 +46,7 @@ describe Thor::Task do
 
   describe "#dup" do
     it "dup options hash" do
-      task = Thor::Task.new("can_has", nil, nil, :foo => true, :bar => :required)
+      task = Thor::Task.new("can_has", nil, nil, nil, :foo => true, :bar => :required)
       task.dup.options.delete(:foo)
       task.options[:foo].must_not be_nil
     end

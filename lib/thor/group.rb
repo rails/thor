@@ -241,7 +241,7 @@ class Thor::Group
       end
 
       def create_task(meth) #:nodoc:
-        tasks[meth.to_s] = Thor::Task.new(meth, nil, nil, nil)
+        tasks[meth.to_s] = Thor::Task.new(meth, nil, nil, nil, nil)
         true
       end
   end

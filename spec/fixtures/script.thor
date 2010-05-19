@@ -52,6 +52,10 @@ END
   end
 
   desc "long_description", "a" * 80
+  long_desc <<-HERE_DOC
+This is a really really really long description.
+Here you go. So very long
+  HERE_DOC
   def long_description
   end
 

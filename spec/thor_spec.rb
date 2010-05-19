@@ -191,9 +191,10 @@ Usage:
 Options:
   [--force]  # Force to do some fooing
 
-do some fooing
-  This is more info!
-  Everyone likes more info!
+Description:
+  do some fooing
+    This is more info!
+    Everyone likes more info!
 END
       end
 
@@ -205,6 +206,10 @@ END
 
       it "normalizes names before claiming they don't exist" do
         capture(:stdout) { MyScript.task_help(shell, "name-with-dashes") }.must =~ /thor my_script:name-with-dashes/
+      end
+
+      it "uses the long description if it exists" do
+        capture(:stdout) { MyScript.task_help(shell, "long_description") }.must =~ /really really really long description/
       end
     end
 
