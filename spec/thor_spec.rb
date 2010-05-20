@@ -184,17 +184,16 @@ describe Thor do
 
     describe "for a specific task" do
       it "provides full help info when talking about a specific task" do
-        capture(:stdout) { MyScript.task_help(shell, "foo") }.must == <<END
+        capture(:stdout) { MyScript.task_help(shell, "foo") }.must == <<-END
 Usage:
   thor my_script:foo BAR
 
 Options:
   [--force]  # Force to do some fooing
 
-Description:
-  do some fooing
-    This is more info!
-    Everyone likes more info!
+do some fooing
+  This is more info!
+  Everyone likes more info!
 END
       end
 
@@ -209,7 +208,15 @@ END
       end
 
       it "uses the long description if it exists" do
-        capture(:stdout) { MyScript.task_help(shell, "long_description") }.must =~ /really really really long description/
+        capture(:stdout) { MyScript.task_help(shell, "long_description") }.must == <<-HELP
+Usage:
+  thor my_script:long_description
+
+Description:
+  This is a really really really long description. Here you go. So very long.
+
+  It even has two paragraphs.
+HELP
       end
     end
 

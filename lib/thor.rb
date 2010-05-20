@@ -167,8 +167,12 @@ class Thor
       shell.say "  #{banner(task)}"
       shell.say
       class_options_help(shell, nil => task.options.map { |_, o| o })
-      shell.say "Description:"
-      shell.say task.long_description.gsub(/^/m, '  \0')
+      if task.long_description
+        shell.say "Description:"
+        shell.print_wrapped(task.long_description, :ident => 2)
+      else
+        shell.say task.description
+      end
     end
 
     # Prints help information for this class.

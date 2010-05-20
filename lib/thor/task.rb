@@ -18,7 +18,7 @@ class Thor
     end
 
     def initialize(name, description, long_description, usage, options=nil)
-      super(name.to_s, description, long_description || description, usage, options || {})
+      super(name.to_s, description, long_description, usage, options || {})
     end
 
     def initialize_copy(other) #:nodoc:
@@ -39,7 +39,7 @@ class Thor
         instance.class.handle_no_task_error(name) : (raise e)
     end
 
-    # Returns the formatted usage by injecting given required arguments 
+    # Returns the formatted usage by injecting given required arguments
     # and required options into the given usage.
     def formatted_usage(klass, namespace=true)
       namespace = klass.namespace unless namespace == false
