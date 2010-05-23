@@ -225,7 +225,7 @@ class Thor
       def create_task(meth) #:nodoc:
         if @usage && @desc
           tasks[meth.to_s] = Thor::Task.new(meth, @desc, @long_desc, @usage, method_options)
-          @usage, @desc, @method_options = nil
+          @usage, @desc, @long_desc, @method_options = nil
           true
         elsif self.all_tasks[meth.to_s] || meth.to_sym == :method_missing
           true

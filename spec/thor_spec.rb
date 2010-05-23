@@ -218,6 +218,12 @@ Description:
   It even has two paragraphs.
 HELP
       end
+
+      it "doesn't assign the long description to the next task without one" do
+        capture(:stdout) do
+          MyScript.task_help(shell, "name_with_dashes")
+        end.must_not =~ /so very long/i
+      end
     end
 
     describe "instance method" do
