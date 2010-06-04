@@ -192,10 +192,28 @@ describe Thor::Actions do
         @foo = "FOO"
         say_status :cool, :padding
       TEMPLATE
-      @template.instance_eval "def read; self; end" # Make the string respond to read
+      @template.stub(:read).and_return(@template)
 
+      @file = '/'
+      runner.stub(:open).and_return(@template)
+    end
+
+    it "accepts a URL as the path" do
       @file = "http://gist.github.com/103208.txt"
       runner.should_receive(:open).with(@file, "Accept" => "application/x-thor-template").and_return(@template)
+      action(:apply, @file)
+    end
+
+    it "accepts a secure URL as the path" do
+      @file = "https://gist.github.com/103208.txt"
+      runner.should_receive(:open).with(@file, "Accept" => "application/x-thor-template").and_return(@template)
+      action(:apply, @file)
+    end
+
+    it "accepts a local file path with spaces" do
+      @file = File.expand_path("fixtures/path with spaces", File.dirname(__FILE__))
+      runner.should_receive(:open).with(@file).and_return(@template)
+      action(:apply, @file)
     end
 
     it "opens a file and executes its content in the instance binding" do

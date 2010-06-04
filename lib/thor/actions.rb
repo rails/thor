@@ -190,12 +190,13 @@ class Thor
     #
     def apply(path, config={})
       verbose = config.fetch(:verbose, true)
-      path    = find_in_source_paths(path) unless path =~ /^http\:\/\//
+      is_uri  = path =~ /^https?\:\/\//
+      path    = find_in_source_paths(path) unless is_uri
 
       say_status :apply, path, verbose
       shell.padding += 1 if verbose
 
-      if URI(path).is_a?(URI::HTTP)
+      if is_uri
         contents = open(path, "Accept" => "application/x-thor-template") {|io| io.read }
       else
         contents = open(path) {|io| io.read }
