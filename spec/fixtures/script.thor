@@ -37,6 +37,7 @@ END
   end
 
   desc "example_default_task", "example!"
+  method_options :with => :string
   def example_default_task
     options.empty? ? "default task" : options
   end

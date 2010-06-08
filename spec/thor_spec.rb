@@ -41,6 +41,10 @@ describe Thor do
       MyScript.start([]).must == "default task"
     end
 
+    it "invokes the default task if no command is specified even if switches are given" do
+      MyScript.start(["--with", "option"]).must == {"with"=>"option"}
+    end
+
     it "inherits the default task from parent" do
       MyChildScript.default_task.must == "example_default_task"
     end

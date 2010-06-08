@@ -136,7 +136,15 @@ class Thor
     #
     def start(original_args=ARGV, config={})
       super do |given_args|
-        meth = normalize_task_name(given_args.shift)
+        meth = given_args.first.to_s
+
+        if !meth.empty? && (map[meth] || meth !~ /^\-/)
+          given_args.shift
+        else
+          meth = nil
+        end
+
+        meth = normalize_task_name(meth)
         task = all_tasks[meth]
 
         if task
@@ -246,8 +254,7 @@ class Thor
       # If a map can't be found use the sent name or the default task.
       #
       def normalize_task_name(meth) #:nodoc:
-        mapping = map[meth.to_s]
-        meth = mapping || meth || default_task
+        meth = map[meth.to_s] || meth || default_task
         meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
       end
   end
