@@ -21,6 +21,18 @@ describe Thor::Shell do
     it "returns the shell in use" do
       MyCounter.new([1,2]).shell.must be_kind_of(Thor::Base.shell)
     end
+    
+    it "uses $THOR_SHELL" do
+      class Thor::Shell::TestShell < Thor::Shell::Basic; end
+      
+      Thor::Base.shell.must == shell.class
+      ENV['THOR_SHELL'] = 'TestShell'
+      Thor::Base.shell = nil
+      Thor::Base.shell.must == Thor::Shell::TestShell
+      ENV['THOR_SHELL'] = ''
+      Thor::Base.shell = shell.class
+      Thor::Base.shell.must == shell.class
+    end
   end
 
   describe "with_padding" do
@@ -31,4 +43,5 @@ describe Thor::Shell do
       end
     end
   end
+  
 end
