@@ -131,6 +131,15 @@ TABLE
   xyz  #786  last...
 TABLE
     end
+
+    it "honors the colwidth option" do
+      content = capture(:stdout){ shell.print_table(@table, :colwidth => 10)}
+      content.must == <<-TABLE
+abc         #123  first three
+            #0    empty
+xyz         #786  last three
+TABLE
+    end
   end
 
   describe "#file_collision" do

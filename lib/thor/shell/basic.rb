@@ -81,16 +81,20 @@ class Thor
       # Array[Array[String, String, ...]]
       #
       # ==== Options
-      # ident<Integer>:: Ident the first column by ident value.
+      # ident<Integer>:: Indent the first column by ident value.
+      # colwidth<Integer>:: Force the first column to colwidth spaces wide.
       #
       def print_table(table, options={})
         return if table.empty?
 
-        formats, ident = [], options[:ident].to_i
+        formats, ident, colwidth = [], options[:ident].to_i, options[:colwidth]
         options[:truncate] = terminal_width if options[:truncate] == true
 
-        0.upto(table.first.length - 2) do |i|
-          maxima = table.max{ |a,b| a[i].size <=> b[i].size }[i].size
+        formats << "%-#{colwidth + 2}s" if colwidth
+        start = colwidth ? 1 : 0
+
+        start.upto(table.first.length - 2) do |i|
+          maxima ||= table.max{|a,b| a[i].size <=> b[i].size }[i].size
           formats << "%-#{maxima + 2}s"
         end
 
