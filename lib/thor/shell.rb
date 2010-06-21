@@ -1,5 +1,6 @@
 require 'rbconfig'
 require 'thor/shell/color'
+require 'thor/shell/html'
 
 class Thor
   module Base
