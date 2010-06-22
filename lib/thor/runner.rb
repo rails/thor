@@ -13,7 +13,7 @@ class Thor::Runner < Thor #:nodoc:
 
   # Override Thor#help so it can give information about any class and any method.
   #
-  def help(meth=nil)
+  def help(meth = nil)
     if meth && !self.respond_to?(meth)
       initialize_thorfiles(meth)
       klass, task = Thor::Util.find_class_and_task_by_namespace(meth)
@@ -156,8 +156,8 @@ class Thor::Runner < Thor #:nodoc:
 
   private
 
-    def self.banner(task)
-      "thor " + task.formatted_usage(self, false)
+    def self.banner(task, all = false, subcommand = false)
+      "thor " + task.formatted_usage(self, all, subcommand)
     end
 
     def thor_root

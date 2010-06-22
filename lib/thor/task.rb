@@ -41,15 +41,14 @@ class Thor
 
     # Returns the formatted usage by injecting given required arguments
     # and required options into the given usage.
-    def formatted_usage(klass, namespace=true)
+    def formatted_usage(klass, namespace = true, subcommand = false)
       namespace = klass.namespace unless namespace == false
-
-      # Add namespace
-      formatted = if namespace
-        "#{namespace.gsub(/^(default|thor:runner:)/,'')}:"
-      else
-        ""
+      if namespace
+        formatted = "#{namespace.gsub(/^(default|thor:runner:)/,'')}:"
+        formatted.sub!(/.$/, ' ') if subcommand
       end
+
+      formatted ||= ""
 
       # Add usage with required arguments
       formatted << if klass && !klass.arguments.empty?

@@ -188,8 +188,8 @@ class Thor
     # ==== Parameters
     # shell<Thor::Shell>
     #
-    def help(shell)
-      list = printable_tasks
+    def help(shell, subcommand = false)
+      list = printable_tasks(true, subcommand)
       Thor::Util.thor_classes_in(self).each do |klass|
         list += klass.printable_tasks(false)
       end
@@ -202,10 +202,10 @@ class Thor
     end
 
     # Returns tasks ready to be printed.
-    def printable_tasks(all=true)
+    def printable_tasks(all = true, subcommand = false)
       (all ? all_tasks : tasks).map do |_, task|
         item = []
-        item << banner(task)
+        item << banner(task, false, subcommand)
         item << (task.description ? "# #{task.description.gsub(/\s+/m,' ')}" : "")
         item
       end
@@ -233,8 +233,9 @@ class Thor
       # the task that is going to be invoked and a boolean which indicates if
       # the namespace should be displayed as arguments.
       #
-      def banner(task)
-        "#{banner_base} #{task.formatted_usage(self, banner_base == "thor")}"
+      def banner(task, namespace = nil, subcommand = false)
+        namespace ||= banner_base == "thor"
+        "#{banner_base} #{task.formatted_usage(self, namespace, subcommand)}"
       end
 
       def baseclass #:nodoc:
@@ -270,11 +271,9 @@ class Thor
       end
 
       def subcommand_help(cmd)
-        desc "#{cmd} help [COMMAND]", "Describe subcommands or one specific subcommand"
+        desc "help [COMMAND]", "Describe subcommands or one specific subcommand"
         class_eval <<-RUBY
-          def help(task = nil)
-            super(task, true)
-          end
+          def help(task = nil, subcommand = true); super; end
         RUBY
       end
 
@@ -289,7 +288,7 @@ class Thor
   map HELP_MAPPINGS => :help
 
   desc "help [TASK]", "Describe available tasks or one specific task"
-  def help(task=nil)
-    task ? self.class.task_help(shell, task) : self.class.help(shell)
+  def help(task = nil, subcommand = false)
+    task ? self.class.task_help(shell, task) : self.class.help(shell, subcommand)
   end
 end

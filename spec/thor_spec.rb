@@ -152,7 +152,7 @@ describe Thor do
     end
 
     it "passes arguments to subcommand classes" do
-      capture(:stdout){ Scripts::MyDefaults.start(["barn", "open", "shotgun"]) }.must == "That's going to leave a mark."
+      capture(:stdout){ Scripts::MyDefaults.start(["barn", "open", "shotgun"]) }.strip.must == "That's going to leave a mark."
     end
   end
 
