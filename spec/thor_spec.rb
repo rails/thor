@@ -141,6 +141,21 @@ describe Thor do
     end
   end
 
+  describe "#subcommand" do
+    it "maps a given subcommand to another Thor subclass" do
+      barn_help = capture(:stdout){ Scripts::MyDefaults.start(["barn"]) }
+      barn_help.must include("barn help [COMMAND]  # Describe subcommands or one specific subcommand")
+    end
+
+    it "passes commands to subcommand classes" do
+      capture(:stdout){ Scripts::MyDefaults.start(["barn", "open"]) }.strip.must == "Open sesame!"
+    end
+
+    it "passes arguments to subcommand classes" do
+      capture(:stdout){ Scripts::MyDefaults.start(["barn", "open", "shotgun"]) }.must == "That's going to leave a mark."
+    end
+  end
+
   describe "#help" do
     def shell
       @shell ||= Thor::Base.shell.new

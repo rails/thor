@@ -121,6 +121,17 @@ class MyChildScript < MyScript
   remove_task :boom, :undefine => true
 end
 
+class Barn < Thor
+  desc "open [ITEM]", "open the barn door"
+  def open(item = nil)
+    if item == "shotgun"
+      puts "That's going to leave a mark."
+    else
+      puts "Open sesame!"
+    end
+  end
+end
+
 module Scripts
   class MyScript < MyChildScript
     argument :accessor, :type => :string
@@ -143,6 +154,9 @@ module Scripts
     def task_conflict
       puts "task"
     end
+
+    desc "barn", "commands to manage the barn"
+    subcommand "barn", Barn
   end
 
   class ChildDefault < Thor

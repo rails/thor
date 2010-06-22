@@ -1,6 +1,5 @@
 require 'thor/base'
 
-# TODO: Update thor to allow for git-style CLI (git bisect run)
 class Thor
   class << self
     # Sets the default task when thor is executed without an explicit task to be called.
@@ -135,6 +134,7 @@ class Thor
     #   script.invoke(:task, first_arg, second_arg, third_arg)
     #
     def start(original_args=ARGV, config={})
+      @@original_args = original_args
       super do |given_args|
         meth = given_args.first.to_s
 
@@ -215,6 +215,17 @@ class Thor
       raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{task.formatted_usage(self, banner_base == "thor").inspect}."
     end
 
+    def subcommands
+      @@subcommands ||= {}
+    end
+
+    def subcommand(subcommand, subcommand_class)
+      subcommand = subcommand.to_s
+      subcommands[subcommand] = subcommand_class
+      subcommand_class.subcommand_help subcommand
+      define_method(subcommand) { |*_| subcommand_class.start(subcommand_args) }
+    end
+
     protected
 
       # The banner for this class. You can customize it if you are invoking the
@@ -257,6 +268,20 @@ class Thor
         meth = map[meth.to_s] || meth || default_task
         meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
       end
+
+      def subcommand_help(cmd)
+        desc "#{cmd} help [COMMAND]", "Describe subcommands or one specific subcommand"
+        class_eval <<-RUBY
+          def help(task = nil)
+            super(task, true)
+          end
+        RUBY
+      end
+
+  end
+
+  def subcommand_args
+    @@original_args[1..-1]
   end
 
   include Thor::Base
