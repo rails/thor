@@ -42,8 +42,8 @@ class Thor
           $stdout.puts(message)
         else
           $stdout.print(message)
-          $stdout.flush
         end
+        $stdout.flush
       end
 
       # Say a status with the given color and appends the message. Since this
