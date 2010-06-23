@@ -1,6 +1,4 @@
 require 'rbconfig'
-require 'thor/shell/color'
-require 'thor/shell/html'
 
 class Thor
   module Base
@@ -26,6 +24,10 @@ class Thor
 
   module Shell
     SHELL_DELEGATED_METHODS = [:ask, :yes?, :no?, :say, :say_status, :print_table]
+
+    autoload :Basic, 'thor/shell/basic'
+    autoload :Color, 'thor/shell/color'
+    autoload :HTML,  'thor/shell/HTML'
 
     # Add shell to initialize config values.
     #
