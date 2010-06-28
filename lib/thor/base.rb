@@ -382,11 +382,15 @@ class Thor
       end
 
       def handle_no_task_error(task) #:nodoc:
-        if self.banner_base == "thor"
+        if $thor_runner
           raise UndefinedTaskError, "Could not find task #{task.inspect} in #{namespace.inspect} namespace."
         else
           raise UndefinedTaskError, "Could not find task #{task.inspect}."
         end
+      end
+
+      def handle_argument_error(task, error) #:nodoc:
+        raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{self.banner(task).inspect}."
       end
 
       protected
@@ -514,11 +518,6 @@ class Thor
         # A flag that makes the process exit with status 1 if any error happens.
         def exit_on_failure?
           false
-        end
-
-        # Returns the base for banner.
-        def banner_base
-          @banner_base ||= $thor_runner ? "thor" : File.basename($0.split(" ").first)
         end
 
         # SIGNATURE: Sets the baseclass. This is where the superclass lookup

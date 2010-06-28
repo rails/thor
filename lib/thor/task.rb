@@ -43,8 +43,9 @@ class Thor
     # and required options into the given usage.
     def formatted_usage(klass, namespace = true, subcommand = false)
       namespace = klass.namespace unless namespace == false
+
       if namespace
-        formatted = "#{namespace.gsub(/^(default|thor:runner:)/,'')}:"
+        formatted = "#{namespace.gsub(/^(default)/,'')}:"
         formatted.sub!(/.$/, ' ') if subcommand
       end
 

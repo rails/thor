@@ -85,7 +85,7 @@ describe Thor::Runner do
     it "does not swallow Thor InvocationError" do
       ARGV.replace ["my_script:animal"]
       content = capture(:stderr) { Thor::Runner.start }
-      content.strip.must == '"animal" was called incorrectly. Call as "my_script:animal TYPE".'
+      content.strip.must == '"animal" was called incorrectly. Call as "thor my_script:animal TYPE".'
     end
   end
 

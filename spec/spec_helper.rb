@@ -19,6 +19,7 @@ load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "invoke.thor")
 
 # Set shell to basic
+$0 = "thor"
 Thor::Base.shell = Thor::Shell::Basic
 
 Kernel.module_eval do

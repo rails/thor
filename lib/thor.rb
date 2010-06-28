@@ -211,10 +211,6 @@ class Thor
       end
     end
 
-    def handle_argument_error(task, error) #:nodoc:
-      raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{task.formatted_usage(self, banner_base == "thor").inspect}."
-    end
-
     def subcommands
       @@subcommands ||= {}
     end
@@ -234,8 +230,7 @@ class Thor
       # the namespace should be displayed as arguments.
       #
       def banner(task, namespace = nil, subcommand = false)
-        namespace ||= banner_base == "thor"
-        "#{banner_base} #{task.formatted_usage(self, namespace, subcommand)}"
+        "#{$0} #{task.formatted_usage(self, $thor_runner, subcommand)}"
       end
 
       def baseclass #:nodoc:
