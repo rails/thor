@@ -267,16 +267,11 @@ class Thor::Runner < Thor #:nodoc:
       raise Error, "No Thor tasks available" if klasses.empty?
       show_modules if with_modules && !thor_yaml.empty?
 
-      # Remove subclasses
-      klasses.dup.each do |klass|
-        klasses -= Thor::Util.thor_classes_in(klass)
-      end
-
       list = Hash.new { |h,k| h[k] = [] }
       groups = klasses.select { |k| k.ancestors.include?(Thor::Group) }
 
       # Get classes which inherit from Thor
-      (klasses - groups).each { |k| list[k.namespace] += k.printable_tasks(false) }
+      (klasses - groups).each { |k| list[k.namespace.split(":").first] += k.printable_tasks(false) }
 
       # Get classes which inherit from Thor::Base
       groups.map! { |k| k.printable_tasks(false).first }
