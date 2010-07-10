@@ -31,10 +31,10 @@ class Thor
 
     def show_default?
       case default
-        when Array, String, Hash
-          !default.empty?
-        else
-          default
+      when Array, String, Hash
+        !default.empty?
+      else
+        default
       end
     end
 
@@ -45,21 +45,21 @@ class Thor
       end
 
       def valid_type?(type)
-        VALID_TYPES.include?(type.to_sym)
+        self.class::VALID_TYPES.include?(type.to_sym)
       end
 
       def default_banner
         case type
-          when :boolean
-            nil
-          when :string, :default
-            human_name.upcase
-          when :numeric
-            "N"
-          when :hash
-            "key:value"
-          when :array
-            "one two three"
+        when :boolean
+          nil
+        when :string, :default
+          human_name.upcase
+        when :numeric
+          "N"
+        when :hash
+          "key:value"
+        when :array
+          "one two three"
         end
       end
 

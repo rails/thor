@@ -8,6 +8,17 @@ describe Thor do
       options.must == { "force" => true }
     end
 
+    it "sets method_option with given parameters" do
+      arg, options = MyScript.start(["with_optional"])
+      options.must == {}
+
+      arg, options = MyScript.start(["with_optional", "--lazy"])
+      options.must == { "lazy" => "yes" }
+
+      arg, options = MyScript.start(["with_optional", "--lazy", "yesyes!"])
+      options.must == { "lazy" => "yesyes!" }
+    end
+
     describe "when :for is supplied" do
       it "updates an already defined task" do
         args, options = MyChildScript.start(["animal", "horse", "--other=fish"])

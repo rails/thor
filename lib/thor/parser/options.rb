@@ -150,7 +150,7 @@ class Thor
             return nil # User set value to nil
           elsif option.string? && !option.required?
             # Return the default if there is one, else the human name
-            return option.default || option.human_name
+            return option.lazy_default || option.default || option.human_name
           else
             raise MalformattedArgumentError, "No value provided for option '#{switch}'"
           end

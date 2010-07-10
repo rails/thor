@@ -67,6 +67,7 @@ END
   end
 
   method_options :all => :boolean
+  method_option :lazy, :lazy_default => "yes"
   desc "with_optional NAME", "invoke with optional name"
   def with_optional(name=nil)
     [ name, options ]

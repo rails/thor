@@ -449,7 +449,7 @@ class Thor
         def build_option(name, options, scope) #:nodoc:
           scope[name] = Thor::Option.new(name, options[:desc], options[:required],
                                                options[:type], options[:default], options[:banner],
-                                               options[:group], options[:aliases])
+                                               options[:lazy_default], options[:group], options[:aliases])
         end
 
         # Receives a hash of options, parse them and add to the scope. This is a

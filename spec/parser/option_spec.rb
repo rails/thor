@@ -6,8 +6,8 @@ describe Thor::Option do
     Thor::Option.parse(key, value)
   end
 
-  def option(name, description=nil, required=false, type=nil, default=nil, banner=nil, group=nil, aliases=[])
-    @option ||= Thor::Option.new(name, description, required, type, default, banner, group, aliases)
+  def option(name, *args)
+    @option ||= Thor::Option.new(name, *args)
   end
 
   describe "#parse" do

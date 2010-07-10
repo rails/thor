@@ -1,13 +1,14 @@
 class Thor
   class Option < Argument #:nodoc:
-    attr_reader :aliases, :group
+    attr_reader :aliases, :group, :lazy_default
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
-    def initialize(name, description=nil, required=nil, type=nil, default=nil, banner=nil, group=nil, aliases=nil)
+    def initialize(name, description=nil, required=nil, type=nil, default=nil, banner=nil, lazy_default=nil, group=nil, aliases=nil)
       super(name, description, required, type, default, banner)
-      @aliases = [*aliases].compact
-      @group   = group.to_s.capitalize if group
+      @lazy_default = lazy_default
+      @group        = group.to_s.capitalize if group
+      @aliases      = [*aliases].compact
     end
 
     # This parse quick options given as method_options. It makes several
@@ -48,23 +49,22 @@ class Thor
       default = value
 
       type = case value
-        when Symbol
-          default  = nil
-
-          if VALID_TYPES.include?(value)
-            value
-          elsif required = (value == :required)
-            :string
-          end
-        when TrueClass, FalseClass
-          :boolean
-        when Numeric
-          :numeric
-        when Hash, Array, String
-          value.class.name.downcase.to_sym
+      when Symbol
+        default = nil
+        if VALID_TYPES.include?(value)
+          value
+        elsif required = (value == :required)
+          :string
+        end
+      when TrueClass, FalseClass
+        :boolean
+      when Numeric
+        :numeric
+      when Hash, Array, String
+        value.class.name.downcase.to_sym
       end
 
-      self.new(name.to_s, nil, required, type, default, nil, nil, aliases)
+      self.new(name.to_s, nil, required, type, default, nil, nil, nil, aliases)
     end
 
     def switch_name
@@ -91,38 +91,30 @@ class Thor
       end
     end
 
-    # Allow some type predicates as: boolean?, string? and etc.
-    #
-    def method_missing(method, *args, &block)
-      given = method.to_s.sub(/\?$/, '').to_sym
-      if valid_type?(given)
-        self.type == given
-      else
-        super
-      end
+    VALID_TYPES.each do |type|
+      class_eval <<-RUBY, __FILE__, __LINE__ + 1
+        def #{type}?
+          self.type == #{type.inspect}
+        end
+      RUBY
     end
 
-    protected
+  protected
 
-      def validate!
-        raise ArgumentError, "An option cannot be boolean and required." if boolean? && required?
-      end
+    def validate!
+      raise ArgumentError, "An option cannot be boolean and required." if boolean? && required?
+    end
 
-      def valid_type?(type)
-        VALID_TYPES.include?(type.to_sym)
-      end
+    def dasherized?
+      name.index('-') == 0
+    end
 
-      def dasherized?
-        name.index('-') == 0
-      end
+    def undasherize(str)
+      str.sub(/^-{1,2}/, '')
+    end
 
-      def undasherize(str)
-        str.sub(/^-{1,2}/, '')
-      end
-
-      def dasherize(str)
-        (str.length > 1 ? "--" : "-") + str.gsub('_', '-')
-      end
-
+    def dasherize(str)
+      (str.length > 1 ? "--" : "-") + str.gsub('_', '-')
+    end
   end
 end

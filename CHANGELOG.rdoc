@@ -1,5 +1,6 @@
 == 0.13, released 2010-02-03
 
+* Added :lazy_default which is only triggered if a switch is given
 * Added Thor::Shell::HTML
 * Decoupled Thor::Group and Thor, so it's easier to vendor
 * Added check_unknown_options! in case you want error messages to be raised in valid switches
