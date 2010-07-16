@@ -77,12 +77,19 @@ describe Thor do
   end
 
   describe "#desc" do
-    before(:all) do
-      @content = capture(:stdout) { MyScript.start(["help"]) }
+    it "provides description for a task" do
+      content = capture(:stdout) { MyScript.start(["help"]) }
+      content.must =~ /thor my_script:zoo\s+# zoo around/m
     end
 
-    it "provides description for a task" do
-      @content.must =~ /zoo\s+# zoo around/m
+    it "provides no namespace if $thor_runner is false" do
+      begin
+        $thor_runner = false
+        content = capture(:stdout) { MyScript.start(["help"]) }
+        content.must =~ /thor zoo\s+# zoo around/m
+      ensure
+        $thor_runner = true
+      end
     end
 
     describe "when :for is supplied" do

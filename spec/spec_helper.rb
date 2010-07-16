@@ -10,17 +10,16 @@ require 'rdoc'
 require 'diff/lcs' # You need diff/lcs installed to run specs (but not to run Thor).
 require 'fakeweb'  # You need fakeweb installed to run specs (but not to run Thor).
 
+# Set shell to basic
+$0 = "thor"
 $thor_runner = true
+Thor::Base.shell = Thor::Shell::Basic
 
 # Load fixtures
 load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "group.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "invoke.thor")
-
-# Set shell to basic
-$0 = "thor"
-Thor::Base.shell = Thor::Shell::Basic
 
 Kernel.module_eval do
   alias_method :must, :should

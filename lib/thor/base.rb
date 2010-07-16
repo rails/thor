@@ -336,6 +336,7 @@ class Thor
       def no_tasks
         @no_tasks = true
         yield
+      ensure
         @no_tasks = false
       end
 

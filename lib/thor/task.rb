@@ -42,9 +42,8 @@ class Thor
     # Returns the formatted usage by injecting given required arguments
     # and required options into the given usage.
     def formatted_usage(klass, namespace = true, subcommand = false)
-      namespace = klass.namespace unless namespace == false
-
       if namespace
+        namespace = klass.namespace
         formatted = "#{namespace.gsub(/^(default)/,'')}:"
         formatted.sub!(/.$/, ' ') if subcommand
       end
