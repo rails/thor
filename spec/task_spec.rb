@@ -31,16 +31,16 @@ describe Thor::Task do
 
   describe "#dynamic" do
     it "creates a dynamic task with the given name" do
-      Thor::Task::Dynamic.new('task').name.must == 'task'
-      Thor::Task::Dynamic.new('task').description.must == 'A dynamically-generated task'
-      Thor::Task::Dynamic.new('task').usage.must == 'task'
-      Thor::Task::Dynamic.new('task').options.must == {}
+      Thor::DynamicTask.new('task').name.must == 'task'
+      Thor::DynamicTask.new('task').description.must == 'A dynamically-generated task'
+      Thor::DynamicTask.new('task').usage.must == 'task'
+      Thor::DynamicTask.new('task').options.must == {}
     end
 
     it "does not invoke an existing method" do
       mock = mock()
       mock.class.should_receive(:handle_no_task_error).with("to_s")
-      Thor::Task::Dynamic.new('to_s').run(mock)
+      Thor::DynamicTask.new('to_s').run(mock)
     end
   end
 

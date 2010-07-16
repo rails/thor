@@ -26,6 +26,11 @@ class MyScript < Thor
     [type]
   end
 
+  desc "hidden TYPE", "this is hidden", :hide => true
+  def hidden(type)
+    [type]
+  end
+
   desc "foo BAR", <<END
 do some fooing
   This is more info!

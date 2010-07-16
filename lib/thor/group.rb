@@ -233,7 +233,7 @@ class Thor::Group
 
       # Represents the whole class as a task.
       def self_task #:nodoc:
-        Thor::Task::Dynamic.new(self.namespace, class_options)
+        Thor::DynamicTask.new(self.namespace, class_options)
       end
 
       def baseclass #:nodoc:

@@ -97,6 +97,16 @@ describe Thor do
         capture(:stdout) { MyChildScript.start(["help"]) }.must =~ /animal KIND \s+# fish around/m
       end
     end
+
+    describe "when :hide is supplied" do
+      it "does not show the task in help" do
+        capture(:stdout) { MyScript.start(["help"]) }.must_not =~ /this is hidden/m
+      end
+
+      it "but the task is still invokcable not show the task in help" do
+        MyScript.start(["hidden", "yesyes"]).must == ["yesyes"]
+      end
+    end
   end
 
   describe "#method_options" do

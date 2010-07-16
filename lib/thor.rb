@@ -23,6 +23,7 @@ class Thor
     # ==== Parameters
     # usage<String>
     # description<String>
+    # options<String>
     #
     def desc(usage, description, options={})
       if options[:for]
@@ -30,7 +31,7 @@ class Thor
         task.usage = usage             if usage
         task.description = description if description
       else
-        @usage, @desc = usage, description
+        @usage, @desc, @hide = usage, description, options[:hide] || false
       end
     end
 
@@ -135,6 +136,7 @@ class Thor
     #
     def start(original_args=ARGV, config={})
       @@original_args = original_args
+
       super do |given_args|
         meth = given_args.first.to_s
 
@@ -154,7 +156,7 @@ class Thor
           args, opts = given_args, {}
         end
 
-        task ||= Thor::Task::Dynamic.new(meth)
+        task ||= Thor::DynamicTask.new(meth)
         trailing = args[Range.new(arguments.size, -1)]
         new(args, opts, config).invoke(task, trailing || [])
       end
@@ -204,11 +206,12 @@ class Thor
     # Returns tasks ready to be printed.
     def printable_tasks(all = true, subcommand = false)
       (all ? all_tasks : tasks).map do |_, task|
+        next if task.hidden?
         item = []
         item << banner(task, false, subcommand)
         item << (task.description ? "# #{task.description.gsub(/\s+/m,' ')}" : "")
         item
-      end
+      end.compact
     end
 
     def subcommands
@@ -239,8 +242,9 @@ class Thor
 
       def create_task(meth) #:nodoc:
         if @usage && @desc
-          tasks[meth.to_s] = Thor::Task.new(meth, @desc, @long_desc, @usage, method_options)
-          @usage, @desc, @long_desc, @method_options = nil
+          base_class = @hide ? Thor::HiddenTask : Thor::Task
+          tasks[meth.to_s] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
+          @usage, @desc, @long_desc, @method_options, @hide = nil
           true
         elsif self.all_tasks[meth.to_s] || meth.to_sym == :method_missing
           true
