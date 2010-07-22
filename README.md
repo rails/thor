@@ -1,10 +1,10 @@
-= thor 
+# Thor 
 
-== Description
+## Description
 
-Thor is a simple and efficient tool for building self-documenting command line utilities.  It removes the pain of parsing command line options, writing "USAGE:" banners, and can also be used as an alternative to the Rake[http://github.com/jimweirich/rake] build tool.  The syntax is Rake-like, so it should be familiar to most Rake users.
+Thor is a simple and efficient tool for building self-documenting command line utilities.  It removes the pain of parsing command line options, writing "USAGE:" banners, and can also be used as an alternative to the [Rake](http://github.com/jimweirich/rake) build tool.  The syntax is Rake-like, so it should be familiar to most Rake users. 
 
-== Installation
+## Installation
 
 $ gem install thor
 
@@ -12,9 +12,10 @@ or
 
 $ gem install wycats-thor -s http://gems.github.com
 
-== Usage
-Map options to a class. Simply create a class with the appropriate annotations
-and have options automatically map to functions and parameters.
+## Usage
+
+Map options to a class.  Simply create a class with the appropriate annotations
+and have options automatically map to functions and parameters.  
 
 Example:
 
@@ -37,7 +38,7 @@ Example:
       end
     end
 
-Thor automatically maps commands as such:
+Thor automatically maps commands as such: 
 
     thor app:install myname --force
 
@@ -46,12 +47,12 @@ That gets converted to:
     App.new.install("myname")
     # with {'force' => true} as options hash
 
-1. Inherit from Thor to turn a class into an option mapper
-2. Map additional non-valid identifiers to specific methods. In this case, convert -L to :list
-3. Describe the method immediately below. The first parameter is the usage information, and the second parameter is the description
-4. Provide any additional options that will be available the instance method options.
+1. Inherit from Thor to turn a class into an option mapper.  
+2. Map additional non-valid identifiers to specific methods.  In this case, convert -L to :list
+3. Describe the method immediately below.  The first parameter is the usage information, and the second parameter is the description.  
+4. Provide any additional options that will be available the instance method options.  
 
-== Types for <tt>method_options</tt>
+## Types for <tt>method_options</tt>
 
 * :boolean - is parsed as <tt>--option</tt> or <tt>--option=true</tt>
 * :string  - is parsed as <tt>--option=VALUE</tt>
@@ -59,7 +60,7 @@ That gets converted to:
 * :array   - is parsed as <tt>--option=one two three</tt>
 * :hash    - is parsed as <tt>--option=name:string age:integer</tt>
 
-Besides, method_option allows a default value to be given, examples:
+Besides, method_option allows a default value to be given.  Examples:
 
     method_options :force => false
     #=> Creates a boolean option with default value false
@@ -70,19 +71,19 @@ Besides, method_option allows a default value to be given, examples:
     method_options :threshold => 3.0
     #=> Creates a numeric option with default value 3.0
 
-You can also supply <tt>:option => :required</tt> to mark an option as required. The
-type is assumed to be string. If you want a required hash with default values
+You can also supply <tt>:option => :required</tt> to mark an option as required.  The
+type is assumed to be string.  If you want a required hash with default values
 as option, you can use <tt>method_option</tt> which uses a more declarative style:
 
     method_option :attributes, :type => :hash, :default => {}, :required => true
 
 All arguments can be set to nil (except required arguments), by suppling a no or
-skip variant. For example:
+skip variant.  For example: 
 
     thor app name --no-attributes
 
 In previous versions, aliases for options were created automatically, but now
-they should be explicit. You can supply aliases in both short and declarative
+they should be explicit.  You can supply aliases in both short and declarative
 styles:
 
     method_options %w( force -f ) => :boolean
@@ -95,9 +96,9 @@ You can supply as many aliases as you want.
 
 NOTE: Type :optional available in Thor 0.9.0 was deprecated. Use :string or :boolean instead.
 
-== Namespaces
+## Namespaces
 
-By default, your Thor tasks are invoked using Ruby namespace. In the example
+By default, your Thor tasks are invoked using Ruby namespace.  In the example
 above, tasks are invoked as:
 
     thor app:install name --force
@@ -123,14 +124,13 @@ If desired, you can change the namespace:
       end
     end
 
-And then your tasks hould be invoked as:
+And then your tasks should be invoked as:
 
     thor myapp:install name --force
 
-== Invocations
+## Invocations
 
-Thor comes with a invocation-dependency system as well which allows a task to be
-invoked only once. For example:
+Thor comes with a invocation-dependency system as well, which allows a task to be invoked only once.  For example:
 
     class Counter < Thor
       desc "one", "Prints 1, 2, 3"
@@ -156,14 +156,14 @@ When invoking the task one:
 
     thor counter:one
 
-The output is "1 2 3", which means that the three task was invoked only once.
+The output is "1 2 3", which means that the three task was invoked only once.  
 You can even invoke tasks from another class, so be sure to check the
-documentation[http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor.html].
+[documentation](http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor.html).
 
-== Thor::Group
+## Thor::Group
 
-Thor has a special class called Thor::Group. The main difference to Thor class
-is that it invokes all tasks at once. The example above could be rewritten in
+Thor has a special class called Thor::Group.  The main difference to Thor class
+is that it invokes all tasks at once.  The example above could be rewritten in
 Thor::Group as this:
 
     class Counter < Thor::Group
@@ -186,12 +186,12 @@ When invoked:
 
     thor counter
 
-It prints "1 2 3" as well. Notice you should describe (using the method <tt>desc</tt>)
-only the class and not each task anymore. Thor::Group is a great tool to create
+It prints "1 2 3" as well.  Notice you should describe (using the method <tt>desc</tt>)
+only the class and not each task anymore.  Thor::Group is a great tool to create
 generators, since you can define several steps which are invoked in the order they
-are defined (Thor::Group is the tool use in generators in Rails 3.0).
+are defined (Thor::Group is the tool use in generators in Rails 3.0). 
 
-Besides, Thor::Group can parse arguments and options as Thor tasks:
+Besides, Thor::Group can parse arguments and options as Thor tasks: 
 
     class Counter < Thor::Group
       # number will be available as attr_accessor
@@ -223,13 +223,13 @@ You can also give options to Thor::Group, but instead of using <tt>method_option
 and <tt>method_options</tt>, you should use <tt>class_option</tt> and <tt>class_options</tt>.
 Both argument and class_options methods are available to Thor class as well.
 
-== Actions
+## Actions
 
-Thor comes with several actions which helps with script and generator tasks. You
-might be familiar with them since some came from Rails Templates. They are:
+Thor comes with several actions which helps with script and generator tasks.  You
+might be familiar with them since some came from Rails Templates.  They are:
 <tt>say</tt>, <tt>ask</tt>, <tt>yes?</tt>, <tt>no?</tt>, <tt>add_file</tt>,
 <tt>remove_file</tt>, <tt>copy_file</tt>, <tt>template</tt>, <tt>directory</tt>,
-<tt>inside</tt>, <tt>run</tt>, <tt>inject_into_file</tt> and a couple more.
+<tt>inside</tt>, <tt>run</tt>, <tt>inject_into_file</tt> and a couple more. 
 
 To use them, you just need to include Thor::Actions in your Thor classes:
 
@@ -239,13 +239,13 @@ To use them, you just need to include Thor::Actions in your Thor classes:
     end
 
 Some actions like copy file requires that a class method called source_root is
-defined in your class. This is the directory where your templates should be
-placed. Be sure to check the documentation on actions[http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor/Actions.html].
+defined in your class.  This is the directory where your templates should be
+placed.  Be sure to check the documentation on [actions](http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor/Actions.html).
 
-== Generators
+## Generators
 
-A great use for Thor is creating custom generators. Combining Thor::Group,
-Thor::Actions and ERB templates makes this very easy. Here is an example:
+A great use for Thor is creating custom generators.  Combining Thor::Group,
+Thor::Actions and ERB templates makes this very easy.  Here is an example:
 
     class Newgem < Thor::Group
       include Thor::Actions
@@ -277,8 +277,8 @@ Thor::Actions and ERB templates makes this very easy. Here is an example:
       end
     end
 
-Doing a <tt>thor -T</tt> will show how to run our generator. It should read:
-<tt>thor newgem NAME</tt>. This shows that we have to supply a NAME
+Doing a <tt>thor -T</tt> will show how to run our generator.  It should read:
+<tt>thor newgem NAME</tt>.  This shows that we have to supply a NAME
 argument for our generator to run.
 
 The <tt>create_lib_file</tt> uses an ERB template. This is what it looks like:
@@ -287,24 +287,19 @@ The <tt>create_lib_file</tt> uses an ERB template. This is what it looks like:
     end
 
 The arguments that you set in your generator will automatically be passed in
-when <tt>template</tt> gets called. Be sure to read the documentation[http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor/Actions.html] for
+when <tt>template</tt> gets called.  Be sure to read the [documentation](http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor/Actions.html) for
 more options.
 
 Running the generator with <tt>thor newgem devise</tt> will
-create two files: "devise/lib/devise.rb",
-"devise/test/devise_test.rb". The user will then be prompt (with the
-use of the method <tt>yes?</tt>) if he wants to copy the MITLICENSE. If you
-want to change the test framework, you can add the option:
-<tt>thor newgem devise --test-framework=rspec</tt>
-This will generate: "devise/lib/devise.rb" and
-"devise/spec/devise_spec.rb".
+create two files: "devise/lib/devise.rb", and "devise/test/devise_test.rb".  The user will then be asked (via a prompt by the <tt>yes?</tt> method) whether or not they would like to copy the MIT License.  If you want to change the test framework, you can add the option: <tt>thor newgem devise --test-framework=rspec</tt> 
 
-== Further Reading
+This will generate two files - "devise/lib/devise.rb" and "devise/spec/devise_spec.rb".
 
-Thor has many scripting possibilities beyond these examples. Be sure to read
-through the documentation[http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor.html] and specs[http://github.com/wycats/thor/tree/master/spec/] to get a better understanding of all the
-options Thor offers.
+## Further Reading
 
-== License
+Thor offers many scripting possibilities beyond these examples.  Be sure to read
+through the [documentation](http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor.html) and [specs](http://github.com/wycats/thor/tree/master/spec/) to get a better understanding of the options available. 
+
+## License
 
 Released under the MIT License.  See the LICENSE file for further details. 
