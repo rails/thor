@@ -1,5 +1,18 @@
-= thor
+= thor 
 
+== Description
+
+Thor is a simple and efficient tool for building self-documenting command line utilities.  It removes the pain of parsing command line options, writing "USAGE:" banners, and can also be used as an alternative to the Rake[http://github.com/jimweirich/rake] build tool.  The syntax is Rake-like, so it should be familiar to most Rake users.
+
+== Installation
+
+$ gem install thor
+
+or
+
+$ gem install wycats-thor -s http://gems.github.com
+
+== Usage
 Map options to a class. Simply create a class with the appropriate annotations
 and have options automatically map to functions and parameters.
 
@@ -294,4 +307,4 @@ options Thor offers.
 
 == License
 
-See MIT LICENSE.
+Released under the MIT License.  See the LICENSE file for further details. 
