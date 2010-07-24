@@ -27,7 +27,7 @@ class Thor
 
     autoload :Basic, 'thor/shell/basic'
     autoload :Color, 'thor/shell/color'
-    autoload :HTML,  'thor/shell/HTML'
+    autoload :HTML,  'thor/shell/html'
 
     # Add shell to initialize config values.
     #
