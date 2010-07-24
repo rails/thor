@@ -38,10 +38,12 @@ class Thor
         message  = message.to_s
         message  = set_color(message, color) if color
 
+        spaces = "  " * padding
+
         if force_new_line
-          $stdout.puts(message)
+          $stdout.puts(spaces + message)
         else
-          $stdout.print(message)
+          $stdout.print(spaces + message)
         end
         $stdout.flush
       end
