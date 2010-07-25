@@ -94,6 +94,11 @@ class Thor
     #   invoke Rspec::RR, [], :style => :foo
     #
     def invoke(name=nil, *args)
+      if name.nil?
+        warn "[Thor] Calling invoke() without argument is deprecated. Please use invoke_all instead.\n#{caller.join("\n")}"
+        return invoke_all
+      end
+
       args.unshift(nil) if Array === args.first || NilClass === args.first
       task, args, opts, config = args
 
