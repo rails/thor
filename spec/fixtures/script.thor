@@ -73,6 +73,9 @@ END
 
   method_options :all => :boolean
   method_option :lazy, :lazy_default => "yes"
+  method_option :lazy_numeric, :type => :numeric, :lazy_default => 42
+  method_option :lazy_array,   :type => :array,   :lazy_default => %w[eat at joes]
+  method_option :lazy_hash,    :type => :hash,    :lazy_default => {'swedish' => 'meatballs'}
   desc "with_optional NAME", "invoke with optional name"
   def with_optional(name=nil)
     [ name, options ]

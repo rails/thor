@@ -151,6 +151,8 @@ class Thor
           elsif option.string? && !option.required?
             # Return the default if there is one, else the human name
             return option.lazy_default || option.default || option.human_name
+          elsif option.lazy_default
+            return option.lazy_default
           else
             raise MalformattedArgumentError, "No value provided for option '#{switch}'"
           end

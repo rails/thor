@@ -8,15 +8,43 @@ describe Thor do
       options.must == { "force" => true }
     end
 
-    it "sets method_option with given parameters" do
-      arg, options = MyScript.start(["with_optional"])
-      options.must == {}
+    describe ":lazy_default" do
+      it "is absent when option is not specified" do
+        arg, options = MyScript.start(["with_optional"])
+        options.must == {}
+      end
 
-      arg, options = MyScript.start(["with_optional", "--lazy"])
-      options.must == { "lazy" => "yes" }
+      it "sets a default that can be overridden for strings" do
+        arg, options = MyScript.start(["with_optional", "--lazy"])
+        options.must == { "lazy" => "yes" }
 
-      arg, options = MyScript.start(["with_optional", "--lazy", "yesyes!"])
-      options.must == { "lazy" => "yesyes!" }
+        arg, options = MyScript.start(["with_optional", "--lazy", "yesyes!"])
+        options.must == { "lazy" => "yesyes!" }
+      end
+
+      it "sets a default that can be overridden for numerics" do
+        arg, options = MyScript.start(["with_optional", "--lazy-numeric"])
+        options.must == { "lazy_numeric" => 42 }
+
+        arg, options = MyScript.start(["with_optional", "--lazy-numeric", 20000])
+        options.must == { "lazy_numeric" => 20000 }
+      end
+
+      it "sets a default that can be overridden for arrays" do
+        arg, options = MyScript.start(["with_optional", "--lazy-array"])
+        options.must == { "lazy_array" => %w[eat at joes] }
+
+        arg, options = MyScript.start(["with_optional", "--lazy-array", "hello", "there"])
+        options.must == { "lazy_array" => %w[hello there] }
+      end
+
+      it "sets a default that can be overridden for hashes" do
+        arg, options = MyScript.start(["with_optional", "--lazy-hash"])
+        options.must == { "lazy_hash" => {'swedish' => 'meatballs'} }
+
+        arg, options = MyScript.start(["with_optional", "--lazy-hash", "polish:sausage"])
+        options.must == { "lazy_hash" => {'polish' => 'sausage'} }
+      end
     end
 
     describe "when :for is supplied" do
