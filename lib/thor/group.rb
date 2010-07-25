@@ -22,21 +22,6 @@ class Thor::Group
       end
     end
 
-    # Start works differently in Thor::Group, it simply invokes all tasks
-    # inside the class.
-    #
-    def start(original_args=ARGV, config={})
-      super do |given_args|
-        if Thor::HELP_MAPPINGS.include?(given_args.first)
-          help(config[:shell])
-          return
-        end
-
-        args, opts = Thor::Options.split(given_args)
-        new(args, opts, config).invoke
-      end
-    end
-
     # Prints help information.
     #
     # ==== Options
@@ -224,6 +209,23 @@ class Thor::Group
     end
 
     protected
+
+      # The method responsible for dispatching given the args.
+      def dispatch(task, given_args, given_opts, config) #:nodoc:
+        if Thor::HELP_MAPPINGS.include?(given_args.first)
+          help(config[:shell])
+          return
+        end
+
+        args, opts = Thor::Options.split(given_args)
+        opts = given_opts || opts
+
+        if task
+          new(args, opts, config).invoke_task(all_tasks[task])
+        else
+          new(args, opts, config).invoke_all
+        end
+      end
 
       # The banner for this class. You can customize it if you are invoking the
       # thor class by another ways which is not the Thor::Runner.

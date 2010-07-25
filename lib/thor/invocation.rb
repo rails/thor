@@ -10,10 +10,10 @@ class Thor
       # available only in class methods invocations (i.e. in Thor::Group).
       def prepare_for_invocation(key, name) #:nodoc:
         case name
-          when Symbol, String
-            Thor::Util.find_class_and_task_by_namespace(name.to_s, !key)
-          else
-            name
+        when Symbol, String
+          Thor::Util.find_class_and_task_by_namespace(name.to_s, !key)
+        else
+          name
         end
       end
     end
@@ -97,26 +97,25 @@ class Thor
       args.unshift(nil) if Array === args.first || NilClass === args.first
       task, args, opts, config = args
 
-      object, task    = _prepare_for_invocation(name, task)
-      klass, instance = _initialize_klass_with_initializer(object, args, opts, config)
+      klass, task        = _retrieve_class_and_task(name, task)
+      args, opts, config = _parse_initialization_options(args, opts, config)
 
-      method_args = []
-      current = @_invocations[klass]
+      klass.send(:dispatch, task, args, opts, config)
+    end
 
-      iterator = proc do |_, task|
-        unless current.include?(task.name)
-          current << task.name
-          task.run(instance, method_args)
-        end
+    # Invoke the given task if the given args.
+    def invoke_task(task, *args) #:nodoc:
+      current = @_invocations[self.class]
+
+      unless current.include?(task.name)
+        current << task.name
+        task.run(self, *args)
       end
+    end
 
-      if task
-        args ||= []
-        method_args = args[Range.new(klass.arguments.size, -1)] || []
-        iterator.call(nil, task)
-      else
-        klass.all_tasks.map(&iterator)
-      end
+    # Invoke all tasks for the current instance.
+    def invoke_all #:nodoc:
+      self.class.all_tasks.map { |_, task| invoke_task(task) }
     end
 
     # Invokes using shell padding.
@@ -131,50 +130,33 @@ class Thor
         { :invocations => @_invocations }
       end
 
-      # This method can receive several different types of arguments and it's then
-      # responsible to normalize them by returning the object where the task should
-      # be invoked and a Thor::Task object.
-      def _prepare_for_invocation(name, sent_task=nil) #:nodoc:
-        if name.is_a?(Thor::Task)
-          task = name
-        elsif task = self.class.all_tasks[name.to_s]
-          object = self
+      # This method simply retrieves the class and task to be invoked.
+      # If the name is nil or the given name is a task in the current class,
+      # use the given name and return self as class. Otherwise, call
+      # prepare_for_invocation in the current class.
+      def _retrieve_class_and_task(name, sent_task=nil) #:nodoc:
+        case
+        when name.nil?
+          [self.class, nil]
+        when self.class.all_tasks[name.to_s]
+          [self.class, name.to_s]
         else
-          object, task = self.class.prepare_for_invocation(nil, name)
-          task ||= sent_task
+          klass, task = self.class.prepare_for_invocation(nil, name)
+          [klass, task || sent_task]
         end
-
-        # If the object was not set, use self and use the name as task.
-        object, task = self, name unless object
-        return object, _validate_task(object, task)
-      end
-
-      # Check if the object given is a Thor class object and get a task object
-      # for it.
-      def _validate_task(object, task) #:nodoc:
-        klass = object.is_a?(Class) ? object : object.class
-        raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
-
-        task ||= klass.default_task if klass.respond_to?(:default_task)
-        task = klass.all_tasks[task.to_s] || Thor::DynamicTask.new(task) if task && !task.is_a?(Thor::Task)
-        task
       end
 
       # Initialize klass using values stored in the @_initializer.
-      def _initialize_klass_with_initializer(object, args, opts, config) #:nodoc:
-        if object.is_a?(Class)
-          klass = object
+      def _parse_initialization_options(args, opts, config) #:nodoc:
+        stored_args, stored_opts, stored_config = @_initializer
 
-          stored_args, stored_opts, stored_config = @_initializer
-          args ||= stored_args.dup
-          opts ||= stored_opts.dup
+        args ||= stored_args.dup
+        opts ||= stored_opts.dup
 
-          config ||= {}
-          config = stored_config.merge(_shared_configuration).merge!(config)
-          [ klass, klass.new(args, opts, config) ]
-        else
-          [ object.class, object ]
-        end
+        config ||= {}
+        config = stored_config.merge(_shared_configuration).merge!(config)
+
+        [ args, opts, config ]
       end
   end
 end

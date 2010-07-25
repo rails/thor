@@ -37,13 +37,6 @@ describe Thor::Invocation do
       base.invoke(B, :one, ["Jose"]).must == "Valim, Jose"
     end
 
-    it "accepts a Thor instance as argument" do
-      invoked = B.new([], :last_name => "Valim")
-      base = A.new
-      base.invoke(invoked, :one, ["Jose"]).must == "Valim, Jose"
-      base.invoke(invoked, :one, ["Jose"]).must be_nil
-    end
-
     it "allows customized options to be given" do
       base = A.new([], :last_name => "Wrong")
       base.invoke(B, :one, ["Jose"], :last_name => "Valim").must == "Valim, Jose"
