@@ -13,6 +13,7 @@ require 'fakeweb'  # You need fakeweb installed to run specs (but not to run Tho
 # Set shell to basic
 $0 = "thor"
 $thor_runner = true
+ARGV.clear
 Thor::Base.shell = Thor::Shell::Basic
 
 # Load fixtures

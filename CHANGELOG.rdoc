@@ -21,7 +21,7 @@
   Thor classes.
 
 * BACKWARDS INCOMPATIBLE: aliases are not generated automatically anymore
-  since it wrong behavior to the invocation system.
+  since it may cause wrong behavior in the invocation system.
 
 * thor help now show information about any class/task. All those calls are
   possible:

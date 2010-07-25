@@ -35,8 +35,8 @@ class Thor
       # say("I know you knew that.")
       #
       def say(message="", color=nil, force_new_line=(message.to_s !~ /( |\t)$/))
-        message  = message.to_s
-        message  = set_color(message, color) if color
+        message = message.to_s
+        message = set_color(message, color) if color
 
         spaces = "  " * padding
 
@@ -60,7 +60,9 @@ class Thor
 
         status = status.to_s.rjust(12)
         status = set_color status, color, true if color
-        say "#{status}#{spaces}#{message}", nil, true
+
+        $stdout.puts "#{status}#{spaces}#{message}"
+        $stdout.flush
       end
 
       # Make a question the to user and returns true if the user replies "y" or

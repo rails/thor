@@ -97,9 +97,10 @@ class Thor
       args.unshift(nil) if Array === args.first || NilClass === args.first
       task, args, opts, config = args
 
-      klass, task        = _retrieve_class_and_task(name, task)
-      args, opts, config = _parse_initialization_options(args, opts, config)
+      klass, task = _retrieve_class_and_task(name, task)
+      raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
 
+      args, opts, config = _parse_initialization_options(args, opts, config)
       klass.send(:dispatch, task, args, opts, config)
     end
 
