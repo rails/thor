@@ -158,7 +158,7 @@ class Thor
 
         task ||= Thor::DynamicTask.new(meth)
         trailing = args[Range.new(arguments.size, -1)]
-        config.merge!(:allow_unknown_options => true) if subcommand?(task)
+        config[:current_task] = task
         new(args, opts, config).invoke(task, trailing || [])
       end
     end
@@ -216,11 +216,7 @@ class Thor
     end
 
     def subcommands
-      @@subcommands ||= {}
-    end
-
-    def subcommand?(task)
-      subcommands.has_key?(task.name)
+      @subcommands ||= from_superclass(:subcommands, {})
     end
 
     def subcommand(subcommand, subcommand_class)
@@ -228,6 +224,43 @@ class Thor
       subcommands[subcommand] = subcommand_class
       subcommand_class.subcommand_help subcommand
       define_method(subcommand) { |*_| subcommand_class.start(subcommand_args) }
+    end
+
+    # Extend check unknown options to accept a hash of conditions.
+    #
+    # === Parameters
+    # options<Hash>: A hash containing :only and/or :except keys
+    def check_unknown_options!(options={})
+      @check_unknown_options ||= Hash.new
+      options.each do |key, value|
+        if value
+          @check_unknown_options[key] = Array(value)
+        else
+          @check_unknown_options.delete(key)
+        end
+      end 
+      @check_unknown_options
+    end
+
+    # Overwrite check_unknown_options? to take subcommands and options into account.
+    def check_unknown_options?(config) #:nodoc:
+      options = check_unknown_options
+      return false unless options
+
+      task = config[:current_task]
+      return true unless task
+
+      name = task.name
+
+      if subcommands.has_key?(name)
+        false
+      elsif options[:except]
+        !options[:except].include?(name.to_sym)
+      elsif options[:only]
+        options[:only].include?(name.to_sym)
+      else
+        true
+      end
     end
 
     protected
@@ -248,10 +281,10 @@ class Thor
       def create_task(meth) #:nodoc:
         if @usage && @desc
           base_class = @hide ? Thor::HiddenTask : Thor::Task
-          tasks[meth.to_s] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
+          tasks[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
           @usage, @desc, @long_desc, @method_options, @hide = nil
           true
-        elsif self.all_tasks[meth.to_s] || meth.to_sym == :method_missing
+        elsif self.all_tasks[meth] || meth == "method_missing"
           true
         else
           puts "[WARNING] Attempted to create task #{meth.inspect} without usage or description. " <<

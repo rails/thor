@@ -1,5 +1,5 @@
 class MyScript < Thor
-  check_unknown_options!
+  check_unknown_options! :except => :with_optional
 
   attr_accessor :some_attribute
   attr_writer :another_attribute

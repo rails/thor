@@ -244,6 +244,12 @@ describe Thor::Base do
         MyScript.start(["foo", "bar", "--force", "true", "--unknown", "baz"])
       }.strip.must == "Unknown switches '--unknown'"
     end
+
+    it "checks unknown options except specified" do
+      capture(:stderr) {
+        MyScript.start(["with_optional", "NAME", "--omg", "--invalid"]).must == ["NAME", {}]
+      }.strip.must be_empty
+    end
   end
 
   describe "attr_*" do

@@ -53,7 +53,7 @@ class Thor
 
       opts = Thor::Options.new(parse_options, hash_options)
       self.options = opts.parse(array_options)
-      opts.check_unknown! if self.class.check_unknown_options? and not config[:allow_unknown_options]
+      opts.check_unknown! if self.class.check_unknown_options?(config)
     end
 
     class << self
@@ -114,8 +114,12 @@ class Thor
         @check_unknown_options = true
       end
 
-      def check_unknown_options? #:nodoc:
-        @check_unknown_options || false
+      def check_unknown_options #:nodoc:
+        @check_unknown_options ||= from_superclass(:check_unknown_options, false)
+      end
+
+      def check_unknown_options?(config) #:nodoc:
+        !!check_unknown_options
       end
 
       # Adds an argument to the class and creates an attr_accessor for it.
