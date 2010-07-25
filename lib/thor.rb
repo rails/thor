@@ -158,6 +158,7 @@ class Thor
 
         task ||= Thor::DynamicTask.new(meth)
         trailing = args[Range.new(arguments.size, -1)]
+        config.merge!(:allow_unknown_options => true) if subcommand?(task)
         new(args, opts, config).invoke(task, trailing || [])
       end
     end
@@ -216,6 +217,10 @@ class Thor
 
     def subcommands
       @@subcommands ||= {}
+    end
+
+    def subcommand?(task)
+      subcommands.has_key?(task.name)
     end
 
     def subcommand(subcommand, subcommand_class)

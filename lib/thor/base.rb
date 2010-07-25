@@ -53,7 +53,7 @@ class Thor
 
       opts = Thor::Options.new(parse_options, hash_options)
       self.options = opts.parse(array_options)
-      opts.check_unknown! if self.class.check_unknown_options?
+      opts.check_unknown! if self.class.check_unknown_options? and not config[:allow_unknown_options]
     end
 
     class << self

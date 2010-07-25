@@ -136,6 +136,13 @@ class Barn < Thor
       puts "Open sesame!"
     end
   end
+
+  desc "paint [COLOR]", "paint the barn"
+  method_option :coats, :type => :numeric, :default => 2, :desc => 'how many coats of paint'
+  def paint(color='red')
+    puts "#{options[:coats]} coats of #{color} paint"
+  end
+
 end
 
 module Scripts
@@ -150,6 +157,8 @@ module Scripts
   end
 
   class MyDefaults < Thor
+    check_unknown_options!
+
     namespace :default
     desc "cow", "prints 'moo'"
     def cow

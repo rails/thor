@@ -182,6 +182,10 @@ describe Thor do
     it "passes arguments to subcommand classes" do
       capture(:stdout){ Scripts::MyDefaults.start(["barn", "open", "shotgun"]) }.strip.must == "That's going to leave a mark."
     end
+
+    it "ignores unknown options (the subcommand class will handle them)" do
+      capture(:stdout){ Scripts::MyDefaults.start(["barn", "paint", "blue", "--coats", "4"])}.strip.must == "4 coats of blue paint"
+    end
   end
 
   describe "#help" do
