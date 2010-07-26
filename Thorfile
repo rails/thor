@@ -10,7 +10,7 @@ rescue LoadError
 end
 
 GEM_NAME = 'thor'
-EXTRA_RDOC_FILES = ["README.rdoc", "LICENSE", "CHANGELOG.rdoc", "VERSION", "Thorfile"]
+EXTRA_RDOC_FILES = ["README.md", "LICENSE", "CHANGELOG.rdoc", "VERSION", "Thorfile"]
 
 class Default < Thor
   include Thor::RakeCompat
@@ -44,7 +44,7 @@ class Default < Thor
     require 'jeweler'
     Jeweler::Tasks.new do |s|
       s.name = GEM_NAME
-      s.version = Thor::VERSION
+      s.version = Thor::VERSION.dup
       s.rubyforge_project = "textmate"
       s.platform = Gem::Platform::RUBY
       s.summary = "A scripting framework that replaces rake, sake and rubigen"

@@ -1,3 +1,3 @@
 class Thor
-  VERSION = "0.13.8".freeze
+  VERSION = "0.14.0".freeze
 end
