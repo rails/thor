@@ -252,7 +252,8 @@ class Thor
       # the namespace should be displayed as arguments.
       #
       def banner(task, namespace = nil, subcommand = false)
-        "#{$0} #{task.formatted_usage(self, $thor_runner, subcommand)}"
+        base = File.basename($0).split(" ").first
+        "#{base} #{task.formatted_usage(self, $thor_runner, subcommand)}"
       end
 
       def baseclass #:nodoc:
