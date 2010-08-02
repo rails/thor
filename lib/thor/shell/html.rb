@@ -58,7 +58,7 @@ class Thor
         bold, end_bold = bold ? [BOLD, END_BOLD] : ['', '']
         "#{bold}#{color}#{string}#{CLEAR}#{end_bold}"
       end
-      
+
       # Ask something to the user and receives a response.
       #
       # ==== Example

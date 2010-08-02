@@ -200,7 +200,7 @@ class Thor
         else
           @check_unknown_options.delete(key)
         end
-      end 
+      end
       @check_unknown_options
     end
 
