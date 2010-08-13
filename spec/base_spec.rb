@@ -74,7 +74,7 @@ describe Thor::Base do
       MyCounter.start(["1", "2", "--third", "3"])[2].must == 3
     end
 
-    it "does not create an acessor for it" do
+    it "does not create an accessor for it" do
       BrokenCounter.start(["1", "2", "--third", "3"])[3].must be_false
     end
   end
