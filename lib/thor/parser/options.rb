@@ -134,7 +134,15 @@ class Thor
       #
       def parse_boolean(switch)
         if current_is_value?
-          ["true", "TRUE", "t", "T", true].include?(shift)
+          if ["true", "TRUE", "t", "T", true].include?(peek)
+            shift
+            true
+          elsif ["false", "FALSE", "f", "F", false].include?(peek)
+            shift
+            false
+          else
+            true
+          end
         else
           @switches.key?(switch) || !no_or_skip?(switch)
         end
