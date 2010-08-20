@@ -216,8 +216,8 @@ class Thor
     #
     def self.ruby_command
       @ruby_command ||= begin
-        ruby = File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name'])
-        ruby << Config::CONFIG['EXEEXT']
+        ruby = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
+        ruby << RbConfig::CONFIG['EXEEXT']
 
         # escape string in case path to ruby executable contain spaces.
         ruby.sub!(/.*\s.*/m, '"\&"')
