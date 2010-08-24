@@ -6,7 +6,7 @@ require 'thor/base'
 # tasks.
 class Thor::Group
   class << self
-    # The descrition for this Thor::Group. If none is provided, but a source root
+    # The description for this Thor::Group. If none is provided, but a source root
     # exists, tries to find the USAGE one folder above it, otherwise searches
     # in the superclass.
     #
@@ -114,7 +114,7 @@ class Thor::Group
 
       names.each do |name|
         unless class_options.key?(name)
-          raise ArgumentError, "You have to define the option #{name.inspect} " << 
+          raise ArgumentError, "You have to define the option #{name.inspect} " <<
                                "before setting invoke_from_option."
         end
 
