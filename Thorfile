@@ -10,7 +10,7 @@ rescue LoadError
 end
 
 GEM_NAME = 'thor'
-EXTRA_RDOC_FILES = ["README.md", "LICENSE", "CHANGELOG.rdoc", "VERSION", "Thorfile"]
+EXTRA_RDOC_FILES = ["README.md", "LICENSE", "CHANGELOG.rdoc", "Thorfile"]
 
 class Default < Thor
   include Thor::RakeCompat
