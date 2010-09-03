@@ -84,7 +84,7 @@ describe Thor::Actions::Directory do
       File.directory?(file).must be_true
     end
 
-    it "does not copy .empty_diretories files" do
+    it "does not copy .empty_directory files" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "components", ".empty_directory")
       File.exists?(file).must be_false
