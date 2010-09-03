@@ -97,7 +97,7 @@ Gem::Specification.new do |s|
      "spec/fixtures/bundle/main.thor",
      "spec/fixtures/doc",
      "spec/fixtures/doc/%file_name%.rb.tt",
-     "spec/fixtures/doc/components",
+     "spec/fixtures/doc/components/.empty_directory",
      "spec/fixtures/doc/README",
      "spec/fixtures/group.thor",
      "spec/fixtures/invoke.thor",
