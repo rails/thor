@@ -230,7 +230,7 @@ class Thor::Group
       # The banner for this class. You can customize it if you are invoking the
       # thor class by another ways which is not the Thor::Runner.
       def banner
-        "#{$0} #{self_task.formatted_usage(self, false)}"
+        "#{basename} #{self_task.formatted_usage(self, false)}"
       end
 
       # Represents the whole class as a task.
