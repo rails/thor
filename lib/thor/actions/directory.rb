@@ -21,7 +21,7 @@ class Thor
     #   directory "doc"
     #
     # It will create a doc directory in the destination with the following
-    # files (assuming that the app_name is "blog"):
+    # files (assuming that the `app_name` method returns the value "blog"):
     #
     #   doc/
     #     components/
