@@ -531,6 +531,13 @@ class Thor
           false
         end
 
+        #
+        # The basename of the program invoking the thor class.
+        #
+        def basename
+          File.basename($0).split(' ').first
+        end
+
         # SIGNATURE: Sets the baseclass. This is where the superclass lookup
         # finishes.
         def baseclass #:nodoc:
