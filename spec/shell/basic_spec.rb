@@ -27,11 +27,11 @@ describe Thor::Shell::Basic do
     it "asks the user and returns true if the user replies yes" do
       $stdout.should_receive(:print).with("Should I overwrite it? ")
         $stdin.should_receive(:gets).and_return('y')
-      shell.yes?("Should I overwrite it?").must be_true
+      shell.yes?("Should I overwrite it?").must === true
 
       $stdout.should_receive(:print).with("Should I overwrite it? ")
         $stdin.should_receive(:gets).and_return('n')
-      shell.yes?("Should I overwrite it?").must_not be_true
+      shell.yes?("Should I overwrite it?").must_not === true
     end
   end
 
@@ -39,11 +39,11 @@ describe Thor::Shell::Basic do
     it "asks the user and returns true if the user replies no" do
       $stdout.should_receive(:print).with("Should I overwrite it? ")
         $stdin.should_receive(:gets).and_return('n')
-      shell.no?("Should I overwrite it?").must be_true
+      shell.no?("Should I overwrite it?").must === true
 
       $stdout.should_receive(:print).with("Should I overwrite it? ")
         $stdin.should_receive(:gets).and_return('Yes')
-      shell.no?("Should I overwrite it?").must be_false
+      shell.no?("Should I overwrite it?").must === false
     end
   end
 

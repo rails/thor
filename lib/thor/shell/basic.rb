@@ -69,7 +69,7 @@ class Thor
       # "yes".
       #
       def yes?(statement, color=nil)
-        ask(statement, color) =~ is?(:yes)
+        !!(ask(statement, color) =~ is?(:yes))
       end
 
       # Make a question the to user and returns true if the user replies "n" or
