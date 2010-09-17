@@ -50,7 +50,7 @@ class Thor
     end
 
     def parse(args)
-      @pile = args.dup
+      @pile = except_underscores(args.dup)
 
       while peek
         if current_is_switch?
@@ -169,6 +169,12 @@ class Thor
         @non_assigned_required.delete(option)
         send(:"parse_#{option.type}", switch)
       end
+      
+      # Except underscores in commandline switches
+      def except_underscores(args)
+        args.map {|x| x =~ /^--/ ? x.gsub('_', '-') : x }
+      end
+      
 
   end
 end

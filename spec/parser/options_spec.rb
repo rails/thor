@@ -47,6 +47,11 @@ describe Thor::Options do
     it "accepts hashes" do
       Thor::Options.to_switches(:count => {:a => :b}).must == "--count a:b"
     end
+    
+    it "accepts underscored options" do
+      Thor::Options.to_switches(:under_score_option => "foo bar").must == '--under_score_option "foo bar"'
+    end
+    
   end
 
   describe "#parse" do
@@ -115,6 +120,19 @@ describe Thor::Options do
       parse("--asdf---asdf", "baz", "--foo", "--asdf---dsf--asdf").must == {"foo" => "--asdf---dsf--asdf"}
       check_unknown!
     end
+    
+    it "excepts underscores in commandline args hash for boolean" do
+      create :foo_bar => :boolean
+      parse("--foo_bar")["foo_bar"].must == true
+      parse("--no_foo_bar")["foo_bar"].must == false
+    end
+    
+    it "excepts underscores in commandline args hash for strings" do
+      create :foo_bar => :string, :baz_foo => :string
+      parse("--foo_bar", "baz")["foo_bar"].must == "baz"
+      parse("--baz_foo", "foo bar")["baz_foo"].must == "foo bar"
+    end
+    
 
     describe "with no input" do
       it "and no switches returns an empty hash" do
