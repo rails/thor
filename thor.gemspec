@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.version = "0.14.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Yehuda Katz", "Jos\xC3\xA9 Valim"]
+  s.authors = ["Yehuda Katz", "Jos\303\251 Valim"]
   s.date = %q{2010-09-17}
   s.description = %q{A scripting framework that replaces rake, sake and rubigen}
   s.email = %q{ruby-thor@googlegroups.com}
