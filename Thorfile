@@ -59,6 +59,7 @@ class Default < Thor
       s.executables = %w( thor rake2thor )
       s.files = s.extra_rdoc_files + Dir.glob("{bin,lib}/**/*")
       s.test_files.include 'spec/**/*'
+      s.test_files.include 'spec/fixtures/doc/components/.empty_directory'
       s.test_files.exclude 'spec/sandbox/**/*'
     end
 
