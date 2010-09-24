@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{thor}
-  s.version = "0.14.1"
+  s.version = "0.14.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Yehuda Katz", "Jos\303\251 Valim"]
-  s.date = %q{2010-09-17}
+  s.date = %q{2010-09-24}
   s.description = %q{A scripting framework that replaces rake, sake and rubigen}
   s.email = %q{ruby-thor@googlegroups.com}
   s.executables = ["thor", "rake2thor"]
@@ -73,6 +73,7 @@ Gem::Specification.new do |s|
      "spec/core_ext/ordered_hash_spec.rb",
      "spec/fixtures/application.rb",
      "spec/fixtures/bundle/execute.rb",
+     "spec/fixtures/doc/block_helper.rb",
      "spec/fixtures/doc/config.rb",
      "spec/group_spec.rb",
      "spec/invocation_spec.rb",
