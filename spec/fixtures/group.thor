@@ -37,6 +37,13 @@ FOO
     super
     base.source_paths.unshift(File.expand_path(File.join(File.dirname(__FILE__), "doc")))
   end
+
+  no_tasks do
+    def world(&block)
+      result = capture(&block)
+      concat(result.strip + " world!")
+    end
+  end
 end
 
 class ClearCounter < MyCounter

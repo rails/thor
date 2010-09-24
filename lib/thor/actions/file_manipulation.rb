@@ -86,7 +86,7 @@ class Thor
       context = instance_eval('binding')
 
       create_file destination, nil, config do
-        content = ERB.new(::File.binread(source), nil, '-').result(context)
+        content = ERB.new(::File.binread(source), nil, '-', '@output_buffer').result(context)
         content = block.call(content) if block
         content
       end
@@ -225,5 +225,22 @@ class Thor
     end
     alias :remove_dir :remove_file
 
+  private
+    attr_accessor :output_buffer
+    def concat(string)
+      @output_buffer.concat(string)
+    end
+
+    def capture(*args, &block)
+      with_output_buffer { block.call(*args) }
+    end
+
+    def with_output_buffer(buf = '') #:nodoc:
+      self.output_buffer, old_buffer = buf, output_buffer
+      yield
+      output_buffer
+    ensure
+      self.output_buffer = old_buffer
+    end
   end
 end

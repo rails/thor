@@ -117,6 +117,13 @@ describe Thor::Actions do
   end
 
   describe "#template" do
+    it "allows using block helpers in the template" do
+      action :template, "doc/block_helper.rb"
+
+      file = File.join(destination_root, "doc/block_helper.rb")
+      File.read(file).must == "Hello world!"
+    end
+
     it "evaluates the template given as source" do
       runner.instance_variable_set("@klass", "Config")
       action :template, "doc/config.rb"
