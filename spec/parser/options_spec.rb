@@ -188,6 +188,11 @@ describe Thor::Options do
         parse("--foo=12")["foo"].must == "12"
         parse("--foo=bar=baz")["foo"].must == "bar=baz"
       end
+      
+      it "must accept underscores switch=value assignment" do
+        create :foo_bar => :required
+        parse("--foo_bar=http://example.com/under_score/")["foo_bar"].must == "http://example.com/under_score/"
+      end
 
       it "accepts a --no-switch format" do
         create "--foo" => "bar"

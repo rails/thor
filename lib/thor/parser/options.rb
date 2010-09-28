@@ -172,9 +172,15 @@ class Thor
       
       # Except underscores in commandline switches
       def except_underscores(args)
-        args.map {|x| x =~ /^--/ ? x.gsub('_', '-') : x }
+        args.map do |x| 
+          if x =~ EQ_RE
+            switch = $1
+            x.sub(switch, switch.gsub('_', '-'))
+          else
+            x.gsub('_', '-')
+          end
+        end
       end
-      
 
   end
 end
