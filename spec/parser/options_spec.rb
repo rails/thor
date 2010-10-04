@@ -132,7 +132,6 @@ describe Thor::Options do
       parse("--foo_bar", "baz")["foo_bar"].must == "baz"
       parse("--baz_foo", "foo bar")["baz_foo"].must == "foo bar"
     end
-    
 
     describe "with no input" do
       it "and no switches returns an empty hash" do

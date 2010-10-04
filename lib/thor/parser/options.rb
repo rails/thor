@@ -50,10 +50,12 @@ class Thor
     end
 
     def parse(args)
-      @pile = except_underscores(args.dup)
+      @pile = args.dup
 
       while peek
-        if current_is_switch?
+        match, is_switch = current_is_switch?
+
+        if is_switch
           case shift
             when SHORT_SQ_RE
               unshift($1.split('').map { |f| "-#{f}" })
@@ -68,7 +70,7 @@ class Thor
           switch = normalize_switch(switch)
           option = switch_option(switch)
           @assigns[option.human_name] = parse_peek(switch, option)
-        elsif current_is_switch_formatted?
+        elsif match
           @unknown << shift
         else
           shift
@@ -92,15 +94,17 @@ class Thor
       #
       def current_is_switch?
         case peek
-          when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
-            switch?($1)
-          when SHORT_SQ_RE
-            $1.split('').any? { |f| switch?("-#{f}") }
+        when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
+          [true, switch?($1)]
+        when SHORT_SQ_RE
+          [true, $1.split('').any? { |f| switch?("-#{f}") }]
+        else
+          [false, false]
         end
       end
 
-      def switch_formatted?(arg)
-        case arg
+      def current_is_switch_formatted?
+        case peek
         when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM, SHORT_SQ_RE
           true
         else
@@ -108,12 +112,8 @@ class Thor
         end
       end
 
-      def current_is_switch_formatted?
-        switch_formatted? peek
-      end
-
       def switch?(arg)
-        switch_option(arg) || @shorts.key?(arg)
+        switch_option(normalize_switch(arg))
       end
 
       def switch_option(arg)
@@ -127,7 +127,7 @@ class Thor
       # Check if the given argument is actually a shortcut.
       #
       def normalize_switch(arg)
-        @shorts.key?(arg) ? @shorts[arg] : arg
+        (@shorts[arg] || arg).tr('_', '-')
       end
 
       # Parse boolean values which can be given as --foo=true, --foo or --no-foo.
@@ -169,18 +169,5 @@ class Thor
         @non_assigned_required.delete(option)
         send(:"parse_#{option.type}", switch)
       end
-      
-      # Except underscores in commandline switches
-      def except_underscores(args)
-        args.map do |x| 
-          if x =~ EQ_RE
-            switch = $1
-            x.sub(switch, switch.gsub('_', '-'))
-          else
-            x.gsub('_', '-')
-          end
-        end
-      end
-
   end
 end
