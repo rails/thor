@@ -162,6 +162,12 @@ describe Thor::Actions do
           runner.say_status :no, :padding
         end.must =~ /no  padding/
       end
+
+      it "remove littered directories in pretend mode" do
+        runner.inside("bar", :pretend => true) {}
+        directory_that_shouldnt_exist = destination_root + "/bar"
+        File.exists?(directory_that_shouldnt_exist).must be_false
+      end
     end
   end
 
