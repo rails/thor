@@ -142,11 +142,9 @@ describe Thor::Actions do
     end
     
     describe "when pretending" do
-      it "we should be able to step in and do more actions" do
-        runner.inside("bar", :pretend => true) do |dest|
-          Dir.pwd.must_not =~ /bar/
-          dest.must =~ /bar/
-        end
+      it "no directories should be created" do
+        runner.inside("bar", :pretend => true) {}
+        File.exists?("bar").must be_false
       end
     end
 

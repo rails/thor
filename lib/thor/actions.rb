@@ -158,7 +158,7 @@ class Thor
     #
     def inside(dir='', config={}, &block)
       verbose = config.fetch(:verbose, false)
-      pretend = options[:pretend] || config.fetch(:pretend, false)
+      pretend = options[:pretend]
 
       say_status :inside, dir, verbose
       shell.padding += 1 if verbose
