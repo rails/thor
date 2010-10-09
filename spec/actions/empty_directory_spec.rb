@@ -62,6 +62,13 @@ describe Thor::Actions::EmptyDirectory do
       invoke!.must == "      create  doc\n"
     end
 
+    it "does not create a directory if pretending" do
+      base.inside("foo", :pretend => true) do
+        empty_directory("ghost")
+      end
+      File.exists?(File.join(base.destination_root, "ghost")).must be_false
+    end
+
     describe "when directory exists" do
       it "shows exist status" do
         empty_directory("doc")

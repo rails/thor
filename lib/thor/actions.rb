@@ -157,21 +157,24 @@ class Thor
     # config<Hash>:: give :verbose => true to log and use padding.
     #
     def inside(dir='', config={}, &block)
-      thor_created_dir = false
       verbose = config.fetch(:verbose, false)
 
       say_status :inside, dir, verbose
       shell.padding += 1 if verbose
       @destination_stack.push File.expand_path(dir, destination_root)
 
-      unless File.exist?(destination_root)
-        FileUtils.mkdir_p(destination_root) && thor_created_dir = true
+      # If the directory doesnt exist and we're not pretending
+      if !File.exist?(destination_root) && !config[:pretend]
+        FileUtils.mkdir_p(destination_root)
       end
-      FileUtils.cd(destination_root) { block.arity == 1 ? yield(destination_root) : yield }
+      
+      if config[:pretend]
+        # In pretend mode, just yield down to the block
+        block.arity == 1 ? yield(destination_root) : yield
+      else
+        FileUtils.cd(destination_root) { block.arity == 1 ? yield(destination_root) : yield }
+      end
 
-      if config[:pretend] && thor_created_dir
-        FileUtils.rmdir(destination_root)
-      end
       @destination_stack.pop
       shell.padding -= 1 if verbose
     end
