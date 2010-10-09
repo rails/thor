@@ -63,7 +63,7 @@ class Thor
         # Shortcut for pretend.
         #
         def pretend?
-          base.options[:pretend]
+          base.options[:pretend] or config[:pretend]
         end
 
         # Sets the absolute destination value from a relative destination value.

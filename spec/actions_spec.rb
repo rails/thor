@@ -140,6 +140,15 @@ describe Thor::Actions do
         File.exists?(file).must be_true
       end
     end
+    
+    describe "when pretending" do
+      it "we should be able to step in and do more actions" do
+        runner.inside("bar", :pretend => true) do |dest|
+          Dir.pwd.must_not =~ /bar/
+          dest.must =~ /bar/
+        end
+      end
+    end
 
     describe "when verbose" do
       it "logs status" do
@@ -161,12 +170,6 @@ describe Thor::Actions do
           runner.inside("foo", :verbose => true) {}
           runner.say_status :no, :padding
         end.must =~ /no  padding/
-      end
-
-      it "remove littered directories in pretend mode" do
-        runner.inside("bar", :pretend => true) {}
-        directory_that_shouldnt_exist = destination_root + "/bar"
-        File.exists?(directory_that_shouldnt_exist).must be_false
       end
     end
   end
