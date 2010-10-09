@@ -41,7 +41,7 @@ describe Thor::Actions::Directory do
     end
     
     it "should not create a directory in pretend mode" do
-      invoke! "doc", "ghost"
+      invoke! "doc", "ghost", :pretend => true
       File.exists?("ghost").must be_false
     end
 
