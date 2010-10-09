@@ -158,17 +158,18 @@ class Thor
     #
     def inside(dir='', config={}, &block)
       verbose = config.fetch(:verbose, false)
+      pretend = options[:pretend] || config.fetch(:pretend, false)
 
       say_status :inside, dir, verbose
       shell.padding += 1 if verbose
       @destination_stack.push File.expand_path(dir, destination_root)
 
       # If the directory doesnt exist and we're not pretending
-      if !File.exist?(destination_root) && !config[:pretend]
+      if !File.exist?(destination_root) && !pretend
         FileUtils.mkdir_p(destination_root)
       end
       
-      if config[:pretend]
+      if pretend
         # In pretend mode, just yield down to the block
         block.arity == 1 ? yield(destination_root) : yield
       else
