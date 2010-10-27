@@ -28,7 +28,7 @@ describe Thor::Shell do
       Thor::Base.shell.must == shell.class
       ENV['THOR_SHELL'] = 'TestShell'
       Thor::Base.shell = nil
-      Thor::Base.shell.class.must == Thor::Shell::TestShell
+      Thor::Base.shell.must == Thor::Shell::TestShell
       ENV['THOR_SHELL'] = ''
       Thor::Base.shell = shell.class
       Thor::Base.shell.must == shell.class
