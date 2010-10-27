@@ -7,11 +7,12 @@ class Thor
     #
     def self.shell
       @shell ||= if ENV['THOR_SHELL'] && ENV['THOR_SHELL'].size > 0
-        Thor::Shell.const_get(ENV['THOR_SHELL'])
+        shell = Thor::Shell.const_get(ENV['THOR_SHELL'])
+        shell.is_a?(Class) ? shell.new : shell
       elsif RbConfig::CONFIG['host_os'] =~ /mswin|mingw/
-        Thor::Shell::Basic
+        Thor::Shell::Basic.new
       else
-        Thor::Shell::Color
+        Thor::Shell::Color.new
       end
     end
 
