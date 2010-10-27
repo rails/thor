@@ -11,6 +11,21 @@ class Thor
         @base, @padding = nil, 0
       end
 
+      # Mute everything that's inside given block
+      #
+      def mute
+        @mute = true
+        yield
+      ensure
+        @mute = false
+      end
+
+      # Check if base is muted
+      #
+      def mute?
+        @mute
+      end
+
       # Sets the output padding, not allowing less than zero values.
       #
       def padding=(value)
@@ -229,7 +244,7 @@ HELP
         end
 
         def quiet? #:nodoc:
-          base && base.options[:quiet]
+          mute? || (base && base.options[:quiet])
         end
 
         # This code was copied from Rake, available under MIT-LICENSE

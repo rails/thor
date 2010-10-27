@@ -75,6 +75,15 @@ describe Thor::Shell::Basic do
       shell.say_status(:create, "")
     end
 
+    it "does not print a message if base is muted" do
+      shell.should_receive(:mute?).and_return(true)
+      $stdout.should_not_receive(:puts)
+
+      shell.mute do
+        shell.say_status(:created, "~/.thor/task.thor")
+      end
+    end
+
     it "does not print a message if base is set to quiet" do
       base = MyCounter.new [1,2]
       base.should_receive(:options).and_return(:quiet => true)
