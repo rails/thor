@@ -18,6 +18,18 @@ class Thor
       end
     end
 
+    # Registers another Thor subclass as a command.
+    #
+    # ==== Parameters
+    # klass<Class>:: Thor subclass to register
+    # command<String>:: Subcommand name to use
+    # usage<String>:: Short usage for the subcommand
+    # description<String>:: Description for the subcommand
+    def register(klass, subcommand_name, usage, description, options={})
+      desc usage, description, options
+      subcommand subcommand_name, klass
+    end
+
     # Defines the usage and the description of the next task.
     #
     # ==== Parameters
