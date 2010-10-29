@@ -392,6 +392,22 @@ class Thor
         exit(1) if exit_on_failure?
       end
 
+      # Allows to use private methods from parent in child classes as tasks.
+      #
+      # ==== Paremeters
+      #   names<Array>:: Method names to be used as tasks
+      #
+      # ==== Examples
+      #
+      #   public_task :foo
+      #   public_task :foo, :bar, :baz
+      #
+      def public_task(*names)
+        names.each do |name|
+          class_eval "def #{name}(*); super end"
+        end
+      end
+
       def handle_no_task_error(task) #:nodoc:
         if $thor_runner
           raise UndefinedTaskError, "Could not find task #{task.inspect} in #{namespace.inspect} namespace."

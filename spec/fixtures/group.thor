@@ -93,3 +93,22 @@ class TaskConflict < Thor::Group
     puts "group"
   end
 end
+
+class ParentGroup < Thor::Group
+private
+  def foo
+    "foo"
+  end
+
+  def baz(name = 'baz')
+    name
+  end
+end
+
+class ChildGroup < ParentGroup
+  def bar
+    "bar"
+  end
+
+  public_task :foo, :baz
+end

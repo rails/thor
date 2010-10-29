@@ -1,6 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Thor::Group do
+  describe "task" do
+    it "allows to use private methods from parent class as tasks" do
+      ChildGroup.start.must == ["bar", "foo", "baz"]
+      ChildGroup.new.baz("bar").must == "bar"
+    end
+  end
+
   describe "#start" do
     it "invokes all the tasks under the Thor group" do
       MyCounter.start(["1", "2", "--third", "3"]).must == [ 1, 2, 3 ]
