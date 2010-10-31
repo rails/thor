@@ -70,7 +70,7 @@ class Thor
           lookup = config[:recursive] ? File.join(source, '**') : source
           lookup = File.join(lookup, '{*,.[a-z]*}')
 
-          Dir[lookup].each do |file_source|
+          Dir[lookup].sort.each do |file_source|
             next if File.directory?(file_source)
             file_destination = File.join(given_destination, file_source.gsub(source, '.'))
             file_destination.gsub!('/./', '/')
