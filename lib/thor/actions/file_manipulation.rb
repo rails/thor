@@ -71,6 +71,7 @@ class Thor
     # source<String>:: the relative path to the source root.
     # destination<String>:: the relative path to the destination root.
     # config<Hash>:: give :verbose => false to not log the status.
+    # config[:get_output]<String>:: set to true to have the call return the buffer instead of writing it to a file.
     #
     # ==== Examples
     #
@@ -85,10 +86,15 @@ class Thor
       source  = File.expand_path(find_in_source_paths(source.to_s))
       context = instance_eval('binding')
 
-      create_file destination, nil, config do
-        content = ERB.new(::File.binread(source), nil, '-', '@output_buffer').result(context)
-        content = block.call(content) if block
+      content = ERB.new(::File.binread(source), nil, '-', '@output_buffer').result(context)
+      content = block.call(content) if block
+
+      if ((config.delete(:get_output) == true) rescue false)
         content
+      else
+        create_file destination, nil, config do
+          content
+        end
       end
     end
 
