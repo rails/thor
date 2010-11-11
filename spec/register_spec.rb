@@ -28,8 +28,17 @@ class SuperSecretPlugin < Thor
   end
 end
 
-# TODO:
-# * register a Thor::Group should cause it to be invoked
+class GroupPlugin < Thor::Group
+  desc "part one"
+  def part_one
+    puts "part one"
+  end
+
+  desc "part two"
+  def part_two
+    puts "part two"
+  end
+end
 
 
 BoringVendorProvidedCLI.register(
@@ -44,6 +53,12 @@ BoringVendorProvidedCLI.register(
   "secret stuff",
   "Nothing to see here. Move along.",
   :hide => true)
+
+BoringVendorProvidedCLI.register(
+  GroupPlugin,
+  'groupwork',
+  "Do a bunch of things in a row",
+  "purple monkey dishwasher")
 
 describe ".register-ing a Thor subclass" do
   it "registers the plugin as a subcommand" do
@@ -66,5 +81,12 @@ describe ".register-ing a Thor subclass" do
       secret_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[secret squirrel]) }
       secret_output.must == "I love nuts\n"
     end
+  end
+end
+
+describe ".register-ing a Thor::Group subclass" do
+  it "registers the group as a single command" do
+    group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[groupwork]) }
+    group_output.must == "part one\npart two\n"
   end
 end
