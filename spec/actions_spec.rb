@@ -287,30 +287,30 @@ describe Thor::Actions do
 
   describe "#thor" do
     it "executes the thor command" do
-      runner.should_receive(:`).with("thor list")
+      runner.should_receive(:system).with("thor list")
       action :thor, :list, :verbose => true
     end
 
     it "converts extra arguments to command arguments" do
-      runner.should_receive(:`).with("thor list foo bar")
+      runner.should_receive(:system).with("thor list foo bar")
       action :thor, :list, "foo", "bar"
     end
 
     it "converts options hash to switches" do
-      runner.should_receive(:`).with("thor list foo bar --foo")
+      runner.should_receive(:system).with("thor list foo bar --foo")
       action :thor, :list, "foo", "bar", :foo => true
 
-      runner.should_receive(:`).with("thor list --foo 1 2 3")
+      runner.should_receive(:system).with("thor list --foo 1 2 3")
       action :thor, :list, :foo => [1,2,3]
     end
 
     it "logs status" do
-      runner.should_receive(:`).with("thor list")
+      runner.should_receive(:system).with("thor list")
       action(:thor, :list).must == "         run  thor list from \".\"\n"
     end
 
     it "does not log status if required" do
-      runner.should_receive(:`).with("thor list --foo 1 2 3")
+      runner.should_receive(:system).with("thor list --foo 1 2 3")
       action(:thor, :list, :foo => [1,2,3], :verbose => false).must be_empty
     end
   end
