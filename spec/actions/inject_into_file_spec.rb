@@ -16,11 +16,11 @@ describe Thor::Actions::InjectIntoFile do
   end
 
   def invoke!(*args, &block)
-    capture(:stdout){ invoker.inject_into_file(*args, &block) }
+    capture(:stdout){ invoker.insert_into_file(*args, &block) }
   end
 
   def revoke!(*args, &block)
-    capture(:stdout){ revoker.inject_into_file(*args, &block) }
+    capture(:stdout){ revoker.insert_into_file(*args, &block) }
   end
 
   def file

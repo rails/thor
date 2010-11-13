@@ -110,7 +110,7 @@ class Thor
       FileUtils.chmod_R(mode, path) unless options[:pretend]
     end
 
-    # Prepend text to a file. Since it depends on inject_into_file, it's reversible.
+    # Prepend text to a file. Since it depends on insert_into_file, it's reversible.
     #
     # ==== Parameters
     # path<String>:: path of the file to be changed
@@ -119,19 +119,20 @@ class Thor
     #
     # ==== Example
     #
-    #   prepend_file 'config/environments/test.rb', 'config.gem "rspec"'
+    #   prepend_to_file 'config/environments/test.rb', 'config.gem "rspec"'
     #
-    #   prepend_file 'config/environments/test.rb' do
+    #   prepend_to_file 'config/environments/test.rb' do
     #     'config.gem "rspec"'
     #   end
     #
-    def prepend_file(path, *args, &block)
+    def prepend_to_file(path, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
       config.merge!(:after => /\A/)
-      inject_into_file(path, *(args << config), &block)
+      insert_into_file(path, *(args << config), &block)
     end
+    alias_method :prepend_file, :prepend_to_file
 
-    # Append text to a file. Since it depends on inject_into_file, it's reversible.
+    # Append text to a file. Since it depends on insert_into_file, it's reversible.
     #
     # ==== Parameters
     # path<String>:: path of the file to be changed
@@ -140,20 +141,21 @@ class Thor
     #
     # ==== Example
     #
-    #   append_file 'config/environments/test.rb', 'config.gem "rspec"'
+    #   append_to_file 'config/environments/test.rb', 'config.gem "rspec"'
     #
-    #   append_file 'config/environments/test.rb' do
+    #   append_to_file 'config/environments/test.rb' do
     #     'config.gem "rspec"'
     #   end
     #
-    def append_file(path, *args, &block)
+    def append_to_file(path, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
       config.merge!(:before => /\z/)
-      inject_into_file(path, *(args << config), &block)
+      insert_into_file(path, *(args << config), &block)
     end
+    alias_method :append_file, :append_to_file
 
     # Injects text right after the class definition. Since it depends on
-    # inject_into_file, it's reversible.
+    # insert_into_file, it's reversible.
     #
     # ==== Parameters
     # path<String>:: path of the file to be changed
@@ -172,7 +174,7 @@ class Thor
     def inject_into_class(path, klass, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
       config.merge!(:after => /class #{klass}\n|class #{klass} .*\n/)
-      inject_into_file(path, *(args << config), &block)
+      insert_into_file(path, *(args << config), &block)
     end
 
     # Run a regular expression replacement on a file.

@@ -227,35 +227,35 @@ describe Thor::Actions do
       end
     end
 
-    describe "#append_file" do
+    describe "#append_to_file" do
       it "appends content to the file" do
-        action :append_file, "doc/README", "END\n"
+        action :append_to_file, "doc/README", "END\n"
         File.binread(file).must == "__start__\nREADME\n__end__\nEND\n"
       end
 
       it "accepts a block" do
-        action(:append_file, "doc/README"){ "END\n" }
+        action(:append_to_file, "doc/README"){ "END\n" }
         File.binread(file).must == "__start__\nREADME\n__end__\nEND\n"
       end
 
       it "logs status" do
-        action(:append_file, "doc/README", "END").must == "      append  doc/README\n"
+        action(:append_to_file, "doc/README", "END").must == "      append  doc/README\n"
       end
     end
 
-    describe "#prepend_file" do
+    describe "#prepend_to_file" do
       it "prepends content to the file" do
-        action :prepend_file, "doc/README", "START\n"
+        action :prepend_to_file, "doc/README", "START\n"
         File.binread(file).must == "START\n__start__\nREADME\n__end__\n"
       end
 
       it "accepts a block" do
-        action(:prepend_file, "doc/README"){ "START\n" }
+        action(:prepend_to_file, "doc/README"){ "START\n" }
         File.binread(file).must == "START\n__start__\nREADME\n__end__\n"
       end
 
       it "logs status" do
-        action(:prepend_file, "doc/README", "START").must == "     prepend  doc/README\n"
+        action(:prepend_to_file, "doc/README", "START").must == "     prepend  doc/README\n"
       end
     end
 
