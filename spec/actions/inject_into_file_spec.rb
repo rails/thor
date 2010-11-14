@@ -47,7 +47,7 @@ describe Thor::Actions::InjectIntoFile do
     end
 
     it "logs status" do
-      invoke!("doc/README", "\nmore content", :after => "__start__").must == "      inject  doc/README\n"
+      invoke!("doc/README", "\nmore content", :after => "__start__").must == "      insert  doc/README\n"
     end
 
     it "does not change the file if pretending" do
@@ -87,40 +87,40 @@ describe Thor::Actions::InjectIntoFile do
   end
 
   describe "#revoke!" do
-    it "deinjects the destination file after injection" do
+    it "substracts the destination file after injection" do
       invoke! "doc/README", "\nmore content", :after => "__start__"
       revoke! "doc/README", "\nmore content", :after => "__start__"
       File.read(file).must == "__start__\nREADME\n__end__\n"
     end
 
-    it "deinjects the destination file before injection" do
+    it "substracts the destination file before injection" do
       invoke! "doc/README", "more content\n", :before => "__start__"
       revoke! "doc/README", "more content\n", :before => "__start__"
       File.read(file).must == "__start__\nREADME\n__end__\n"
     end
 
-    it "deinjects even with double after injection" do
+    it "substracts even with double after injection" do
       invoke! "doc/README", "\nmore content", :after => "__start__"
       invoke! "doc/README", "\nanother stuff", :after => "__start__"
       revoke! "doc/README", "\nmore content", :after => "__start__"
       File.read(file).must == "__start__\nanother stuff\nREADME\n__end__\n"
     end
 
-    it "deinjects even with double before injection" do
+    it "substracts even with double before injection" do
       invoke! "doc/README", "more content\n", :before => "__start__"
       invoke! "doc/README", "another stuff\n", :before => "__start__"
       revoke! "doc/README", "more content\n", :before => "__start__"
       File.read(file).must == "another stuff\n__start__\nREADME\n__end__\n"
     end
 
-    it "deinjects when prepending" do
+    it "substracts when prepending" do
       invoke! "doc/README", "more content\n", :after => /\A/
       invoke! "doc/README", "another stuff\n", :after => /\A/
       revoke! "doc/README", "more content\n", :after => /\A/
       File.read(file).must == "another stuff\n__start__\nREADME\n__end__\n"
     end
 
-    it "deinjects when appending" do
+    it "substracts when appending" do
       invoke! "doc/README", "more content\n", :before => /\z/
       invoke! "doc/README", "another stuff\n", :before => /\z/
       revoke! "doc/README", "more content\n", :before => /\z/
@@ -129,7 +129,7 @@ describe Thor::Actions::InjectIntoFile do
 
     it "shows progress information to the user" do
       invoke!("doc/README", "\nmore content", :after => "__start__")
-      revoke!("doc/README", "\nmore content", :after => "__start__").must == "    deinject  doc/README\n"
+      revoke!("doc/README", "\nmore content", :after => "__start__").must == "    subtract  doc/README\n"
     end
   end
 end

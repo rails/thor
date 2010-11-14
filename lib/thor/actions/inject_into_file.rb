@@ -77,12 +77,16 @@ class Thor
       protected
 
         def say_status(behavior)
-          status = if flag == /\A/
-            behavior == :invoke ? :prepend : :unprepend
-          elsif flag == /\z/
-            behavior == :invoke ? :append : :unappend
+          status = if behavior == :invoke
+            if flag == /\A/
+               :prepend
+            elsif flag == /\z/
+              :append
+            else
+              :insert
+            end
           else
-            behavior == :invoke ? :inject : :deinject
+            :subtract
           end
 
           super(status, config[:verbose])

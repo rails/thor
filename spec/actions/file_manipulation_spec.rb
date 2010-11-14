@@ -275,7 +275,7 @@ describe Thor::Actions do
       end
 
       it "logs status" do
-        action(:inject_into_class, "application.rb", Application, "  filter_parameters :password\n").must == "      inject  application.rb\n"
+        action(:inject_into_class, "application.rb", Application, "  filter_parameters :password\n").must == "      insert  application.rb\n"
       end
 
       it "does not append if class name does not match" do
