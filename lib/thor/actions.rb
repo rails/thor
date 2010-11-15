@@ -243,11 +243,7 @@ class Thor
       say_status :run, desc, config.fetch(:verbose, true)
 
       unless options[:pretend]
-        if config[:with] == :thor
-          system "#{command}"
-        else
-          `#{command}`
-        end
+        config[:capture] ? `#{command}` : system("#{command}")
       end
     end
 
@@ -283,12 +279,13 @@ class Thor
       config  = args.last.is_a?(Hash) ? args.pop : {}
       verbose = config.key?(:verbose) ? config.delete(:verbose) : true
       pretend = config.key?(:pretend) ? config.delete(:pretend) : false
+      capture = config.key?(:capture) ? config.delete(:capture) : false
 
       args.unshift task
       args.push Thor::Options.to_switches(config)
       command = args.join(' ').strip
 
-      run command, :with => :thor, :verbose => verbose, :pretend => pretend
+      run command, :with => :thor, :verbose => verbose, :pretend => pretend, :capture => capture
     end
 
     protected

@@ -245,7 +245,7 @@ describe Thor::Actions do
 
   describe "#run" do
     before(:each) do
-      runner.should_receive(:`).with("ls")
+      runner.should_receive(:system).with("ls")
     end
 
     it "executes the command given" do
@@ -269,7 +269,7 @@ describe Thor::Actions do
   describe "#run_ruby_script" do
     before(:each) do
       Thor::Util.stub!(:ruby_command).and_return("/opt/jruby")
-      runner.should_receive(:`).with("/opt/jruby script.rb")
+      runner.should_receive(:system).with("/opt/jruby script.rb")
     end
 
     it "executes the ruby script" do
@@ -312,6 +312,11 @@ describe Thor::Actions do
     it "does not log status if required" do
       runner.should_receive(:system).with("thor list --foo 1 2 3")
       action(:thor, :list, :foo => [1,2,3], :verbose => false).must be_empty
+    end
+
+    it "captures the output when :capture is given" do
+      runner.should_receive(:`).with("thor foo bar")
+      action(:thor, "foo", "bar", :capture => true)
     end
   end
 end
