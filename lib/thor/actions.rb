@@ -220,7 +220,7 @@ class Thor
     #
     # ==== Parameters
     # command<String>:: the command to be executed.
-    # config<Hash>:: give :verbose => false to not log the status. Specify :with
+    # config<Hash>:: give :verbose => false to not log the status, :capture => true to hide to output. Specify :with
     #                to append an executable to command executation.
     #
     # ==== Example
@@ -264,8 +264,9 @@ class Thor
     # ==== Parameters
     # task<String>:: the task to be invoked
     # args<Array>:: arguments to the task
-    # config<Hash>:: give :verbose => false to not log the status. Other options
-    #                are given as parameter to Thor.
+    # config<Hash>:: give :verbose => false to not log the status, :capture => true to hide to output.
+    #                Other options are given as parameter to Thor.
+    #
     #
     # ==== Examples
     #
