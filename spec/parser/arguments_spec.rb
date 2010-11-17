@@ -26,6 +26,7 @@ describe Thor::Arguments do
       create :string => nil, :hash => nil
       parse("product", "title:string", "age:integer")["string"].must == "product"
       parse("product", "title:string", "age:integer")["hash"].must == { "title" => "string", "age" => "integer"}
+      parse("product", "url:http://www.amazon.com/gp/product/1595825495")["hash"].must == { "url" => "http://www.amazon.com/gp/product/1595825495" }
     end
 
     it "accepts arrays" do
