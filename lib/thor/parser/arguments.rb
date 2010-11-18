@@ -94,8 +94,8 @@ class Thor
         hash = {}
 
         while current_is_value? && peek.include?(?:)
-          key, *value = shift.split(':')
-          hash[key] = value.join(':')
+          key, value = shift.split(':',2)
+          hash[key] = value
         end
         hash
       end
