@@ -6,6 +6,7 @@ gem 'diff-lcs'
 gem 'jeweler'
 gem 'rdoc'
 gem 'rake'
+gem 'thor'
 
 platforms :mri_18 do
   gem "ruby-debug", ">= 0.10.3"
