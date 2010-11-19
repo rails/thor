@@ -8,10 +8,10 @@ describe Thor::Shell::Basic do
   describe "#padding" do
     it "cannot be set to below zero" do
       shell.padding = 10
-      shell.padding.must == 10
+      shell.padding.should == 10
 
       shell.padding = -1
-      shell.padding.must == 0
+      shell.padding.should == 0
     end
   end
 
@@ -19,7 +19,7 @@ describe Thor::Shell::Basic do
     it "prints a message to the user and gets the response" do
       $stdout.should_receive(:print).with("Should I overwrite it? ")
       $stdin.should_receive(:gets).and_return('Sure')
-      shell.ask("Should I overwrite it?").must == "Sure"
+      shell.ask("Should I overwrite it?").should == "Sure"
     end
   end
 
@@ -27,11 +27,11 @@ describe Thor::Shell::Basic do
     it "asks the user and returns true if the user replies yes" do
       $stdout.should_receive(:print).with("Should I overwrite it? ")
         $stdin.should_receive(:gets).and_return('y')
-      shell.yes?("Should I overwrite it?").must === true
+      shell.yes?("Should I overwrite it?").should === true
 
       $stdout.should_receive(:print).with("Should I overwrite it? ")
         $stdin.should_receive(:gets).and_return('n')
-      shell.yes?("Should I overwrite it?").must_not === true
+      shell.yes?("Should I overwrite it?").should_not === true
     end
   end
 
@@ -39,11 +39,11 @@ describe Thor::Shell::Basic do
     it "asks the user and returns true if the user replies no" do
       $stdout.should_receive(:print).with("Should I overwrite it? ")
         $stdin.should_receive(:gets).and_return('n')
-      shell.no?("Should I overwrite it?").must === true
+      shell.no?("Should I overwrite it?").should === true
 
       $stdout.should_receive(:print).with("Should I overwrite it? ")
         $stdin.should_receive(:gets).and_return('Yes')
-      shell.no?("Should I overwrite it?").must === false
+      shell.no?("Should I overwrite it?").should === false
     end
   end
 
@@ -115,7 +115,7 @@ describe Thor::Shell::Basic do
 
     it "prints a table" do
       content = capture(:stdout){ shell.print_table(@table) }
-      content.must == <<-TABLE
+      content.should == <<-TABLE
 abc  #123  first three
      #0    empty
 xyz  #786  last three
@@ -124,7 +124,7 @@ TABLE
 
     it "prints a table with identation" do
       content = capture(:stdout){ shell.print_table(@table, :ident => 2) }
-      content.must == <<-TABLE
+      content.should == <<-TABLE
   abc  #123  first three
        #0    empty
   xyz  #786  last three
@@ -134,7 +134,7 @@ TABLE
     it "uses maximum terminal width" do
       shell.should_receive(:terminal_width).and_return(20)
       content = capture(:stdout){ shell.print_table(@table, :ident => 2, :truncate => true) }
-      content.must == <<-TABLE
+      content.should == <<-TABLE
   abc  #123  firs...
        #0    empty
   xyz  #786  last...
@@ -143,7 +143,7 @@ TABLE
 
     it "honors the colwidth option" do
       content = capture(:stdout){ shell.print_table(@table, :colwidth => 10)}
-      content.must == <<-TABLE
+      content.should == <<-TABLE
 abc         #123  first three
             #0    empty
 xyz         #786  last three
@@ -161,19 +161,19 @@ TABLE
     it "returns true if the user choose default option" do
       $stdout.stub!(:print)
       $stdin.should_receive(:gets).and_return('')
-      shell.file_collision('foo').must be_true
+      shell.file_collision('foo').should be_true
     end
 
     it "returns false if the user choose no" do
       $stdout.stub!(:print)
       $stdin.should_receive(:gets).and_return('n')
-      shell.file_collision('foo').must be_false
+      shell.file_collision('foo').should be_false
     end
 
     it "returns true if the user choose yes" do
       $stdout.stub!(:print)
       $stdin.should_receive(:gets).and_return('y')
-      shell.file_collision('foo').must be_true
+      shell.file_collision('foo').should be_true
     end
 
     it "shows help usage if the user choose help" do
@@ -181,7 +181,7 @@ TABLE
       $stdin.should_receive(:gets).and_return('h')
       $stdin.should_receive(:gets).and_return('n')
       help = capture(:stdout){ shell.file_collision('foo') }
-      help.must =~ /h \- help, show this help/
+      help.should =~ /h \- help, show this help/
     end
 
     it "quits if the user choose quit" do
@@ -191,17 +191,17 @@ TABLE
 
       lambda {
         shell.file_collision('foo')
-      }.must raise_error(SystemExit)
+      }.should raise_error(SystemExit)
     end
 
     it "always returns true if the user choose always" do
       $stdout.should_receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqh] ')
       $stdin.should_receive(:gets).and_return('a')
 
-      shell.file_collision('foo').must be_true
+      shell.file_collision('foo').should be_true
 
       $stdout.should_not_receive(:print)
-      shell.file_collision('foo').must be_true
+      shell.file_collision('foo').should be_true
     end
 
     describe "when a block is given" do

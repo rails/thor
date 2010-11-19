@@ -15,34 +15,34 @@ describe Thor::Actions do
 
   describe "on include" do
     it "adds runtime options to the base class" do
-      MyCounter.class_options.keys.must include(:pretend)
-      MyCounter.class_options.keys.must include(:force)
-      MyCounter.class_options.keys.must include(:quiet)
-      MyCounter.class_options.keys.must include(:skip)
+      MyCounter.class_options.keys.should include(:pretend)
+      MyCounter.class_options.keys.should include(:force)
+      MyCounter.class_options.keys.should include(:quiet)
+      MyCounter.class_options.keys.should include(:skip)
     end
   end
 
   describe "#initialize" do
     it "has default behavior invoke" do
-      runner.behavior.must == :invoke
+      runner.behavior.should == :invoke
     end
 
     it "can have behavior revoke" do
-      MyCounter.new([1], {}, :behavior => :revoke).behavior.must == :revoke
+      MyCounter.new([1], {}, :behavior => :revoke).behavior.should == :revoke
     end
 
     it "when behavior is set to force, overwrite options" do
       runner = MyCounter.new([1], { :force => false, :skip => true }, :behavior => :force)
-      runner.behavior.must == :invoke
-      runner.options.force.must be_true
-      runner.options.skip.must_not be_true
+      runner.behavior.should == :invoke
+      runner.options.force.should be_true
+      runner.options.skip.should_not be_true
     end
 
     it "when behavior is set to skip, overwrite options" do
       runner = MyCounter.new([1], ["--force"], :behavior => :skip)
-      runner.behavior.must == :invoke
-      runner.options.force.must_not be_true
-      runner.options.skip.must be_true
+      runner.behavior.should == :invoke
+      runner.options.force.should_not be_true
+      runner.options.skip.should be_true
     end
   end
 
@@ -51,54 +51,54 @@ describe Thor::Actions do
       it "gets the current directory and expands the path to set the root" do
         base = MyCounter.new([1])
         base.destination_root = "here"
-        base.destination_root.must == File.expand_path(File.join(File.dirname(__FILE__), "..", "here"))
+        base.destination_root.should == File.expand_path(File.join(File.dirname(__FILE__), "..", "here"))
       end
 
       it "does not use the current directory if one is given" do
         root = File.expand_path("/")
         base = MyCounter.new([1])
         base.destination_root = root
-        base.destination_root.must == root
+        base.destination_root.should == root
       end
 
       it "uses the current directory if none is given" do
         base = MyCounter.new([1])
-        base.destination_root.must == File.expand_path(File.join(File.dirname(__FILE__), ".."))
+        base.destination_root.should == File.expand_path(File.join(File.dirname(__FILE__), ".."))
       end
     end
 
     describe "#relative_to_original_destination_root" do
       it "returns the path relative to the absolute root" do
-        runner.relative_to_original_destination_root(file).must == "foo"
+        runner.relative_to_original_destination_root(file).should == "foo"
       end
 
       it "does not remove dot if required" do
-        runner.relative_to_original_destination_root(file, false).must == "./foo"
+        runner.relative_to_original_destination_root(file, false).should == "./foo"
       end
 
       it "always use the absolute root" do
         runner.inside("foo") do
-          runner.relative_to_original_destination_root(file).must == "foo"
+          runner.relative_to_original_destination_root(file).should == "foo"
         end
       end
 
       describe "#source_paths_for_search" do
         it "add source_root to source_paths_for_search" do
-          MyCounter.source_paths_for_search.must include(File.expand_path("fixtures", File.dirname(__FILE__)))
+          MyCounter.source_paths_for_search.should include(File.expand_path("fixtures", File.dirname(__FILE__)))
         end
 
         it "keeps only current source root in source paths" do
-          ClearCounter.source_paths_for_search.must include(File.expand_path("fixtures/bundle", File.dirname(__FILE__)))
-          ClearCounter.source_paths_for_search.must_not include(File.expand_path("fixtures", File.dirname(__FILE__)))
+          ClearCounter.source_paths_for_search.should include(File.expand_path("fixtures/bundle", File.dirname(__FILE__)))
+          ClearCounter.source_paths_for_search.should_not include(File.expand_path("fixtures", File.dirname(__FILE__)))
         end
 
         it "customized source paths should be before source roots" do
-          ClearCounter.source_paths_for_search[0].must == File.expand_path("fixtures/doc", File.dirname(__FILE__))
-          ClearCounter.source_paths_for_search[1].must == File.expand_path("fixtures/bundle", File.dirname(__FILE__))
+          ClearCounter.source_paths_for_search[0].should == File.expand_path("fixtures/doc", File.dirname(__FILE__))
+          ClearCounter.source_paths_for_search[1].should == File.expand_path("fixtures/bundle", File.dirname(__FILE__))
         end
 
         it "keeps inherited source paths at the end" do
-          ClearCounter.source_paths_for_search.last.must == File.expand_path("fixtures/broken", File.dirname(__FILE__))
+          ClearCounter.source_paths_for_search.last.should == File.expand_path("fixtures/broken", File.dirname(__FILE__))
         end
       end
     end
@@ -107,17 +107,17 @@ describe Thor::Actions do
       it "raises an error if source path is empty" do
         lambda {
           A.new.find_in_source_paths("foo")
-        }.must raise_error(Thor::Error, /Currently you have no source paths/)
+        }.should raise_error(Thor::Error, /Currently you have no source paths/)
       end
 
       it "finds a template inside the source path" do
-        runner.find_in_source_paths("doc").must == File.expand_path("doc", source_root)
-        lambda { runner.find_in_source_paths("README") }.must raise_error
+        runner.find_in_source_paths("doc").should == File.expand_path("doc", source_root)
+        lambda { runner.find_in_source_paths("README") }.should raise_error
 
         new_path = File.join(source_root, "doc")
         runner.instance_variable_set(:@source_paths, nil)
         runner.source_paths.unshift(new_path)
-        runner.find_in_source_paths("README").must == File.expand_path("README", new_path)
+        runner.find_in_source_paths("README").should == File.expand_path("README", new_path)
       end
     end
   end
@@ -125,26 +125,26 @@ describe Thor::Actions do
   describe "#inside" do
     it "executes the block inside the given folder" do
       runner.inside("foo") do
-        Dir.pwd.must == file
+        Dir.pwd.should == file
       end
     end
 
     it "changes the base root" do
       runner.inside("foo") do
-        runner.destination_root.must == file
+        runner.destination_root.should == file
       end
     end
 
     it "creates the directory if it does not exist" do
       runner.inside("foo") do
-        File.exists?(file).must be_true
+        File.exists?(file).should be_true
       end
     end
 
     describe "when pretending" do
       it "no directories should be created" do
         runner.inside("bar", :pretend => true) {}
-        File.exists?("bar").must be_false
+        File.exists?("bar").should be_false
       end
     end
 
@@ -152,7 +152,7 @@ describe Thor::Actions do
       it "logs status" do
         capture(:stdout) do
           runner.inside("foo", :verbose => true) {}
-        end.must =~ /inside  foo/
+        end.should =~ /inside  foo/
       end
 
       it "uses padding in next status" do
@@ -160,14 +160,14 @@ describe Thor::Actions do
           runner.inside("foo", :verbose => true) do
             runner.say_status :cool, :padding
           end
-        end.must =~ /cool    padding/
+        end.should =~ /cool    padding/
       end
 
       it "removes padding after block" do
         capture(:stdout) do
           runner.inside("foo", :verbose => true) {}
           runner.say_status :no, :padding
-        end.must =~ /no  padding/
+        end.should =~ /no  padding/
       end
     end
   end
@@ -175,20 +175,20 @@ describe Thor::Actions do
   describe "#in_root" do
     it "executes the block in the root folder" do
       runner.inside("foo") do
-        runner.in_root { Dir.pwd.must == destination_root }
+        runner.in_root { Dir.pwd.should == destination_root }
       end
     end
 
     it "changes the base root" do
       runner.inside("foo") do
-        runner.in_root { runner.destination_root.must == destination_root }
+        runner.in_root { runner.destination_root.should == destination_root }
       end
     end
 
     it "returns to the previous state" do
       runner.inside("foo") do
         runner.in_root { }
-        runner.destination_root.must == file
+        runner.destination_root.should == file
       end
     end
   end
@@ -225,21 +225,21 @@ describe Thor::Actions do
 
     it "opens a file and executes its content in the instance binding" do
       action :apply, @file
-      runner.instance_variable_get("@foo").must == "FOO"
+      runner.instance_variable_get("@foo").should == "FOO"
     end
 
     it "applies padding to the content inside the file" do
-      action(:apply, @file).must =~ /cool    padding/
+      action(:apply, @file).should =~ /cool    padding/
     end
 
     it "logs its status" do
-      action(:apply, @file).must =~ /       apply  #{@file}\n/
+      action(:apply, @file).should =~ /       apply  #{@file}\n/
     end
 
     it "does not log status" do
       content = action(:apply, @file, :verbose => false)
-      content.must =~ /cool  padding/
-      content.must_not =~ /apply http/
+      content.should =~ /cool  padding/
+      content.should_not =~ /apply http/
     end
   end
 
@@ -253,11 +253,11 @@ describe Thor::Actions do
     end
 
     it "logs status" do
-      action(:run, "ls").must == "         run  ls from \".\"\n"
+      action(:run, "ls").should == "         run  ls from \".\"\n"
     end
 
     it "does not log status if required" do
-      action(:run, "ls", :verbose => false).must be_empty
+      action(:run, "ls", :verbose => false).should be_empty
     end
 
     it "accepts a color as status" do
@@ -277,11 +277,11 @@ describe Thor::Actions do
     end
 
     it "logs status" do
-      action(:run_ruby_script, "script.rb").must == "         run  jruby script.rb from \".\"\n"
+      action(:run_ruby_script, "script.rb").should == "         run  jruby script.rb from \".\"\n"
     end
 
     it "does not log status if required" do
-      action(:run_ruby_script, "script.rb", :verbose => false).must be_empty
+      action(:run_ruby_script, "script.rb", :verbose => false).should be_empty
     end
   end
 
@@ -306,12 +306,12 @@ describe Thor::Actions do
 
     it "logs status" do
       runner.should_receive(:system).with("thor list")
-      action(:thor, :list).must == "         run  thor list from \".\"\n"
+      action(:thor, :list).should == "         run  thor list from \".\"\n"
     end
 
     it "does not log status if required" do
       runner.should_receive(:system).with("thor list --foo 1 2 3")
-      action(:thor, :list, :foo => [1,2,3], :verbose => false).must be_empty
+      action(:thor, :list, :foo => [1,2,3], :verbose => false).should be_empty
     end
 
     it "captures the output when :capture is given" do

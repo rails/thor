@@ -30,12 +30,12 @@ describe Thor::Actions::InjectIntoFile do
   describe "#invoke!" do
     it "changes the file adding content after the flag" do
       invoke! "doc/README", "\nmore content", :after => "__start__"
-      File.read(file).must == "__start__\nmore content\nREADME\n__end__\n"
+      File.read(file).should == "__start__\nmore content\nREADME\n__end__\n"
     end
 
     it "changes the file adding content before the flag" do
       invoke! "doc/README", "more content\n", :before => "__end__"
-      File.read(file).must == "__start__\nREADME\nmore content\n__end__\n"
+      File.read(file).should == "__start__\nREADME\nmore content\n__end__\n"
     end
 
     it "accepts data as a block" do
@@ -43,17 +43,17 @@ describe Thor::Actions::InjectIntoFile do
         "more content\n"
       end
 
-      File.read(file).must == "__start__\nREADME\nmore content\n__end__\n"
+      File.read(file).should == "__start__\nREADME\nmore content\n__end__\n"
     end
 
     it "logs status" do
-      invoke!("doc/README", "\nmore content", :after => "__start__").must == "      insert  doc/README\n"
+      invoke!("doc/README", "\nmore content", :after => "__start__").should == "      insert  doc/README\n"
     end
 
     it "does not change the file if pretending" do
       invoker :pretend => true
       invoke! "doc/README", "\nmore content", :after => "__start__"
-      File.read(file).must == "__start__\nREADME\n__end__\n"
+      File.read(file).should == "__start__\nREADME\n__end__\n"
     end
 
     it "does not change the file if already include content" do
@@ -61,13 +61,13 @@ describe Thor::Actions::InjectIntoFile do
         "more content\n"
       end
 
-      File.read(file).must == "__start__\nREADME\nmore content\n__end__\n"
+      File.read(file).should == "__start__\nREADME\nmore content\n__end__\n"
 
       invoke! "doc/README", :before => "__end__" do
         "more content\n"
       end
 
-      File.read(file).must == "__start__\nREADME\nmore content\n__end__\n"
+      File.read(file).should == "__start__\nREADME\nmore content\n__end__\n"
     end
 
     it "does change the file if already include content and :force == true" do
@@ -75,13 +75,13 @@ describe Thor::Actions::InjectIntoFile do
         "more content\n"
       end
 
-      File.read(file).must == "__start__\nREADME\nmore content\n__end__\n"
+      File.read(file).should == "__start__\nREADME\nmore content\n__end__\n"
 
       invoke! "doc/README", :before => "__end__", :force => true do
         "more content\n"
       end
 
-      File.read(file).must == "__start__\nREADME\nmore content\nmore content\n__end__\n"
+      File.read(file).should == "__start__\nREADME\nmore content\nmore content\n__end__\n"
     end
 
   end
@@ -90,46 +90,46 @@ describe Thor::Actions::InjectIntoFile do
     it "substracts the destination file after injection" do
       invoke! "doc/README", "\nmore content", :after => "__start__"
       revoke! "doc/README", "\nmore content", :after => "__start__"
-      File.read(file).must == "__start__\nREADME\n__end__\n"
+      File.read(file).should == "__start__\nREADME\n__end__\n"
     end
 
     it "substracts the destination file before injection" do
       invoke! "doc/README", "more content\n", :before => "__start__"
       revoke! "doc/README", "more content\n", :before => "__start__"
-      File.read(file).must == "__start__\nREADME\n__end__\n"
+      File.read(file).should == "__start__\nREADME\n__end__\n"
     end
 
     it "substracts even with double after injection" do
       invoke! "doc/README", "\nmore content", :after => "__start__"
       invoke! "doc/README", "\nanother stuff", :after => "__start__"
       revoke! "doc/README", "\nmore content", :after => "__start__"
-      File.read(file).must == "__start__\nanother stuff\nREADME\n__end__\n"
+      File.read(file).should == "__start__\nanother stuff\nREADME\n__end__\n"
     end
 
     it "substracts even with double before injection" do
       invoke! "doc/README", "more content\n", :before => "__start__"
       invoke! "doc/README", "another stuff\n", :before => "__start__"
       revoke! "doc/README", "more content\n", :before => "__start__"
-      File.read(file).must == "another stuff\n__start__\nREADME\n__end__\n"
+      File.read(file).should == "another stuff\n__start__\nREADME\n__end__\n"
     end
 
     it "substracts when prepending" do
       invoke! "doc/README", "more content\n", :after => /\A/
       invoke! "doc/README", "another stuff\n", :after => /\A/
       revoke! "doc/README", "more content\n", :after => /\A/
-      File.read(file).must == "another stuff\n__start__\nREADME\n__end__\n"
+      File.read(file).should == "another stuff\n__start__\nREADME\n__end__\n"
     end
 
     it "substracts when appending" do
       invoke! "doc/README", "more content\n", :before => /\z/
       invoke! "doc/README", "another stuff\n", :before => /\z/
       revoke! "doc/README", "more content\n", :before => /\z/
-      File.read(file).must == "__start__\nREADME\n__end__\nanother stuff\n"
+      File.read(file).should == "__start__\nREADME\n__end__\nanother stuff\n"
     end
 
     it "shows progress information to the user" do
       invoke!("doc/README", "\nmore content", :after => "__start__")
-      revoke!("doc/README", "\nmore content", :after => "__start__").must == "    subtract  doc/README\n"
+      revoke!("doc/README", "\nmore content", :after => "__start__").should == "    subtract  doc/README\n"
     end
   end
 end

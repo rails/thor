@@ -13,28 +13,28 @@ describe Thor::Task do
     it "includes namespace within usage" do
       Object.stub!(:namespace).and_return("foo")
       Object.stub!(:arguments).and_return([])
-      task(:bar => :required).formatted_usage(Object).must == "foo:can_has --bar=BAR"
+      task(:bar => :required).formatted_usage(Object).should == "foo:can_has --bar=BAR"
     end
 
     it "removes default from namespace" do
       Object.stub!(:namespace).and_return("default:foo")
       Object.stub!(:arguments).and_return([])
-      task(:bar => :required).formatted_usage(Object).must == ":foo:can_has --bar=BAR"
+      task(:bar => :required).formatted_usage(Object).should == ":foo:can_has --bar=BAR"
     end
 
     it "injects arguments into usage" do
       Object.stub!(:namespace).and_return("foo")
       Object.stub!(:arguments).and_return([ Thor::Argument.new(:bar, nil, true, :string) ])
-      task(:foo => :required).formatted_usage(Object).must == "foo:can_has BAR --foo=FOO"
+      task(:foo => :required).formatted_usage(Object).should == "foo:can_has BAR --foo=FOO"
     end
   end
 
   describe "#dynamic" do
     it "creates a dynamic task with the given name" do
-      Thor::DynamicTask.new('task').name.must == 'task'
-      Thor::DynamicTask.new('task').description.must == 'A dynamically-generated task'
-      Thor::DynamicTask.new('task').usage.must == 'task'
-      Thor::DynamicTask.new('task').options.must == {}
+      Thor::DynamicTask.new('task').name.should == 'task'
+      Thor::DynamicTask.new('task').description.should == 'A dynamically-generated task'
+      Thor::DynamicTask.new('task').usage.should == 'task'
+      Thor::DynamicTask.new('task').options.should == {}
     end
 
     it "does not invoke an existing method" do
@@ -48,7 +48,7 @@ describe Thor::Task do
     it "dup options hash" do
       task = Thor::Task.new("can_has", nil, nil, nil, :foo => true, :bar => :required)
       task.dup.options.delete(:foo)
-      task.options[:foo].must_not be_nil
+      task.options[:foo].should_not be_nil
     end
   end
 

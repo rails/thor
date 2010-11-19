@@ -32,9 +32,9 @@ describe Thor::Shell::Color do
         $stdin.should_receive(:gets).and_return('n')
 
         output = capture(:stdout){ shell.file_collision('spec/fixtures/doc/README'){ "README\nEND\n" } }
-        output.must =~ /\e\[31m\- __start__\e\[0m/
-        output.must =~ /^  README/
-        output.must =~ /\e\[32m\+ END\e\[0m/
+        output.should =~ /\e\[31m\- __start__\e\[0m/
+        output.should =~ /^  README/
+        output.should =~ /\e\[32m\+ END\e\[0m/
       end
     end
   end

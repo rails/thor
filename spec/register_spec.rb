@@ -63,23 +63,23 @@ BoringVendorProvidedCLI.register(
 describe ".register-ing a Thor subclass" do
   it "registers the plugin as a subcommand" do
     fireworks_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[exciting fireworks]) }
-    fireworks_output.must == "kaboom!\n"
+    fireworks_output.should == "kaboom!\n"
   end
 
   it "includes the plugin's usage in the help" do
     help_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[help]) }
-    help_output.must include('do exciting things')
+    help_output.should include('do exciting things')
   end
 
   context "when hidden" do
     it "omits the hidden plugin's usage from the help" do
       help_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[help]) }
-      help_output.must_not include('secret stuff')
+      help_output.should_not include('secret stuff')
     end
 
     it "registers the plugin as a subcommand" do
       secret_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[secret squirrel]) }
-      secret_output.must == "I love nuts\n"
+      secret_output.should == "I love nuts\n"
     end
   end
 end
@@ -87,6 +87,6 @@ end
 describe ".register-ing a Thor::Group subclass" do
   it "registers the group as a single command" do
     group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[groupwork]) }
-    group_output.must == "part one\npart two\n"
+    group_output.should == "part one\npart two\n"
   end
 end

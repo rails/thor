@@ -5,7 +5,9 @@ require 'thor'
 require 'thor/group'
 require 'stringio'
 
+require 'rcov'
 require 'rdoc'
+require 'rspec'
 require 'diff/lcs' # You need diff/lcs installed to run specs (but not to run Thor).
 require 'fakeweb'  # You need fakeweb installed to run specs (but not to run Thor).
 
@@ -20,11 +22,6 @@ load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "group.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "invoke.thor")
-
-Kernel.module_eval do
-  alias_method :must, :should
-  alias_method :must_not, :should_not
-end
 
 RSpec.configure do |config|
   def capture(stream)

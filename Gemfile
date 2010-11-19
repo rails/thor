@@ -1,6 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'fakeweb'
+gem 'rcov'
 gem 'rspec'
 gem 'diff-lcs'
 gem 'jeweler'

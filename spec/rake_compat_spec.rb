@@ -28,41 +28,41 @@ end
 
 describe Thor::RakeCompat do
   it "sets the rakefile application" do
-    ["rake_compat_spec.rb", "Thorfile"].must include(Rake.application.rakefile)
+    ["rake_compat_spec.rb", "Thorfile"].should include(Rake.application.rakefile)
   end
 
   it "adds rake tasks to thor classes too" do
     task = ThorTask.tasks["cool"]
-    task.must be
+    task.should be
   end
 
   it "uses rake tasks descriptions on thor" do
-    ThorTask.tasks["cool"].description.must == "Say it's cool"
+    ThorTask.tasks["cool"].description.should == "Say it's cool"
   end
 
   it "gets usage from rake tasks name" do
-    ThorTask.tasks["cool"].usage.must == "cool"
+    ThorTask.tasks["cool"].usage.should == "cool"
   end
 
   it "uses non namespaced name as description if non is available" do
-    ThorTask::HiperMega.tasks["super"].description.must == "super"
+    ThorTask::HiperMega.tasks["super"].description.should == "super"
   end
 
   it "converts namespaces to classes" do
-    ThorTask.const_get(:HiperMega).must == ThorTask::HiperMega
+    ThorTask.const_get(:HiperMega).should == ThorTask::HiperMega
   end
 
   it "does not add tasks from higher namespaces in lowers namespaces" do
-    ThorTask.tasks["super"].must_not be
+    ThorTask.tasks["super"].should_not be
   end
 
   it "invoking the thor task invokes the rake task" do
     capture(:stdout) do
       ThorTask.start ["cool"]
-    end.must == "COOL\n"
+    end.should == "COOL\n"
 
     capture(:stdout) do
       ThorTask::HiperMega.start ["super"]
-    end.must == "HIPER MEGA SUPER\n"
+    end.should == "HIPER MEGA SUPER\n"
   end
 end

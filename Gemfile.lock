@@ -14,6 +14,7 @@ GEM
     linecache19 (0.5.11)
       ruby_core_source (>= 0.1.4)
     rake (0.8.7)
+    rcov (0.9.9)
     rdoc (2.5.11)
     rspec (2.1.0)
       rspec-core (~> 2.1.0)
@@ -48,6 +49,7 @@ DEPENDENCIES
   fakeweb
   jeweler
   rake
+  rcov
   rdoc
   rspec
   ruby-debug (>= 0.10.3)

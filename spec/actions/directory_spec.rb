@@ -28,8 +28,8 @@ describe Thor::Actions::Directory do
       source      = File.join(source_root, source_path, file)
       destination = File.join(destination_root, destination_path, file)
 
-      File.exists?(destination).must be_true
-      FileUtils.identical?(source, destination).must be_true
+      File.exists?(destination).should be_true
+      FileUtils.identical?(source, destination).should be_true
     end
   end
 
@@ -37,12 +37,12 @@ describe Thor::Actions::Directory do
     it "raises an error if the source does not exist" do
       lambda {
         invoke! "unknown"
-      }.must raise_error(Thor::Error, /Could not find "unknown" in any of your source paths/)
+      }.should raise_error(Thor::Error, /Could not find "unknown" in any of your source paths/)
     end
 
     it "should not create a directory in pretend mode" do
       invoke! "doc", "ghost", :pretend => true
-      File.exists?("ghost").must be_false
+      File.exists?("ghost").should be_false
     end
 
     it "copies the whole directory recursively to the default destination" do
@@ -59,13 +59,13 @@ describe Thor::Actions::Directory do
       invoke! ".", "tasks", :recursive => false
 
       file = File.join(destination_root, "tasks", "group.thor")
-      File.exists?(file).must be_true
+      File.exists?(file).should be_true
 
       file = File.join(destination_root, "tasks", "doc")
-      File.exists?(file).must be_false
+      File.exists?(file).should be_false
 
       file = File.join(destination_root, "tasks", "doc", "README")
-      File.exists?(file).must be_false
+      File.exists?(file).should be_false
     end
 
     it "copies files from the source relative to the current path" do
@@ -78,40 +78,40 @@ describe Thor::Actions::Directory do
     it "copies and evaluates templates" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "rdoc.rb")
-      File.exists?(file).must be_true
-      File.read(file).must == "FOO = FOO\n"
+      File.exists?(file).should be_true
+      File.read(file).should == "FOO = FOO\n"
     end
 
     it "copies directories" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "components")
-      File.exists?(file).must be_true
-      File.directory?(file).must be_true
+      File.exists?(file).should be_true
+      File.directory?(file).should be_true
     end
 
     it "does not copy .empty_directory files" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "components", ".empty_directory")
-      File.exists?(file).must be_false
+      File.exists?(file).should be_false
     end
 
     it "copies directories even if they are empty" do
       invoke! "doc/components", "docs/components"
       file = File.join(destination_root, "docs", "components")
-      File.exists?(file).must be_true
+      File.exists?(file).should be_true
     end
 
     it "does not copy empty directories twice" do
       content = invoke!("doc/components", "docs/components")
-      content.must_not =~ /exist/
+      content.should_not =~ /exist/
     end
 
     it "logs status" do
       content = invoke!("doc")
-      content.must =~ /create  doc\/README/
-      content.must =~ /create  doc\/config\.rb/
-      content.must =~ /create  doc\/rdoc\.rb/
-      content.must =~ /create  doc\/components/
+      content.should =~ /create  doc\/README/
+      content.should =~ /create  doc\/config\.rb/
+      content.should =~ /create  doc\/rdoc\.rb/
+      content.should =~ /create  doc\/components/
     end
 
     it "yields a block" do
@@ -119,7 +119,7 @@ describe Thor::Actions::Directory do
       invoke!("doc") do |content|
         checked ||= !!(content =~ /FOO/)
       end
-      checked.must be_true
+      checked.should be_true
     end
   end
 
@@ -128,9 +128,9 @@ describe Thor::Actions::Directory do
       invoke! "doc"
       revoke! "doc"
 
-      File.exists?(File.join(destination_root, "doc", "README")).must be_false
-      File.exists?(File.join(destination_root, "doc", "config.rb")).must be_false
-      File.exists?(File.join(destination_root, "doc", "components")).must be_false
+      File.exists?(File.join(destination_root, "doc", "README")).should be_false
+      File.exists?(File.join(destination_root, "doc", "config.rb")).should be_false
+      File.exists?(File.join(destination_root, "doc", "components")).should be_false
     end
   end
 end

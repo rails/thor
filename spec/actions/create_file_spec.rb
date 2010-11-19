@@ -30,36 +30,36 @@ describe Thor::Actions::CreateFile do
     it "creates a file" do
       create_file("doc/config.rb")
       invoke!
-      File.exists?(File.join(destination_root, "doc/config.rb")).must be_true
+      File.exists?(File.join(destination_root, "doc/config.rb")).should be_true
     end
 
     it "does not create a file if pretending" do
       create_file("doc/config.rb", {}, :pretend => true)
       invoke!
-      File.exists?(File.join(destination_root, "doc/config.rb")).must be_false
+      File.exists?(File.join(destination_root, "doc/config.rb")).should be_false
     end
 
     it "shows created status to the user" do
       create_file("doc/config.rb")
-      invoke!.must == "      create  doc/config.rb\n"
+      invoke!.should == "      create  doc/config.rb\n"
     end
 
     it "does not show any information if log status is false" do
       silence!
       create_file("doc/config.rb")
-      invoke!.must be_empty
+      invoke!.should be_empty
     end
 
     it "returns the given destination" do
       capture(:stdout) do
-        create_file("doc/config.rb").invoke!.must == "doc/config.rb"
+        create_file("doc/config.rb").invoke!.should == "doc/config.rb"
       end
     end
 
     it "converts encoded instructions" do
       create_file("doc/%file_name%.rb.tt")
       invoke!
-      File.exists?(File.join(destination_root, "doc/rdoc.rb.tt")).must be_true
+      File.exists?(File.join(destination_root, "doc/rdoc.rb.tt")).should be_true
     end
 
     describe "when file exists" do
@@ -72,7 +72,7 @@ describe Thor::Actions::CreateFile do
         it "shows identical status" do
           create_file("doc/config.rb")
           invoke!
-          invoke!.must == "   identical  doc/config.rb\n"
+          invoke!.should == "   identical  doc/config.rb\n"
         end
       end
 
@@ -82,46 +82,46 @@ describe Thor::Actions::CreateFile do
         end
 
         it "shows forced status to the user if force is given" do
-          create_file("doc/config.rb", {}, :force => true).must_not be_identical
-          invoke!.must == "       force  doc/config.rb\n"
+          create_file("doc/config.rb", {}, :force => true).should_not be_identical
+          invoke!.should == "       force  doc/config.rb\n"
         end
 
         it "shows skipped status to the user if skip is given" do
-          create_file("doc/config.rb", {}, :skip => true).must_not be_identical
-          invoke!.must == "        skip  doc/config.rb\n"
+          create_file("doc/config.rb", {}, :skip => true).should_not be_identical
+          invoke!.should == "        skip  doc/config.rb\n"
         end
 
         it "shows forced status to the user if force is configured" do
-          create_file("doc/config.rb", :force => true).must_not be_identical
-          invoke!.must == "       force  doc/config.rb\n"
+          create_file("doc/config.rb", :force => true).should_not be_identical
+          invoke!.should == "       force  doc/config.rb\n"
         end
 
         it "shows skipped status to the user if skip is configured" do
-          create_file("doc/config.rb", :skip => true).must_not be_identical
-          invoke!.must == "        skip  doc/config.rb\n"
+          create_file("doc/config.rb", :skip => true).should_not be_identical
+          invoke!.should == "        skip  doc/config.rb\n"
         end
 
         it "shows conflict status to ther user" do
-          create_file("doc/config.rb").must_not be_identical
+          create_file("doc/config.rb").should_not be_identical
           $stdin.should_receive(:gets).and_return('s')
           file = File.join(destination_root, 'doc/config.rb')
 
           content = invoke!
-          content.must =~ /conflict  doc\/config\.rb/
-          content.must =~ /Overwrite #{file}\? \(enter "h" for help\) \[Ynaqdh\]/
-          content.must =~ /skip  doc\/config\.rb/
+          content.should =~ /conflict  doc\/config\.rb/
+          content.should =~ /Overwrite #{file}\? \(enter "h" for help\) \[Ynaqdh\]/
+          content.should =~ /skip  doc\/config\.rb/
         end
 
         it "creates the file if the file collision menu returns true" do
           create_file("doc/config.rb")
           $stdin.should_receive(:gets).and_return('y')
-          invoke!.must =~ /force  doc\/config\.rb/
+          invoke!.should =~ /force  doc\/config\.rb/
         end
 
         it "skips the file if the file collision menu returns false" do
           create_file("doc/config.rb")
           $stdin.should_receive(:gets).and_return('n')
-          invoke!.must =~ /skip  doc\/config\.rb/
+          invoke!.should =~ /skip  doc\/config\.rb/
         end
 
         it "executes the block given to show file content" do
@@ -140,31 +140,31 @@ describe Thor::Actions::CreateFile do
       create_file("doc/config.rb")
       invoke!
       revoke!
-      File.exists?(@action.destination).must be_false
+      File.exists?(@action.destination).should be_false
     end
 
     it "does not raise an error if the file does not exist" do
       create_file("doc/config.rb")
       revoke!
-      File.exists?(@action.destination).must be_false
+      File.exists?(@action.destination).should be_false
     end
   end
 
   describe "#exists?" do
     it "returns true if the destination file exists" do
       create_file("doc/config.rb")
-      @action.exists?.must be_false
+      @action.exists?.should be_false
       invoke!
-      @action.exists?.must be_true
+      @action.exists?.should be_true
     end
   end
 
   describe "#identical?" do
     it "returns true if the destination file and is identical" do
       create_file("doc/config.rb")
-      @action.identical?.must be_false
+      @action.identical?.should be_false
       invoke!
-      @action.identical?.must be_true
+      @action.identical?.should be_true
     end
   end
 end

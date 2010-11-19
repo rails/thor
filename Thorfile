@@ -14,6 +14,7 @@ class Default < Thor
 
   RSpec::Core::RakeTask.new(:rcov) do |t|
     t.rcov = true
+    t.rcov_opts =  %[-Ilib -Ispec --exclude "gems/*"]
   end
 
   begin
