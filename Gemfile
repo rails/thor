@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'fakeweb'
-gem 'rspec', '~> 1.3'
+gem 'rspec'
 gem 'diff-lcs'
 gem 'jeweler'
 gem 'rdoc'

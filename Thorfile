@@ -1,13 +1,8 @@
 # enconding: utf-8
 
 require File.join(File.dirname(__FILE__), "lib", "thor", "version")
-require 'rubygems'
 require 'thor/rake_compat'
-require 'spec/rake/spectask'
-begin
-  require 'rdoc/task'
-rescue LoadError
-end
+require 'rspec/core/rake_task'
 
 GEM_NAME = 'thor'
 EXTRA_RDOC_FILES = ["README.md", "LICENSE", "CHANGELOG.rdoc", "Thorfile"]
@@ -15,20 +10,16 @@ EXTRA_RDOC_FILES = ["README.md", "LICENSE", "CHANGELOG.rdoc", "Thorfile"]
 class Default < Thor
   include Thor::RakeCompat
 
-  Spec::Rake::SpecTask.new(:spec) do |t|
-    t.libs << 'lib'
-    t.spec_opts = ['--options', "spec/spec.opts"]
-    t.spec_files = FileList['spec/**/*_spec.rb']
-  end
+  RSpec::Core::RakeTask.new(:spec)
 
-  Spec::Rake::SpecTask.new(:rcov) do |t|
-    t.libs << 'lib'
-    t.spec_opts = ['--options', "spec/spec.opts"]
-    t.spec_files = FileList['spec/**/*_spec.rb']
+  RSpec::Core::RakeTask.new(:rcov) do |t|
     t.rcov = true
-    t.rcov_dir = "rcov"
   end
 
+  begin
+    require 'rdoc/task'
+  rescue LoadError
+  end
   if defined?(RDoc)
     RDoc::Task.new do |rdoc|
       rdoc.main     = "README.rdoc"
