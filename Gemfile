@@ -1,12 +1,12 @@
 source 'http://rubygems.org'
 
-gem 'fakeweb'
-gem 'rcov'
-gem 'rspec'
 gem 'diff-lcs'
 gem 'jeweler'
-gem 'rdoc'
+gem 'fakeweb'
 gem 'rake'
+gem 'rdoc'
+gem 'rspec'
+gem 'simplecov'
 gem 'thor'
 
 platforms :mri_18 do

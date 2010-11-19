@@ -1,11 +1,16 @@
 $TESTING=true
 
+require 'simplecov'
+SimpleCov.start do
+  add_group 'Libraries', 'lib'
+  add_group 'Specs', 'spec'
+end
+
 $:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 require 'thor'
 require 'thor/group'
 require 'stringio'
 
-require 'rcov'
 require 'rdoc'
 require 'rspec'
 require 'diff/lcs' # You need diff/lcs installed to run specs (but not to run Thor).

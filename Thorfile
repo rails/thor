@@ -12,11 +12,6 @@ class Default < Thor
 
   RSpec::Core::RakeTask.new(:spec)
 
-  RSpec::Core::RakeTask.new(:rcov) do |t|
-    t.rcov = true
-    t.rcov_opts =  %[-Ilib -Ispec --exclude "gems/*"]
-  end
-
   begin
     require 'rdoc/task'
   rescue LoadError

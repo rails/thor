@@ -14,7 +14,6 @@ GEM
     linecache19 (0.5.11)
       ruby_core_source (>= 0.1.4)
     rake (0.8.7)
-    rcov (0.9.9)
     rdoc (2.5.11)
     rspec (2.1.0)
       rspec-core (~> 2.1.0)
@@ -39,6 +38,9 @@ GEM
       ruby-debug-base19 (>= 0.11.19)
     ruby_core_source (0.1.4)
       archive-tar-minitar (>= 0.5.2)
+    simplecov (0.3.7)
+      simplecov-html (>= 0.3.7)
+    simplecov-html (0.3.9)
     thor (0.14.4)
 
 PLATFORMS
@@ -49,9 +51,9 @@ DEPENDENCIES
   fakeweb
   jeweler
   rake
-  rcov
   rdoc
   rspec
   ruby-debug (>= 0.10.3)
   ruby-debug19
+  simplecov
   thor
