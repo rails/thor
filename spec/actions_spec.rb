@@ -140,7 +140,7 @@ describe Thor::Actions do
         File.exists?(file).must be_true
       end
     end
-    
+
     describe "when pretending" do
       it "no directories should be created" do
         runner.inside("bar", :pretend => true) {}

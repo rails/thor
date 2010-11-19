@@ -6,7 +6,7 @@ class RakeTask < Rake::TaskLib
   def initialize
     define
   end
-  
+
   def define
     desc "Say it's cool"
     task :cool do

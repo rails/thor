@@ -39,7 +39,7 @@ describe Thor::Actions::Directory do
         invoke! "unknown"
       }.must raise_error(Thor::Error, /Could not find "unknown" in any of your source paths/)
     end
-    
+
     it "should not create a directory in pretend mode" do
       invoke! "doc", "ghost", :pretend => true
       File.exists?("ghost").must be_false

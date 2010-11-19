@@ -36,7 +36,7 @@ Spec::Runner.configure do |config|
       eval "$#{stream} = StringIO.new"
       yield
       result = eval("$#{stream}").string
-    ensure 
+    ensure
       eval("$#{stream} = #{stream.upcase}")
     end
 

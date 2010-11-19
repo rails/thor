@@ -168,7 +168,7 @@ class Thor
       if !File.exist?(destination_root) && !pretend
         FileUtils.mkdir_p(destination_root)
       end
-      
+
       if pretend
         # In pretend mode, just yield down to the block
         block.arity == 1 ? yield(destination_root) : yield

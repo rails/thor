@@ -47,11 +47,11 @@ describe Thor::Options do
     it "accepts hashes" do
       Thor::Options.to_switches(:count => {:a => :b}).must == "--count a:b"
     end
-    
+
     it "accepts underscored options" do
       Thor::Options.to_switches(:under_score_option => "foo bar").must == '--under_score_option "foo bar"'
     end
-    
+
   end
 
   describe "#parse" do
@@ -108,10 +108,10 @@ describe Thor::Options do
       parse("--bar", "baz", "--baz", "unknown")
       lambda { check_unknown! }.must raise_error(Thor::UnknownArgumentError, "Unknown switches '--baz'")
     end
-    
+
     it "skips leading non-switches" do
       create(:foo => "baz")
-      
+
       parse("asdf", "--foo", "bar").must == {"foo" => "bar"}
     end
 
@@ -120,13 +120,13 @@ describe Thor::Options do
       parse("--asdf---asdf", "baz", "--foo", "--asdf---dsf--asdf").must == {"foo" => "--asdf---dsf--asdf"}
       check_unknown!
     end
-    
+
     it "excepts underscores in commandline args hash for boolean" do
       create :foo_bar => :boolean
       parse("--foo_bar")["foo_bar"].must == true
       parse("--no_foo_bar")["foo_bar"].must == false
     end
-    
+
     it "excepts underscores in commandline args hash for strings" do
       create :foo_bar => :string, :baz_foo => :string
       parse("--foo_bar", "baz")["foo_bar"].must == "baz"
@@ -187,7 +187,7 @@ describe Thor::Options do
         parse("--foo=12")["foo"].must == "12"
         parse("--foo=bar=baz")["foo"].must == "bar=baz"
       end
-      
+
       it "must accept underscores switch=value assignment" do
         create :foo_bar => :required
         parse("--foo_bar=http://example.com/under_score/")["foo_bar"].must == "http://example.com/under_score/"
@@ -207,7 +207,7 @@ describe Thor::Options do
         create "--foo" => :string
         parse("--foo")["foo"].must == "foo"
       end
-      
+
       it "accepts a --switch format on non required types with default values" do
         create "--baz" => :string, "--foo" => "bar"
         parse("--baz", "bang", "--foo")["foo"].must == "bar"

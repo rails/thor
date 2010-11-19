@@ -10,9 +10,9 @@ class Thor
     # destination<String>:: Relative path to the destination root
     # data<String>:: Data to add to the file. Can be given as a block.
     # config<Hash>:: give :verbose => false to not log the status and the flag
-    #                for injection (:after or :before) or :force => true for 
+    #                for injection (:after or :before) or :force => true for
     #                insert two or more times the same content.
-    # 
+    #
     # ==== Examples
     #
     #   insert_into_file "config/environment.rb", "config.gem :thor", :after => "Rails::Initializer.run do |config|\n"
