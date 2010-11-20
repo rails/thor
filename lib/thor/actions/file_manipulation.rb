@@ -30,6 +30,28 @@ class Thor
       end
     end
 
+    # Links the file from the relative source to the relative destination. If
+    # the destination is not given it's assumed to be equal to the source.
+    #
+    # ==== Parameters
+    # source<String>:: the relative path to the source root.
+    # destination<String>:: the relative path to the destination root.
+    # config<Hash>:: give :verbose => false to not log the status.
+    #
+    # ==== Examples
+    #
+    #   link_file "README", "doc/README"
+    #
+    #   link_file "doc/README"
+    #
+    def link_file(source, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
+      destination = args.first || source
+      source = File.expand_path(find_in_source_paths(source.to_s))
+
+      create_link destination, source, config
+    end
+
     # Gets the content at the given address and places it at the given relative
     # destination. If a block is given instead of destination, the content of
     # the url is yielded and used as location.

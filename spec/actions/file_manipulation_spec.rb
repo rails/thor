@@ -80,6 +80,29 @@ describe Thor::Actions do
     end
   end
 
+  describe "#link_file" do
+    it "links file from source to default destination" do
+      action :link_file, "task.thor"
+      exists_and_identical?("task.thor", "task.thor")
+    end
+
+    it "links file from source to the specified destination" do
+      action :link_file, "task.thor", "foo.thor"
+      exists_and_identical?("task.thor", "foo.thor")
+    end
+
+    it "links file from the source relative to the current path" do
+      runner.inside("doc") do
+        action :link_file, "README"
+      end
+      exists_and_identical?("doc/README", "doc/README")
+    end
+
+    it "logs status" do
+      action(:link_file, "task.thor").should == "      create  task.thor\n"
+    end
+  end
+
   describe "#get" do
     it "copies file from source to the specified destination" do
       action :get, "doc/README", "docs/README"

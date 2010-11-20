@@ -14,24 +14,19 @@ class Thor
     #
     # ==== Examples
     #
-    #   create_file "lib/fun_party.rb" do
-    #     hostname = ask("What is the virtual hostname I should use?")
-    #     "vhost.name = #{hostname}"
-    #   end
+    #   create_link "config/apache.conf", "/etc/apache.conf"
     #
-    #   create_file "config/apache.conf", "your apache config"
-    #
-    def create_file(destination, *args, &block)
+    def create_link(destination, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
-      data = args.first
-      action CreateFile.new(self, destination, block || data.to_s, config)
+      source = args.first
+      action CreateLink.new(self, destination, source, config)
     end
-    alias :add_file :create_file
+    alias :add_link :create_link
 
     # AddFile is a subset of Template, which instead of rendering a file with
     # ERB, it gets the content from the user.
     #
-    class CreateFile < EmptyDirectory #:nodoc:
+    class CreateLink < EmptyDirectory #:nodoc:
       attr_reader :data
 
       def initialize(base, destination, data, config={})
@@ -42,7 +37,13 @@ class Thor
       def invoke!
         invoke_with_conflict_check do
           FileUtils.mkdir_p(File.dirname(destination))
-          File.open(destination, 'wb') { |f| f.write render }
+          # Create a symlink by default
+          config[:symbolic] ||= true
+          if config[:symbolic]
+            File.symlink(render, destination)
+          else
+            File.link(render, destination)
+          end
         end
         given_destination
       end
