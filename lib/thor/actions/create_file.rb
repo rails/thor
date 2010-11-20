@@ -39,14 +39,6 @@ class Thor
         super(base, destination, config)
       end
 
-      def invoke!
-        invoke_with_conflict_check do
-          FileUtils.mkdir_p(File.dirname(destination))
-          File.open(destination, 'wb') { |f| f.write render }
-        end
-        given_destination
-      end
-
       # Checks if the content of the file at the destination is identical to the rendered result.
       #
       # ==== Returns
@@ -54,6 +46,14 @@ class Thor
       #
       def identical?
         exists? && File.binread(destination) == render
+      end
+
+      def invoke!
+        invoke_with_conflict_check do
+          FileUtils.mkdir_p(File.dirname(destination))
+          File.open(destination, 'wb') { |f| f.write render }
+        end
+        given_destination
       end
 
       include CreationUtils
