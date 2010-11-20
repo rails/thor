@@ -1,13 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'diff-lcs'
-gem 'jeweler'
-gem 'fakeweb'
-gem 'rake'
-gem 'rdoc'
-gem 'rspec'
-gem 'simplecov'
-gem 'thor'
+gemspec
 
 platforms :mri_18 do
   gem "ruby-debug", ">= 0.10.3"

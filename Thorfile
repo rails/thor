@@ -1,57 +1,24 @@
 # enconding: utf-8
-
-require File.join(File.dirname(__FILE__), "lib", "thor", "version")
 require 'thor/rake_compat'
-require 'rspec/core/rake_task'
-
-GEM_NAME = 'thor'
-EXTRA_RDOC_FILES = ["README.md", "LICENSE", "CHANGELOG.rdoc", "Thorfile"]
 
 class Default < Thor
   include Thor::RakeCompat
 
+  require 'rspec/core/rake_task'
   RSpec::Core::RakeTask.new(:spec)
 
-  begin
-    require 'rdoc/task'
-  rescue LoadError
-  end
+  require 'bundler'
+  Bundler::GemHelper.install_tasks
+
+  require 'rdoc/task'
   if defined?(RDoc)
     RDoc::Task.new do |rdoc|
-      rdoc.main     = "README.rdoc"
-      rdoc.rdoc_dir = "rdoc"
-      rdoc.title    = GEM_NAME
-      rdoc.rdoc_files.include(*EXTRA_RDOC_FILES)
+      rdoc.main     = 'README.md'
+      rdoc.rdoc_dir = 'rdoc'
+      rdoc.title    = 'thor'
+      rdoc.rdoc_files.include('README.md', 'LICENSE', 'CHANGELOG.rdoc', 'Thorfile')
       rdoc.rdoc_files.include('lib/**/*.rb')
       rdoc.options << '--line-numbers' << '--inline-source'
     end
-  end
-
-  begin
-    require 'jeweler'
-    Jeweler::Tasks.new do |s|
-      s.name = GEM_NAME
-      s.version = Thor::VERSION.dup
-      s.rubyforge_project = "textmate"
-      s.platform = Gem::Platform::RUBY
-      s.summary = "A scripting framework that replaces rake, sake and rubigen"
-      s.email = "ruby-thor@googlegroups.com"
-      s.homepage = "http://yehudakatz.com"
-      s.description = "A scripting framework that replaces rake, sake and rubigen"
-      s.authors = ['Yehuda Katz', 'José Valim']
-      s.has_rdoc = true
-      s.extra_rdoc_files = EXTRA_RDOC_FILES
-      s.require_path = 'lib'
-      s.bindir = "bin"
-      s.executables = %w( thor rake2thor )
-      s.files = s.extra_rdoc_files + Dir.glob("{bin,lib}/**/*")
-      s.test_files.include 'spec/**/*'
-      s.test_files.include 'spec/fixtures/doc/components/.empty_directory'
-      s.test_files.exclude 'spec/sandbox/**/*'
-    end
-
-    Jeweler::GemcutterTasks.new
-  rescue LoadError
-    puts "Jeweler, or one of its dependencies, is not available. Install it with: gem install jeweler"
   end
 end
