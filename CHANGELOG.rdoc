@@ -1,4 +1,5 @@
 == 0.14, released 2010-07-25
+
 * Added CreateLink class and #link_file method 
 * Made Thor::Actions#run use system as default method for system calls
 * Allow use of private methods from superclass as tasks 
