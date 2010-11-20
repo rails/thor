@@ -13,6 +13,7 @@ GEM
     linecache (0.43)
     linecache19 (0.5.11)
       ruby_core_source (>= 0.1.4)
+    rake (0.8.7)
     rdoc (2.5.11)
     rspec (2.1.0)
       rspec-core (~> 2.1.0)
@@ -47,6 +48,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.0)
   fakeweb (~> 1.3)
+  rake (>= 0.8)
   rdoc (~> 2.5)
   rspec (~> 2.1)
   ruby-debug (>= 0.10.3)

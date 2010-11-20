@@ -1,10 +1,12 @@
 require 'fileutils'
 require 'uri'
 require 'thor/core_ext/file_binary_read'
-
-Dir[File.join(File.dirname(__FILE__), "actions", "*.rb")].each do |action|
-  require action
-end
+require 'thor/actions/create_file'
+require 'thor/actions/create_link'
+require 'thor/actions/directory'
+require 'thor/actions/empty_directory'
+require 'thor/actions/file_manipulation'
+require 'thor/actions/inject_into_file'
 
 class Thor
   module Actions

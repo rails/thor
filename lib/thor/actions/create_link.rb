@@ -1,4 +1,4 @@
-require 'thor/actions/empty_directory'
+require 'thor/actions/create_file'
 
 class Thor
   module Actions
