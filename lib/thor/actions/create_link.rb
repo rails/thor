@@ -39,6 +39,7 @@ class Thor
           FileUtils.mkdir_p(File.dirname(destination))
           # Create a symlink by default
           config[:symbolic] ||= true
+          File.unlink(destination) if exists?
           if config[:symbolic]
             File.symlink(render, destination)
           else
