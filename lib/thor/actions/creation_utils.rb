@@ -1,15 +1,6 @@
 class Thor
   module Actions
     module CreationUtils
-      # Checks if the content of the file at the destination is identical to the rendered result.
-      #
-      # ==== Returns
-      # Boolean:: true if it is identical, false otherwise.
-      #
-      def identical?
-        exists? && File.binread(destination) == render
-      end
-
       # Holds the content to be added to the file.
       #
       def render
