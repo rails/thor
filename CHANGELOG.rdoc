@@ -1,3 +1,14 @@
+== 0.14, released 2010-07-25
+* Added CreateLink class and #link_file method 
+* Made Thor::Actions#run use system as default method for system calls
+* Allow use of private methods from superclass as tasks 
+* Added mute(&block) method which allows to run block without any output
+* Removed config[:pretend]
+* Enabled underscores for command line switches
+* Added Thor::Base.basename which is used by both Thor.banner and Thor::Group.banner
+* Deprecated invoke() without arguments
+* Added :only and :except to check_unknown_options
+
 == 0.13, released 2010-02-03
 
 * Added :lazy_default which is only triggered if a switch is given
