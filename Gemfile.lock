@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    thor (0.14.5)
+    thor (0.14.6)
 
 GEM
   remote: http://rubygems.org/
@@ -43,6 +43,7 @@ GEM
     simplecov-html (0.3.9)
 
 PLATFORMS
+  java
   ruby
 
 DEPENDENCIES
