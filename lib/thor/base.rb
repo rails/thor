@@ -94,8 +94,6 @@ class Thor
     end
 
     module ClassMethods
-      attr_accessor :debugging
-
       def attr_reader(*) #:nodoc:
         no_tasks { super }
       end
@@ -384,11 +382,10 @@ class Thor
       #   script.invoke(:task, first_arg, second_arg, third_arg)
       #
       def start(given_args=ARGV, config={})
-        self.debugging = given_args.delete("--debug")
         config[:shell] ||= Thor::Base.shell.new
         dispatch(nil, given_args.dup, nil, config)
       rescue Thor::Error => e
-        debugging ? (raise e) : config[:shell].error(e.message)
+        ENV["THOR_DEBUG"] == "1" ? (raise e) : config[:shell].error(e.message)
         exit(1) if exit_on_failure?
       end
 

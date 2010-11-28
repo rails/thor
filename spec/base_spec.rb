@@ -227,10 +227,15 @@ describe Thor::Base do
   end
 
   describe "#start" do
-    it "raises an error instead of rescueing if --debug is given" do
-      lambda {
-        MyScript.start ["what", "--debug"]
-      }.should raise_error(Thor::UndefinedTaskError, 'Could not find task "what" in "my_script" namespace.')
+    it "raises an error instead of rescueing if THOR_DEBUG=1 is given" do
+      begin
+        ENV["THOR_DEBUG"] = 1
+        lambda {
+          MyScript.start ["what", "--debug"]
+        }.should raise_error(Thor::UndefinedTaskError, 'Could not find task "what" in "my_script" namespace.')
+      rescue
+        ENV["THOR_DEBUG"] = nil
+      end
     end
 
     it "does not steal args" do
