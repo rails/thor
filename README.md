@@ -157,8 +157,8 @@ When invoking the task one:
     thor counter:one
 
 The output is "1 2 3", which means that the three task was invoked only once.  
-You can even invoke tasks from another class, so be sure to check the
-[documentation](http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor.html).
+You can even invoke tasks from another class, so be sure to check the documentation
+[documentation](http://rdoc.info/github/wycats/thor) for Thor class.
 
 Notice invocations do not share the same object. I.e, Thor will instantiate Counter once to invoke the task one, then, it instantiates another to invoke the task two and another for task three. This happens to allow options and arguments to parsed again. For example, if two and three have different options and both of them were given to the command line, calling invoke makes them be parsed each time and used accordingly by each task.
 
@@ -242,7 +242,7 @@ To use them, you just need to include Thor::Actions in your Thor classes:
 
 Some actions like copy file requires that a class method called source_root is
 defined in your class.  This is the directory where your templates should be
-placed.  Be sure to check the documentation on [actions](http://rdoc.info/rdoc/wycats/thor/blob/f939a3e8a854616784cac1dcff04ef4f3ee5f7ff/Thor/Actions.html).
+placed.  Be sure to check the documentation on [Thor::Actions](http://rdoc.info/github/wycats/thor).
 
 ## Generators
 
