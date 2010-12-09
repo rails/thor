@@ -39,7 +39,7 @@ class Thor
       #
       def ask(statement, color=nil)
         say("#{statement} ", color)
-        $stdin.gets.strip
+        stdin.gets.strip
       end
 
       # Say (print) something to the user. If the sentence ends with a whitespace
@@ -56,11 +56,11 @@ class Thor
         spaces = "  " * padding
 
         if force_new_line
-          $stdout.puts(spaces + message)
+          stdout.puts(spaces + message)
         else
-          $stdout.print(spaces + message)
+          stdout.print(spaces + message)
         end
-        $stdout.flush
+        stdout.flush
       end
 
       # Say a status with the given color and appends the message. Since this
@@ -76,8 +76,8 @@ class Thor
         status = status.to_s.rjust(12)
         status = set_color status, color, true if color
 
-        $stdout.puts "#{status}#{spaces}#{message}"
-        $stdout.flush
+        stdout.puts "#{status}#{spaces}#{message}"
+        stdout.flush
       end
 
       # Make a question the to user and returns true if the user replies "y" or
@@ -128,7 +128,7 @@ class Thor
           end
 
           sentence = truncate(sentence, options[:truncate]) if options[:truncate]
-          $stdout.puts sentence
+          stdout.puts sentence
         end
       end
 
@@ -154,9 +154,9 @@ class Thor
 
         paras.each do |para|
           para.split("\n").each do |line|
-            $stdout.puts line.insert(0, " " * ident)
+            stdout.puts line.insert(0, " " * ident)
           end
-          $stdout.puts unless para == paras.last
+          stdout.puts unless para == paras.last
         end
       end
 
@@ -200,7 +200,7 @@ class Thor
       # will be rescued and wrapped in the method below.
       #
       def error(statement)
-        $stderr.puts statement
+        stderr.puts statement
       end
 
       # Apply color to the given string with optional bold. Disabled in the
@@ -211,6 +211,18 @@ class Thor
       end
 
       protected
+
+        def stdout
+          $stdout
+        end
+
+        def stdin
+          $stdin
+        end
+
+        def stderr
+          $stderr
+        end
 
         def is?(value) #:nodoc:
           value = value.to_s
