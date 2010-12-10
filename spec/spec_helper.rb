@@ -9,6 +9,7 @@ end
 $:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 require 'thor'
 require 'thor/group'
+require 'thor/wrapper'
 require 'stringio'
 
 require 'rdoc'
@@ -27,6 +28,7 @@ load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "group.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "invoke.thor")
+load File.join(File.dirname(__FILE__), "fixtures", "wrapper.thor")
 
 RSpec.configure do |config|
   def capture(stream)
