@@ -232,7 +232,7 @@ classes extend the tasks available through other commands. That is, the wrapper 
 define its own tasks, which are added to (or override) those provided by the wrapped ("parent")
 command. So, for instance:
 
-	class Foo < Thor::Wrapper
+	class Wrapping < Thor::Wrapper
 	  wraps "textmate"
 		
 	  desc "bar", "Do cool stuff"
@@ -251,39 +251,40 @@ tasks. These will override the definition of any corresponding <tt>textmate</tt>
 exist. Assuming that <tt>textmate</tt> is Yehuda Katz's textmate script 
 (https://github.com/wycats/textmate), then the following behavior occurs:
 
-    > foo help
+    > wrapping help
 	Tasks:
-	  bar              # Do cool stuff
-	  help [TASK]      # Describe available tasks or one specific task
-	  install NAME     # Install a bundle. Source must be one of trunk, review, github, or per...
-	  list [SEARCH]    # lists all the bundles installed locally
-	  reload           # Reloads TextMate Bundles
-	  search [SEARCH]  # Lists all the matching remote bundles
-	  uninstall NAME   # uninstall a bundle
-	  update           # Hijack the update command
+	  wrapping bar              # Do cool stuff
+	  wrapping help [TASK]      # Describe available tasks or one specific task
+	  wrapping install NAME     # Install a bundle. Source must be one of trunk, review, github, or per...
+	  wrapping list [SEARCH]    # lists all the bundles installed locally
+	  wrapping reload           # Reloads TextMate Bundles
+	  wrapping search [SEARCH]  # Lists all the matching remote bundles
+	  wrapping uninstall NAME   # uninstall a bundle
+	  wrapping update           # Hijack the update command
 
-	> foo help list
+	> wrapping help list
 	Usage:
-	  textmate list [SEARCH]
+	  wrapping list [SEARCH]
 
 	lists all the bundles installed locally	
-	> foo help update
+	> wrapping help update
 	Usage:
-	  foo update
+	  wrapping update
 
 	Hijack the update command
-	> foo update
+	> wrapping update
 	Oh no, you didn't
-	> foo list
+	> wrapping list
 	
 	User Bundles
 	------------
 	...
 	>
 	
-Thor::Wrapper defines some convenience methods, including <tt>parent</tt>, <tt>wrap</tt> and 
-<tt>forward</tt>. <tt>parent</tt> returns the name of the parent command ("textmate" in the example
-above). <tt>wrap</tt> and <tt>forward</tt> pass a command along to the parent command. In the
+Thor::Wrapper defines some convenience methods, including <tt>parent</tt>, <tt>parent_path</tt>, 
+<tt>wrap</tt> and <tt>forward</tt>. <tt>parent</tt> returns the name of the parent command ("textmate" in 
+the example above). <tt>parent_path</tt> returns the path of the parent command, as determined by the 
+active load path. <tt>wrap</tt> and <tt>forward</tt> pass a command along to the parent command. In the
 example above,<tt>forward("update")</tt> would run the <tt>textmate update</tt> command 
 (that is, the original version, without the override defined in class Foo). The difference between 
 <tt>wrap</tt> and <tt>forward</tt> lies in how the command is invoked -- <tt>wrap</tt> uses backticks, 
