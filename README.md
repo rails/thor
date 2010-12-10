@@ -227,27 +227,77 @@ Both argument and class_options methods are available to Thor class as well.
 
 ## Thor::Wrapper
 
-Thor can also "wrap" the function of other commands, using the Thor::Wrapper class. Thor
-"wrapper" scripts created using the Thor::Wrapper class extend the subcommands available 
-through other commands. That is, the wrapper script can define its own subcommands, in addition
-to (or overriding) those provided by the base (or "parent") command. So, for instance:
+Thor can also "wrap" the function of other commands, using the Thor::Wrapper class. Wapper 
+classes extend the tasks available through other commands. That is, the wrapper class can 
+define its own tasks, which are added to (or override) those provided by the wrapped ("parent")
+command. So, for instance:
 
 	class Foo < Thor::Wrapper
-	  wraps "/usr/bin/textmate"
+	  wraps "textmate"
 		
 	  desc "bar", "Do cool stuff"
 	  def bar
 		puts "plugh"
 	  end
 	
-	  desc "list", "Hijack the list command"
-	  def list
+	  desc "update", "Hijack the update command"
+	  def update
 	    puts "Oh no, you didn't"
 	  end
 	end
 
-Adds a "plugh" command
+This wraps the existing <tt>textmate</tt> command, defining <tt>bar</tt> and <tt>update</tt> 
+tasks. These will override the definition of any corresponding <tt>textmate</tt> tasks, if they
+exist. Assuming that <tt>textmate</tt> is Yehuda Katz's textmate script 
+(https://github.com/wycats/textmate), then the following behavior occurs:
 
+    > foo help
+	Tasks:
+	  bar              # Do cool stuff
+	  help [TASK]      # Describe available tasks or one specific task
+	  install NAME     # Install a bundle. Source must be one of trunk, review, github, or per...
+	  list [SEARCH]    # lists all the bundles installed locally
+	  reload           # Reloads TextMate Bundles
+	  search [SEARCH]  # Lists all the matching remote bundles
+	  uninstall NAME   # uninstall a bundle
+	  update           # Hijack the update command
+
+	> foo help list
+	Usage:
+	  textmate list [SEARCH]
+
+	lists all the bundles installed locally	
+	> foo help update
+	Usage:
+	  foo update
+
+	Hijack the update command
+	> foo update
+	Oh no, you didn't
+	> foo list
+	
+	User Bundles
+	------------
+	...
+	>
+	
+Thor::Wrapper defines some convenience methods, including <tt>parent</tt>, <tt>wrap</tt> and 
+<tt>forward</tt>. <tt>parent</tt> returns the name of the parent command ("textmate" in the example
+above). <tt>wrap</tt> and <tt>forward</tt> pass a command along to the parent command. In the
+example above,<tt>forward("update")</tt> would run the <tt>textmate update</tt> command 
+(that is, the original version, without the override defined in class Foo). The difference between 
+<tt>wrap</tt> and <tt>forward</tt> lies in how the command is invoked -- <tt>wrap</tt> uses backticks, 
+and returns the output of the forwarded command, while <tt>forward</tt> uses <tt>system()<tt>, 
+and returns the return code of the command. These methods allow for Thor::Wrapper classes to wrap 
+behavior around other commands, for example:
+
+	desc "update", "Update with before and after hooks"
+	def update
+	  call_before_update_hook
+	  forward("update")
+	  call_after_update_hook
+	end
+	
 ## Actions
 
 Thor comes with several actions which helps with script and generator tasks.  You
