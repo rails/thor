@@ -1,25 +1,48 @@
 class Thor::Wrapper < Thor
   
   private 
-  
+
+  # Returns the name of the parent (overridden or wrapped) command.
   def parent
     self.class.parent
   end
   
+  # Forwards a command to the parent, using a system() call.
+  # Output from the command is written to $stdout, etc. 
+  # Returns the return code of the command.
+  #
+  # ==== Parameters
+  # args<Array>:: Arguments for the parent command.
   def forward(*args)
     self.class.forward(*args)
   end
   
+  # Forwards a command to the parent, using a backticks (``).
+  # Returns the output (from $stdout) of the command.
+  #
+  # ==== Parameters
+  # args<Array>:: Arguments for the parent command.
   def wrap(*args)
     self.class.wrap(*args)
   end
 
   class << self
         
+    # Define the command to be wrapped (the parent command).
+    # For example:
+    #
+    #    class Foo < Thor::Wrapper
+    #      wraps "/usr/bin/textmate"
+    #      ...
+    #    end
+    #
+    # ==== Parameters
+    # args<Array>:: Arguments for the parent command.
     def wraps(s)
       @parent = s
     end
 
+    # Returns the name of the parent (overridden or wrapped) command.
     def parent
       @parent
     end
@@ -28,25 +51,39 @@ class Thor::Wrapper < Thor
       forward(*ARGV)
     end
   
+    # Forwards a command to the parent, using a system() call.
+    # Output from the command is written to $stdout, etc. 
+    # Returns the return code of the command.
+    #
+    # ==== Parameters
+    # args<Array>:: Arguments for the parent command.
     def forward(*args)
       check_forward
       system forward_command(*args)
     end
     
+    # Forwards a command to the parent, using a backticks (``).
+    # Returns the output (from $stdout) of the command.
+    #
+    # ==== Parameters
+    # args<Array>:: Arguments for the parent command.
     def wrap(*args)
       check_forward
       `#{forward_command(*args)}`
     end
     
+    # Check that the parent command exists, and is executable.
+    # Raises a Thor::Error if it isn't
     def check_forward
       raise Thor::Error, "#{parent} is not installed" unless File.exists?(parent)
       raise Thor::Error, "#{parent} exists, but is not executable" unless File.executable?(parent)
     end
 
-    def forward_command(*args)
+    def forward_command(*args) #:nodoc:
       "#{parent} #{args.join(' ')}"
     end
 
+    # Returns tasks ready to be printed.
     def printable_tasks(all=true, subcommand=false)
       list = super
       Thor::Util.thor_classes_in(self).each do |klass|
@@ -67,6 +104,7 @@ class Thor::Wrapper < Thor
       list.map {|t| t[3..-1]}
     end
     
+    # Returns tasks of the parent command, ready to be printed.
     def parent_tasks
       (wrap('help').split("\n")[1..-1] || []).map do |t|
         raise Thor::Error, "Unexpected help response from #{parent}: #{t}" unless t =~ /^\s*([^\s]+)\s+(([^\s]+)(?:\s+(?:\S.*?))?)\s*(#.*?)\s*$/
@@ -74,6 +112,12 @@ class Thor::Wrapper < Thor
       end
     end
 
+    # Prints help information for the given task.
+    #
+    # ==== Parameters
+    # shell<Thor::Shell>
+    # task_name<String>
+    #
     def task_help(shell, task_name)
       meth = normalize_task_name(task_name)
       if all_tasks[meth]
