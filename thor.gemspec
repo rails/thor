@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.name = 'thor'
   s.version = Thor::VERSION.dup
   s.required_rubygems_version = Gem::Requirement.new(">= 1.3.6") if s.respond_to? :required_rubygems_version=
-  s.authors = ['Yehuda Katz', 'José Valim']
+  s.authors = ['Yehuda Katz', 'José Valim', 'Richard LeBer']
   s.description = %q{A scripting framework that replaces rake, sake and rubigen}
   s.email = ['ruby-thor@googlegroups.com']
   s.extra_rdoc_files = extra_rdoc_files

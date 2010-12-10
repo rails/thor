@@ -225,6 +225,29 @@ You can also give options to Thor::Group, but instead of using <tt>method_option
 and <tt>method_options</tt>, you should use <tt>class_option</tt> and <tt>class_options</tt>.
 Both argument and class_options methods are available to Thor class as well.
 
+## Thor::Wrapper
+
+Thor can also "wrap" the function of other commands, using the Thor::Wrapper class. Thor
+"wrapper" scripts created using the Thor::Wrapper class extend the subcommands available 
+through other commands. That is, the wrapper script can define its own subcommands, in addition
+to (or overriding) those provided by the base (or "parent") command. So, for instance:
+
+	class Foo < Thor::Wrapper
+	  wraps "/usr/bin/textmate"
+		
+	  desc "bar", "Do cool stuff"
+	  def bar
+		puts "plugh"
+	  end
+	
+	  desc "list", "Hijack the list command"
+	  def list
+	    puts "Oh no, you didn't"
+	  end
+	end
+
+Adds a "plugh" command
+
 ## Actions
 
 Thor comes with several actions which helps with script and generator tasks.  You

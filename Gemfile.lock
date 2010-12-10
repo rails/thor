@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    thor (0.14.6)
+    thor (0.14.7)
 
 GEM
   remote: http://rubygems.org/

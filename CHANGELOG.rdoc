@@ -1,3 +1,7 @@
+= 0.14.7, candidate by Richard LeBer, 2010-12-10
+
+* Added Thor::Wrapper class for "wrapping" and overriding existing programs
+
 == 0.14, released 2010-07-25
 
 * Added CreateLink class and #link_file method 
