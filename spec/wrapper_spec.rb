@@ -140,6 +140,24 @@ describe Thor::Wrapper do
     def shell
       @shell ||= Thor::Base.shell.new
     end
+    
+    # Length of content line, excluding trailing '...' if any
+    def content_length(line)
+      line[/(.*?)(?:\.\.\.\s*$)?/,1].length
+    end
+    
+    def max_content_length(output)
+      output.split("\n").map{|line| content_length(line)}.max
+    end
+    
+    def trim_to(output, width)
+      output.split("\n").map{|line| line[0, width]}.join("\n")
+    end
+    
+    def should_equal_trimmed(res, expected)
+      trim_width = [max_content_length(res), max_content_length(expected)].min
+      trim_to(res, trim_width).should == trim_to(expected, trim_width)
+    end
 
     before :each do 
       # Mock the help text of the parent command
@@ -157,11 +175,16 @@ END
       Wrapping.should_receive(:wrap).with("help").and_return(parent_help)
     end
     
-    it "returns help for the command and the parent, combined" do
-      $stderr.puts "Testing help"
+    it "does not prefix help usage with namespace" do
       $thor_runner = false
-      res = capture(:stdout) { Wrapping.help(shell) }
-      res.should == <<END
+      res = capture(:stdout) { Wrapping.start(["help"]) }
+      res.should =~ /^\s+thor\s+bar/
+    end
+  
+    it "returns help for the command and the parent, combined" do
+      $thor_runner = false
+      res = capture(:stdout) { Wrapping.start(["help"]) }
+      expected = <<END
 Tasks:
   thor bar              # Do cool stuff
   thor help [TASK]      # Describe available tasks or one specific task
@@ -173,6 +196,23 @@ Tasks:
   thor update           # Hijack the update command
 
 END
+      should_equal_trimmed res, expected
+    end
+  end
+    
+  describe "Thor::Runner" do
+    describe "['installed']" do
+      it "prints the child and parent tasks in the list" do
+        res = capture(:stdout) { Thor::Runner.start(["installed"]) }
+        res =~ /wrapping\n-+\nthor\s+bar.*thor\s+reload/m
+      end
+    end
+    
+    describe "['list']" do
+      it "prints the child and parent tasks in the list" do
+        res = capture(:stdout) { Thor::Runner.start(["list"]) }
+        res =~ /wrapping\n-+\nthor\s+bar.*thor\s+reload/m
+      end
     end
   end
 end

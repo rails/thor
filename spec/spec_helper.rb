@@ -34,9 +34,6 @@ load File.join(File.dirname(__FILE__), "fixtures", "wrapper.thor")
 class Object
   alias_method :old_backquote, :`
   def `(cmd)
-    # $stderr.puts
-    # $stderr.puts "Object#\`(#{cmd.inspect})"
-    # $stderr.puts
     case cmd
     when "which #{WRAPPED_COMMAND.inspect}" # Issued by Thor::Wrapper when locating parent
       WRAPPED_PATH

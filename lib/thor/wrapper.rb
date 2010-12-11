@@ -122,11 +122,8 @@ class Thor::Wrapper < Thor
     # Returns tasks ready to be printed.
     def printable_tasks(all=true, subcommand=false)
       list = child_and_subclass_task_specs(all, subcommand).map{|t| t.unshift('child')}
-      list += parent_task_specs.map{|t| t.unshift('parent')}
+      list += parent_task_specs.map{|t| t[1..-1].unshift(basename).unshift('parent')}
       sorted_list = list.sort_by {|t| [t[1], t[2], t[0]]} # Note that child tasks come before parent tasks
-      $stderr.puts
-      $stderr.puts sorted_list.inspect
-      $stderr.puts
       # Override parent task definitions with child task definitions
       task_definitions = sorted_list.inject({}) do |hsh, task|
         hsh[task[2]] = task unless hsh[task[2]]
