@@ -159,9 +159,10 @@ describe Thor::Wrapper do
       trim_to(res, trim_width).should == trim_to(expected, trim_width)
     end
 
-    before :each do 
-      # Mock the help text of the parent command
-      parent_help = <<END
+    describe " (no task)" do
+      before :each do 
+        # Mock the help text of the parent command
+        parent_help = <<END
 Tasks:
   textmate help [TASK]      # Describe available tasks or one specific task
   textmate install NAME     # Install a bundle. Source must be one of trunk, review, github, or personal. If multiple...
@@ -172,19 +173,19 @@ Tasks:
   textmate update           # updates all installed bundles
 
 END
-      Wrapping.should_receive(:wrap).with("help").and_return(parent_help)
-    end
+        Wrapping.should_receive(:wrap).with("help").and_return(parent_help)
+      end
     
-    it "does not prefix help usage with namespace" do
-      $thor_runner = false
-      res = capture(:stdout) { Wrapping.start(["help"]) }
-      res.should =~ /^\s+thor\s+bar/
-    end
+      it "does not prefix help usage with namespace" do
+        $thor_runner = false
+        res = capture(:stdout) { Wrapping.start(["help"]) }
+        res.should =~ /^\s+thor\s+bar/
+      end
   
-    it "returns help for the command and the parent, combined" do
-      $thor_runner = false
-      res = capture(:stdout) { Wrapping.start(["help"]) }
-      expected = <<END
+      it "returns help for the command and the parent, combined" do
+        $thor_runner = false
+        res = capture(:stdout) { Wrapping.start(["help"]) }
+        expected = <<END
 Tasks:
   thor bar              # Do cool stuff
   thor help [TASK]      # Describe available tasks or one specific task
@@ -196,7 +197,52 @@ Tasks:
   thor update           # Hijack the update command
 
 END
-      should_equal_trimmed res, expected
+        should_equal_trimmed res, expected
+      end
+    end
+  
+    describe " task" do
+      it "returns task help for commands from the child" do
+        $thor_runner = false
+        Wrapping.should_not_receive(:wrap)
+        res = capture(:stdout) { Wrapping.start(["help", "bar"]) }
+        expected = <<END
+Usage:
+  thor bar
+
+Do cool stuff
+END
+        res.should == expected
+      end
+
+      it "returns task help for commands from the parent, with the command name overridden" do
+        $thor_runner = false
+        parent_help = <<END
+Usage:
+  textmate reload
+
+Options:
+  [--verbose]  
+
+Reloads TextMate Bundles
+END
+        Wrapping.should_receive(:wrap).with("help", "reload").and_return(parent_help)
+        res = capture(:stdout) { Wrapping.start(["help", "reload"]) }
+        res.should == parent_help.gsub(/\btextmate\b/,'thor')
+      end
+
+      it "returns task help for commands overridden by the child" do
+        $thor_runner = false
+        Wrapping.should_not_receive(:wrap)
+        res = capture(:stdout) { Wrapping.start(["help", "update"]) }
+        expected = <<END
+Usage:
+  thor update
+
+Hijack the update command
+END
+        res.should == expected
+      end
     end
   end
     

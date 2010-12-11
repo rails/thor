@@ -155,7 +155,7 @@ class Thor::Wrapper < Thor
       if all_tasks[meth]
         super
       else
-        forward("help", task_name)
+        shell.say wrap("help", task_name).gsub(parent,basename)
       end
     end
   end
