@@ -60,7 +60,7 @@ class Thor::Wrapper < Thor
     end
 
     def handle_no_task_error(task) #:nodoc:
-      forward(task, *arguments)
+      forward(task, *original_arguments[1..-1])
     end
   
     # Forwards a command to the parent, using a system() call.

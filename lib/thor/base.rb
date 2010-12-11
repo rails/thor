@@ -383,10 +383,17 @@ class Thor
       #
       def start(given_args=ARGV, config={})
         config[:shell] ||= Thor::Base.shell.new
+        @original_arguments = given_args
         dispatch(nil, given_args.dup, nil, config)
       rescue Thor::Error => e
         ENV["THOR_DEBUG"] == "1" ? (raise e) : config[:shell].error(e.message)
         exit(1) if exit_on_failure?
+      end
+      
+      # Returns the original value of the arguments passed to the start method.
+      # Useful for Thor::Wrapper
+      def original_arguments
+        @original_arguments
       end
 
       # Allows to use private methods from parent in child classes as tasks.
