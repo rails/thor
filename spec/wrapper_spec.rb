@@ -261,4 +261,45 @@ END
       end
     end
   end
+
+  describe " task invocation" do
+    describe " of tasks defined in the child" do
+      it "invokes the child task" do
+        res = capture(:stdout) { Wrapping.start(["bar"]) }
+        res.should == "plugh\n"
+      end
+      
+      it "does not invoke the parent task" do
+        Wrapping.should_not_receive(:forward)
+        Wrapping.should_not_receive(:wrap)
+        capture(:stdout) { Wrapping.start(["bar"]) }
+      end
+    end
+    
+    describe " of tasks overridden in the child" do
+      it "invokes the child task" do
+        res = capture(:stdout) { Wrapping.start(["update"]) }
+        res.should == "Oh no, you didn't\n"
+      end
+      
+      it "does not invoke the parent task" do
+        Wrapping.should_not_receive(:forward)
+        Wrapping.should_not_receive(:wrap)
+        capture(:stdout) { Wrapping.start(["update"]) }
+      end
+    end
+    
+    describe " of tasks defined in the parent" do
+      it "does not invoke the child task" do
+        Wrapping.stub!(:forward)
+        @wrapper.should_not_receive(:reload)
+      end
+      
+      it "invokes the parent task" do
+        Wrapping.should_receive(:forward).with("reload").once
+        Wrapping.should_not_receive(:wrap)
+        capture(:stdout) { Wrapping.start(["reload"]) }
+      end
+    end
+  end
 end

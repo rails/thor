@@ -13,12 +13,16 @@ class Wrapping < Thor::Wrapper
      
   desc "bar", "Do cool stuff"
   def bar
-	puts "plugh"
+	  res = "plugh"
+	  puts res
+	  res
   end
 
   desc "update", "Hijack the update command"
   def update
-    puts "Oh no, you didn't"
+    res = "Oh no, you didn't"
+    puts res
+    res
   end
 end
 
