@@ -133,7 +133,12 @@ class Thor
       end
 
       # Prints a long string, word-wrapping the text to the current width of the
-      # terminal display. Ideal for printing heredocs.
+      # terminal display. "\n\n" forces a paragraph break. Ideal for printing heredocs.
+      #
+      # If you want to override this wrapping behavior (e.g. for printing tables),
+      # the following tricks work:
+      # "\005" forces a single line break
+      # "\177" is a non-breaking and non-squeezed space
       #
       # ==== Parameters
       # String
