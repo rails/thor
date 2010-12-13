@@ -331,4 +331,21 @@ class Thor
   def help(task = nil, subcommand = false)
     task ? self.class.task_help(shell, task) : self.class.help(shell, subcommand)
   end
+
+  def initialize(*)
+    super
+    lazy_load_options!
+  end
+
+  no_task do
+    def lazy_load_options!
+      options = Thor::CoreExt::HashWithIndifferentAccess.new
+
+      @options.each do |key, value|
+        options[key] = (Proc === value ? value.call : value)
+      end
+
+      @options = options
+    end
+  end
 end
