@@ -94,7 +94,7 @@ class Thor::Wrapper < Thor
     end
 
     def forward_command(*args) #:nodoc:
-      "#{parent} #{args.join(' ')}"
+      "#{parent} #{args.map{|arg| arg.gsub(/ /,'\ ')}.join(' ')}"
     end
 
     # Returns tasks of the wrapper class (but not the parent)
