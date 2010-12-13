@@ -307,6 +307,12 @@ END
         capture(:stdout) { Wrapping.start(["reload", "foo"]) }
       end
 
+      it "invokes the parent task with parameters including spaces" do
+        Wrapping.should_receive(:forward).with("reload", "foo bar").once
+        Wrapping.should_not_receive(:wrap)
+        capture(:stdout) { Wrapping.start(["reload", "foo bar"]) }
+      end
+
       it "invokes the parent task with options" do
         Wrapping.should_receive(:forward).with("reload", "--foo=bar").once
         Wrapping.should_not_receive(:wrap)
