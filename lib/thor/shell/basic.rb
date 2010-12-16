@@ -117,7 +117,7 @@ class Thor
           formats << "%-#{maxima + 2}s"
         end
 
-        formats[0] = formats[0].insert(0, " " * ident)
+        formats[0] = formats[0].insert(0, " " * ident) if formats[0]
         formats << "%s"
 
         table.each do |row|

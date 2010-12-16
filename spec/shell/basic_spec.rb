@@ -149,6 +149,14 @@ abc         #123  first three
 xyz         #786  last three
 TABLE
     end
+
+    it "allows single column tables" do
+      content = capture(:stdout){ shell.print_table([["row 1"], ["row 2"]])}
+      content.should == <<-TABLE
+row 1
+row 2
+      TABLE
+    end
   end
 
   describe "#file_collision" do
