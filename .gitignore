@@ -1,8 +1,9 @@
-.bundle
 *.rbc
-/pkg
-/coverage
-/spec/sandbox
-/rdoc
+.bundle
 .idea
 .rvmrc
+/coverage
+/pkg
+/rdoc
+/spec/sandbox
+Gemfile.lock
