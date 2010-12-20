@@ -132,6 +132,25 @@ class Thor
       FileUtils.chmod_R(mode, path) unless options[:pretend]
     end
 
+    # Changes the owner and group of the given file or directory.
+    #
+    # ==== Parameters
+    # path<String>:: the name of the file to change owner and group
+    # user<String>:: the user
+    # group<String>:: the group
+    # config<Hash>:: give :verbose => false to not log the status.
+    #
+    # ==== Example
+    #
+    #   chown "script/*", "bob", "admin"
+    #
+    def chown(path, user, group, config={})
+      return unless behavior == :invoke
+      path = File.expand_path(path, destination_root)
+      say_status :chown, relative_to_original_destination_root(path), config.fetch(:verbose, true)
+      FileUtils.chown_R(user, group, path) unless options[:pretend]
+    end
+
     # Prepend text to a file. Since it depends on insert_into_file, it's reversible.
     #
     # ==== Parameters
