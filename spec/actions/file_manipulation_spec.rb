@@ -73,6 +73,29 @@ describe Thor::Actions do
     end
   end
 
+  describe "#chgrp" do
+    it "executes the command given" do
+      FileUtils.should_receive(:chown_R).with(nil, "group", file)
+      action :chgrp, "foo", "group"
+    end
+
+    it "does not execute the command if pretending given" do
+      FileUtils.should_not_receive(:chown_R)
+      runner(:pretend => true)
+      action :chgrp, "foo", "group"
+    end
+
+    it "logs status" do
+      FileUtils.should_receive(:chown_R).with(nil, "group", file)
+      action(:chgrp, "foo", "group").should == "       chgrp  foo\n"
+    end
+
+    it "does not log status if required" do
+      FileUtils.should_receive(:chown_R).with(nil, "group", file)
+      action(:chgrp, "foo", "group", :verbose => false).should be_empty
+    end
+  end
+
   describe "#copy_file" do
     it "copies file from source to default destination" do
       action :copy_file, "task.thor"
