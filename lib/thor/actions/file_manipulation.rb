@@ -128,7 +128,7 @@ class Thor
     def chmod(path, mode, config={})
       return unless behavior == :invoke
       path = File.expand_path(path, destination_root)
-      say_status :chmod, relative_to_original_destination_root(path), config.fetch(:verbose, true)
+      say_status :chmod, sprintf("%o %s", mode, relative_to_original_destination_root(path)), config.fetch(:verbose, true)
       FileUtils.chmod_R(mode, path) unless options[:pretend]
     end
 
@@ -147,7 +147,10 @@ class Thor
     def chown(path, user, group, config={})
       return unless behavior == :invoke
       path = File.expand_path(path, destination_root)
-      say_status :chown, relative_to_original_destination_root(path), config.fetch(:verbose, true)
+      message = "#{user}"
+      message << ":#{group}" if group
+      message << " #{relative_to_original_destination_root(path)}"
+      say_status :chown, message, config.fetch(:verbose, true)
       FileUtils.chown_R(user, group, path) unless options[:pretend]
     end
 
@@ -165,7 +168,7 @@ class Thor
     def chgrp(path, group, config={})
       return unless behavior == :invoke
       path = File.expand_path(path, destination_root)
-      say_status :chgrp, relative_to_original_destination_root(path), config.fetch(:verbose, true)
+      say_status :chgrp, "#{group} #{relative_to_original_destination_root(path)}", config.fetch(:verbose, true)
       FileUtils.chown_R(nil, group, path) unless options[:pretend]
     end
 
