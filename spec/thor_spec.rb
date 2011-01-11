@@ -61,7 +61,7 @@ describe Thor do
         end
 
         it "adds a task to the tasks list if the updated task is on the parent class" do
-          Scripts::MyScript.tasks["example_default_task"].should_not be_nil
+          Scripts::MyScript.tasks["example_default_task"].should be
         end
 
         it "clones the parent task" do
