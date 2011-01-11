@@ -48,7 +48,7 @@ describe Thor::Task do
     it "dup options hash" do
       task = Thor::Task.new("can_has", nil, nil, nil, :foo => true, :bar => :required)
       task.dup.options.delete(:foo)
-      task.options[:foo].should_not be_nil
+      task.options[:foo].should be
     end
   end
 
