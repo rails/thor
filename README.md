@@ -371,6 +371,31 @@ create two files: "devise/lib/devise.rb", and "devise/test/devise_test.rb".  The
 
 This will generate two files - "devise/lib/devise.rb" and "devise/spec/devise_spec.rb".
 
+## Making an executable
+
+You may want to make a script as an executable command. Let the line <tt>#{your thor class name}.start</tt> be the end of the script.
+
+Example: mythorcommand.rb
+
+    #!/usr/bin/env ruby
+    require "rubygems" # ruby1.9 doesn't "require" it though
+    require "thor"
+    class MyThorCommand < Thor
+      desc "foo", "Prints foo"
+      def one
+        puts "foo"
+      end
+    end
+    MyThorCommand.start
+
+Then make the script executable:
+
+    chmod a+x mythorcommand.rb
+
+Now you can type:
+
+    ./mythorcommand.rb foo
+
 ## Further Reading
 
 Thor offers many scripting possibilities beyond these examples.  Be sure to read
