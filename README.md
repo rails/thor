@@ -308,7 +308,7 @@ Example: mythorcommand.rb
     require "thor"
     class MyThorCommand < Thor
       desc "foo", "Prints foo"
-      def one
+      def foo
         puts "foo"
       end
     end
