@@ -32,14 +32,22 @@ class Thor
         @padding = [0, value].max
       end
 
-      # Ask something to the user and receives a response.
+      # Asks something to the user and receives a response.
+      #
+      # If asked to limit the correct responses, you can pass in an
+      # array of acceptable answers.  If one of those is not supplied,
+      # they will be shown a message stating that one of those answers
+      # must be given and reasked the question.
       #
       # ==== Example
       # ask("What is your name?")
       #
-      def ask(statement, color=nil)
-        say("#{statement} ", color)
-        stdin.gets.strip
+      # ask("What is your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])
+      #
+      def ask(statement, *args)
+        options = args.last.is_a?(Hash) ? args.pop : {}
+
+        options[:limited_to] ? ask_filtered(statement, options[:limited_to], *args) : ask_simply(statement, *args)
       end
 
       # Say (print) something to the user. If the sentence ends with a whitespace
@@ -297,6 +305,24 @@ HELP
           end
         end
 
+        def ask_simply(statement, color = nil)
+          say("#{statement} ", color)
+          stdin.gets.strip
+        end
+
+        def ask_filtered(statement, answer_set, *args)
+          correct_answer = nil
+
+          until correct_answer
+            answer = ask_simply("#{statement} #{answer_set.inspect}", *args)
+
+            correct_answer = answer_set.include?(answer) ? answer : nil
+
+            say("Your response must be one of: #{answer_set}. Please try again.") unless correct_answer
+          end
+
+          correct_answer
+        end
     end
   end
 end
