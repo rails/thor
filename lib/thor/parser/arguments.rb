@@ -28,7 +28,7 @@ class Thor
       @switches = arguments
 
       arguments.each do |argument|
-        if argument.default
+        if argument.default != nil
           @assigns[argument.human_name] = argument.default
         elsif argument.required?
           @non_assigned_required << argument
