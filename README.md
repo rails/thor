@@ -1,8 +1,8 @@
-# Thor 
+# Thor
 
 ## Description
 
-Thor is a simple and efficient tool for building self-documenting command line utilities.  It removes the pain of parsing command line options, writing "USAGE:" banners, and can also be used as an alternative to the [Rake](http://github.com/jimweirich/rake) build tool.  The syntax is Rake-like, so it should be familiar to most Rake users. 
+Thor is a simple and efficient tool for building self-documenting command line utilities.  It removes the pain of parsing command line options, writing "USAGE:" banners, and can also be used as an alternative to the [Rake](https://github.com/jimweirich/rake) build tool.  The syntax is Rake-like, so it should be familiar to most Rake users.
 
 ## Installation
 
@@ -18,4 +18,4 @@ Please see [the wiki](https://github.com/wycats/thor/wiki) for basic usage and o
 
 ## License
 
-Released under the MIT License.  See the LICENSE file for further details. 
+Released under the MIT License.  See the LICENSE file for further details.
