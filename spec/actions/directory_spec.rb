@@ -82,6 +82,13 @@ describe Thor::Actions::Directory do
       File.read(file).should == "FOO = FOO\n"
     end
 
+    it "copies directories and preserved file mode" do
+      invoke! "preserve", "preserved", :preserve => true
+      original = File.join(source_root, "preserve", "script.sh")
+      copy = File.join(destination_root, "preserved", "script.sh")
+      File.stat(original).mode.should == File.stat(copy).mode
+    end
+
     it "copies directories" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "components")
