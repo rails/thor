@@ -65,10 +65,9 @@ class Thor
       @required_options ||= options.map{ |_, o| o.usage if o.required? }.compact.sort.join(" ")
     end
 
-    # Given a target, checks if this class name is not a private/protected method.
+    # Given a target, checks if this class name is a public method.
     def public_method?(instance) #:nodoc:
-      collection = instance.private_methods + instance.protected_methods
-      (collection & [name.to_s, name.to_sym]).empty?
+      !(instance.public_methods & [name.to_s, name.to_sym]).empty?
     end
 
     def sans_backtrace(backtrace, caller) #:nodoc:
