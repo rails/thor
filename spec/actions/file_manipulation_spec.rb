@@ -68,6 +68,13 @@ describe Thor::Actions do
       exists_and_identical?("doc/README", "doc/README")
     end
 
+    it "copies file from source to default destination and preserves file mode" do
+      action :copy_file, "preserve/script.sh", :preserve => true
+      original = File.join(source_root, "preserve/script.sh")
+      copy = File.join(destination_root, "preserve/script.sh")
+      File.stat(original).mode.should == File.stat(copy).mode
+    end
+
     it "logs status" do
       action(:copy_file, "task.thor").should == "      create  task.thor\n"
     end
