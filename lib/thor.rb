@@ -26,7 +26,7 @@ class Thor
     # usage<String>:: Short usage for the subcommand
     # description<String>:: Description for the subcommand
     def register(klass, subcommand_name, usage, description, options={})
-      if klass <= Thor::Group
+      if Thor.const_defined?(:Group) && klass <= Thor::Group
         desc usage, description, options
         define_method(subcommand_name) { invoke klass }
       else
