@@ -1,7 +1,17 @@
+fhelp
 require 'thor/base'
 
 class Thor
   class << self
+    # Sets a banner for the class as a whole
+    #
+    # ==== Parameters
+    # text<String>:: The banner text
+    #
+    def class_banner(text)
+      @class_banner = text
+    end
+    
     # Sets the default task when thor is executed without an explicit task to be called.
     #
     # ==== Parameters
@@ -173,6 +183,7 @@ class Thor
     # shell<Thor::Shell>
     #
     def help(shell, subcommand = false)
+      shell.say @class_banner if @class_banner
       list = printable_tasks(true, subcommand)
       Thor::Util.thor_classes_in(self).each do |klass|
         list += klass.printable_tasks(false)

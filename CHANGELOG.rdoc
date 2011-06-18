@@ -1,3 +1,9 @@
+= 0.14.8, candidate by Richard LeBer, 2011-06-18
+
+* Fix problem with printing appropriate class help information for subcommands
+* Fixed unintended dependency of subcommands on Thor::Group
+* Add class banner method
+
 = 0.14.7, candidate by Richard LeBer, 2010-12-10
 
 * Added Thor::Wrapper class for "wrapping" and overriding existing programs
