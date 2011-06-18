@@ -5,7 +5,7 @@ class Thor
     # Sets the default task when thor is executed without an explicit task to be called.
     #
     # ==== Parameters
-    # meth<Symbol>:: name of the defaut task
+    # meth<Symbol>:: name of the default task
     #
     def default_task(meth=nil)
       case meth
