@@ -199,9 +199,14 @@ class Thor
     def subcommands
       @subcommands ||= from_superclass(:subcommands, [])
     end
+    
+    def parent_commands
+      @parent_commands ||= from_superclass(:parent_commands, [])
+    end
 
     def subcommand(subcommand, subcommand_class)
       self.subcommands << subcommand.to_s
+      subcommand_class.parent_commands << subcommand.to_s
       subcommand_class.subcommand_help subcommand
       define_method(subcommand) { |*args| invoke subcommand_class, args }
     end
