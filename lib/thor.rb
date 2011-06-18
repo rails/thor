@@ -1,4 +1,3 @@
-fhelp
 require 'thor/base'
 
 class Thor
