@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.description = %q{A scripting framework that replaces rake, sake and rubigen}
   s.email = 'ruby-thor@googlegroups.com'
   s.executables = `git ls-files -- bin/*`.split("\n").map{|f| File.basename(f)}
-  s.extra_rdoc_files = ['CHANGELOG.rdoc', 'LICENSE', 'README.md', 'Thorfile']
+  s.extra_rdoc_files = ['CHANGELOG.rdoc', 'LICENSE.md', 'README.md', 'Thorfile']
   s.files = `git ls-files`.split("\n")
   s.homepage = 'http://github.com/wycats/thor'
   s.name = 'thor'

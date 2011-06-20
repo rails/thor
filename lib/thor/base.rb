@@ -506,6 +506,7 @@ class Thor
         # and file into baseclass.
         def inherited(klass)
           Thor::Base.register_klass_file(klass)
+          klass.instance_variable_set(:@no_tasks, false)
         end
 
         # Fire this callback whenever a method is added. Added methods are
