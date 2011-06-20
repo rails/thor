@@ -522,7 +522,7 @@ class Thor
           return unless public_instance_methods.include?(meth) ||
                         public_instance_methods.include?(meth.to_sym)
 
-          return if @no_tasks || !create_task(meth)
+          return if (defined?(@no_tasks) && @no_tasks) || !create_task(meth)
 
           is_thor_reserved_word?(meth, :task)
           Thor::Base.register_klass_file(self)
