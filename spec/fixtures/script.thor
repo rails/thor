@@ -184,3 +184,22 @@ module Scripts
   end
 end
 
+class WithArgsOnDefaultTask < Thor
+  default_task :example_default_task, :args=>true
+  
+  banner "MyScript does really cool stuff"
+
+  map "-T" => :animal, ["-f", "--foo"] => :foo
+
+  desc "zoo", "zoo around"
+  def zoo
+    "zoo"
+  end
+
+  desc "example_default_task", "example!"
+  method_options :with => :string
+  def example_default_task(*args)
+    ["default task", options, args]
+  end
+end
+
