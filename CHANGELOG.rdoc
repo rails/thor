@@ -1,3 +1,8 @@
+= 0.14.9, candidate by Richard LeBer, 2011-06-21
+
+* Change Thor::class_banner to Thor::banner (and old Thor::banner to Thor::task_banner)
+* Allow default tasks, even if arguments are given
+
 = 0.14.8, candidate by Richard LeBer, 2011-06-18
 
 * Fix problem with printing appropriate class help information for subcommands

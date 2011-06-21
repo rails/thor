@@ -421,7 +421,7 @@ class Thor
       end
 
       def handle_argument_error(task, error) #:nodoc:
-        raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{self.banner(task).inspect}."
+        raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{self.task_banner(task).inspect}."
       end
 
       protected
