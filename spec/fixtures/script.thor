@@ -83,6 +83,13 @@ END
     [ name, options ]
   end
 
+  method_option :repeater, :type=>:string, :default='foo', :repeats=>true
+  method_option :other, :type=>:boolean
+  desc "with_repeater NAME", "invoke with optional name"
+  def with_repeater(name=nil)
+    [ name, options ]
+  end
+
   class AnotherScript < Thor
     desc "baz", "do some bazing"
     def baz
