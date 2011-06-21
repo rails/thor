@@ -102,8 +102,15 @@ describe Thor do
     it "inherits all mappings from parent" do
       MyChildScript.default_task.should == "example_default_task"
     end
-  end
 
+  end
+  describe "#banner" do
+    it "includes a class banner" do
+      content = capture(:stdout) { MyScript.start(["help"]) }
+      content.should =~ /MyScript does really cool stuff/m
+    end
+  end
+      
   describe "#desc" do
     it "provides description for a task" do
       content = capture(:stdout) { MyScript.start(["help"]) }
