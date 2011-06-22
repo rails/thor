@@ -294,8 +294,13 @@ class Thor
         elsif @default_task && @default_task_allows_args
           meth = @default_task
           task = all_tasks[normalize_task_name(meth)]
-          given_args = original_args # Restore original arguments (meth has been popped above)
-          args, opts = Thor::Options.split(given_args)
+          if task
+            given_args = original_args # Restore original arguments (meth has been popped above)
+            args, opts = Thor::Options.split(given_args)
+          else # Default task not found
+            args, opts = given_args, nil
+            task = Thor::DynamicTask.new(meth)
+          end
         else
           args, opts = given_args, nil
           task = Thor::DynamicTask.new(meth)

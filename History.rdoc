@@ -1,0 +1,3 @@
+=== 0.14.10 2011-06-22
+
+* Improve handling of invalid default_task
