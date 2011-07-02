@@ -1,3 +1,5 @@
+require 'pp'
+
 class Thor
   class Task < Struct.new(:name, :description, :long_description, :usage, :options)
     FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
@@ -114,7 +116,9 @@ class Thor
     end
 
     def run(instance, args=[])
-      if (instance.methods & [name.to_s, name.to_sym]).empty?
+      if name == '' # Missing task -- probably misnamed default task
+        instance.class.handle_no_task_error(instance.class.default_task)
+      elsif (instance.methods & [name.to_s, name.to_sym]).empty?
         super
       else
         instance.class.handle_no_task_error(name)
