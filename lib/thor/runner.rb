@@ -156,7 +156,7 @@ class Thor::Runner < Thor #:nodoc:
 
   private
 
-    def self.banner(task, all = false, subcommand = false)
+    def self.task_banner(task, all = false, subcommand = false)
       "thor " + task.formatted_usage(self, all, subcommand)
     end
 
