@@ -132,6 +132,12 @@ describe Thor do
     end
   end
 
+  describe "#bad_default_task" do
+    it "calls method missing if no command is specified" do
+      BadDefaultTask.start([]).should == [nil, []]
+    end
+  end
+
   describe "#map" do
     it "calls the alias of a method if one is provided" do
       MyScript.start(["-T", "fish"]).should == ["fish"]
