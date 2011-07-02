@@ -89,6 +89,32 @@ describe Thor do
     end
   end
 
+  describe "#default_task_with_args_allowed" do
+    it "sets a default task" do
+      WithArgsOnDefaultTask.default_task.should == "example_default_task"
+    end
+
+    it "invokes the default task if no command is specified" do
+      WithArgsOnDefaultTask.start([]).first.should == "default task"
+    end
+
+    it "invokes the default task if no command is specified even if switches are given" do
+      WithArgsOnDefaultTask.start(["--with", "option"])[1].should == {"with"=>"option"}
+    end
+
+    it "invokes the default task if no command is specified even if arguments are given" do
+      WithArgsOnDefaultTask.start(["foo", "bar"]).first.should == "default task"
+    end
+
+    it "passes arguments to the default task" do
+      WithArgsOnDefaultTask.start(["foo", "bar"]).last.should == ["foo", "bar"]
+    end
+
+    it "invokes other defined commands properly" do
+      WithArgsOnDefaultTask.start(["zoo"]).should == "zoo"
+    end
+  end
+
   describe "#map" do
     it "calls the alias of a method if one is provided" do
       MyScript.start(["-T", "fish"]).should == ["fish"]
