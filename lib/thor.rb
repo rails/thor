@@ -53,6 +53,7 @@ class Thor
     end
 
     # Defines the long description of the next task.
+    # Note: Thor normally wraps the long description. See Thor::Basic#print_wrapped for options
     #
     # ==== Parameters
     # long description<String>
