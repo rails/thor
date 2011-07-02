@@ -153,8 +153,8 @@ class Thor
 
         paras.map! do |unwrapped|
           unwrapped.strip.gsub(/\n/, " ").squeeze(" ").
-          gsub(/.{1,#{width}}(?:\s|\Z)/){($& + 5.chr).
-          gsub(/\n\005/,"\n").gsub(/\005/,"\n")}
+          gsub(/.{1,#{width}}(?:\s|\Z)/){($& + 5.chr)}.
+          gsub(/\n\005/,"\n").gsub(/\005/,"\n")
         end
 
         paras.each do |para|
