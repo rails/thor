@@ -14,15 +14,38 @@ class Thor
     # Sets the default task when thor is executed without an explicit task to be called.
     #
     # ==== Parameters
-    # meth<Symbol>:: name of the defaut task
+    # meth<Symbol>:: name of the default task
+    # options<Hash>:: options (see below)
     #
-    def default_task(meth=nil)
+    # ==== Options
+    # :args     - Use the default task, even if arguments are given. See example below
+    #
+    # ==== :args Option Example
+    #
+    #  class Foo < Thor
+    #    default_task :bar, :args=>true
+    #    def bar(*args)
+    #      puts "In bar: args=#{args.inspect}"
+    #    end
+    #  end
+    #  
+    #  > thor foo a b c
+    #  In bar: args=["a", "b", "c"]
+    #  >
+    #
+    #  Whereas, the same thing with "default_task :bar", would throw an UndefinedTaskError
+    #
+    # ==== Parameters
+    # text<String>:: The banner text
+    #
+    def default_task(meth=nil, options={})
       case meth
         when :none
           @default_task = 'help'
         when nil
           @default_task ||= from_superclass(:default_task, 'help')
         else
+          @default_task_allows_args = options[:args]
           @default_task = meth.to_s
       end
     end
@@ -262,10 +285,16 @@ class Thor
 
       # The method responsible for dispatching given the args.
       def dispatch(meth, given_args, given_opts, config) #:nodoc:
+        original_args = given_args.dup
         meth ||= retrieve_task_name(given_args)
         task = all_tasks[normalize_task_name(meth)]
 
         if task
+          args, opts = Thor::Options.split(given_args)
+        elsif @default_task && @default_task_allows_args
+          meth = @default_task
+          task = all_tasks[normalize_task_name(meth)]
+          given_args = original_args # Restore original arguments (meth has been popped above)
           args, opts = Thor::Options.split(given_args)
         else
           args, opts = given_args, nil
