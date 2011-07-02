@@ -2,6 +2,15 @@ require 'thor/base'
 
 class Thor
   class << self
+    # Sets a banner for the class as a whole
+    #
+    # ==== Parameters
+    # text<String>:: The banner text
+    #
+    def banner(text)
+      @class_banner = text
+    end
+    
     # Sets the default task when thor is executed without an explicit task to be called.
     #
     # ==== Parameters
@@ -156,7 +165,7 @@ class Thor
       handle_no_task_error(meth) unless task
 
       shell.say "Usage:"
-      shell.say "  #{banner(task)}"
+      shell.say "  #{task_banner(task)}"
       shell.say
       class_options_help(shell, nil => task.options.map { |_, o| o })
       if task.long_description
@@ -173,6 +182,7 @@ class Thor
     # shell<Thor::Shell>
     #
     def help(shell, subcommand = false)
+      shell.say @class_banner if @class_banner
       list = printable_tasks(true, subcommand)
       Thor::Util.thor_classes_in(self).each do |klass|
         list += klass.printable_tasks(false)
@@ -190,7 +200,7 @@ class Thor
       (all ? all_tasks : tasks).map do |_, task|
         next if task.hidden?
         item = []
-        item << banner(task, false, subcommand)
+        item << task_banner(task, false, subcommand)
         item << (task.description ? "# #{task.description.gsub(/\s+/m,' ')}" : "")
         item
       end.compact
@@ -269,12 +279,12 @@ class Thor
         new(args, opts, config).invoke_task(task, trailing || [])
       end
 
-      # The banner for this class. You can customize it if you are invoking the
+      # The banner for a task. You can customize it if you are invoking the
       # thor class by another ways which is not the Thor::Runner. It receives
       # the task that is going to be invoked and a boolean which indicates if
       # the namespace should be displayed as arguments.
       #
-      def banner(task, namespace = nil, subcommand = false)
+      def task_banner(task, namespace = nil, subcommand = false)
         "#{basename} #{task.formatted_usage(self, $thor_runner, subcommand)}"
       end
 

@@ -7,6 +7,8 @@ class MyScript < Thor
 
   group :script
   default_task :example_default_task
+  
+  banner "MyScript does really cool stuff"
 
   map "-T" => :animal, ["-f", "--foo"] => :foo
 
