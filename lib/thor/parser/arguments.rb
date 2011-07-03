@@ -49,6 +49,10 @@ class Thor
       @assigns
     end
 
+    def remaining
+      @pile
+    end
+
     private
 
       def no_or_skip?(arg)

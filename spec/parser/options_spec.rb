@@ -262,6 +262,12 @@ describe Thor::Options do
         parse("--no-foo-bar")["foo_bar"].should == false
         parse("--skip-foo-bar")["foo_bar"].should == false
       end
+
+      it "doesn't eat the next part of the param" do
+        create :foo => :boolean
+        parse("--foo", "bar").should == {"foo" => true}
+        @opt.remaining.should == ["bar"]
+      end
     end
 
     describe "with :hash type" do

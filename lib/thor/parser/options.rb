@@ -38,7 +38,7 @@ class Thor
         @non_assigned_required.delete(hash_options[key])
       end
 
-      @shorts, @switches, @unknown = {}, {}, []
+      @shorts, @switches, @extra = {}, {}, []
 
       options.each do |option|
         @switches[option.switch_name] = option
@@ -49,14 +49,19 @@ class Thor
       end
     end
 
+    def remaining
+      @extra
+    end
+
     def parse(args)
       @pile = args.dup
 
       while peek
         match, is_switch = current_is_switch?
+        shifted = shift
 
         if is_switch
-          case shift
+          case shifted
             when SHORT_SQ_RE
               unshift($1.split('').map { |f| "-#{f}" })
               next
@@ -71,9 +76,10 @@ class Thor
           option = switch_option(switch)
           @assigns[option.human_name] = parse_peek(switch, option)
         elsif match
-          @unknown << shift
+          @extra << shifted
+          @extra << shift while peek && peek !~ /^-/
         else
-          shift
+          @extra << shifted
         end
       end
 
@@ -85,7 +91,9 @@ class Thor
     end
 
     def check_unknown!
-      raise UnknownArgumentError, "Unknown switches '#{@unknown.join(', ')}'" unless @unknown.empty?
+      # an unknown option starts with - or -- and has no more -'s afterward.
+      unknown = @extra.select { |str| str =~ /^--?[^-]*$/ }
+      raise UnknownArgumentError, "Unknown switches '#{unknown.join(', ')}'" unless unknown.empty?
     end
 
     protected

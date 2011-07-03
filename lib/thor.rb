@@ -259,8 +259,10 @@ class Thor
         opts = given_opts || opts || []
         config.merge!(:current_task => task, :task_options => task.options)
 
+        instance = new(args, opts, config)
+        args = instance.args
         trailing = args[Range.new(arguments.size, -1)]
-        new(args, opts, config).invoke_task(task, trailing || [])
+        instance.invoke_task(task, trailing || [])
       end
 
       # The banner for this class. You can customize it if you are invoking the

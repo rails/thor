@@ -168,7 +168,7 @@ describe Thor do
     end
 
     it "does not set options in attributes" do
-      MyScript.start(["with_optional", "--all"]).should == [nil, { "all" => true }]
+      MyScript.start(["with_optional", "--all"]).should == [nil, { "all" => true }, []]
     end
 
     it "raises an error if a required param is not provided" do
@@ -329,6 +329,34 @@ HELP
         klass = Class.new(Thor)
         klass.class_eval "def help; end"
       }.should be_empty
+    end
+  end
+
+  describe "edge-cases" do
+    it "can handle boolean options followed by arguments" do
+      klass = Class.new(Thor) do
+        method_option :loud, :type => :boolean
+        desc "hi NAME", "say hi to name"
+        def hi(name)
+          name.upcase! if options[:loud]
+          "Hi #{name}"
+        end
+      end
+
+      klass.start(["hi", "jose"]).should == "Hi jose"
+      klass.start(["hi", "jose", "--loud"]).should == "Hi JOSE"
+      klass.start(["hi", "--loud", "jose"]).should == "Hi JOSE"
+    end
+
+    it "passes through unknown options" do
+      klass = Class.new(Thor) do
+        desc "unknown", "passing unknown options"
+        def unknown(*args)
+          args
+        end
+      end
+
+      klass.start(["unknown", "foo", "--bar", "baz", "bat", "--bam"]).should == ["foo", "--bar", "baz", "bat", "--bam"]
     end
   end
 end

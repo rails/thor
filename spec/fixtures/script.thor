@@ -77,8 +77,8 @@ END
   method_option :lazy_array,   :type => :array,   :lazy_default => %w[eat at joes]
   method_option :lazy_hash,    :type => :hash,    :lazy_default => {'swedish' => 'meatballs'}
   desc "with_optional NAME", "invoke with optional name"
-  def with_optional(name=nil)
-    [ name, options ]
+  def with_optional(name=nil, *args)
+    [ name, options, args ]
   end
 
   class AnotherScript < Thor

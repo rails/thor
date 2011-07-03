@@ -175,4 +175,42 @@ describe Thor::Group do
       end
     end
   end
+
+  describe "edge-cases" do
+    it "can handle boolean options followed by arguments" do
+      klass = Class.new(Thor::Group) do
+        desc "say hi to name"
+        argument :name, :type => :string
+        class_option :loud, :type => :boolean
+
+        def hi
+          name.upcase! if options[:loud]
+          "Hi #{name}"
+        end
+      end
+
+      klass.start(["jose"]).should == ["Hi jose"]
+      klass.start(["jose", "--loud"]).should == ["Hi JOSE"]
+      klass.start(["--loud", "jose"]).should == ["Hi JOSE"]
+    end
+
+    it "provides extra args as `args`" do
+      klass = Class.new(Thor::Group) do
+        desc "say hi to name"
+        argument :name, :type => :string
+        class_option :loud, :type => :boolean
+
+        def hi
+          name.upcase! if options[:loud]
+          out = "Hi #{name}"
+          out << ": " << args.join(", ") unless args.empty?
+          out
+        end
+      end
+
+      klass.start(["jose"]).should == ["Hi jose"]
+      klass.start(["jose", "--loud"]).should == ["Hi JOSE"]
+      klass.start(["--loud", "jose"]).should == ["Hi JOSE"]
+    end
+  end
 end

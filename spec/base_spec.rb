@@ -252,7 +252,7 @@ describe Thor::Base do
 
     it "checks unknown options except specified" do
       capture(:stderr) {
-        MyScript.start(["with_optional", "NAME", "--omg", "--invalid"]).should == ["NAME", {}]
+        MyScript.start(["with_optional", "NAME", "--omg", "--invalid"]).should == ["NAME", {}, ["--omg", "--invalid"]]
       }.strip.should be_empty
     end
   end
