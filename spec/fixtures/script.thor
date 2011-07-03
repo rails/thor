@@ -7,6 +7,8 @@ class MyScript < Thor
 
   group :script
   default_task :example_default_task
+  
+  banner "MyScript does really cool stuff"
 
   map "-T" => :animal, ["-f", "--foo"] => :foo
 
@@ -78,6 +80,13 @@ END
   method_option :lazy_hash,    :type => :hash,    :lazy_default => {'swedish' => 'meatballs'}
   desc "with_optional NAME", "invoke with optional name"
   def with_optional(name=nil)
+    [ name, options ]
+  end
+
+  method_option :repeater, :type=>:string, :default='foo', :repeats=>true
+  method_option :other, :type=>:boolean
+  desc "with_repeater NAME", "invoke with optional name"
+  def with_repeater(name=nil)
     [ name, options ]
   end
 
@@ -180,5 +189,42 @@ module Scripts
   class ChildDefault < Thor
     namespace "default:child"
   end
+end
+
+class WithArgsOnDefaultTask < Thor
+  default_task :example_default_task, :args=>true
+  
+  banner "MyScript does really cool stuff"
+
+  map "-T" => :animal, ["-f", "--foo"] => :foo
+
+  desc "zoo", "zoo around"
+  def zoo
+    "zoo"
+  end
+
+  desc "example_default_task", "example!"
+  method_options :with => :string
+  def example_default_task(*args)
+    ["default task", options, args]
+  end
+
+  class WithBadDefaultTask < Thor
+    default_task :bad_default_task
+
+    banner "MyScript does really cool stuff"
+
+    map "-T" => :animal, ["-f", "--foo"] => :foo
+
+    desc "zoo", "zoo around"
+    def zoo
+      "zoo"
+    end
+
+    desc "example_default_task", "example!"
+    method_options :with => :string
+    def example_default_task(*args)
+      ["default task", options, args]
+    end
 end
 

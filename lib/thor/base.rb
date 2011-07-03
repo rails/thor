@@ -414,7 +414,7 @@ class Thor
       end
 
       def handle_argument_error(task, error) #:nodoc:
-        raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{self.banner(task).inspect}."
+        raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{self.task_banner(task).inspect}."
       end
 
       protected
@@ -471,9 +471,13 @@ class Thor
         # name<Symbol>:: The name of the argument.
         # options<Hash>:: Described in both class_option and method_option.
         def build_option(name, options, scope) #:nodoc:
+          if options[:repeats]
+            options = options.merge(:default=>[])
+          end
           scope[name] = Thor::Option.new(name, options[:desc], options[:required],
                                                options[:type], options[:default], options[:banner],
-                                               options[:lazy_default], options[:group], options[:aliases])
+                                               options[:lazy_default], options[:group], options[:aliases], 
+                                               options[:repeats])
         end
 
         # Receives a hash of options, parse them and add to the scope. This is a

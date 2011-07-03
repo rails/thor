@@ -2,18 +2,50 @@ require 'thor/base'
 
 class Thor
   class << self
+    # Sets a banner for the class as a whole
+    #
+    # ==== Parameters
+    # text<String>:: The banner text
+    #
+    def banner(text)
+      @class_banner = text
+    end
+    
     # Sets the default task when thor is executed without an explicit task to be called.
     #
     # ==== Parameters
-    # meth<Symbol>:: name of the defaut task
+    # meth<Symbol>:: name of the default task
+    # options<Hash>:: options (see below)
     #
-    def default_task(meth=nil)
+    # ==== Options
+    # :args     - Use the default task, even if arguments are given. See example below
+    #
+    # ==== :args Option Example
+    #
+    #  class Foo < Thor
+    #    default_task :bar, :args=>true
+    #    def bar(*args)
+    #      puts "In bar: args=#{args.inspect}"
+    #    end
+    #  end
+    #  
+    #  > thor foo a b c
+    #  In bar: args=["a", "b", "c"]
+    #  >
+    #
+    #  Whereas, the same thing with "default_task :bar", would throw an UndefinedTaskError
+    #
+    # ==== Parameters
+    # text<String>:: The banner text
+    #
+    def default_task(meth=nil, options={})
       case meth
         when :none
           @default_task = 'help'
         when nil
           @default_task ||= from_superclass(:default_task, 'help')
         else
+          @default_task_allows_args = options[:args]
           @default_task = meth.to_s
       end
     end
@@ -26,7 +58,7 @@ class Thor
     # usage<String>:: Short usage for the subcommand
     # description<String>:: Description for the subcommand
     def register(klass, subcommand_name, usage, description, options={})
-      if klass <= Thor::Group
+      if Thor.const_defined?(:Group) && klass <= Thor::Group
         desc usage, description, options
         define_method(subcommand_name) { invoke klass }
       else
@@ -53,6 +85,7 @@ class Thor
     end
 
     # Defines the long description of the next task.
+    # Note: Thor normally wraps the long description. See Thor::Basic#print_wrapped for options
     #
     # ==== Parameters
     # long description<String>
@@ -155,7 +188,7 @@ class Thor
       handle_no_task_error(meth) unless task
 
       shell.say "Usage:"
-      shell.say "  #{banner(task)}"
+      shell.say "  #{task_banner(task)}"
       shell.say
       class_options_help(shell, nil => task.options.map { |_, o| o })
       if task.long_description
@@ -172,6 +205,7 @@ class Thor
     # shell<Thor::Shell>
     #
     def help(shell, subcommand = false)
+      shell.say @class_banner if @class_banner
       list = printable_tasks(true, subcommand)
       Thor::Util.thor_classes_in(self).each do |klass|
         list += klass.printable_tasks(false)
@@ -189,7 +223,7 @@ class Thor
       (all ? all_tasks : tasks).map do |_, task|
         next if task.hidden?
         item = []
-        item << banner(task, false, subcommand)
+        item << task_banner(task, false, subcommand)
         item << (task.description ? "# #{task.description.gsub(/\s+/m,' ')}" : "")
         item
       end.compact
@@ -198,9 +232,14 @@ class Thor
     def subcommands
       @subcommands ||= from_superclass(:subcommands, [])
     end
+    
+    def parent_commands
+      @parent_commands ||= from_superclass(:parent_commands, [])
+    end
 
     def subcommand(subcommand, subcommand_class)
       self.subcommands << subcommand.to_s
+      subcommand_class.parent_commands << subcommand.to_s
       subcommand_class.subcommand_help subcommand
       define_method(subcommand) { |*args| invoke subcommand_class, args }
     end
@@ -246,11 +285,22 @@ class Thor
 
       # The method responsible for dispatching given the args.
       def dispatch(meth, given_args, given_opts, config) #:nodoc:
+        original_args = given_args.dup
         meth ||= retrieve_task_name(given_args)
         task = all_tasks[normalize_task_name(meth)]
 
         if task
           args, opts = Thor::Options.split(given_args)
+        elsif @default_task && @default_task_allows_args
+          meth = @default_task
+          task = all_tasks[normalize_task_name(meth)]
+          if task
+            given_args = original_args # Restore original arguments (meth has been popped above)
+            args, opts = Thor::Options.split(given_args)
+          else # Default task not found
+            args, opts = given_args, nil
+            task = Thor::DynamicTask.new(meth)
+          end
         else
           args, opts = given_args, nil
           task = Thor::DynamicTask.new(meth)
@@ -263,12 +313,12 @@ class Thor
         new(args, opts, config).invoke_task(task, trailing || [])
       end
 
-      # The banner for this class. You can customize it if you are invoking the
+      # The banner for a task. You can customize it if you are invoking the
       # thor class by another ways which is not the Thor::Runner. It receives
       # the task that is going to be invoked and a boolean which indicates if
       # the namespace should be displayed as arguments.
       #
-      def banner(task, namespace = nil, subcommand = false)
+      def task_banner(task, namespace = nil, subcommand = false)
         "#{basename} #{task.formatted_usage(self, $thor_runner, subcommand)}"
       end
 
