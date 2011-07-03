@@ -5,10 +5,10 @@ class Thor
     class Basic
       attr_accessor :base, :padding
 
-      # Initialize base, mute and padding to nil.
+      # Initialize base and padding to nil.
       #
       def initialize #:nodoc:
-        @base, @mute, @padding = nil, false, 0
+        @base, @padding = nil, 0
       end
 
       # Mute everything that's inside given block
@@ -133,12 +133,7 @@ class Thor
       end
 
       # Prints a long string, word-wrapping the text to the current width of the
-      # terminal display. "\n\n" forces a paragraph break. Ideal for printing heredocs.
-      #
-      # If you want to override this wrapping behavior (e.g. for printing tables),
-      # the following tricks work:
-      # "\005" forces a single line break
-      # "\177" is a non-breaking and non-squeezed space
+      # terminal display. Ideal for printing heredocs.
       #
       # ==== Parameters
       # String
@@ -153,8 +148,8 @@ class Thor
 
         paras.map! do |unwrapped|
           unwrapped.strip.gsub(/\n/, " ").squeeze(" ").
-          gsub(/.{1,#{width}}(?:\s|\Z)/){($& + 5.chr)}.
-          gsub(/\n\005/,"\n").gsub(/\005/,"\n")
+          gsub(/.{1,#{width}}(?:\s|\Z)/){($& + 5.chr).
+          gsub(/\n\005/,"\n").gsub(/\005/,"\n")}
         end
 
         paras.each do |para|
@@ -200,7 +195,7 @@ class Thor
       end
 
       # Called if something goes wrong during the execution. This is used by Thor
-      # internally and should not be used inside your scripts. If something went
+      # internally and should not be used inside your scripts. If someone went
       # wrong, you can always raise an exception. If you raise a Thor::Error, it
       # will be rescued and wrapped in the method below.
       #

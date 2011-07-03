@@ -1,5 +1,3 @@
-require 'pp'
-
 class Thor
   class Task < Struct.new(:name, :description, :long_description, :usage, :options)
     FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
@@ -41,9 +39,6 @@ class Thor
 
       formatted ||= ""
 
-      # Add parent commands (for subcommands)
-      klass.parent_commands.each {|parent_command| formatted << parent_command + ' ' }
-
       # Add usage with required arguments
       formatted << if klass && !klass.arguments.empty?
         usage.to_s.gsub(/^#{name}/) do |match|
@@ -70,9 +65,10 @@ class Thor
       @required_options ||= options.map{ |_, o| o.usage if o.required? }.compact.sort.join(" ")
     end
 
-    # Given a target, checks if this class name is a public method.
+    # Given a target, checks if this class name is not a private/protected method.
     def public_method?(instance) #:nodoc:
-      !(instance.public_methods & [name.to_s, name.to_sym]).empty?
+      collection = instance.private_methods + instance.protected_methods
+      (collection & [name.to_s, name.to_sym]).empty?
     end
 
     def sans_backtrace(backtrace, caller) #:nodoc:
@@ -108,9 +104,7 @@ class Thor
     end
 
     def run(instance, args=[])
-      if name == '' # Missing task -- probably misnamed default task
-        instance.class.handle_no_task_error(instance.class.default_task)
-      elsif (instance.methods & [name.to_s, name.to_sym]).empty?
+      if (instance.methods & [name.to_s, name.to_sym]).empty?
         super
       else
         instance.class.handle_no_task_error(name)

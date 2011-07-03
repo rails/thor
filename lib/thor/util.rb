@@ -8,11 +8,11 @@ class Thor
   #
   # 1) Methods to convert thor namespaces to constants and vice-versa.
   #
-  #   Thor::Util.namespace_from_thor_class(Foo::Bar::Baz) #=> "foo:bar:baz"
+  #   Thor::Utils.namespace_from_thor_class(Foo::Bar::Baz) #=> "foo:bar:baz"
   #
   # 2) Loading thor files and sandboxing:
   #
-  #   Thor::Util.load_thorfile("~/.thor/foo")
+  #   Thor::Utils.load_thorfile("~/.thor/foo")
   #
   module Util
 

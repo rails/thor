@@ -64,7 +64,7 @@ class Thor
       # ==== Example
       # ask("What is your name?")
       #
-      # TODO:ignored: Implement #ask for Thor::Shell::HTML
+      # TODO: Implement #ask for Thor::Shell::HTML
       def ask(statement, color=nil)
         raise NotImplementedError, "Implement #ask for Thor::Shell::HTML"
       end

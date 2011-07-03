@@ -1,15 +1,14 @@
 class Thor
   class Option < Argument #:nodoc:
-    attr_reader :aliases, :group, :lazy_default, :repeats
+    attr_reader :aliases, :group, :lazy_default
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
-    def initialize(name, description=nil, required=nil, type=nil, default=nil, banner=nil, lazy_default=nil, group=nil, aliases=nil, repeats=nil)
+    def initialize(name, description=nil, required=nil, type=nil, default=nil, banner=nil, lazy_default=nil, group=nil, aliases=nil)
       super(name, description, required, type, default, banner)
       @lazy_default = lazy_default
       @group        = group.to_s.capitalize if group
       @aliases      = [*aliases].compact
-      @repeats      = repeats
     end
 
     # This parse quick options given as method_options. It makes several
@@ -65,7 +64,7 @@ class Thor
         value.class.name.downcase.to_sym
       end
 
-      self.new(name.to_s, nil, required, type, default, nil, nil, nil, aliases, nil)
+      self.new(name.to_s, nil, required, type, default, nil, nil, nil, aliases)
     end
 
     def switch_name

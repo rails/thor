@@ -173,7 +173,7 @@ describe Thor::Actions do
     it "converts enconded instructions" do
       runner.should_receive(:file_name).and_return("rdoc")
       action :template, "doc/%file_name%.rb.tt"
-      file = File.join(destination_root, "doc/rdoc.rb")
+      file = File.join(destination_root, "doc/rdoc.rb.tt")
       File.exists?(file).should be_true
     end
 
@@ -186,13 +186,6 @@ describe Thor::Actions do
         "OMG" + content
       end
       File.read(File.join(destination_root, "doc/config.rb")).should =~ /^OMG/
-    end
-    
-    it "guesses the destination name when given only a source" do
-      action :template, "doc/config.yaml.tt"
-
-      file = File.join(destination_root, "doc/config.yaml")
-      File.exists?(file).should be_true
     end
   end
 

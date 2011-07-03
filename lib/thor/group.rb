@@ -187,9 +187,9 @@ class Thor::Group
         human_name = value.respond_to?(:classify) ? value.classify : value
 
         group_options[human_name] ||= []
-        group_options[human_name] += klass.class_options.values.select do |class_option|
-          base_options[class_option.name.to_sym].nil? && class_option.group.nil? &&
-          !group_options.values.flatten.any? { |i| i.name == class_option.name }
+        group_options[human_name] += klass.class_options.values.select do |option|
+          base_options[option.name.to_sym].nil? && option.group.nil? &&
+          !group_options.values.flatten.any? { |i| i.name == option.name }
         end
 
         yield klass if block_given?

@@ -105,7 +105,6 @@ describe Thor::Runner do
       # Stub load and save to avoid thor.yaml from being overwritten
       YAML.stub!(:load_file).and_return(@original_yaml)
       File.stub!(:exists?).with(root_file).and_return(true)
-      File.stub!(:exists?).with(WRAPPED_PATH).and_return(true) # This will happen for Thor::Wrapper fixture
       File.stub!(:open).with(root_file, "w")
     end
 

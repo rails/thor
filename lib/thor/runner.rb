@@ -1,6 +1,5 @@
 require 'thor'
 require 'thor/group'
-require 'thor/wrapper'
 require 'thor/core_ext/file_binary_read'
 
 require 'fileutils'
@@ -74,7 +73,7 @@ class Thor::Runner < Thor #:nodoc:
       as = basename if as.empty?
     end
 
-    location = if options[:relative] || name =~ /^https?:\/\//
+    location = if options[:relative] || name =~ /^http:\/\//
       name
     else
       File.expand_path(name)
@@ -157,7 +156,7 @@ class Thor::Runner < Thor #:nodoc:
 
   private
 
-    def self.task_banner(task, all = false, subcommand = false)
+    def self.banner(task, all = false, subcommand = false)
       "thor " + task.formatted_usage(self, all, subcommand)
     end
 
@@ -263,7 +262,7 @@ class Thor::Runner < Thor #:nodoc:
     # it shows a table with information extracted from the yaml file.
     #
     def display_klasses(with_modules=false, show_internal=false, klasses=Thor::Base.subclasses)
-      klasses -= [Thor, Thor::Runner, Thor::Group, Thor::Wrapper] unless show_internal
+      klasses -= [Thor, Thor::Runner, Thor::Group] unless show_internal
 
       raise Error, "No Thor tasks available" if klasses.empty?
       show_modules if with_modules && !thor_yaml.empty?
@@ -272,9 +271,6 @@ class Thor::Runner < Thor #:nodoc:
       groups = klasses.select { |k| k.ancestors.include?(Thor::Group) }
 
       # Get classes which inherit from Thor
-      # $stderr.puts
-      # $stderr.puts "In Thor::Runner.display_classes:\n  klasses = #{klasses.inspect}\n  groups = #{groups.inspect}"
-      # $stderr.puts
       (klasses - groups).each { |k| list[k.namespace.split(":").first] += k.printable_tasks(false) }
 
       # Get classes which inherit from Thor::Base

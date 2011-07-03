@@ -229,10 +229,6 @@ describe Thor::Options do
         parse("--foo", "--bar")["foo"].should == true
       end
 
-      it "uses the default value if no switch is given" do
-        parse("")["foo"].should == false
-      end
-
       it "accepts --opt=value assignment" do
         parse("--foo=true")["foo"].should == true
         parse("--foo=false")["foo"].should == false
