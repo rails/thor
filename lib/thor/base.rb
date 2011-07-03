@@ -383,17 +383,10 @@ class Thor
       #
       def start(given_args=ARGV, config={})
         config[:shell] ||= Thor::Base.shell.new
-        @original_arguments = given_args
         dispatch(nil, given_args.dup, nil, config)
       rescue Thor::Error => e
         ENV["THOR_DEBUG"] == "1" ? (raise e) : config[:shell].error(e.message)
         exit(1) if exit_on_failure?
-      end
-      
-      # Returns the original value of the arguments passed to the start method.
-      # Useful for Thor::Wrapper
-      def original_arguments
-        @original_arguments
       end
 
       # Allows to use private methods from parent in child classes as tasks.
@@ -421,7 +414,7 @@ class Thor
       end
 
       def handle_argument_error(task, error) #:nodoc:
-        raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{self.task_banner(task).inspect}."
+        raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{self.banner(task).inspect}."
       end
 
       protected
@@ -478,13 +471,9 @@ class Thor
         # name<Symbol>:: The name of the argument.
         # options<Hash>:: Described in both class_option and method_option.
         def build_option(name, options, scope) #:nodoc:
-          if options[:repeats]
-            options = options.merge(:default=>[])
-          end
           scope[name] = Thor::Option.new(name, options[:desc], options[:required],
                                                options[:type], options[:default], options[:banner],
-                                               options[:lazy_default], options[:group], options[:aliases], 
-                                               options[:repeats])
+                                               options[:lazy_default], options[:group], options[:aliases])
         end
 
         # Receives a hash of options, parse them and add to the scope. This is a

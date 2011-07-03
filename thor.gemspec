@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 require File.expand_path('../lib/thor/version', __FILE__)
+
 Gem::Specification.new do |s|
   s.add_development_dependency "bundler", "~> 1.0"
   s.add_development_dependency "fakeweb", "~> 1.3"

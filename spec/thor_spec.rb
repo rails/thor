@@ -47,23 +47,6 @@ describe Thor do
       end
     end
 
-    describe ":repeats" do
-      it "returns [] if no values are given" do
-        arg, options = MyScript.start(["with_repeater"])
-        options.should == {:repeater=>[]}
-      end
-
-      it "returns a single value" do
-        arg, options = MyScript.start(["with_repeater", "--repeater", "foo"])
-        options.should == {:repeater=>["foo"]}
-      end
-
-      it "returns multiple values" do
-        arg, options = MyScript.start(["with_repeater", "--repeater", "foo", "--other", "--repeater", "bar"])
-        options.should == {:repeater=>["foo", "bar"], :other=>true}
-      end
-    end
-
     describe "when :for is supplied" do
       it "updates an already defined task" do
         args, options = MyChildScript.start(["animal", "horse", "--other=fish"])
@@ -106,38 +89,6 @@ describe Thor do
     end
   end
 
-  describe "#default_task_with_args_allowed" do
-    it "sets a default task" do
-      WithArgsOnDefaultTask.default_task.should == "example_default_task"
-    end
-
-    it "invokes the default task if no command is specified" do
-      WithArgsOnDefaultTask.start([]).first.should == "default task"
-    end
-
-    it "invokes the default task if no command is specified even if switches are given" do
-      WithArgsOnDefaultTask.start(["--with", "option"])[1].should == {"with"=>"option"}
-    end
-
-    it "invokes the default task if no command is specified even if arguments are given" do
-      WithArgsOnDefaultTask.start(["foo", "bar"]).first.should == "default task"
-    end
-
-    it "passes arguments to the default task" do
-      WithArgsOnDefaultTask.start(["foo", "bar"]).last.should == ["foo", "bar"]
-    end
-
-    it "invokes other defined commands properly" do
-      WithArgsOnDefaultTask.start(["zoo"]).should == "zoo"
-    end
-  end
-
-  describe "#bad_default_task" do
-    it "calls method missing if no command is specified" do
-      BadDefaultTask.start([]).should == [nil, []]
-    end
-  end
-
   describe "#map" do
     it "calls the alias of a method if one is provided" do
       MyScript.start(["-T", "fish"]).should == ["fish"]
@@ -151,15 +102,8 @@ describe Thor do
     it "inherits all mappings from parent" do
       MyChildScript.default_task.should == "example_default_task"
     end
+  end
 
-  end
-  describe "#banner" do
-    it "includes a class banner" do
-      content = capture(:stdout) { MyScript.start(["help"]) }
-      content.should =~ /MyScript does really cool stuff/m
-    end
-  end
-      
   describe "#desc" do
     it "provides description for a task" do
       content = capture(:stdout) { MyScript.start(["help"]) }
