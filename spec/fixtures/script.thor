@@ -83,7 +83,7 @@ END
     [ name, options ]
   end
 
-  method_option :repeater, :type=>:string, :default='foo', :repeats=>true
+  method_option :repeater, :type=>:string, :default=>'foo', :repeats=>true
   method_option :other, :type=>:boolean
   desc "with_repeater NAME", "invoke with optional name"
   def with_repeater(name=nil)
@@ -226,5 +226,6 @@ class WithArgsOnDefaultTask < Thor
     def example_default_task(*args)
       ["default task", options, args]
     end
+  end
 end
 
