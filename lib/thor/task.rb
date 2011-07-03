@@ -104,7 +104,11 @@ class Thor
 
     def run(instance, args=[])
       if (instance.methods & [name.to_s, name.to_sym]).empty?
-        super
+        if ((instance.protected_methods + instance.public_methods) & ([:method_missing, "method_missing"])).empty?
+          super
+        else
+          instance.send(:method_missing, name.to_sym, *args)
+        end
       else
         instance.class.handle_no_task_error(name)
       end

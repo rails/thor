@@ -2,20 +2,24 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 require 'thor/rake_compat'
 require 'rake/tasklib'
 
+$main = self
+
 class RakeTask < Rake::TaskLib
   def initialize
     define
   end
 
   def define
-    desc "Say it's cool"
-    task :cool do
-      puts "COOL"
-    end
+    $main.instance_eval do
+      desc "Say it's cool"
+      task :cool do
+        puts "COOL"
+      end
 
-    namespace :hiper_mega do
-      task :super do
-        puts "HIPER MEGA SUPER"
+      namespace :hiper_mega do
+        task :super do
+          puts "HIPER MEGA SUPER"
+        end
       end
     end
   end
