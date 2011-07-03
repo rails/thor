@@ -18,8 +18,15 @@ class Thor
     # By default, a task invokes a method in the thor class. You can change this
     # implementation to create custom tasks.
     def run(instance, args=[])
-      public_method?(instance) ?
-        instance.send(name, *args) : instance.class.handle_no_task_error(name)
+      if private_method?(instance)
+        instance.class.handle_no_task_error(name)
+      elsif public_method?(instance)
+        instance.send(name, *args)
+      elsif local_method?(instance, :method_missing)
+        instance.send(:method_missing, name.to_sym, *args)
+      else
+        instance.class.handle_no_task_error(name)
+      end
     rescue ArgumentError => e
       handle_argument_error?(instance, e, caller) ?
         instance.class.handle_argument_error(self, e) : (raise e)
@@ -70,6 +77,15 @@ class Thor
       !(instance.public_methods & [name.to_s, name.to_sym]).empty?
     end
 
+    def private_method?(instance)
+      !(instance.private_methods & [name.to_s, name.to_sym]).empty?
+    end
+
+    def local_method?(instance, name)
+      methods = instance.public_methods(false) + instance.private_methods(false) + instance.protected_methods(false)
+      !(methods & [name.to_s, name.to_sym]).empty?
+    end
+
     def sans_backtrace(backtrace, caller) #:nodoc:
       saned  = backtrace.reject { |frame| frame =~ FILE_REGEXP }
       saned -= caller
@@ -104,11 +120,7 @@ class Thor
 
     def run(instance, args=[])
       if (instance.methods & [name.to_s, name.to_sym]).empty?
-        if ((instance.protected_methods + instance.public_methods) & ([:method_missing, "method_missing"])).empty?
-          super
-        else
-          instance.send(:method_missing, name.to_sym, *args)
-        end
+        super
       else
         instance.class.handle_no_task_error(name)
       end

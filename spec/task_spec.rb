@@ -11,21 +11,18 @@ describe Thor::Task do
 
   describe "#formatted_usage" do
     it "includes namespace within usage" do
-      Object.stub!(:namespace).and_return("foo")
-      Object.stub!(:arguments).and_return([])
-      task(:bar => :required).formatted_usage(Object).should == "foo:can_has --bar=BAR"
+      object = Struct.new(:namespace, :arguments).new("foo", [])
+      task(:bar => :required).formatted_usage(object).should == "foo:can_has --bar=BAR"
     end
 
     it "removes default from namespace" do
-      Object.stub!(:namespace).and_return("default:foo")
-      Object.stub!(:arguments).and_return([])
-      task(:bar => :required).formatted_usage(Object).should == ":foo:can_has --bar=BAR"
+      object = Struct.new(:namespace, :arguments).new("default:foo", [])
+      task(:bar => :required).formatted_usage(object).should == ":foo:can_has --bar=BAR"
     end
 
     it "injects arguments into usage" do
-      Object.stub!(:namespace).and_return("foo")
-      Object.stub!(:arguments).and_return([ Thor::Argument.new(:bar, nil, true, :string) ])
-      task(:foo => :required).formatted_usage(Object).should == "foo:can_has BAR --foo=FOO"
+      object = Struct.new(:namespace, :arguments).new("foo", [Thor::Argument.new(:bar, nil, true, :string)])
+      task(:foo => :required).formatted_usage(object).should == "foo:can_has BAR --foo=FOO"
     end
   end
 
@@ -55,15 +52,23 @@ describe Thor::Task do
   describe "#run" do
     it "runs a task by calling a method in the given instance" do
       mock = mock()
-      mock.should_receive(:send).with("can_has", 1, 2, 3)
-      task.run(mock, [1, 2, 3])
+      mock.should_receive(:can_has).and_return {|*args| args }
+      task.run(mock, [1, 2, 3]).should == [1, 2, 3]
     end
 
     it "raises an error if the method to be invoked is private" do
-      mock = mock()
-      mock.should_receive(:private_methods).and_return(['can_has'])
-      mock.class.should_receive(:handle_no_task_error).with("can_has")
-      task.run(mock)
+      klass = Class.new do
+        def self.handle_no_task_error(name)
+          name
+        end
+
+      private
+        def can_has
+          "fail"
+        end
+      end
+
+      task.run(klass.new).should == "can_has"
     end
   end
 end
