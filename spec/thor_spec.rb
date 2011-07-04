@@ -50,17 +50,17 @@ describe Thor do
     describe ":repeats" do
       it "returns [] if no values are given" do
         arg, options = MyScript.start(["with_repeater"])
-        options.should == {:repeater=>[]}
+        options.should == {"repeater"=>[]}
       end
 
       it "returns a single value" do
-        arg, options = MyScript.start(["with_repeater", "--repeater", "foo"])
-        options.should == {:repeater=>["foo"]}
+        arg, options = MyScript.start(["with_repeater", "--repeater", "baz"])
+        options.should == {"repeater"=>["baz"]}
       end
 
       it "returns multiple values" do
         arg, options = MyScript.start(["with_repeater", "--repeater", "foo", "--other", "--repeater", "bar"])
-        options.should == {:repeater=>["foo", "bar"], :other=>true}
+        options.should == {"repeater"=>["foo", "bar"], "other"=>true}
       end
     end
 
@@ -134,7 +134,10 @@ describe Thor do
 
   describe "#bad_default_task" do
     it "calls method missing if no command is specified" do
-      BadDefaultTask.start([]).should == [nil, []]
+      content = capture(:stderr){
+        WithBadDefaultTask.start([])
+      }
+      content.strip.should == 'Could not find task "bad_default_task" in "with_bad_default_task" namespace.'
     end
   end
 

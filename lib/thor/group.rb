@@ -174,7 +174,7 @@ class Thor::Group
       invocations.each do |name, from_option|
         value = if from_option
           option = class_options[name]
-          option.type == :boolean ? name : option.default
+          option.type == :boolean ? name : (option.default.dup rescue option.default)
         else
           name
         end
@@ -202,6 +202,10 @@ class Thor::Group
       item << banner
       item << (desc ? "# #{desc.gsub(/\s+/m,' ')}" : "")
       [item]
+    end
+    
+    def parent_commands
+      []
     end
 
     def handle_argument_error(task, error) #:nodoc:
