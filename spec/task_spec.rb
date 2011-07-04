@@ -55,13 +55,15 @@ describe Thor::Task do
   describe "#run" do
     it "runs a task by calling a method in the given instance" do
       mock = mock()
+      mock.should_receive(:public_methods).and_return([:can_has])
       mock.should_receive(:send).with("can_has", 1, 2, 3)
       task.run(mock, [1, 2, 3])
     end
 
     it "raises an error if the method to be invoked is private" do
       mock = mock()
-      mock.should_receive(:private_methods).and_return(['can_has'])
+      mock.should_receive(:private_methods).and_return([:can_has])
+      mock.should_receive(:public_methods).and_return([])
       mock.class.should_receive(:handle_no_task_error).with("can_has")
       task.run(mock)
     end

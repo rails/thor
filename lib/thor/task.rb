@@ -67,7 +67,15 @@ class Thor
 
     # Given a target, checks if this class name is a public method.
     def public_method?(instance) #:nodoc:
-      !(instance.public_methods & [name.to_s, name.to_sym]).empty?
+      # The following seems strange, but it's a workaround for MacRuby bug 204
+      # Also, simply looking at whether task is in public_methods doesn't work for dynamic tasks
+      private_methods   = instance.private_methods
+      protected_methods = instance.protected_methods
+      public_methods    = instance.public_methods
+      public_and_private = public_methods & private_methods # Strangely, this isn't always [] in MacRuby!
+      private_or_protected = private_methods + protected_methods
+      !((public_and_private & [name.to_s, name.to_sym]).empty?) ||      # First, is it public AND private (MacRuby)?
+            (private_or_protected & [name.to_s, name.to_sym]).empty?    # Otherwise, is it not private or protected?
     end
 
     def sans_backtrace(backtrace, caller) #:nodoc:
