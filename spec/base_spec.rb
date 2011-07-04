@@ -178,7 +178,7 @@ describe Thor::Base do
       Thor::Base.subclass_files[File.expand_path(thorfile)].should == [
         MyScript, MyScript::AnotherScript, MyChildScript, Barn,
         Scripts::MyScript, Scripts::MyDefaults, Scripts::ChildDefault,
-        WithArgsOnDefaultTask
+        WithArgsOnDefaultTask, WithBadDefaultTask
       ]
     end
 

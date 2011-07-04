@@ -106,7 +106,9 @@ class Thor
     end
 
     def run(instance, args=[])
-      if (instance.methods & [name.to_s, name.to_sym]).empty?
+      if name == '' # Missing task -- probably misnamed default task
+        instance.class.handle_no_task_error(instance.class.default_task)
+      elsif (instance.methods & [name.to_s, name.to_sym]).empty?
         super
       else
         instance.class.handle_no_task_error(name)
