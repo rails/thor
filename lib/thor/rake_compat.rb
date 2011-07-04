@@ -46,7 +46,8 @@ self.instance_eval do
       description << task.arg_names.map{ |n| n.to_s.upcase }.join(' ')
       description.strip!
 
-      klass.desc description, task.comment || non_namespaced_name
+      klass.desc description, Rake.application.last_description || non_namespaced_name
+      Rake.application.last_description = nil
       klass.send :define_method, non_namespaced_name do |*args|
         Rake::Task[task.name.to_sym].invoke(*args)
       end
