@@ -47,6 +47,23 @@ describe Thor do
       end
     end
 
+    describe ":repeats" do
+      it "returns [] if no values are given" do
+        arg, options = MyScript.start(["with_repeater"])
+        options.should == {"repeater"=>[]}
+      end
+
+      it "returns a single value" do
+        arg, options = MyScript.start(["with_repeater", "--repeater", "baz"])
+        options.should == {"repeater"=>["baz"]}
+      end
+
+      it "returns multiple values" do
+        arg, options = MyScript.start(["with_repeater", "--repeater", "foo", "--other", "--repeater", "bar"])
+        options.should == {"repeater"=>["foo", "bar"], "other"=>true}
+      end
+    end
+
     describe "when :for is supplied" do
       it "updates an already defined task" do
         args, options = MyChildScript.start(["animal", "horse", "--other=fish"])
