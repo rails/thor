@@ -36,6 +36,16 @@ describe Thor::Runner do
   end
 
   describe "#start" do
+    def when_no_thorfiles_exist
+      old_dir = Dir.pwd
+      Dir.chdir '..'
+      delete = Thor::Base.subclasses.select {|e| e.namespace == 'default' }
+      delete.each {|e| Thor::Base.subclasses.delete e }
+      yield
+      Thor::Base.subclasses.concat delete
+      Dir.chdir old_dir
+    end
+
     it "invokes a task from Thor::Runner" do
       ARGV.replace ["list"]
       capture(:stdout){ Thor::Runner.start }.should =~ /my_counter N/
@@ -70,6 +80,15 @@ describe Thor::Runner do
       ARGV.replace ["unknown"]
       content = capture(:stderr){ Thor::Runner.start }
       content.strip.should == 'Could not find task "unknown" in "default" namespace.'
+    end
+
+    it "raises an error if class/task can't be found in a setup without thorfiles" do
+      when_no_thorfiles_exist do
+        ARGV.replace ["unknown"]
+        Thor::Runner.should_receive :exit
+        content = capture(:stderr){ Thor::Runner.start }
+        content.strip.should == 'Could not find task "unknown"'
+      end
     end
 
     it "does not swallow NoMethodErrors that occur inside the called method" do

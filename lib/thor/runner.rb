@@ -30,6 +30,7 @@ class Thor::Runner < Thor #:nodoc:
     meth = meth.to_s
     initialize_thorfiles(meth)
     klass, task = Thor::Util.find_class_and_task_by_namespace(meth)
+    raise UndefinedTaskError, "Could not find task #{task.inspect}" if klass.nil?
     args.unshift(task) if task
     klass.start(args, :shell => self.shell)
   end
