@@ -2,6 +2,16 @@ require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
 require 'thor/runner'
 
 describe Thor::Runner do
+  def when_no_thorfiles_exist
+    old_dir = Dir.pwd
+    Dir.chdir '..'
+    delete = Thor::Base.subclasses.select {|e| e.namespace == 'default' }
+    delete.each {|e| Thor::Base.subclasses.delete e }
+    yield
+    Thor::Base.subclasses.concat delete
+    Dir.chdir old_dir
+  end
+
   describe "#help" do
     it "shows information about Thor::Runner itself" do
       capture(:stdout){ Thor::Runner.start(["help"]) }.should =~ /List the available thor tasks/
@@ -33,19 +43,17 @@ describe Thor::Runner do
       content = capture(:stderr){ Thor::Runner.start(["help", "unknown"]) }
       content.strip.should == 'Could not find task "unknown" in "default" namespace.'
     end
+
+    it "raises error if a class/task cannot be found for a setup without thorfiles" do
+      when_no_thorfiles_exist do
+        Thor::Runner.should_receive :exit
+        content = capture(:stderr){ Thor::Runner.start(["help", "unknown"]) }
+        content.strip.should == 'Could not find task "unknown".'
+      end
+    end
   end
 
   describe "#start" do
-    def when_no_thorfiles_exist
-      old_dir = Dir.pwd
-      Dir.chdir '..'
-      delete = Thor::Base.subclasses.select {|e| e.namespace == 'default' }
-      delete.each {|e| Thor::Base.subclasses.delete e }
-      yield
-      Thor::Base.subclasses.concat delete
-      Dir.chdir old_dir
-    end
-
     it "invokes a task from Thor::Runner" do
       ARGV.replace ["list"]
       capture(:stdout){ Thor::Runner.start }.should =~ /my_counter N/
@@ -87,7 +95,7 @@ describe Thor::Runner do
         ARGV.replace ["unknown"]
         Thor::Runner.should_receive :exit
         content = capture(:stderr){ Thor::Runner.start }
-        content.strip.should == 'Could not find task "unknown"'
+        content.strip.should == 'Could not find task "unknown".'
       end
     end
 

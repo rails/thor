@@ -426,8 +426,8 @@ class Thor
         end
       end
 
-      def handle_no_task_error(task) #:nodoc:
-        if $thor_runner
+      def handle_no_task_error(task, has_namespace = $thor_runner) #:nodoc:
+        if has_namespace
           raise UndefinedTaskError, "Could not find task #{task.inspect} in #{namespace.inspect} namespace."
         else
           raise UndefinedTaskError, "Could not find task #{task.inspect}."
