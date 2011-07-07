@@ -17,6 +17,7 @@ class Thor::Runner < Thor #:nodoc:
     if meth && !self.respond_to?(meth)
       initialize_thorfiles(meth)
       klass, task = Thor::Util.find_class_and_task_by_namespace(meth)
+      self.class.handle_no_task_error(task, false) if klass.nil?
       klass.start(["-h", task].compact, :shell => self.shell)
     else
       super
@@ -30,6 +31,7 @@ class Thor::Runner < Thor #:nodoc:
     meth = meth.to_s
     initialize_thorfiles(meth)
     klass, task = Thor::Util.find_class_and_task_by_namespace(meth)
+    self.class.handle_no_task_error(task, false) if klass.nil?
     args.unshift(task) if task
     klass.start(args, :shell => self.shell)
   end
