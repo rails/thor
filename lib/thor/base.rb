@@ -19,7 +19,7 @@ class Thor
                            action add_file create_file in_root inside run run_ruby_script)
 
   module Base
-    attr_accessor :options, :args
+    attr_accessor :options, :parent_options, :args
 
     # It receives arguments in an Array and two hashes, one for options and
     # other for configuration.

@@ -5,7 +5,7 @@ class Thor
     # Sets the default task when thor is executed without an explicit task to be called.
     #
     # ==== Parameters
-    # meth<Symbol>:: name of the defaut task
+    # meth<Symbol>:: name of the default task
     #
     def default_task(meth=nil)
       case meth
@@ -108,6 +108,8 @@ class Thor
       @method_options
     end
 
+    alias options method_options
+
     # Adds an option to the set of method options. If :for is given as option,
     # it allows you to change the options from a previous defined task.
     #
@@ -142,6 +144,8 @@ class Thor
 
       build_option(name, options, scope)
     end
+
+    alias option method_option
 
     # Prints help information for the given task.
     #
@@ -202,7 +206,11 @@ class Thor
     def subcommand(subcommand, subcommand_class)
       self.subcommands << subcommand.to_s
       subcommand_class.subcommand_help subcommand
-      define_method(subcommand) { |*args| invoke subcommand_class, args }
+
+      define_method(subcommand) do |*args|
+        args, opts = Thor::Arguments.split(args)
+        invoke subcommand_class, args, opts
+      end
     end
 
     # Extend check unknown options to accept a hash of conditions.
@@ -260,6 +268,7 @@ class Thor
         config.merge!(:current_task => task, :task_options => task.options)
 
         instance = new(args, opts, config)
+        yield instance if block_given?
         args = instance.args
         trailing = args[Range.new(arguments.size, -1)]
         instance.invoke_task(task, trailing || [])

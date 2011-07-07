@@ -91,8 +91,8 @@ class Thor
     end
 
     def check_unknown!
-      # an unknown option starts with - or -- and has no more -'s afterward.
-      unknown = @extra.select { |str| str =~ /^--?[^-]*$/ }
+      # an unknown option starts with - or -- and has no more --'s afterward.
+      unknown = @extra.select { |str| str =~ /^--?(?:(?!--).)*$/ }
       raise UnknownArgumentError, "Unknown switches '#{unknown.join(', ')}'" unless unknown.empty?
     end
 

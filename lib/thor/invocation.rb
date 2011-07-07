@@ -106,7 +106,9 @@ class Thor
       raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
 
       args, opts, config = _parse_initialization_options(args, opts, config)
-      klass.send(:dispatch, task, args, opts, config)
+      klass.send(:dispatch, task, args, opts, config) do |instance|
+        instance.parent_options = options
+      end
     end
 
     # Invoke the given task if the given args.

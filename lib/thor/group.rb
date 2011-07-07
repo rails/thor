@@ -221,6 +221,7 @@ class Thor::Group
         opts = given_opts || opts
 
         instance = new(args, opts, config)
+        yield instance if block_given?
         args = instance.args
 
         if task
