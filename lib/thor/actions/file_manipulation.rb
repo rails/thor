@@ -187,7 +187,7 @@ class Thor
     #
     # ==== Examples
     #
-    #   inject_into_class "app/controllers/application_controller.rb", "  filter_parameter :password\n"
+    #   inject_into_class "app/controllers/application_controller.rb", ApplicationController, "  filter_parameter :password\n"
     #
     #   inject_into_class "app/controllers/application_controller.rb", ApplicationController do
     #     "  filter_parameter :password\n"
