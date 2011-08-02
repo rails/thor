@@ -8,6 +8,12 @@ body {
   font-family: Helvetica;
   font-size: 14px;
   line-height: 20px;
+  background: url("/images/thor.png") no-repeat;
+  background-position: 10px 10px;
+  padding-top: 280px;
+  width: 700px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 a {
@@ -24,19 +30,23 @@ a:hover {
 }
 
 #main {
+  font-family: "Helvetica Neue";
+  font-weight: 400;
   margin: 10px auto;
   width: 700px;
   background: rgba(255,255,255,0.9);
   padding: 20px;
   border-radius: 5px;
+  box-sizing: border-box;
 }
 
 header {
   background: rgba(0,0,0,0.1);
   padding: 10px;
   -webkit-border-radius: 5px;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 28px;
   color: #925700;
 }
 
