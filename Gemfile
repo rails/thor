@@ -9,3 +9,7 @@ end
 platforms :mri_19 do
   gem "ruby-debug19"
 end
+
+group :development do
+  gem "pry"
+end
