@@ -195,6 +195,31 @@ describe Thor do
     it "raises when an exception happens within the task call" do
       lambda { MyScript.start(["call_myself_with_wrong_arity"]) }.should raise_error(ArgumentError)
     end
+
+    context "when the user enters an unambiguous substring of a command" do
+      it "should invoke a command" do
+        MyScript.start(["z"]).should == MyScript.start(["zoo"])
+      end
+
+      it "should invoke a command, even when there's an alias the resolves to the same command" do
+        MyScript.start(["hi"]).should == MyScript.start(["hidden"])
+      end
+
+      it "should invoke an alias" do
+        MyScript.start(["animal_pri"]).should == MyScript.start(["zoo"])
+      end
+    end
+
+    context "when the user enters an ambiguous substring of a command" do
+      it "should raise an exception that explains the ambiguity" do
+        lambda { MyScript.start(["call"]) }.should raise_error(ArgumentError, 'Ambiguous task call matches [call_myself_with_wrong_arity, call_unexistent_method]')
+      end
+
+      it "should raise an exception when there is an alias" do
+        lambda { MyScript.start(["f"]) }.should raise_error(ArgumentError, 'Ambiguous task f matches [foo, fu]')
+      end
+    end
+
   end
 
   describe "#subcommand" do

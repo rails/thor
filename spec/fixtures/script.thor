@@ -10,6 +10,8 @@ class MyScript < Thor
 
   map "-T" => :animal, ["-f", "--foo"] => :foo
 
+  map "animal_prison" => "zoo"
+
   desc "zoo", "zoo around"
   def zoo
     true
@@ -26,10 +28,14 @@ class MyScript < Thor
     [type]
   end
 
+  map "hid" => "hidden"
+
   desc "hidden TYPE", "this is hidden", :hide => true
   def hidden(type)
     [type]
   end
+
+  map "fu" => "zoo"
 
   desc "foo BAR", <<END
 do some fooing
