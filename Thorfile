@@ -1,6 +1,7 @@
 # enconding: utf-8
 $:.unshift File.expand_path("../lib", __FILE__)
 
+require 'bundler'
 require 'thor/rake_compat'
 
 class Default < Thor
