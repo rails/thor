@@ -4,7 +4,7 @@ require File.expand_path('../lib/thor/version', __FILE__)
 Gem::Specification.new do |s|
   s.add_development_dependency "bundler", "~> 1.0"
   s.add_development_dependency "fakeweb", "~> 1.3"
-  s.add_development_dependency "rake", ">= 0.8"
+  s.add_development_dependency "rake", "~> 0.9"
   s.add_development_dependency "rdoc", "~> 2.5"
   s.add_development_dependency "rspec", "~> 2.3"
   s.add_development_dependency "simplecov", "~> 0.4"
