@@ -1,0 +1,10 @@
+script: bundle exec thor spec
+rvm:
+  - 1.8.7
+  - 1.9.1
+  - 1.9.2
+  - 1.9.3
+  - jruby
+  - rbx
+  - rbx-2.0
+  - ree
