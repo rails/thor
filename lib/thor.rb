@@ -346,7 +346,7 @@ class Thor
       # and determines whether it is an unambiguous prefix of a task or
       # alias name.
       def find_task_possibilities(meth)
-        len = meth.length
+        len = meth.to_s.length
         possibilities = all_tasks.merge(map).keys.select { |n| meth == n[0, len] }.sort
         unique_possibilities = possibilities.map { |k| map[k] || k }.uniq
 
