@@ -29,6 +29,10 @@ load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "invoke.thor")
 
 RSpec.configure do |config|
+  config.before :each do
+    ARGV.replace []
+  end
+
   def capture(stream)
     begin
       stream = stream.to_s
