@@ -83,6 +83,10 @@ class WhinyGenerator < Thor::Group
     File.expand_path(File.dirname(__FILE__))
   end
 
+  def file_name
+    "new_filename"
+  end
+
   def wrong_arity(required)
   end
 end
