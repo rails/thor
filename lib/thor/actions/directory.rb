@@ -74,6 +74,9 @@ class Thor
             next if File.directory?(file_source)
             file_destination = File.join(given_destination, file_source.gsub(source, '.'))
             file_destination.gsub!('/./', '/')
+            file_destination.gsub!(/%([^%]+)%/) do |match|
+              self.base.instance_eval $1
+            end
 
             case file_source
               when /\.empty_directory$/
