@@ -29,6 +29,9 @@ class Thor
     #     rdoc.rb
     #     blog.rb
     #
+    # <b>Encoded path note:</b> Since Thor internals use Object#send to expand %something%,
+    # this `something` should be a public method in the class calling #directory.
+    #
     # ==== Parameters
     # source<String>:: the relative path to the source root.
     # destination<String>:: the relative path to the destination root.
