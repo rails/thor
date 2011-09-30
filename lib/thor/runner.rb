@@ -131,6 +131,7 @@ class Thor::Runner < Thor #:nodoc:
     unless filename == old_filename
       if File(File.join(thor_root, old_filename)).directory?
         FileUtils.rm_rf(File.join(thor_root, old_filename))
+        thor_yaml.delete(old_filename)
       else
         File.delete(File.join(thor_root, old_filename))
       end
