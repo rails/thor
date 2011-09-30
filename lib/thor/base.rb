@@ -231,13 +231,13 @@ class Thor
       # options<Hash>:: Described below.
       #
       # ==== Options
-      # :desc     - Description for the argument.
-      # :required - If the argument is required or not.
-      # :default  - Default value for this argument.
-      # :group    - The group for this options. Use by class options to output options in different levels.
-      # :aliases  - Aliases for this option.
-      # :type     - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
-      # :banner   - String to show on usage notes.
+      # :desc::     -- Description for the argument.
+      # :required:: -- If the argument is required or not.
+      # :default::  -- Default value for this argument.
+      # :group::    -- The group for this options. Use by class options to output options in different levels.
+      # :aliases::  -- Aliases for this option. <b>Note:</b> Thor follows a convention of one-dash-one-letter options. Thus aliases like "-something" wouldn't be parsed; use either "\--something" or "-s" instead.
+      # :type::     -- The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
+      # :banner::   -- String to show on usage notes.
       #
       def class_option(name, options={})
         build_option(name, options, class_options)
