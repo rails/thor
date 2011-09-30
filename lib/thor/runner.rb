@@ -129,7 +129,11 @@ class Thor::Runner < Thor #:nodoc:
     filename     = install(thor_yaml[name][:location])
 
     unless filename == old_filename
-      File.delete(File.join(thor_root, old_filename))
+      if File(File.join(thor_root, old_filename)).directory?
+        FileUtils.rm_r(File.join(thor_root, old_filename))
+      else
+        File.delete(File.join(thor_root, old_filename))
+      end
     end
   end
 
