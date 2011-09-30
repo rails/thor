@@ -27,4 +27,9 @@ class Default < Thor
   def spec
     exec "rspec -cfs spec"
   end
+
+  desc "features", "Run Cucumber stories"
+  def features
+    exec "cucumber"
+  end
 end
