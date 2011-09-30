@@ -228,10 +228,14 @@ describe Thor::Runner do
         silence(:stdout) { Thor::Runner.start(["update", "random"]) }
       end
 
+      it "updates existing thor bundles"
+
       it "installs thor files" do
         ARGV.replace ["install", @location]
         silence(:stdout) { Thor::Runner.start }
       end
+
+      it "installs thor bundles"
     end
   end
 end
