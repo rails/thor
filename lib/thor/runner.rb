@@ -139,7 +139,7 @@ class Thor::Runner < Thor #:nodoc:
     end
 
     unless filename == old_filename
-      File.rm(File.join(thor_root, old_filename))
+      File.delete(File.join(thor_root, old_filename))
     end
   end
 
