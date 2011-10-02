@@ -101,14 +101,21 @@ class Thor
         # get the exception with the corresponding error message.
         #
         def convert_encoded_instructions(filename)
-          filename.gsub(/%(.*?)%/) do |string|
-            instruction = $1.strip
-            if base.respond_to?(instruction)
-              base.send(instruction)
-            else
-              raise Thor::PrivateMethodEncodedError, "Method #{base.class}##{instruction} should be public, not private" if base.respond_to?(instruction, true)
-              string
-            end
+          filename.gsub(/%(.*?)%/) do |initial_string|
+            call_public_method($1.strip) or initial_string
+          end
+        end
+
+        # Calls `base`'s public method `sym`.
+        # Returns:: result of `base.sym` or `nil` if `sym` wasn't found in
+        #  `base`
+        # Raises::  Thor::PrivateMethodEncodedError if `sym` references
+        #  a private method.
+        def call_public_method(sym)
+          if base.respond_to?(sym)
+            base.send(sym)
+          else
+            base.respond_to?(sym, true) ? raise(Thor::PrivateMethodEncodedError, "Method #{base.class}##{sym} should be public, not private") : nil
           end
         end
 
