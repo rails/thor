@@ -70,10 +70,10 @@ Feature: Thor::Actions#directory generates a file with templated name
     Then the following files should not exist:
       | generated/what_i_want_to_see.txt   |
       | generated/what_i_want_to_see_1.txt |
-    And the following files should exist:
-      | templates/%what_was_here%.txt.tt   |
-      | templates/%what_was_here%_1.txt    |
     And the output should contain "Method Tester#what_was_here should be public, not private"
+    And the following files should not exist:
+      | generated/%what_was_here%.txt.tt   |
+      | generated/%what_was_here%_1.txt    |
 
   Scenario: I create the files with correct names
     When I run `./tester_right test`
