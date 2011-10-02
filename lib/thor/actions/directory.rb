@@ -29,8 +29,9 @@ class Thor
     #     rdoc.rb
     #     blog.rb
     #
-    # <b>Encoded path note:</b> Since Thor internals use Object#send to expand %something%,
-    # this `something` should be a public method in the class calling #directory.
+    # <b>Encoded path note:</b> Since Thor internals use Object#respond_to? to check if it can
+    # expand %something%, this `something` should be a public method in the class calling
+    # #directory. If a method is private, Thor stack rises PrivateMethodEncodedError.
     #
     # ==== Parameters
     # source<String>:: the relative path to the source root.
