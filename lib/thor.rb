@@ -28,7 +28,7 @@ class Thor
     def register(klass, subcommand_name, usage, description, options={})
       if klass <= Thor::Group
         desc usage, description, options
-        define_method(subcommand_name) { invoke klass }
+        define_method(subcommand_name) { |*args| invoke(klass, args) }
       else
         desc usage, description, options
         subcommand subcommand_name, klass
