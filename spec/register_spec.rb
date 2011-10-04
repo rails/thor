@@ -40,6 +40,19 @@ class GroupPlugin < Thor::Group
   end
 end
 
+class ClassOptionGroupPlugin < Thor::Group
+  class_option :who,
+    :type => :string,
+    :aliases => "-w",
+    :default => "zebra"
+end
+
+class CompatibleWith19Plugin < ClassOptionGroupPlugin
+  desc "animal"
+  def animal
+    p options[:who]
+  end
+end
 
 BoringVendorProvidedCLI.register(
   ExcitingPluginCLI,
@@ -59,6 +72,12 @@ BoringVendorProvidedCLI.register(
   'groupwork',
   "Do a bunch of things in a row",
   "purple monkey dishwasher")
+
+BoringVendorProvidedCLI.register(
+  CompatibleWith19Plugin,
+  'zoo',
+  "zoo [-w animal]",
+  "Shows a provided animal or just zebra")
 
 describe ".register-ing a Thor subclass" do
   it "registers the plugin as a subcommand" do
@@ -88,5 +107,17 @@ describe ".register-ing a Thor::Group subclass" do
   it "registers the group as a single command" do
     group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[groupwork]) }
     group_output.should == "part one\npart two\n"
+  end
+end
+
+describe "1.8 and 1.9 syntax compatibility" do
+  it "is compatible with both 1.8 and 1.9 syntax w/o task options" do
+    group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[zoo]) }
+    group_output.should match /zebra/
+  end
+
+  it "is compatible with both 1.8 and 1.9 syntax w/task options" do
+    group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[zoo -w lion]) }
+    group_output.should match /lion/
   end
 end
