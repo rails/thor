@@ -114,8 +114,11 @@ class Thor
         def call_public_method(sym)
           if base.respond_to?(sym)
             base.send(sym)
+          elsif base.respond_to?(sym, true)
+            raise Thor::PrivateMethodEncodedError,
+              "Method #{base.class}##{sym} should be public, not private"
           else
-            base.respond_to?(sym, true) ? raise(Thor::PrivateMethodEncodedError, "Method #{base.class}##{sym} should be public, not private") : nil
+            nil
           end
         end
 
