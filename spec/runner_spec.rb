@@ -224,18 +224,18 @@ describe Thor::Runner do
 
       it "updates existing thor files" do
         path = File.join(Thor::Util.thor_root, @original_yaml["random"][:filename])
-        File.should_receive(:delete).with(path)
+        if File.directory? path
+          FileUtils.should_receive(:rm_rf).with(path)
+        else
+          File.should_receive(:delete).with(path)
+        end
         silence(:stdout) { Thor::Runner.start(["update", "random"]) }
       end
-
-      it "updates existing thor bundles"
 
       it "installs thor files" do
         ARGV.replace ["install", @location]
         silence(:stdout) { Thor::Runner.start }
       end
-
-      it "installs thor bundles"
     end
   end
 end
