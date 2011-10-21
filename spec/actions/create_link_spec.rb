@@ -4,7 +4,9 @@ require 'tempfile'
 
 describe Thor::Actions::CreateLink do
   before(:each) do
+    @hardlink_to = File.join(Dir.tmpdir, 'linkdest.rb')
     ::FileUtils.rm_rf(destination_root)
+    ::FileUtils.rm_rf(@hardlink_to)
   end
 
   def create_link(destination=nil, config={}, options={})
@@ -12,6 +14,7 @@ describe Thor::Actions::CreateLink do
     @base.stub!(:file_name).and_return('rdoc')
 
     @tempfile = Tempfile.new("config.rb")
+
     @action = Thor::Actions::CreateLink.new(@base, destination, @tempfile.path,
                                             { :verbose => !@silence }.merge(config))
   end
@@ -34,11 +37,12 @@ describe Thor::Actions::CreateLink do
     end
 
     it "creates a hard link for :symbolic => false" do
-      create_link("doc/config.rb", :symbolic => false)
+      create_link(@hardlink_to, :symbolic => false)
       invoke!
-      destination_path = File.join(destination_root, "doc/config.rb")
+      destination_path = @hardlink_to
       File.exists?(destination_path).should be_true
       File.symlink?(destination_path).should be_false
+      ::FileUtils.rm_rf @hardlink_to
     end
 
     it "creates a symbolic link by default" do
