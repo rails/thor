@@ -42,7 +42,6 @@ describe Thor::Actions::CreateLink do
       destination_path = @hardlink_to
       File.exists?(destination_path).should be_true
       File.symlink?(destination_path).should be_false
-      ::FileUtils.rm_rf @hardlink_to
     end
 
     it "creates a symbolic link by default" do
