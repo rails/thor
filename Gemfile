@@ -13,6 +13,4 @@ end
 
 group :development do
   gem "pry"
-  gem "cucumber"
-  gem "aruba"
 end

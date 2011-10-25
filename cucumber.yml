@@ -1,2 +1,0 @@
-default: --color
-autotest: --format pretty --color
