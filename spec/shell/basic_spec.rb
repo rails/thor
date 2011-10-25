@@ -149,6 +149,16 @@ abc         #123  first three
 xyz         #786  last three
 TABLE
     end
+
+    it "prints tables with implicit columns" do
+      2.times { @table.first.pop }
+      content = capture(:stdout){ shell.print_table(@table) }
+      content.should == <<-TABLE
+abc  
+     #0    empty
+xyz  #786  last three
+TABLE
+    end
   end
 
   describe "#file_collision" do
