@@ -15,6 +15,11 @@ describe Thor::Task do
       task(:bar => :required).formatted_usage(object).should == "foo:can_has --bar=BAR"
     end
 
+    it "includes subcommand name within subcommand usage" do
+      object = Struct.new(:namespace, :arguments).new("main:foo", [])
+      task(:bar => :required).formatted_usage(object, false, true).should == "foo can_has --bar=BAR"
+    end
+
     it "removes default from namespace" do
       object = Struct.new(:namespace, :arguments).new("default:foo", [])
       task(:bar => :required).formatted_usage(object).should == ":foo:can_has --bar=BAR"

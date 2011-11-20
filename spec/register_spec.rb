@@ -90,6 +90,18 @@ describe ".register-ing a Thor subclass" do
     help_output.should include('do exciting things')
   end
 
+  context "when $thor_runner is false" do
+    it "includes the plugin's subcommand name in subcommand's help" do
+      begin
+        $thor_runner = false
+        help_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[exciting]) }
+        help_output.should include('thor exciting_plugin_c_l_i fireworks')
+      ensure
+        $thor_runner = true
+      end
+    end
+  end
+
   context "when hidden" do
     it "omits the hidden plugin's usage from the help" do
       help_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[help]) }
