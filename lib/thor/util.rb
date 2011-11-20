@@ -220,7 +220,7 @@ class Thor
         ruby = File.join(RbConfig::CONFIG['bindir'], ruby_name)
         ruby << RbConfig::CONFIG['EXEEXT']
 
-        # avoid using different name then ruby (on platforms supporting links)
+        # avoid using different name than ruby (on platforms supporting links)
         if ruby_name != 'ruby' && File.respond_to?(:readlink)
           begin
             alternate_ruby = File.join(RbConfig::CONFIG['bindir'], 'ruby')
