@@ -94,6 +94,7 @@ class Thor::Runner < Thor #:nodoc:
     if package == :file
       File.open(destination, "w") { |f| f.puts contents }
     else
+      FileUtils.rm_rf(destination)
       FileUtils.cp_r(name, destination)
     end
 
@@ -129,7 +130,7 @@ class Thor::Runner < Thor #:nodoc:
     filename     = install(thor_yaml[name][:location])
 
     unless filename == old_filename
-      File.delete(File.join(thor_root, old_filename))
+      FileUtils.rm_rf(File.join(thor_root, old_filename))
     end
   end
 

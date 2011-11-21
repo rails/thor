@@ -224,12 +224,42 @@ describe Thor::Runner do
 
       it "updates existing thor files" do
         path = File.join(Thor::Util.thor_root, @original_yaml["random"][:filename])
-        File.should_receive(:delete).with(path)
+        FileUtils.should_receive(:rm_rf).with(path)
         silence(:stdout) { Thor::Runner.start(["update", "random"]) }
       end
 
       it "installs thor files" do
         ARGV.replace ["install", @location]
+        silence(:stdout) { Thor::Runner.start }
+      end
+    end
+
+    describe "install/update bundles" do
+      before(:each) do
+        @location = "#{File.dirname(__FILE__)}/fixtures/bundle"
+
+        @original_yaml['bundle'] = {
+          :location  => @location,
+          :filename  => "4609c7178e8a583e6450ca99339f71fe",
+          :namespaces => ["amazing-bundle"]
+        }
+        FileUtils.stub!(:mkdir_p)
+        FileUtils.stub!(:cp_r)
+        FileUtils.stub!(:touch)
+        $stdin.stub!(:gets).and_return("Y")
+
+        path = File.join(Thor::Util.thor_root, @original_yaml["bundle"][:filename])
+        FileUtils.should_receive(:rm_rf).with(path)
+      end
+
+      it "updates existing bundle" do
+        silence(:stdout) { Thor::Runner.start(["update", "bundle"]) }
+      end
+
+      it "installs thor bundle" do
+        path = File.join(Thor::Util.thor_root, @original_yaml["bundle"][:filename])
+        FileUtils.should_receive(:cp_r).with(@location, path)
+        ARGV.replace ["install", @location, "--as=bundle"]
         silence(:stdout) { Thor::Runner.start }
       end
     end
