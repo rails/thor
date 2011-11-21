@@ -229,6 +229,44 @@ class Thor
       end
     end
 
+    # Uncomment all lines matching a given regex.  It will leave the space
+    # which existed before the comment hash in tact but will remove any spacing
+    # between the comment hash and the beginning of the line.
+    #
+    # ==== Parameters
+    # path<String>:: path of the file to be changed
+    # flag<Regexp|String>:: the regexp or string used to decide which lines to uncomment
+    # config<Hash>:: give :verbose => false to not log the status.
+    #
+    # ==== Example
+    #
+    #   uncomment_lines 'config/initializers/session_store.rb', /active_record/
+    #
+    def uncomment_lines(path, flag, *args)
+      flag = flag.respond_to?(:source) ? flag.source : flag
+
+      gsub_file(path, /^(\s*)#\s*(.*#{flag})/, '\1\2', *args)
+    end
+
+    # Comment all lines matching a given regex.  It will leave the space
+    # which existed before the beginning of the line in tact and will insert
+    # a single space after the comment hash.
+    #
+    # ==== Parameters
+    # path<String>:: path of the file to be changed
+    # flag<Regexp|String>:: the regexp or string used to decide which lines to comment
+    # config<Hash>:: give :verbose => false to not log the status.
+    #
+    # ==== Example
+    #
+    #   comment_lines 'config/initializers/session_store.rb', /cookie_store/
+    #
+    def comment_lines(path, flag, *args)
+      flag = flag.respond_to?(:source) ? flag.source : flag
+
+      gsub_file(path, /^(\s*)([^#|\n]*#{flag})/, '\1# \2', *args)
+    end
+
     # Removes a file at the given location.
     #
     # ==== Parameters

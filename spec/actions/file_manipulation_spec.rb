@@ -314,4 +314,57 @@ describe Thor::Actions do
       end
     end
   end
+
+  describe "when adjusting comments" do
+    before(:each) do
+      ::FileUtils.cp_r(source_root, destination_root)
+    end
+
+    def file
+      File.join(destination_root, "doc", "COMMENTER")
+    end
+
+    unmodified_comments_file = /__start__\n # greenblue\n# yellowblue\n#yellowred\n #greenred\norange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
+
+    describe "#uncomment_lines" do
+      it "uncomments all matching lines in the file" do
+        action :uncomment_lines, "doc/COMMENTER", "green"
+        File.binread(file).should =~ /__start__\n greenblue\n# yellowblue\n#yellowred\n greenred\norange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
+
+        action :uncomment_lines, "doc/COMMENTER", "red"
+        File.binread(file).should =~ /__start__\n greenblue\n# yellowblue\nyellowred\n greenred\norange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
+      end
+
+      it "correctly uncomments lines with hashes in them" do
+        action :uncomment_lines, "doc/COMMENTER", "ind#igo"
+        File.binread(file).should =~ /__start__\n # greenblue\n# yellowblue\n#yellowred\n #greenred\norange\n    purple\n  ind#igo\n  ind#igo\n__end__/
+      end
+
+      it "does not modify already uncommented lines in the file" do
+        action :uncomment_lines, "doc/COMMENTER", "orange"
+        action :uncomment_lines, "doc/COMMENTER", "purple"
+        File.binread(file).should =~ unmodified_comments_file
+      end
+    end
+
+    describe "#comment_lines" do
+      it "comments lines which are not commented" do
+        action :comment_lines, "doc/COMMENTER", "orange"
+        File.binread(file).should =~ /__start__\n # greenblue\n# yellowblue\n#yellowred\n #greenred\n# orange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
+
+        action :comment_lines, "doc/COMMENTER", "purple"
+        File.binread(file).should =~ /__start__\n # greenblue\n# yellowblue\n#yellowred\n #greenred\n# orange\n    # purple\n  ind#igo\n  # ind#igo\n__end__/
+      end
+
+      it "correctly comments lines with hashes in them" do
+        action :comment_lines, "doc/COMMENTER", "ind#igo"
+        File.binread(file).should =~ /__start__\n # greenblue\n# yellowblue\n#yellowred\n #greenred\norange\n    purple\n  # ind#igo\n  # ind#igo\n__end__/
+      end
+
+      it "does not modify already commented lines" do
+        action :comment_lines, "doc/COMMENTER", "green"
+        File.binread(file).should =~ unmodified_comments_file
+      end
+    end
+  end
 end
