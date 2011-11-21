@@ -95,4 +95,36 @@ describe Thor::Actions::EmptyDirectory do
       @action.exists?.should be_true
     end
   end
+
+  context "protected methods" do
+    describe "#convert_encoded_instructions" do
+      before :each do
+        empty_directory("test_dir")
+        @action.base.stub!(:file_name).and_return("expected")
+      end
+
+      it "accepts and executes a 'legal' %\w+% encoded instruction" do
+        @action.send(:convert_encoded_instructions, "%file_name%.txt").should == "expected.txt"
+      end
+
+      it "ignores an 'illegal' %\w+% encoded instruction" do
+        @action.send(:convert_encoded_instructions, "%some_name%.txt").should == "%some_name%.txt"
+      end
+
+      it "ignores incorrectly encoded instruction" do
+        @action.send(:convert_encoded_instructions, "%some.name%.txt").should == "%some.name%.txt"
+      end
+
+      it "raises an error if the instruction refers to a private method" do
+        module PrivExt
+          private
+          def private_file_name
+            "something_hidden"
+          end
+        end
+        @action.base.extend(PrivExt)
+        expect { @action.send(:convert_encoded_instructions, "%private_file_name%.txt") }.to raise_error Thor::PrivateMethodEncodedError
+      end
+    end
+  end
 end

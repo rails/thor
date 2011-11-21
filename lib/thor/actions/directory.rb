@@ -2,13 +2,13 @@ require 'thor/actions/empty_directory'
 
 class Thor
   module Actions
-
     # Copies recursively the files from source directory to root directory.
     # If any of the files finishes with .tt, it's considered to be a template
     # and is placed in the destination without the extension .tt. If any
     # empty directory is found, it's copied and all .empty_directory files are
-    # ignored. Remember that file paths can also be encoded, let's suppose a doc
-    # directory with the following files:
+    # ignored. If any file name is wrapped within % signs, the text within
+    # the % signs will be executed as a method and replaced with the returned
+    # value. Let's suppose a doc directory with the following files:
     #
     #   doc/
     #     components/.empty_directory
@@ -28,6 +28,10 @@ class Thor
     #     README
     #     rdoc.rb
     #     blog.rb
+    #
+    # <b>Encoded path note:</b> Since Thor internals use Object#respond_to? to check if it can
+    # expand %something%, this `something` should be a public method in the class calling
+    # #directory. If a method is private, Thor stack raises PrivateMethodEncodedError.
     #
     # ==== Parameters
     # source<String>:: the relative path to the source root.
