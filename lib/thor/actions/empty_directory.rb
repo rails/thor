@@ -90,16 +90,35 @@ class Thor
 
         # Filenames in the encoded form are converted. If you have a file:
         #
-        #   %class_name%.rb
+        #   %file_name%.rb
         #
-        # It gets the class name from the base and replace it:
+        # It calls #file_name from the base and replaces %-string with the
+        # return value (should be String) of #file_name:
         #
         #   user.rb
         #
+        # The method referenced by %-string SHOULD be public. Otherwise you
+        # get the exception with the corresponding error message.
+        #
         def convert_encoded_instructions(filename)
-          filename.gsub(/%(.*?)%/) do |string|
-            instruction = $1.strip
-            base.respond_to?(instruction) ? base.send(instruction) : string
+          filename.gsub(/%(.*?)%/) do |initial_string|
+            call_public_method($1.strip) or initial_string
+          end
+        end
+
+        # Calls `base`'s public method `sym`.
+        # Returns:: result of `base.sym` or `nil` if `sym` wasn't found in
+        #  `base`
+        # Raises::  Thor::PrivateMethodEncodedError if `sym` references
+        #  a private method.
+        def call_public_method(sym)
+          if base.respond_to?(sym)
+            base.send(sym)
+          elsif base.respond_to?(sym, true)
+            raise Thor::PrivateMethodEncodedError,
+              "Method #{base.class}##{sym} should be public, not private"
+          else
+            nil
           end
         end
 
