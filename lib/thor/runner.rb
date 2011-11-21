@@ -126,7 +126,17 @@ class Thor::Runner < Thor #:nodoc:
 
     old_filename = thor_yaml[name][:filename]
     self.options = self.options.merge("as" => name)
-    filename     = install(thor_yaml[name][:location])
+
+    if File.directory? File.expand_path(name)
+      FileUtils.rm_rf(File.join(thor_root, old_filename))
+
+      thor_yaml.delete(old_filename)
+      save_yaml(thor_yaml)
+
+      filename = install(name)
+    else
+      filename = install(thor_yaml[name][:location])
+    end
 
     unless filename == old_filename
       File.delete(File.join(thor_root, old_filename))
