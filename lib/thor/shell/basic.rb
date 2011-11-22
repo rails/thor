@@ -320,7 +320,8 @@ HELP
 
             correct_answer = answer_set.include?(answer) ? answer : nil
 
-            say("Your response must be one of: #{answer_set}. Please try again.") unless correct_answer
+            answers = answer_set.map(&:inspect).join(", ")
+            say("Your response must be one of: [#{answers}]. Please try again.") unless correct_answer
           end
 
           correct_answer
