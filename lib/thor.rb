@@ -134,6 +134,7 @@ class Thor
     # :aliases  - Aliases for this option.
     # :type     - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
     # :banner   - String to show on usage notes.
+    # :hide     - If you want to hide this option from the help.
     #
     def method_option(name, options={})
       scope = if options[:for]
