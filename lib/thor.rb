@@ -164,7 +164,7 @@ class Thor
       class_options_help(shell, nil => task.options.map { |_, o| o })
       if task.long_description
         shell.say "Description:"
-        shell.print_wrapped(task.long_description, :ident => 2)
+        shell.print_wrapped(task.long_description, :indent => 2)
       else
         shell.say task.description
       end
@@ -183,7 +183,7 @@ class Thor
       list.sort!{ |a,b| a[0] <=> b[0] }
 
       shell.say "Tasks:"
-      shell.print_table(list, :ident => 2, :truncate => true)
+      shell.print_table(list, :indent => 2, :truncate => true)
       shell.say
       class_options_help(shell)
     end
