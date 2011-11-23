@@ -479,7 +479,7 @@ class Thor
           end
 
           shell.say(group_name ? "#{group_name} options:" : "Options:")
-          shell.print_table(list, :ident => 2)
+          shell.print_table(list, :indent => 2)
           shell.say ""
         end
 

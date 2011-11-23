@@ -135,8 +135,8 @@ xyz  #786  last three
 TABLE
     end
 
-    it "prints a table with identation" do
-      content = capture(:stdout){ shell.print_table(@table, :ident => 2) }
+    it "prints a table with indentation" do
+      content = capture(:stdout){ shell.print_table(@table, :indent => 2) }
       content.should == <<-TABLE
   abc  #123  first three
        #0    empty
@@ -146,7 +146,7 @@ TABLE
 
     it "uses maximum terminal width" do
       shell.should_receive(:terminal_width).and_return(20)
-      content = capture(:stdout){ shell.print_table(@table, :ident => 2, :truncate => true) }
+      content = capture(:stdout){ shell.print_table(@table, :indent => 2, :truncate => true) }
       content.should == <<-TABLE
   abc  #123  firs...
        #0    empty
