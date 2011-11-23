@@ -108,13 +108,13 @@ class Thor
       # Array[Array[String, String, ...]]
       #
       # ==== Options
-      # ident<Integer>:: Indent the first column by ident value.
+      # indent<Integer>:: Indent the first column by indent value.
       # colwidth<Integer>:: Force the first column to colwidth spaces wide.
       #
       def print_table(table, options={})
         return if table.empty?
 
-        formats, ident, colwidth = [], options[:ident].to_i, options[:colwidth]
+        formats, indent, colwidth = [], options[:indent].to_i, options[:colwidth]
         options[:truncate] = terminal_width if options[:truncate] == true
 
         formats << "%-#{colwidth + 2}s" if colwidth
@@ -127,7 +127,7 @@ class Thor
           formats << "%-#{maxima + 2}s"
         end
 
-        formats[0] = formats[0].insert(0, " " * ident)
+        formats[0] = formats[0].insert(0, " " * indent)
         formats << "%s"
 
         table.each do |row|
@@ -149,11 +149,11 @@ class Thor
       # String
       #
       # ==== Options
-      # ident<Integer>:: Indent each line of the printed paragraph by ident value.
+      # indent<Integer>:: Indent each line of the printed paragraph by indent value.
       #
       def print_wrapped(message, options={})
-        ident = options[:ident] || 0
-        width = terminal_width - ident
+        indent = options[:indent] || 0
+        width = terminal_width - indent
         paras = message.split("\n\n")
 
         paras.map! do |unwrapped|
@@ -164,7 +164,7 @@ class Thor
 
         paras.each do |para|
           para.split("\n").each do |line|
-            stdout.puts line.insert(0, " " * ident)
+            stdout.puts line.insert(0, " " * indent)
           end
           stdout.puts unless para == paras.last
         end
