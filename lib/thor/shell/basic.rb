@@ -37,7 +37,7 @@ class Thor
       # If asked to limit the correct responses, you can pass in an
       # array of acceptable answers.  If one of those is not supplied,
       # they will be shown a message stating that one of those answers
-      # must be given and reasked the question.
+      # must be given and re-asked the question.
       #
       # ==== Example
       # ask("What is your name?")
@@ -171,7 +171,7 @@ class Thor
       end
 
       # Deals with file collision and returns true if the file should be
-      # overwriten and false otherwise. If a block is given, it uses the block
+      # overwritten and false otherwise. If a block is given, it uses the block
       # response as the content for the diff.
       #
       # ==== Parameters
