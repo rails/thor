@@ -184,7 +184,7 @@ class Thor
       end
     end
 
-    # Returns the root where thor files are located, dependending on the OS.
+    # Returns the root where thor files are located, depending on the OS.
     #
     def self.thor_root
       File.join(user_home, ".thor").gsub(/\\/, '/')

@@ -247,7 +247,7 @@ class Thor
       # Removes a previous defined argument. If :undefine is given, undefine
       # accessors as well.
       #
-      # ==== Paremeters
+      # ==== Parameters
       # names<Array>:: Arguments to be removed
       #
       # ==== Examples
@@ -266,7 +266,7 @@ class Thor
 
       # Removes a previous defined class option.
       #
-      # ==== Paremeters
+      # ==== Parameters
       # names<Array>:: Class options to be removed
       #
       # ==== Examples
@@ -413,7 +413,7 @@ class Thor
 
       # Allows to use private methods from parent in child classes as tasks.
       #
-      # ==== Paremeters
+      # ==== Parameters
       #   names<Array>:: Method names to be used as tasks
       #
       # ==== Examples
