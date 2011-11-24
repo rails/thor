@@ -104,7 +104,7 @@ class Thor::Group
     #
     # ==== Custom invocations
     #
-    # You can also supply a block to customize how the option is giong to be
+    # You can also supply a block to customize how the option is going to be
     # invoked. The block receives two parameters, an instance of the current
     # class and the klass to be invoked.
     #

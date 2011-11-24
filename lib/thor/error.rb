@@ -1,6 +1,6 @@
 class Thor
   # Thor::Error is raised when it's caused by wrong usage of thor classes. Those
-  # errors have their backtrace supressed and are nicely shown to the user.
+  # errors have their backtrace suppressed and are nicely shown to the user.
   #
   # Errors that are caused by the developer, like declaring a method which
   # overwrites a thor keyword, it SHOULD NOT raise a Thor::Error. This way, we

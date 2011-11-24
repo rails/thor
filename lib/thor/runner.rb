@@ -202,7 +202,7 @@ class Thor::Runner < Thor #:nodoc:
       true
     end
 
-    # Load the thorfiles. If relevant_to is supplied, looks for specific files
+    # Load the Thorfiles. If relevant_to is supplied, looks for specific files
     # in the thor_root instead of loading them all.
     #
     # By default, it also traverses the current path until find Thor files, as
@@ -256,7 +256,7 @@ class Thor::Runner < Thor #:nodoc:
       end
     end
 
-    # Load thorfiles relevant to the given method. If you provide "foo:bar" it
+    # Load Thorfiles relevant to the given method. If you provide "foo:bar" it
     # will load all thor files in the thor.yaml that has "foo" e "foo:bar"
     # namespaces registered.
     #
