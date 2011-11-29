@@ -187,7 +187,7 @@ describe Thor::Actions do
       end
       File.read(File.join(destination_root, "doc/config.rb")).should =~ /^OMG/
     end
-    
+
     it "guesses the destination name when given only a source" do
       action :template, "doc/config.yaml.tt"
 
