@@ -87,7 +87,7 @@ class Thor
     end
 
     def sans_backtrace(backtrace, caller) #:nodoc:
-      saned  = backtrace.reject { |frame| frame =~ FILE_REGEXP }
+      saned  = backtrace.reject { |frame| frame =~ FILE_REGEXP || (frame =~ /\.java:/ && RUBY_PLATFORM =~ /java/) }
       saned -= caller
     end
 
