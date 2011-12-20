@@ -82,6 +82,10 @@ describe Thor::Actions do
         end
       end
 
+      it "creates proper relative paths for absolute file location" do
+        runner.relative_to_original_destination_root('/test/file').should == "/test/file"
+      end
+
       describe "#source_paths_for_search" do
         it "add source_root to source_paths_for_search" do
           MyCounter.source_paths_for_search.should include(File.expand_path("fixtures", File.dirname(__FILE__)))
