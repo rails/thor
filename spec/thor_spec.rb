@@ -172,7 +172,7 @@ describe Thor do
     end
 
     it "raises an error if a required param is not provided" do
-      capture(:stderr) { MyScript.start(["animal"]) }.strip.should == '"animal" was called incorrectly. Call as "thor my_script:animal TYPE".'
+      capture(:stderr) { MyScript.start(["animal"]) }.strip.should == 'thor animal requires at least 1 argument: "thor my_script:animal TYPE".'
     end
 
     it "raises an error if the invoked task does not exist" do

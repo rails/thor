@@ -204,8 +204,16 @@ class Thor::Group
       [item]
     end
 
-    def handle_argument_error(task, error) #:nodoc:
-      raise error, "#{task.name.inspect} was called incorrectly. Are you sure it has arity equals to 0?"
+    def handle_argument_error(task, error, arity=nil) #:nodoc:
+      if arity > 0
+        msg = "#{basename} #{task.name} takes #{arity} argument"
+        msg << "s" if arity > 1
+        msg << ", but it should not."
+      else
+        msg = "You should not pass arguments to #{basename} #{task.name}."
+      end
+
+      raise error, msg
     end
 
     protected

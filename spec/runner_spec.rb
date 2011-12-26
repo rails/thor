@@ -106,13 +106,13 @@ describe Thor::Runner do
 
     it "does not swallow Thor::Group InvocationError" do
       ARGV.replace ["whiny_generator"]
-      lambda { Thor::Runner.start }.should raise_error(ArgumentError, /Are you sure it has arity equals to 0\?/)
+      lambda { Thor::Runner.start }.should raise_error(ArgumentError, /thor wrong_arity takes 1 argument, but it should not/)
     end
 
     it "does not swallow Thor InvocationError" do
       ARGV.replace ["my_script:animal"]
       content = capture(:stderr) { Thor::Runner.start }
-      content.strip.should == '"animal" was called incorrectly. Call as "thor my_script:animal TYPE".'
+      content.strip.should == 'thor animal requires at least 1 argument: "thor my_script:animal TYPE".'
     end
   end
 

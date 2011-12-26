@@ -18,9 +18,12 @@ class Thor
     # By default, a task invokes a method in the thor class. You can change this
     # implementation to create custom tasks.
     def run(instance, args=[])
+      arity = nil
+
       if private_method?(instance)
         instance.class.handle_no_task_error(name)
       elsif public_method?(instance)
+        arity = instance.method(name).arity
         instance.send(name, *args)
       elsif local_method?(instance, :method_missing)
         instance.send(:method_missing, name.to_sym, *args)
@@ -29,7 +32,7 @@ class Thor
       end
     rescue ArgumentError => e
       handle_argument_error?(instance, e, caller) ?
-        instance.class.handle_argument_error(self, e) : (raise e)
+        instance.class.handle_argument_error(self, e, arity) : (raise e)
     rescue NoMethodError => e
       handle_no_method_error?(instance, e, caller) ?
         instance.class.handle_no_task_error(name) : (raise e)

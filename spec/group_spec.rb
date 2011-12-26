@@ -32,7 +32,7 @@ describe Thor::Group do
     end
 
     it "raises an error when a Thor group task expects arguments" do
-      lambda { WhinyGenerator.start }.should raise_error(ArgumentError, /Are you sure it has arity equals to 0\?/)
+      lambda { WhinyGenerator.start }.should raise_error(ArgumentError, /thor wrong_arity takes 1 argument, but it should not/)
     end
 
     it "invokes help message if any of the shortcuts is given" do

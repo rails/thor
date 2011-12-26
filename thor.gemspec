@@ -8,6 +8,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rdoc', '~> 3.9'
   s.add_development_dependency 'rspec', '~> 2.3'
   s.add_development_dependency 'simplecov', '~> 0.4'
+  s.add_development_dependency 'childlabor'
   s.authors = ['Yehuda Katz', 'José Valim']
   s.description = %q{A scripting framework that replaces rake, sake and rubigen}
   s.email = 'ruby-thor@googlegroups.com'
