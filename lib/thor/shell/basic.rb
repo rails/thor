@@ -1,8 +1,10 @@
 require 'tempfile'
+require 'thor/shell/password'
 
 class Thor
   module Shell
     class Basic
+      include Password
       attr_accessor :base, :padding
 
       # Initialize base, mute and padding to nil.
@@ -46,8 +48,13 @@ class Thor
       #
       def ask(statement, *args)
         options = args.last.is_a?(Hash) ? args.pop : {}
-
-        options[:limited_to] ? ask_filtered(statement, options[:limited_to], *args) : ask_simply(statement, *args)
+        if options[:limited_to]
+          ask_filtered(statement, options[:limited_to], *args)
+        elsif options[:password]
+          ask_passwordly(statement, *args)
+        else
+          ask_simply(statement, *args)
+        end
       end
 
       # Say (print) something to the user. If the sentence ends with a whitespace

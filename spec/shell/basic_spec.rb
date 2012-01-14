@@ -22,6 +22,11 @@ describe Thor::Shell::Basic do
       shell.ask("Should I overwrite it?").should == "Sure"
     end
 
+    it "prints request a password and get the response" do
+      shell.should_receive(:ask_passwordly).with("Pass:").and_return('secret')
+      shell.ask("Pass:", :password => true).should == "secret"
+    end
+
     it "prints a message to the user with the available options and determines the correctness of the answer" do
       $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor? ["strawberry", "chocolate", "vanilla"] ')
       $stdin.should_receive(:gets).and_return('chocolate')
