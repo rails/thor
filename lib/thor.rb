@@ -66,6 +66,20 @@ class Thor
       end
     end
 
+    # Disables the next task.  It will be hidden, and if invoked, it will raise
+    # an exception with the passed message.
+    #
+    # If run with a block, sets a dynamic condition under which the next task
+    # will be disabled.
+    #
+    # === Parameters
+    # exception message<String>
+    #
+    def disable(err_message, &block)
+      @disable_proc = block
+      @disable_message = err_message
+    end
+
     # Maps an input to a task. If you define:
     #
     #   map "-T" => "list"
@@ -292,7 +306,11 @@ class Thor
         if @usage && @desc
           base_class = @hide ? Thor::HiddenTask : Thor::Task
           tasks[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
-          @usage, @desc, @long_desc, @method_options, @hide = nil
+          tasks[meth].disable(@disable_message, @disable_proc)
+          @usage, @desc, @long_desc, @method_options, @hide, @disable_proc = nil
+
+
+
           true
         elsif self.all_tasks[meth] || meth == "method_missing"
           true
