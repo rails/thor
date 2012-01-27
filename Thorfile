@@ -25,6 +25,6 @@ class Default < Thor
 
   desc "spec", "Run RSpec code examples"
   def spec
-    exec "rspec --color --format=documentation spec"
+    exec "#{Gem.ruby} -S rspec --color --format=documentation spec"
   end
 end
