@@ -248,6 +248,17 @@ describe Thor::Actions do
         File.binread(file).should == "START\nREADME\n__end__\n"
       end
 
+      it "replaces using capturing groups in a block" do
+        action(:gsub_file, "doc/README", /(_+)(start)(_+)/){ |*match| match[2].upcase + match[0] }
+        File.binread(file).should == "START__start__\nREADME\n__end__\n"
+      end
+
+      it "accepts a block which is made from lambda whose arity is one (backwards compat)" do
+        l = lambda{ |match| match.gsub('__', '').upcase }
+        action(:gsub_file, "doc/README", /(_+)(start)(_+)/, &l)
+        File.binread(file).should == "START\nREADME\n__end__\n"
+      end
+
       it "logs status" do
         action(:gsub_file, "doc/README", "__start__", "START").should == "        gsub  doc/README\n"
       end
