@@ -224,7 +224,15 @@ class Thor
 
       unless options[:pretend]
         content = File.binread(path)
-        content.gsub!(flag, *args, &block)
+        if block
+          if block.arity == 1
+            content.gsub!(flag, *args) { block.call($&) }
+          else
+            content.gsub!(flag, *args) { block.call(*$~) }
+          end
+        else
+          content.gsub!(flag, *args)
+        end
         File.open(path, 'wb') { |file| file.write(content) }
       end
     end
