@@ -47,7 +47,7 @@ class Thor
       def ask(statement, *args)
         options = args.last.is_a?(Hash) ? args.pop : {}
 
-        options[:limited_to] ? ask_filtered(statement, options[:limited_to], *args) : ask_simply(statement, *args)
+        options[:limited_to] ? ask_filtered(statement, options[:limited_to], options[:print_limits], *args) : ask_simply(statement, *args)
       end
 
       # Say (print) something to the user. If the sentence ends with a whitespace
@@ -312,11 +312,11 @@ HELP
           stdin.gets.strip
         end
 
-        def ask_filtered(statement, answer_set, *args)
+        def ask_filtered(statement, answer_set, print_limits, *args)
           correct_answer = nil
 
           until correct_answer
-            answer = ask_simply("#{statement} #{answer_set.inspect}", *args)
+            answer = ask_simply("#{statement} #{answer_set.inspect unless print_limits == false}", *args)
 
             correct_answer = answer_set.include?(answer) ? answer : nil
 

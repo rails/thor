@@ -28,11 +28,24 @@ describe Thor::Shell::Basic do
       shell.ask("What's your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"]).should == "chocolate"
     end
 
+    it "prints a message to the user without the available options and determines the correctness of the answer" do
+      $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor?  ')
+      $stdin.should_receive(:gets).and_return('chocolate')
+      shell.ask("What's your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"], :print_limits => false).should == "chocolate"
+    end
+
     it "prints a message to the user with the available options and reasks the question after an incorrect repsonse" do
       $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor? ["strawberry", "chocolate", "vanilla"] ').twice
       $stdout.should_receive(:puts).with('Your response must be one of: ["strawberry", "chocolate", "vanilla"]. Please try again.')
       $stdin.should_receive(:gets).and_return('moose tracks', 'chocolate')
       shell.ask("What's your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"]).should == "chocolate"
+    end
+
+    it "prints a message to the user without the available options and reasks the question after an incorrect response" do
+      $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor?  ').twice
+      $stdout.should_receive(:puts).with('Your response must be one of: ["strawberry", "chocolate", "vanilla"]. Please try again.')
+      $stdin.should_receive(:gets).and_return('moose tracks', 'chocolate')
+      shell.ask("What's your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"], :print_limits => false).should == "chocolate"
     end
   end
 
