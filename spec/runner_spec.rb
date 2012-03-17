@@ -197,7 +197,7 @@ describe Thor::Runner do
 
       it "updates existing thor files" do
         path = File.join(Thor::Util.thor_root, @original_yaml["random"][:filename])
-        FileUtils.should_receive(:rm_rf).with(path)
+        FileUtils.should_receive(:rm_rf).with(path, {:secure => true})
         silence(:stdout) { Thor::Runner.start(["update", "random"]) }
       end
 
@@ -213,7 +213,7 @@ describe Thor::Runner do
 
         @original_yaml['bundle'] = {
           :location  => @location,
-          :filename  => "4609c7178e8a583e6450ca99339f71fe",
+          :filename  => "b14ce8c90b625bf604b57539e87445a4",
           :namespaces => ["amazing-bundle"]
         }
         FileUtils.stub!(:mkdir_p)
@@ -222,7 +222,7 @@ describe Thor::Runner do
         $stdin.stub!(:gets).and_return("Y")
 
         path = File.join(Thor::Util.thor_root, @original_yaml["bundle"][:filename])
-        FileUtils.should_receive(:rm_rf).with(path)
+        FileUtils.should_receive(:rm_rf).with(path, {:secure => true})
       end
 
       it "updates existing bundle" do
