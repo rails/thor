@@ -18,7 +18,7 @@ class Default < Thor
     Rake::Task["install"].execute
   end
 
-  desc "release", "Create tag v1.6.2 and build and push twitter-1.6.2.gem to Rubygems"
+  desc "release", "Create tag v#{Thor::VERSION} and build and push thor-#{Thor::VERSION}.gem to Rubygems"
   def release
     Rake::Task["release"].execute
   end
