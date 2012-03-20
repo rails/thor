@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/wycats/thor.png?branch=master)](http://travis-ci.org/wycats/thor)
+
 Thor
 ====
 
