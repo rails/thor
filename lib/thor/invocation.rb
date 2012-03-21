@@ -117,8 +117,8 @@ class Thor
 
       unless current.include?(task.name)
         current << task.name
-        task.run(self, *args)
       end
+        task.run(self, *args)
     end
 
     # Invoke all tasks for the current instance.
