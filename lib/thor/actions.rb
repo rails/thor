@@ -55,7 +55,7 @@ class Thor
                                :desc => "Run but do not make any changes"
 
         class_option :quiet, :type => :boolean, :aliases => "-q", :group => :runtime,
-                             :desc => "Supress status output"
+                             :desc => "Suppress status output"
 
         class_option :skip, :type => :boolean, :aliases => "-s", :group => :runtime,
                             :desc => "Skip files that already exist"
