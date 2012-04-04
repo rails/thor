@@ -121,13 +121,13 @@ describe Thor::Options do
       check_unknown!
     end
 
-    it "excepts underscores in commandline args hash for boolean" do
+    it "accepts underscores in commandline args hash for boolean" do
       create :foo_bar => :boolean
       parse("--foo_bar")["foo_bar"].should == true
       parse("--no_foo_bar")["foo_bar"].should == false
     end
 
-    it "excepts underscores in commandline args hash for strings" do
+    it "accepts underscores in commandline args hash for strings" do
       create :foo_bar => :string, :baz_foo => :string
       parse("--foo_bar", "baz")["foo_bar"].should == "baz"
       parse("--baz_foo", "foo bar")["baz_foo"].should == "foo bar"
