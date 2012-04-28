@@ -1,7 +1,12 @@
 require 'bundler/setup'
 require 'nanoc3/tasks'
 
-task :deploy do
+task :clean_github do
+  files = Dir["*"] - %w(CNAME Gemfile Gemfile.lock website Rakefile)
+  system "rm -rf", *files
+end
+
+task :deploy => :clean_github do
   Dir.chdir("website") do
     system "nanoc compile"
   end
