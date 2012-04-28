@@ -1,5 +1,13 @@
 require 'nanoc3/tasks'
 
 task :deploy do
+  system "nanoc compile"
 
+  Dir.chdir("..") do
+    system "mv websites/output/* ."
+    system "rm -r websites/output"
+    system "git add ."
+    system "git commit -m \"Deploying on #{Date.today}\""
+    system "git push origin gh-pages"
+  end
 end
