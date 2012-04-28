@@ -5,8 +5,8 @@ task :deploy do
   system "nanoc compile"
 
   Dir.chdir("..") do
-    system "mv websites/output/* ."
-    system "rm -r websites/output"
+    system "mv website/output/* ."
+    system "rm -r website/output"
     system "git add ."
     system "git commit -m \"Deploying on #{Date.today}\""
     system "git push origin gh-pages"
