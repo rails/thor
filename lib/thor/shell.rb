@@ -62,8 +62,8 @@ class Thor
     # Common methods that are delegated to the shell.
     SHELL_DELEGATED_METHODS.each do |method|
       module_eval <<-METHOD, __FILE__, __LINE__
-        def #{method}(*args)
-          shell.#{method}(*args)
+        def #{method}(*args,&block)
+          shell.#{method}(*args,&block)
         end
       METHOD
     end
