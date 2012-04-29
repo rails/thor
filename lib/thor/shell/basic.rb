@@ -125,10 +125,15 @@ class Thor
 
         maximas = []
 
-        start.upto(colcount - 2) do |i|
+        start.upto(colcount - 1) do |i|
           maxima = table.map {|row| row[i] ? row[i].to_s.size : 0 }.max
           maximas << maxima
-          formats << "%-#{maxima + 2}s"
+          if i == colcount -1
+            # Don't output 2 trailing spaces when printing the last column
+            formats << "%-s"
+          else
+            formats << "%-#{maxima + 2}s"
+          end
         end
 
         formats[0] = formats[0].insert(0, " " * indent)
@@ -141,7 +146,12 @@ class Thor
             maxima = maximas[i]
 
             if column.is_a?(Numeric)
-              f = "%#{maxima}s  "
+              if i == row.size - 1
+                # Don't output 2 trailing spaces when printing the last column
+                f = "%#{maxima}s"
+              else
+                f = "%#{maxima}s  "
+              end
             else
               f = formats[i]
             end

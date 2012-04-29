@@ -173,7 +173,7 @@ xyz  #786  last three
 TABLE
     end
 
-    it "prints a table with small numbers, and right-aligns them" do
+    it "prints a table with small numbers and right-aligns them" do
       table = [
         ["Name", "Number", "Color"],
         ["Erik", 1, "green"]
@@ -182,6 +182,18 @@ TABLE
       content.should == <<-TABLE
 Name  Number  Color
 Erik       1  green
+TABLE
+    end
+
+    it "doesn't output extra spaces for right-aligned columns in the last column" do
+      table = [
+        ["Name", "Number"],
+        ["Erik", 1]
+      ]
+      content = capture(:stdout){ shell.print_table(table) }
+      content.should == <<-TABLE
+Name  Number
+Erik       1
 TABLE
     end
 
