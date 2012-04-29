@@ -123,7 +123,7 @@ class Thor
         colcount = table.max{|a,b| a.size <=> b.size }.size
 
         start.upto(colcount - 2) do |i|
-          maxima ||= table.map {|row| row[i] ? row[i].size : 0 }.max
+          maxima ||= table.map {|row| row[i] ? row[i].to_s.size : 0 }.max
           formats << "%-#{maxima + 2}s"
         end
 

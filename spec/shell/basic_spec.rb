@@ -172,6 +172,30 @@ abc
 xyz  #786  last three
 TABLE
     end
+
+    it "prints a table with small numbers" do
+      table = [
+        ["Name", "Number", "Color"],
+        ["Erik", 1, "green"]
+      ]
+      content = capture(:stdout){ shell.print_table(table) }
+      content.should == <<-TABLE
+Name  Number  Color
+Erik  1       green
+TABLE
+    end
+
+    it "prints a table with big numbers" do
+      table = [
+        ["Name", "Number", "Color"],
+        ["Erik", 1234567890123, "green"]
+      ]
+      content = capture(:stdout){ shell.print_table(table) }
+      content.should == <<-TABLE
+Name  Number         Color
+Erik  1234567890123  green
+TABLE
+    end
   end
 
   describe "#file_collision" do
