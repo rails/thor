@@ -22,5 +22,5 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new('>= 1.3.6')
   s.summary = s.description
   s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.version = Thor::VERSION.dup
+  s.version = Thor::VERSION
 end
