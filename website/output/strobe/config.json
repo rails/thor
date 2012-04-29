@@ -1,9 +1,0 @@
-// Strobe Platform application configuration file. This file should
-// be checked into revision control.
-{
-
-  // The Strobe Platform ID for the application. This is how the local
-  // application is mapped to one on the server.
-  "application_id": "286"
-
-}
