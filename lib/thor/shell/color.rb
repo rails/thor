@@ -50,10 +50,46 @@ class Thor
       # on Highline implementation and it automatically appends CLEAR to the end
       # of the returned String.
       #
-      def set_color(string, color, bold=false)
-        color = self.class.const_get(color.to_s.upcase) if color.is_a?(Symbol)
-        bold  = bold ? BOLD : ""
-        "#{bold}#{color}#{string}#{CLEAR}"
+      # Pass foreground, background and bold options to this method as
+      # symbols.
+      #
+      # Example:
+      #
+      #   set_color "Hi!", :red, :on_white, :bold
+      #
+      # The available colors are:
+      #
+      #   :bold
+      #   :black
+      #   :red
+      #   :green
+      #   :yellow
+      #   :blue
+      #   :magenta
+      #   :cyan
+      #   :white
+      #   :on_black
+      #   :on_red
+      #   :on_green
+      #   :on_yellow
+      #   :on_blue
+      #   :on_magenta
+      #   :on_cyan
+      #   :on_white
+      def set_color(string, *colors)
+        if colors.all? { |color| color.is_a?(Symbol) || color.is_a?(String) }
+          ansi_colors = colors.map { |color| lookup_color(color) }
+          "#{ansi_colors.join}#{string}#{CLEAR}"
+        else
+          # The old API was `set_color(color, bold=boolean)`. We
+          # continue to support the old API because you should never
+          # break old APIs unnecessarily :P
+          foreground, bold = colors
+          foreground = self.class.const_get(foreground.to_s.upcase) if foreground.is_a?(Symbol)
+
+          bold       = bold ? BOLD : ""
+          "#{bold}#{foreground}#{string}#{CLEAR}"
+        end
       end
 
       protected

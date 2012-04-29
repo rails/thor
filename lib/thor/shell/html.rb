@@ -7,56 +7,58 @@ class Thor
     #
     class HTML < Basic
       # The start of an HTML bold sequence.
-      BOLD       = "<strong>"
-      # The end of an HTML bold sequence.
-      END_BOLD   = "</strong>"
-
-      # Embed in a String to clear previous color selection.
-      CLEAR      = "</span>"
+      BOLD       = "font-weight: bold"
 
       # Set the terminal's foreground HTML color to black.
-      BLACK      = '<span style="color: black;">'
+      BLACK      = 'color: black'
       # Set the terminal's foreground HTML color to red.
-      RED        = '<span style="color: red;">'
+      RED        = 'color: red'
       # Set the terminal's foreground HTML color to green.
-      GREEN      = '<span style="color: green;">'
+      GREEN      = 'color: green'
       # Set the terminal's foreground HTML color to yellow.
-      YELLOW     = '<span style="color: yellow;">'
+      YELLOW     = 'color: yellow'
       # Set the terminal's foreground HTML color to blue.
-      BLUE       = '<span style="color: blue;">'
+      BLUE       = 'color: blue'
       # Set the terminal's foreground HTML color to magenta.
-      MAGENTA    = '<span style="color: magenta;">'
+      MAGENTA    = 'color: magenta'
       # Set the terminal's foreground HTML color to cyan.
-      CYAN       = '<span style="color: cyan;">'
+      CYAN       = 'color: cyan'
       # Set the terminal's foreground HTML color to white.
-      WHITE      = '<span style="color: white;">'
+      WHITE      = 'color: white'
 
       # Set the terminal's background HTML color to black.
-      ON_BLACK   = '<span style="background-color: black">'
+      ON_BLACK   = 'background-color: black'
       # Set the terminal's background HTML color to red.
-      ON_RED     = '<span style="background-color: red">'
+      ON_RED     = 'background-color: red'
       # Set the terminal's background HTML color to green.
-      ON_GREEN   = '<span style="background-color: green">'
+      ON_GREEN   = 'background-color: green'
       # Set the terminal's background HTML color to yellow.
-      ON_YELLOW  = '<span style="background-color: yellow">'
+      ON_YELLOW  = 'background-color: yellow'
       # Set the terminal's background HTML color to blue.
-      ON_BLUE    = '<span style="background-color: blue">'
+      ON_BLUE    = 'background-color: blue'
       # Set the terminal's background HTML color to magenta.
-      ON_MAGENTA = '<span style="background-color: magenta">'
+      ON_MAGENTA = 'background-color: magenta'
       # Set the terminal's background HTML color to cyan.
-      ON_CYAN    = '<span style="background-color: cyan">'
+      ON_CYAN    = 'background-color: cyan'
       # Set the terminal's background HTML color to white.
-      ON_WHITE   = '<span style="background-color: white">'
+      ON_WHITE   = 'background-color: white'
 
       # Set color by using a string or one of the defined constants. If a third
       # option is set to true, it also adds bold to the string. This is based
       # on Highline implementation and it automatically appends CLEAR to the end
       # of the returned String.
       #
-      def set_color(string, color, bold=false)
-        color = self.class.const_get(color.to_s.upcase) if color.is_a?(Symbol)
-        bold, end_bold = bold ? [BOLD, END_BOLD] : ['', '']
-        "#{bold}#{color}#{string}#{CLEAR}#{end_bold}"
+      def set_color(string, *colors)
+        if colors.all? { |color| color.is_a?(Symbol) || color.is_a?(String) }
+          html_colors = colors.map { |color| lookup_color(color) }
+          "<span style=\"#{html_colors.join("; ")};\">#{string}</span>"
+        else
+          color, bold = colors
+          html_color = self.class.const_get(color.to_s.upcase) if color.is_a?(Symbol)
+          styles = [html_color]
+          styles << BOLD if bold
+          "<span style=\"#{styles.join("; ")};\">#{string}</span>"
+        end
       end
 
       # Ask something to the user and receives a response.

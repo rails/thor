@@ -59,7 +59,8 @@ class Thor
       #
       def say(message="", color=nil, force_new_line=(message.to_s !~ /( |\t)$/))
         message = message.to_s
-        message = set_color(message, color) if color
+
+        message = set_color(message, *color) if color
 
         spaces = "  " * padding
 
@@ -226,11 +227,16 @@ class Thor
       # Apply color to the given string with optional bold. Disabled in the
       # Thor::Shell::Basic class.
       #
-      def set_color(string, color, bold=false) #:nodoc:
+      def set_color(string, *args) #:nodoc:
         string
       end
 
       protected
+
+        def lookup_color(color)
+          return color unless color.is_a?(Symbol)
+          self.class.const_get(color.to_s.upcase)
+        end
 
         def stdout
           $stdout
