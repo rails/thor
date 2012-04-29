@@ -122,8 +122,11 @@ class Thor
 
         colcount = table.max{|a,b| a.size <=> b.size }.size
 
+        maximas = []
+
         start.upto(colcount - 2) do |i|
-          maxima ||= table.map {|row| row[i] ? row[i].to_s.size : 0 }.max
+          maxima = table.map {|row| row[i] ? row[i].to_s.size : 0 }.max
+          maximas << maxima
           formats << "%-#{maxima + 2}s"
         end
 
@@ -134,7 +137,14 @@ class Thor
           sentence = ""
 
           row.each_with_index do |column, i|
-            sentence << formats[i] % column.to_s
+            maxima = maximas[i]
+
+            if column.is_a?(Numeric)
+              f = "%#{maxima}s  "
+            else
+              f = formats[i]
+            end
+            sentence << f % column.to_s
           end
 
           sentence = truncate(sentence, options[:truncate]) if options[:truncate]

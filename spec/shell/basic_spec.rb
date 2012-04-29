@@ -173,7 +173,7 @@ xyz  #786  last three
 TABLE
     end
 
-    it "prints a table with small numbers" do
+    it "prints a table with small numbers, and right-aligns them" do
       table = [
         ["Name", "Number", "Color"],
         ["Erik", 1, "green"]
@@ -181,7 +181,7 @@ TABLE
       content = capture(:stdout){ shell.print_table(table) }
       content.should == <<-TABLE
 Name  Number  Color
-Erik  1       green
+Erik       1  green
 TABLE
     end
 
