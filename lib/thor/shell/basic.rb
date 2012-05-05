@@ -326,10 +326,27 @@ HELP
         end
 
         def truncate(string, width)
-          if string.length <= width
-            string
-          else
-            ( string[0, width-3] || "" ) + "..."
+          as_unicode do
+            chars = string.chars.to_a
+
+            if chars.length <= width
+              chars.join
+            else
+              ( chars[0, width-3].join ) + "..."
+            end
+          end
+        end
+
+        if "".respond_to?(:encode)
+          def as_unicode
+            yield
+          end
+        else
+          def as_unicode
+            old, $KCODE = $KCODE, "U"
+            yield
+          ensure
+            $KCODE = old
           end
         end
 

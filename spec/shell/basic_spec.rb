@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Thor::Shell::Basic do
@@ -145,12 +147,16 @@ TABLE
     end
 
     it "uses maximum terminal width" do
+      @table << ["def", "#456", "Lançam foo bar"]
+      @table << ["ghi", "#789", "بالله  عليكم"]
       shell.should_receive(:terminal_width).and_return(20)
       content = capture(:stdout){ shell.print_table(@table, :indent => 2, :truncate => true) }
       content.should == <<-TABLE
   abc  #123  firs...
        #0    empty
   xyz  #786  last...
+  def  #456  Lanç...
+  ghi  #789  بالل...
 TABLE
     end
 
