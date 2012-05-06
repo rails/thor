@@ -104,7 +104,7 @@ describe Thor::Base do
   end
 
   describe "#class_options_help" do
-    before(:each) do
+    before do
       @content = capture(:stdout) { MyCounter.help(Thor::Base.shell.new) }
     end
 

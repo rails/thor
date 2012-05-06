@@ -151,7 +151,7 @@ describe Thor::Options do
     end
 
     describe "with one required and one optional switch" do
-      before :each do
+      before do
         create "--foo" => :required, "--bar" => :boolean
       end
 
@@ -174,7 +174,7 @@ describe Thor::Options do
     end
 
     describe "with :string type" do
-      before(:each) do
+      before do
         create ["--foo", "-f"] => :required
       end
 
@@ -220,7 +220,7 @@ describe Thor::Options do
     end
 
     describe "with :boolean type" do
-      before(:each) do
+      before do
         create "--foo" => false
       end
 
@@ -271,7 +271,7 @@ describe Thor::Options do
     end
 
     describe "with :hash type" do
-      before(:each) do
+      before do
         create "--attributes" => :hash
       end
 
@@ -289,7 +289,7 @@ describe Thor::Options do
     end
 
     describe "with :array type" do
-      before(:each) do
+      before do
         create "--attributes" => :array
       end
 
@@ -307,7 +307,7 @@ describe Thor::Options do
     end
 
     describe "with :numeric type" do
-      before(:each) do
+      before do
         create "n" => :numeric, "m" => 5
       end
 

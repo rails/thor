@@ -3,7 +3,7 @@ require 'thor/actions'
 require 'tempfile'
 
 describe Thor::Actions::CreateLink do
-  before(:each) do
+  before do
     @hardlink_to = File.join(Dir.tmpdir, 'linkdest.rb')
     ::FileUtils.rm_rf(destination_root)
     ::FileUtils.rm_rf(@hardlink_to)

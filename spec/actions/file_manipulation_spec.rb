@@ -23,7 +23,7 @@ describe Thor::Actions do
     File.join(destination_root, "foo")
   end
 
-  before(:each) do
+  before do
     ::FileUtils.rm_rf(destination_root)
   end
 
@@ -197,7 +197,7 @@ describe Thor::Actions do
   end
 
   describe "when changing existent files" do
-    before(:each) do
+    before do
       ::FileUtils.cp_r(source_root, destination_root)
     end
 
@@ -316,7 +316,7 @@ describe Thor::Actions do
   end
 
   describe "when adjusting comments" do
-    before(:each) do
+    before do
       ::FileUtils.cp_r(source_root, destination_root)
     end
 

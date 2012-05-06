@@ -121,7 +121,7 @@ describe Thor::Shell::Basic do
   end
 
   describe "#print_table" do
-    before(:each) do
+    before do
       @table = []
       @table << ["abc", "#123", "first three"]
       @table << ["", "#0", "empty"]

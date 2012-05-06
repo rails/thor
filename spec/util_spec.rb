@@ -119,7 +119,7 @@ describe Thor::Util do
   end
 
   describe "#user_home" do
-    before(:each) do
+    before do
       ENV.stub!(:[])
       Thor::Util.clear_user_home!
     end

@@ -56,7 +56,7 @@ describe Thor::Group do
   end
 
   describe "#help" do
-    before(:each) do
+    before do
       @content = capture(:stdout){ MyCounter.help(Thor::Base.shell.new) }
     end
 
@@ -76,7 +76,7 @@ describe Thor::Group do
   end
 
   describe "#invoke" do
-    before(:each) do
+    before do
       @content = capture(:stdout){ E.start }
     end
 
@@ -108,7 +108,7 @@ describe Thor::Group do
 
   describe "#invoke_from_option" do
     describe "with default type" do
-      before(:each) do
+      before do
         @content = capture(:stdout){ G.start }
       end
 
@@ -147,7 +147,7 @@ describe Thor::Group do
     end
 
     describe "with boolean type" do
-      before(:each) do
+      before do
         @content = capture(:stdout){ H.start }
       end
 

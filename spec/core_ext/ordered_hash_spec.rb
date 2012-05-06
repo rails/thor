@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'thor/core_ext/ordered_hash'
 
 describe Thor::CoreExt::OrderedHash do
-  before :each do
+  before do
     @hash = Thor::CoreExt::OrderedHash.new
   end
 
@@ -26,7 +26,7 @@ describe Thor::CoreExt::OrderedHash do
   end
 
   describe "with several items" do
-    before :each do
+    before do
       @hash[:foo] = "Foo!"
       @hash[:bar] = "Bar!"
       @hash[:baz] = "Baz!"

@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'thor/actions'
 
 describe Thor::Actions::CreateFile do
-  before(:each) do
+  before do
     ::FileUtils.rm_rf(destination_root)
   end
 
@@ -63,7 +63,7 @@ describe Thor::Actions::CreateFile do
     end
 
     describe "when file exists" do
-      before(:each) do
+      before do
         create_file("doc/config.rb")
         invoke!
       end
@@ -77,7 +77,7 @@ describe Thor::Actions::CreateFile do
       end
 
       describe "and is not identical" do
-        before(:each) do
+        before do
           File.open(File.join(destination_root, 'doc/config.rb'), 'w'){ |f| f.write("FOO = 3") }
         end
 

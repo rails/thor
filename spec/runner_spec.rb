@@ -117,7 +117,7 @@ describe Thor::Runner do
   end
 
   describe "tasks" do
-    before(:each) do
+    before do
       @location = "#{File.dirname(__FILE__)}/fixtures/task.thor"
       @original_yaml = {
         "random" => {
@@ -190,7 +190,7 @@ describe Thor::Runner do
     end
 
     describe "uninstall" do
-      before(:each) do
+      before do
         path = File.join(Thor::Util.thor_root, @original_yaml["random"][:filename])
         FileUtils.should_receive(:rm_rf).with(path)
       end
@@ -201,7 +201,7 @@ describe Thor::Runner do
     end
 
     describe "installed" do
-      before(:each) do
+      before do
         Dir.should_receive(:[]).and_return([])
       end
 
@@ -213,7 +213,7 @@ describe Thor::Runner do
     end
 
     describe "install/update" do
-      before(:each) do
+      before do
         FileUtils.stub!(:mkdir_p)
         FileUtils.stub!(:touch)
         $stdin.stub!(:gets).and_return("Y")

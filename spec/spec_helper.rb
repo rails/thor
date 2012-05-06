@@ -29,7 +29,7 @@ load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "invoke.thor")
 
 RSpec.configure do |config|
-  config.before :each do
+  config.before do
     ARGV.replace []
   end
 

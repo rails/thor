@@ -198,7 +198,7 @@ describe Thor::Actions do
   end
 
   describe "#apply" do
-    before(:each) do
+    before do
       @template = <<-TEMPLATE
         @foo = "FOO"
         say_status :cool, :padding
@@ -248,7 +248,7 @@ describe Thor::Actions do
   end
 
   describe "#run" do
-    before(:each) do
+    before do
       runner.should_receive(:system).with("ls")
     end
 
@@ -271,7 +271,7 @@ describe Thor::Actions do
   end
 
   describe "#run_ruby_script" do
-    before(:each) do
+    before do
       Thor::Util.stub!(:ruby_command).and_return("/opt/jruby")
       runner.should_receive(:system).with("/opt/jruby script.rb")
     end

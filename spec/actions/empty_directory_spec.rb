@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'thor/actions'
 
 describe Thor::Actions::EmptyDirectory do
-  before(:each) do
+  before do
     ::FileUtils.rm_rf(destination_root)
   end
 
@@ -98,7 +98,7 @@ describe Thor::Actions::EmptyDirectory do
 
   context "protected methods" do
     describe "#convert_encoded_instructions" do
-      before :each do
+      before do
         empty_directory("test_dir")
         @action.base.stub!(:file_name).and_return("expected")
       end

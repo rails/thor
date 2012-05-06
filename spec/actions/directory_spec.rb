@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'thor/actions'
 
 describe Thor::Actions::Directory do
-  before(:each) do
+  before do
     ::FileUtils.rm_rf(destination_root)
     invoker.stub!(:file_name).and_return("rdoc")
   end

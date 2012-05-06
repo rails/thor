@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'thor/core_ext/hash_with_indifferent_access'
 
 describe Thor::CoreExt::HashWithIndifferentAccess do
-  before(:each) do
+  before do
     @hash = Thor::CoreExt::HashWithIndifferentAccess.new :foo => 'bar', 'baz' => 'bee', :force => true
   end
 

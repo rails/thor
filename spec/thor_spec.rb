@@ -247,7 +247,7 @@ describe Thor do
     end
 
     describe "on general" do
-      before(:each) do
+      before do
         @content = capture(:stdout){ MyScript.help(shell) }
       end
 

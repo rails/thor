@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'thor/actions'
 
 describe Thor::Actions::InjectIntoFile do
-  before(:each) do
+  before do
     ::FileUtils.rm_rf(destination_root)
     ::FileUtils.cp_r(source_root, destination_root)
   end
