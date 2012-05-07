@@ -1,3 +1,24 @@
+== 0.15.2, released 2012-05-07
+* Added print_in_columns
+* Exposed terminal_width as a public API
+
+== 0.15.1, release 2012-05-06
+* Fix Ruby 1.8 truncation bug with unicode chars
+* Fix shell delegate methods to pass their block
+* Don't output trailing spaces when printing the last column in a table
+
+== 0.15, released 2012-04-29
+* Alias method_options to options
+* Refactor say to allow multiple colors
+* Exposed error as a public API
+* Exposed file_collision as a public API
+* Exposed print_wrapped as a public API
+* Exposed set_color as a public API
+* Fix number-formatting bugs in print_table
+* Fix "indent" typo in print_table
+* Fix Errno::EPIPE when piping tasks to `head`
+* More friendly error messages
+
 == 0.14, released 2010-07-25
 
 * Added CreateLink class and #link_file method
