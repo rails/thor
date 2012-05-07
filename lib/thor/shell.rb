@@ -23,7 +23,7 @@ class Thor
   end
 
   module Shell
-    SHELL_DELEGATED_METHODS = [:ask, :error, :set_color, :yes?, :no?, :say, :say_status, :print_table, :print_wrapped, :file_collision]
+    SHELL_DELEGATED_METHODS = [:ask, :error, :set_color, :yes?, :no?, :say, :say_status, :print_in_columns, :print_table, :print_wrapped, :file_collision]
 
     autoload :Basic, 'thor/shell/basic'
     autoload :Color, 'thor/shell/color'

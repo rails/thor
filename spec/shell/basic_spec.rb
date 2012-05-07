@@ -120,6 +120,22 @@ describe Thor::Shell::Basic do
     end
   end
 
+  describe "#print_in_columns" do
+    before do
+      @array = [1234567890]
+      @array += ('a'..'z').to_a
+    end
+
+    it "prints in columns" do
+      content = capture(:stdout){ shell.print_in_columns(@array) }
+      content.should == <<-ARRAY
+1234567890  a           b           c           d           e           f           g           h           i
+j           k           l           m           n           o           p           q           r           s
+t           u           v           w           x           y           z           
+ARRAY
+    end
+  end
+
   describe "#print_table" do
     before do
       @table = []

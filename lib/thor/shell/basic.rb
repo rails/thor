@@ -103,6 +103,25 @@ class Thor
         !yes?(statement, color)
       end
 
+      # Prints values in columns
+      #
+      # ==== Parameters
+      # Array[String, String, ...]
+      #
+      def print_in_columns(array)
+        return if array.empty?
+        colwidth = (array.map{|el| el.to_s.size}.max || 0) + 2
+        array.each_with_index do |value, index|
+          # Don't output trailing spaces when printing the last column
+          if (((index + 1) % (terminal_width / colwidth))).zero? && !index.zero?
+            stdout.puts value
+          else
+            stdout.printf("%-#{colwidth}s", value)
+          end
+        end
+        stdout.puts
+      end
+
       # Prints a table.
       #
       # ==== Parameters
@@ -112,8 +131,8 @@ class Thor
       # indent<Integer>:: Indent the first column by indent value.
       # colwidth<Integer>:: Force the first column to colwidth spaces wide.
       #
-      def print_table(table, options={})
-        return if table.empty?
+      def print_table(array, options={})
+        return if array.empty?
 
         formats, indent, colwidth = [], options[:indent].to_i, options[:colwidth]
         options[:truncate] = terminal_width if options[:truncate] == true
@@ -121,14 +140,14 @@ class Thor
         formats << "%-#{colwidth + 2}s" if colwidth
         start = colwidth ? 1 : 0
 
-        colcount = table.max{|a,b| a.size <=> b.size }.size
+        colcount = array.max{|a,b| a.size <=> b.size }.size
 
         maximas = []
 
-        start.upto(colcount - 1) do |i|
-          maxima = table.map {|row| row[i] ? row[i].to_s.size : 0 }.max
+        start.upto(colcount - 1) do |index|
+          maxima = array.map {|row| row[index] ? row[index].to_s.size : 0 }.max
           maximas << maxima
-          if i == colcount -1
+          if index == colcount -1
             # Don't output 2 trailing spaces when printing the last column
             formats << "%-s"
           else
@@ -139,21 +158,21 @@ class Thor
         formats[0] = formats[0].insert(0, " " * indent)
         formats << "%s"
 
-        table.each do |row|
+        array.each do |row|
           sentence = ""
 
-          row.each_with_index do |column, i|
-            maxima = maximas[i]
+          row.each_with_index do |column, index|
+            maxima = maximas[index]
 
             if column.is_a?(Numeric)
-              if i == row.size - 1
+              if index == row.size - 1
                 # Don't output 2 trailing spaces when printing the last column
                 f = "%#{maxima}s"
               else
                 f = "%#{maxima}s  "
               end
             else
-              f = formats[i]
+              f = formats[index]
             end
             sentence << f % column.to_s
           end

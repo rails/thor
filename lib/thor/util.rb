@@ -225,11 +225,11 @@ class Thor
           begin
             alternate_ruby = File.join(RbConfig::CONFIG['bindir'], 'ruby')
             alternate_ruby << RbConfig::CONFIG['EXEEXT']
-  
+
             # ruby is a symlink
             if File.symlink? alternate_ruby
               linked_ruby = File.readlink alternate_ruby
-  
+
               # symlink points to 'ruby_install_name'
               ruby = alternate_ruby if linked_ruby == ruby_name || linked_ruby == ruby
             end
