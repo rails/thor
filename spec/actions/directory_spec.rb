@@ -121,6 +121,11 @@ describe Thor::Actions::Directory do
       end
       checked.should be_true
     end
+
+    it "works with glob characters in the path" do
+      content = invoke!("app{1}")
+      content.should =~ /create  app\{1\}\/README/
+    end
   end
 
   describe "#revoke!" do
@@ -131,6 +136,14 @@ describe Thor::Actions::Directory do
       File.exists?(File.join(destination_root, "doc", "README")).should be_false
       File.exists?(File.join(destination_root, "doc", "config.rb")).should be_false
       File.exists?(File.join(destination_root, "doc", "components")).should be_false
+    end
+
+    it "works with glob characters in the path" do
+      invoke! "app{1}"
+      File.exists?(File.join(destination_root, "app{1}", "README")).should be_true
+
+      revoke! "app{1}"
+      File.exists?(File.join(destination_root, "app{1}", "README")).should be_false
     end
   end
 end

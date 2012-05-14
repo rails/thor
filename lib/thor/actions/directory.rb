@@ -71,7 +71,8 @@ class Thor
       protected
 
         def execute!
-          lookup = config[:recursive] ? File.join(source, '**') : source
+          lookup = Util.escape_globs(source)
+          lookup = config[:recursive] ? File.join(lookup, '**') : lookup
           lookup = File.join(lookup, '{*,.[a-z]*}')
 
           Dir[lookup].sort.each do |file_source|
