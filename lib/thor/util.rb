@@ -198,7 +198,7 @@ class Thor
     # If we don't #gsub the \ character, Dir.glob will fail.
     #
     def self.thor_root_glob
-      files = Dir["#{thor_root}/*"]
+      files = Dir["#{escape_globs(thor_root)}/*"]
 
       files.map! do |file|
         File.directory?(file) ? File.join(file, "main.thor") : file
@@ -208,6 +208,7 @@ class Thor
     # Where to look for Thor files.
     #
     def self.globs_for(path)
+      path = escape_globs(path)
       ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
     end
 
@@ -242,6 +243,23 @@ class Thor
         ruby.sub!(/.*\s.*/m, '"\&"')
         ruby
       end
+    end
+
+    # Returns a string that has had any glob characters escaped.
+    # The glob characters are `* ? { } [ ]`.
+    #
+    # ==== Examples
+    #
+    #   Thor::Util.escape_globs('[apps]')   # => '\[apps\]'
+    #
+    # ==== Parameters
+    # String
+    #
+    # ==== Returns
+    # String
+    #
+    def self.escape_globs(path)
+      path.to_s.gsub(/[*?{}\[\]]/, '\\\\\\&')
     end
 
   end

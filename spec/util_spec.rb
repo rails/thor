@@ -160,4 +160,37 @@ describe Thor::Util do
       Thor::Util.user_home.should == "/home/user/"
     end
   end
+
+  describe "#thor_root_glob" do
+    before do
+      ENV.stub!(:[])
+      Thor::Util.clear_user_home!
+    end
+
+    it "escapes globs in path" do
+      ENV.stub!(:[]).with("HOME").and_return("/home/user{1}/")
+      Dir.should_receive(:[]).with("/home/user\\{1\\}/.thor/*").and_return([])
+      Thor::Util.thor_root_glob.should == []
+    end
+  end
+
+  describe "#globs_for" do
+    it "escapes globs in path" do
+      Thor::Util.globs_for("/home/apps{1}").should == [
+        "/home/apps\\{1\\}/Thorfile",
+        "/home/apps\\{1\\}/*.thor",
+        "/home/apps\\{1\\}/tasks/*.thor",
+        "/home/apps\\{1\\}/lib/tasks/*.thor"
+      ]
+    end
+  end
+
+  describe "#escape_globs" do
+    it "escapes ? * { } [ ] glob characters" do
+      Thor::Util.escape_globs("apps?").should == "apps\\?"
+      Thor::Util.escape_globs("apps*").should == "apps\\*"
+      Thor::Util.escape_globs("apps {1}").should == "apps \\{1\\}"
+      Thor::Util.escape_globs("apps [1]").should == "apps \\[1\\]"
+    end
+  end
 end
