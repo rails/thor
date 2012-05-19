@@ -180,7 +180,7 @@ class Thor::Group
         end
         next unless value
 
-        klass, task = prepare_for_invocation(name, value)
+        klass, _ = prepare_for_invocation(name, value)
         next unless klass && klass.respond_to?(:class_options)
 
         value = value.to_s
