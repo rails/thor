@@ -114,13 +114,12 @@ class Thor
         colwidth = (array.map{|el| el.to_s.size}.max || 0) + 2
         array.each_with_index do |value, index|
           # Don't output trailing spaces when printing the last column
-          if (((index + 1) % (terminal_width / colwidth))).zero? && !index.zero?
+          if ((((index + 1) % (terminal_width / colwidth))).zero? && !index.zero?) || index + 1 == array.length
             stdout.puts value
           else
             stdout.printf("%-#{colwidth}s", value)
           end
         end
-        stdout.puts
       end
 
       # Prints a table.
