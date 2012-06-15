@@ -24,7 +24,7 @@ class Thor
       # Check if base is muted
       #
       def mute?
-        @mute ||= false
+        @mute
       end
 
       # Sets the output padding, not allowing less than zero values.
