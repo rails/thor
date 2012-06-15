@@ -6,8 +6,8 @@ describe Thor::Option do
     Thor::Option.parse(key, value)
   end
 
-  def option(name, *args)
-    @option ||= Thor::Option.new(name, *args)
+  def option(name, options={})
+    @option ||= Thor::Option.new(name, options)
   end
 
   describe "#parse" do
@@ -130,14 +130,14 @@ describe Thor::Option do
   end
 
   it "can be required and have default values" do
-    option = option("foo", nil, true, :string, "bar")
+    option = option("foo", :required => true, :type => :string, :default => "bar")
     option.default.should == "bar"
     option.should be_required
   end
 
   it "cannot be required and have type boolean" do
     lambda {
-      option("foo", nil, true, :boolean)
+      option("foo", :required => true, :type => :boolean)
     }.should raise_error(ArgumentError, "An option cannot be boolean and required.")
   end
 
@@ -180,11 +180,11 @@ describe Thor::Option do
     end
 
     it "uses banner when supplied" do
-      option(:foo, nil, false, :string, nil, "BAR").usage.should == "[--foo=BAR]"
+      option(:foo, :required => false, :type => :string, :banner => "BAR").usage.should == "[--foo=BAR]"
     end
 
     it "checkes when banner is an empty string" do
-      option(:foo, nil, false, :string, nil, "").usage.should == "[--foo]"
+      option(:foo, :required => false, :type => :string, :banner => "").usage.should == "[--foo]"
     end
 
     describe "with required values" do

@@ -5,18 +5,20 @@ class Thor
     attr_reader :name, :description, :required, :type, :default, :banner
     alias :human_name :name
 
-    def initialize(name, description=nil, required=true, type=:string, default=nil, banner=nil)
+    def initialize(name, options={})
       class_name = self.class.name.split("::").last
+
+      type = options[:type]
 
       raise ArgumentError, "#{class_name} name can't be nil."                         if name.nil?
       raise ArgumentError, "Type :#{type} is not valid for #{class_name.downcase}s."  if type && !valid_type?(type)
 
       @name        = name.to_s
-      @description = description
-      @required    = required || false
+      @description = options[:desc]
+      @required    = options.key?(:required) ? options[:required] : true
       @type        = (type || :string).to_sym
-      @default     = default
-      @banner      = banner || default_banner
+      @default     = options[:default]
+      @banner      = options[:banner] || default_banner
 
       validate! # Trigger specific validations
     end

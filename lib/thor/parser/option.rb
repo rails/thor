@@ -4,12 +4,13 @@ class Thor
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
-    def initialize(name, description=nil, required=nil, type=nil, default=nil, banner=nil, lazy_default=nil, group=nil, aliases=nil, hide=nil)
-      super(name, description, required, type, default, banner)
-      @lazy_default = lazy_default
-      @group        = group.to_s.capitalize if group
-      @aliases      = [*aliases].compact
-      @hide         = hide
+    def initialize(name, options={})
+      options[:required] = false unless options.key?(:required)
+      super
+      @lazy_default = options[:lazy_default]
+      @group        = options[:group].to_s.capitalize if options[:group]
+      @aliases      = Array(options[:aliases])
+      @hide         = options[:hide]
     end
 
     # This parse quick options given as method_options. It makes several
@@ -64,8 +65,7 @@ class Thor
       when Hash, Array, String
         value.class.name.downcase.to_sym
       end
-
-      self.new(name.to_s, nil, required, type, default, nil, nil, nil, aliases)
+      self.new(name.to_s, :required => required, :type => type, :default => default, :aliases => aliases)
     end
 
     def switch_name

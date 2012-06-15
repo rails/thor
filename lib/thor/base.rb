@@ -196,8 +196,9 @@ class Thor
                                "the non-required argument #{argument.human_name.inspect}."
         end if required
 
-        arguments << Thor::Argument.new(name, options[:desc], required, options[:type],
-                                              options[:default], options[:banner])
+        options[:required] = required
+
+        arguments << Thor::Argument.new(name, options)
       end
 
       # Returns this class arguments, looking up in the ancestors chain.
@@ -510,10 +511,9 @@ class Thor
         # ==== Parameters
         # name<Symbol>:: The name of the argument.
         # options<Hash>:: Described in both class_option and method_option.
+        # scope<Hash>:: Options hash that is being built up
         def build_option(name, options, scope) #:nodoc:
-          scope[name] = Thor::Option.new(name, options[:desc], options[:required],
-                                               options[:type], options[:default], options[:banner],
-                                               options[:lazy_default], options[:group], options[:aliases], options[:hide])
+          scope[name] = Thor::Option.new(name, options)
         end
 
         # Receives a hash of options, parse them and add to the scope. This is a

@@ -168,7 +168,8 @@ describe Thor::Options do
       end
 
       it "does not raises an error if the required option has a default value" do
-        create :foo => Thor::Option.new("foo", nil, true, :string, "baz"), :bar => :boolean
+        options = {:required => true, :type => :string, :default => "baz"}
+        create :foo => Thor::Option.new("foo", options), :bar => :boolean
         lambda { parse("--bar") }.should_not raise_error
       end
     end

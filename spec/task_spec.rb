@@ -26,7 +26,8 @@ describe Thor::Task do
     end
 
     it "injects arguments into usage" do
-      object = Struct.new(:namespace, :arguments).new("foo", [Thor::Argument.new(:bar, nil, true, :string)])
+      options = {:required => true, :type => :string}
+      object = Struct.new(:namespace, :arguments).new("foo", [Thor::Argument.new(:bar, options)])
       task(:foo => :required).formatted_usage(object).should == "foo:can_has BAR --foo=FOO"
     end
   end

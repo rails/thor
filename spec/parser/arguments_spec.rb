@@ -4,7 +4,8 @@ require 'thor/parser'
 describe Thor::Arguments do
   def create(opts={})
     arguments = opts.map do |type, default|
-      Thor::Argument.new(type.to_s, nil, default.nil?, type, default)
+      options = {:required => default.nil?, :type => type, :default => default}
+      Thor::Argument.new(type.to_s, options)
     end
 
     arguments.sort!{ |a,b| b.name <=> a.name }
