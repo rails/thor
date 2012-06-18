@@ -70,11 +70,12 @@ class Thor
       # arguments declared using #argument (this is primarily used
       # by Thor::Group). Tis will leave us with the remaining
       # positional arguments.
-      thor_args = Thor::Arguments.new(self.class.arguments)
-      thor_args.parse(args + opts.remaining).each { |k,v| send("#{k}=", v) }
-      args = thor_args.remaining
+      to_parse  = args
+      to_parse += opts.remaining unless self.class.strict_args_position?(config)
 
-      @args = args
+      thor_args = Thor::Arguments.new(self.class.arguments)
+      thor_args.parse(to_parse).each { |k,v| send("#{k}=", v) }
+      @args = thor_args.remaining
     end
 
     class << self
@@ -139,6 +140,21 @@ class Thor
 
       def check_unknown_options?(config) #:nodoc:
         !!check_unknown_options
+      end
+
+      # If you want only strict string args (useful when cascading thor classes),
+      # call strict_args_position! This is disabled by default to allow dynamic
+      # invocations.
+      def strict_args_position!
+        @strict_args_position = true
+      end
+
+      def strict_args_position #:nodoc:
+        @strict_args_position ||= from_superclass(:strict_args_position, false)
+      end
+
+      def strict_args_position?(config) #:nodoc:
+        !!strict_args_position
       end
 
       # Adds an argument to the class and creates an attr_accessor for it.

@@ -382,6 +382,21 @@ HELP
       end
 
       klass.start(["unknown", "foo", "--bar", "baz", "bat", "--bam"]).should == ["foo", "--bar", "baz", "bat", "--bam"]
+      klass.start(["unknown", "--bar", "baz"]).should == ["--bar", "baz"]
+    end
+
+    it "does not pass through unknown options with strict args" do
+      klass = Class.new(Thor) do
+        strict_args_position!
+
+        desc "unknown", "passing unknown options"
+        def unknown(*args)
+          args
+        end
+      end
+
+      klass.start(["unknown", "--bar", "baz"]).should == []
+      klass.start(["unknown", "foo", "--bar", "baz"]).should == ["foo"]
     end
   end
 end

@@ -1,3 +1,7 @@
+== 0.15.3, release 2012-06-18
+* Support strict_args_position! for backwards compatibility
+* Escape Dir glob characters in paths
+
 == 0.15.2, released 2012-05-07
 * Added print_in_columns
 * Exposed terminal_width as a public API
