@@ -592,7 +592,14 @@ class Thor
             default
           else
             value = superclass.send(method)
-            value.dup if value
+
+            if value
+              if value.is_a?(TrueClass) || value.is_a?(Symbol)
+                value
+              else
+                value.dup
+              end
+            end
           end
         end
 

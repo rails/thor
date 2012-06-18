@@ -398,5 +398,21 @@ HELP
       klass.start(["unknown", "--bar", "baz"]).should == []
       klass.start(["unknown", "foo", "--bar", "baz"]).should == ["foo"]
     end
+
+    it "strict args works in the inheritance chain" do
+      parent = Class.new(Thor) do
+        strict_args_position!
+      end
+
+      klass = Class.new(parent) do
+        desc "unknown", "passing unknown options"
+        def unknown(*args)
+          args
+        end
+      end
+
+      klass.start(["unknown", "--bar", "baz"]).should == []
+      klass.start(["unknown", "foo", "--bar", "baz"]).should == ["foo"]
+    end
   end
 end
