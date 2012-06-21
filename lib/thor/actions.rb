@@ -114,7 +114,7 @@ class Thor
     # the script started).
     #
     def relative_to_original_destination_root(path, remove_dot=true)
-      if path =~ /^#{@destination_stack[0]}/
+      if path =~ /^#{Regexp.escape(@destination_stack[0])}/
         path = path.gsub(@destination_stack[0], '.')
         path = remove_dot ? (path[2..-1] || '') : path
       end
