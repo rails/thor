@@ -86,6 +86,11 @@ describe Thor::Actions do
         runner.relative_to_original_destination_root('/test/file').should == "/test/file"
       end
 
+      it "does not fail with files constaining regexp characters" do
+        runner = MyCounter.new([1], {}, { :destination_root => File.join(destination_root, "fo[o-b]ar") })
+        runner.relative_to_original_destination_root("bar").should == "bar"
+      end
+
       describe "#source_paths_for_search" do
         it "add source_root to source_paths_for_search" do
           MyCounter.source_paths_for_search.should include(File.expand_path("fixtures", File.dirname(__FILE__)))

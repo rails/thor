@@ -114,12 +114,12 @@ class Thor
     # the script started).
     #
     def relative_to_original_destination_root(path, remove_dot=true)
-      if path =~ /^#{Regexp.escape(@destination_stack[0])}/
-        path = path.gsub(@destination_stack[0], '.')
-        path = remove_dot ? (path[2..-1] || '') : path
+      path = path.dup
+      if path.gsub!(@destination_stack[0], '.')
+        remove_dot ? (path[2..-1] || '') : path
+      else
+        path
       end
-
-      path
     end
 
     # Holds source paths in instance so they can be manipulated.
