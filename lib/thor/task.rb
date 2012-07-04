@@ -11,8 +11,16 @@ class Thor
       self.options = other.options.dup if other.options
     end
 
+    def hidden=(proc_or_bool)
+      @hide = proc_or_bool
+    end
+
     def hidden?
-      false
+      begin
+        @hide.call
+      rescue NoMethodError
+        @hide
+      end
     end
 
     # By default, a task invokes a method in the thor class. You can change this
@@ -105,13 +113,6 @@ class Thor
     def handle_no_method_error?(instance, error, caller)
       not_debugging?(instance) &&
         error.message =~ /^undefined method `#{name}' for #{Regexp.escape(instance.to_s)}$/
-    end
-  end
-
-  # A task that is hidden in help messages but still invocable.
-  class HiddenTask < Task
-    def hidden?
-      true
     end
   end
 

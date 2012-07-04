@@ -131,7 +131,7 @@ describe Thor do
         capture(:stdout) { MyScript.start(["help"]) }.should_not =~ /this is hidden/m
       end
 
-      it "but the task is still invokcable not show the task in help" do
+      it "can still invoke the task" do
         MyScript.start(["hidden", "yesyes"]).should == ["yesyes"]
       end
     end
@@ -155,6 +155,17 @@ describe Thor do
       arg, options = MyChildScript.start(args)
       arg.should == 'bird'
       options.should == { "force"=>true, "param"=>1.0, "other"=>"tweets" }
+    end
+  end
+
+  describe "#hide_if" do
+    it "does not show the task in help if the passed block evaluates to true" do
+      $block_hide = true
+      capture(:stdout) { MyScript.start(["help"]) }.should_not =~ /hidden this is/m
+    end
+    it "does show the task in help if the passed block evaluates to false" do
+      $block_hide = false
+      capture(:stdout) { MyScript.start(["help"]) }.should =~ /hidden this is/m
     end
   end
 

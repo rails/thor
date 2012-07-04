@@ -66,6 +66,12 @@ class Thor
       end
     end
 
+    # Sets a block to evaluate if/when the next task will be hidden from the help command.
+    # Overrides the :hide option in desc
+    def hide_if(&block)
+      @hide= block
+    end
+
     # Maps an input to a task. If you define:
     #
     #   map "-T" => "list"
@@ -290,8 +296,12 @@ class Thor
 
       def create_task(meth) #:nodoc:
         if @usage && @desc
-          base_class = @hide ? Thor::HiddenTask : Thor::Task
+          base_class = Thor::Task
+
           tasks[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
+
+          tasks[meth].hidden = @hide
+
           @usage, @desc, @long_desc, @method_options, @hide = nil
           true
         elsif self.all_tasks[meth] || meth == "method_missing"

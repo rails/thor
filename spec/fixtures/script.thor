@@ -35,6 +35,12 @@ class MyScript < Thor
     [type]
   end
 
+  desc "blockhidden", "hidden this is"
+  hide_if { $block_hide }
+  def blockhidden
+    true
+  end
+
   map "fu" => "zoo"
 
   desc "foo BAR", <<END
