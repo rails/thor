@@ -146,6 +146,15 @@ describe Thor::Actions do
       end
       FakeWeb.clean_registry
     end
+
+    it "accepts https remote sources" do
+      body = "__start__\nHTTPSFILE\n__end__\n"
+      FakeWeb.register_uri(:get, 'https://example.com/file.txt', :body => body)
+      action :get, 'https://example.com/file.txt' do |content|
+        content.must == body
+      end
+      FakeWeb.clean_registry
+    end
   end
 
   describe "#template" do
