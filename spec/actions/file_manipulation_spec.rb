@@ -41,12 +41,68 @@ describe Thor::Actions do
 
     it "logs status" do
       FileUtils.should_receive(:chmod_R).with(0755, file)
-      action(:chmod, "foo", 0755).should == "       chmod  foo\n"
+      action(:chmod, "foo", 0755).should == "       chmod  755 foo\n"
     end
 
     it "does not log status if required" do
       FileUtils.should_receive(:chmod_R).with(0755, file)
       action(:chmod, "foo", 0755, :verbose => false).should be_empty
+    end
+  end
+
+  describe "#chown" do
+    it "executes the command given" do
+      FileUtils.should_receive(:chown_R).with("user", "group", file)
+      action :chown, "foo", "user", "group"
+    end
+
+    it "does not execute the command if pretending given" do
+      FileUtils.should_not_receive(:chown_R)
+      runner(:pretend => true)
+      action :chown, "foo", "user", "group"
+    end
+
+    it "logs status with both user and group" do
+      FileUtils.should_receive(:chown_R).with("user", "group", file)
+      action(:chown, "foo", "user", "group").should == "       chown  user:group foo\n"
+    end
+
+    it "logs status with only user" do
+      FileUtils.should_receive(:chown_R).with("user", nil, file)
+      action(:chown, "foo", "user", nil).should == "       chown  user foo\n"
+    end
+
+    it "logs status with only group" do
+      FileUtils.should_receive(:chown_R).with(nil, "group", file)
+      action(:chown, "foo", nil, "group").should == "       chown  :group foo\n"
+    end
+
+    it "does not log status if required" do
+      FileUtils.should_receive(:chown_R).with("user", "group", file)
+      action(:chown, "foo", "user", "group", :verbose => false).should be_empty
+    end
+  end
+
+  describe "#chgrp" do
+    it "executes the command given" do
+      FileUtils.should_receive(:chown_R).with(nil, "group", file)
+      action :chgrp, "foo", "group"
+    end
+
+    it "does not execute the command if pretending given" do
+      FileUtils.should_not_receive(:chown_R)
+      runner(:pretend => true)
+      action :chgrp, "foo", "group"
+    end
+
+    it "logs status" do
+      FileUtils.should_receive(:chown_R).with(nil, "group", file)
+      action(:chgrp, "foo", "group").should == "       chgrp  group foo\n"
+    end
+
+    it "does not log status if required" do
+      FileUtils.should_receive(:chown_R).with(nil, "group", file)
+      action(:chgrp, "foo", "group", :verbose => false).should be_empty
     end
   end
 

@@ -128,8 +128,48 @@ class Thor
     def chmod(path, mode, config={})
       return unless behavior == :invoke
       path = File.expand_path(path, destination_root)
-      say_status :chmod, relative_to_original_destination_root(path), config.fetch(:verbose, true)
+      say_status :chmod, sprintf("%o %s", mode, relative_to_original_destination_root(path)), config.fetch(:verbose, true)
       FileUtils.chmod_R(mode, path) unless options[:pretend]
+    end
+
+    # Changes the owner and group of the given file or directory.
+    #
+    # ==== Parameters
+    # path<String>:: the name of the file to change owner and group
+    # user<String>:: the user
+    # group<String>:: the group
+    # config<Hash>:: give :verbose => false to not log the status.
+    #
+    # ==== Example
+    #
+    #   chown "script/*", "bob", "admin"
+    #
+    def chown(path, user, group, config={})
+      return unless behavior == :invoke
+      path = File.expand_path(path, destination_root)
+      message = "#{user}"
+      message << ":#{group}" if group
+      message << " #{relative_to_original_destination_root(path)}"
+      say_status :chown, message, config.fetch(:verbose, true)
+      FileUtils.chown_R(user, group, path) unless options[:pretend]
+    end
+
+    # Changes the group of the given file or directory.
+    #
+    # ==== Parameters
+    # path<String>:: the name of the file to change group
+    # group<String>:: the group
+    # config<Hash>:: give :verbose => false to not log the status.
+    #
+    # ==== Example
+    #
+    #   chgrp "script/*", "admin"
+    #
+    def chgrp(path, group, config={})
+      return unless behavior == :invoke
+      path = File.expand_path(path, destination_root)
+      say_status :chgrp, "#{group} #{relative_to_original_destination_root(path)}", config.fetch(:verbose, true)
+      FileUtils.chown_R(nil, group, path) unless options[:pretend]
     end
 
     # Prepend text to a file. Since it depends on insert_into_file, it's reversible.
