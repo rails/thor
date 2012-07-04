@@ -49,6 +49,9 @@ class Thor
 
       formatted ||= ""
 
+      # Add parent commands (for subcommands)
+      klass.parent_commands.each {|parent_command| formatted << parent_command + ' ' }
+
       # Add usage with required arguments
       formatted << if klass && !klass.arguments.empty?
         usage.to_s.gsub(/^#{name}/) do |match|
