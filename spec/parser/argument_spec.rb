@@ -25,6 +25,12 @@ describe Thor::Argument do
         argument(:task, :type => :string, :default => "bar", :required => true)
       }.should raise_error(ArgumentError, "An argument cannot be required and have default value.")
     end
+
+    it "raises an error if enum isn't an array" do
+      lambda {
+        argument(:task, :type => :string, :enum => "bar")
+      }.should raise_error(ArgumentError, "An argument cannot have an enum other than an array.")
+    end
   end
 
   describe "#usage" do
