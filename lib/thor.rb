@@ -321,7 +321,7 @@ class Thor
 
       # receives a (possibly nil) task name and returns a name that is in
       # the tasks hash. In addition to normalizing aliases, this logic
-      # will determine if a shortened command is an unambiguous prefix of
+      # will determine if a shortened command is an unambiguous substring of
       # a task or alias.
       #
       # +normalize_task_name+ also converts names like +animal-prison+
@@ -344,7 +344,7 @@ class Thor
       end
 
       # this is the logic that takes the task name passed in by the user
-      # and determines whether it is an unambiguous prefix of a task or
+      # and determines whether it is an unambiguous substrings of a task or
       # alias name.
       def find_task_possibilities(meth)
         len = meth.to_s.length
