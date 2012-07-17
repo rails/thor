@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.executables = `git ls-files -- bin/*`.split("\n").map{|f| File.basename(f)}
   s.extra_rdoc_files = ['CHANGELOG.rdoc', 'LICENSE.md', 'README.md', 'Thorfile']
   s.files = `git ls-files`.split("\n")
-  s.homepage = 'http://github.com/wycats/thor'
+  s.homepage = 'http://whatisthor.com/'
   s.name = 'thor'
   s.rdoc_options = ['--charset=UTF-8']
   s.require_paths = ['lib']
