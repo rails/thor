@@ -339,6 +339,11 @@ HELP
         capture(:stdout){ MyScript.start(["help", "foo"]) }.should =~ /Usage:/
       end
     end
+    describe "with argument" do
+      it "calls the class method" do
+        capture(:stdout){ MyScriptWithAnArgument.start(["help", "throw"]) }.should =~ /Usage:/
+      end
+    end
   end
 
   describe "when creating tasks" do

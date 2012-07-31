@@ -154,6 +154,14 @@ class Barn < Thor
 
 end
 
+class MyScriptWithAnArgument < Thor
+  argument :food, :type => :string
+  desc "throw", "throw food into the monkey cage"
+  def throw
+    puts "don't feed #{food} to the monkeys"
+  end
+end
+
 module Scripts
   class MyScript < MyChildScript
     argument :accessor, :type => :string
