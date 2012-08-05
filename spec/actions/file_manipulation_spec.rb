@@ -324,20 +324,20 @@ describe Thor::Actions do
       File.join(destination_root, "doc", "COMMENTER")
     end
 
-    unmodified_comments_file = /__start__\n # greenblue\n# yellowblue\n#yellowred\n #greenred\norange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
+    unmodified_comments_file = /__start__\n # greenblue\n#\n# yellowblue\n#yellowred\n #greenred\norange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
 
     describe "#uncomment_lines" do
       it "uncomments all matching lines in the file" do
         action :uncomment_lines, "doc/COMMENTER", "green"
-        File.binread(file).should =~ /__start__\n greenblue\n# yellowblue\n#yellowred\n greenred\norange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
+        File.binread(file).should =~ /__start__\n greenblue\n#\n# yellowblue\n#yellowred\n greenred\norange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
 
         action :uncomment_lines, "doc/COMMENTER", "red"
-        File.binread(file).should =~ /__start__\n greenblue\n# yellowblue\nyellowred\n greenred\norange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
+        File.binread(file).should =~ /__start__\n greenblue\n#\n# yellowblue\nyellowred\n greenred\norange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
       end
 
       it "correctly uncomments lines with hashes in them" do
         action :uncomment_lines, "doc/COMMENTER", "ind#igo"
-        File.binread(file).should =~ /__start__\n # greenblue\n# yellowblue\n#yellowred\n #greenred\norange\n    purple\n  ind#igo\n  ind#igo\n__end__/
+        File.binread(file).should =~ /__start__\n # greenblue\n#\n# yellowblue\n#yellowred\n #greenred\norange\n    purple\n  ind#igo\n  ind#igo\n__end__/
       end
 
       it "does not modify already uncommented lines in the file" do
@@ -345,20 +345,25 @@ describe Thor::Actions do
         action :uncomment_lines, "doc/COMMENTER", "purple"
         File.binread(file).should =~ unmodified_comments_file
       end
+
+      it "does not uncomment the wrong line when uncommenting lines preceded by blank commented line" do
+        action :uncomment_lines, "doc/COMMENTER", "yellow"
+        File.binread(file).should =~ /__start__\n # greenblue\n#\nyellowblue\nyellowred\n #greenred\norange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
+      end
     end
 
     describe "#comment_lines" do
       it "comments lines which are not commented" do
         action :comment_lines, "doc/COMMENTER", "orange"
-        File.binread(file).should =~ /__start__\n # greenblue\n# yellowblue\n#yellowred\n #greenred\n# orange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
+        File.binread(file).should =~ /__start__\n # greenblue\n#\n# yellowblue\n#yellowred\n #greenred\n# orange\n    purple\n  ind#igo\n  # ind#igo\n__end__/
 
         action :comment_lines, "doc/COMMENTER", "purple"
-        File.binread(file).should =~ /__start__\n # greenblue\n# yellowblue\n#yellowred\n #greenred\n# orange\n    # purple\n  ind#igo\n  # ind#igo\n__end__/
+        File.binread(file).should =~ /__start__\n # greenblue\n#\n# yellowblue\n#yellowred\n #greenred\n# orange\n    # purple\n  ind#igo\n  # ind#igo\n__end__/
       end
 
       it "correctly comments lines with hashes in them" do
         action :comment_lines, "doc/COMMENTER", "ind#igo"
-        File.binread(file).should =~ /__start__\n # greenblue\n# yellowblue\n#yellowred\n #greenred\norange\n    purple\n  # ind#igo\n  # ind#igo\n__end__/
+        File.binread(file).should =~ /__start__\n # greenblue\n#\n# yellowblue\n#yellowred\n #greenred\norange\n    purple\n  # ind#igo\n  # ind#igo\n__end__/
       end
 
       it "does not modify already commented lines" do
