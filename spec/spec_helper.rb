@@ -27,6 +27,7 @@ load File.join(File.dirname(__FILE__), "fixtures", "task.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "group.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "invoke.thor")
+load File.join(File.dirname(__FILE__), "fixtures", "enum.thor")
 
 RSpec.configure do |config|
   config.before do

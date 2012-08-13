@@ -2,7 +2,7 @@ class Thor
   class Argument #:nodoc:
     VALID_TYPES = [ :numeric, :hash, :array, :string ]
 
-    attr_reader :name, :description, :required, :type, :default, :banner
+    attr_reader :name, :description, :enum, :required, :type, :default, :banner
     alias :human_name :name
 
     def initialize(name, options={})
@@ -19,6 +19,7 @@ class Thor
       @type        = (type || :string).to_sym
       @default     = options[:default]
       @banner      = options[:banner] || default_banner
+      @enum        = options[:enum]
 
       validate! # Trigger specific validations
     end
@@ -43,7 +44,11 @@ class Thor
     protected
 
       def validate!
-        raise ArgumentError, "An argument cannot be required and have default value." if required? && !default.nil?
+        if required? && !default.nil?
+          raise ArgumentError, "An argument cannot be required and have default value."
+        elsif @enum && !@enum.is_a?(Array)
+          raise ArgumentError, "An argument cannot have an enum other than an array."
+        end
       end
 
       def valid_type?(type)
