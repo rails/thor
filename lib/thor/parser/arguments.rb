@@ -144,7 +144,13 @@ class Thor
         if no_or_skip?(name)
           nil
         else
-          shift
+          value = shift
+          if @switches.is_a?(Hash) && switch = @switches[name]
+            if switch.enum && !switch.enum.include?(value)
+              raise MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
+            end
+          end
+          value
         end
       end
 

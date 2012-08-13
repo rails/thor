@@ -138,6 +138,11 @@ describe Thor::Base do
       content.should =~ /Foo options\:/
       content.should =~ /--last-name=LAST_NAME/
     end
+
+    it "displays choices for enums" do
+      content = capture(:stdout) { Enum.help(Thor::Base.shell.new) }
+      content.should =~ /Possible values\: apple, banana/
+    end
   end
 
   describe "#namespace" do
