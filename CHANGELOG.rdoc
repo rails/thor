@@ -1,3 +1,6 @@
+== 0.16.0, release 2012-08-14
+* Add enum to string arguments
+
 == 0.15.4, release 2012-06-29
 * Fix regression when destination root contains reserved regexp characters
 
