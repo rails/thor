@@ -21,9 +21,9 @@ class Thor
     # ==== Parameters
     # namespace<String>:: The namespace to search for.
     #
-    def self.find_by_namespace(namespace)
+    def self.find_by_namespace(namespace, task_name=nil)
       namespace = "default#{namespace}" if namespace.empty? || namespace =~ /^:/
-      Thor::Base.subclasses.find { |klass| klass.namespace == namespace }
+      Thor::Base.subclasses.find { |klass| klass.namespace == namespace and task_name.nil? || klass.tasks.keys.include?(task_name) }
     end
 
     # Receives a constant and converts it to a Thor namespace. Since Thor tasks
@@ -132,7 +132,9 @@ class Thor
       if namespace.include?(?:) # look for a namespaced task
         pieces = namespace.split(":")
         task   = pieces.pop
-        klass  = Thor::Util.find_by_namespace(pieces.join(":"))
+        actual_namespace = pieces.join(":")
+        klass = Thor::Util.find_by_namespace(actual_namespace, task)
+        klass ||= Thor::Util.find_by_namespace(actual_namespace)
       end
       unless klass # look for a Thor::Group with the right name
         klass, task = Thor::Util.find_by_namespace(namespace), nil
