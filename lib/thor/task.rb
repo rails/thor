@@ -24,9 +24,9 @@ class Thor
         instance.class.handle_no_task_error(name)
       elsif public_method?(instance)
         arity = instance.method(name).arity
-        instance.send(name, *args)
+        instance.__send__(name, *args)
       elsif local_method?(instance, :method_missing)
-        instance.send(:method_missing, name.to_sym, *args)
+        instance.__send__(:method_missing, name.to_sym, *args)
       else
         instance.class.handle_no_task_error(name)
       end
