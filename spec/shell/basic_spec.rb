@@ -24,6 +24,13 @@ describe Thor::Shell::Basic do
       shell.ask("Should I overwrite it?").should == "Sure"
     end
 
+    it "prints a message and returns nil if EOF is sent to stdin" do
+      $stdout.should_receive(:print).with(" ")
+      $stdin.should_receive(:gets).and_return(nil)
+      shell.ask("").should == nil
+    end
+
+
     it "prints a message to the user with the available options and determines the correctness of the answer" do
       $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor? ["strawberry", "chocolate", "vanilla"] ')
       $stdin.should_receive(:gets).and_return('chocolate')
