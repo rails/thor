@@ -370,7 +370,7 @@ HELP
 
       def ask_simply(statement, color=nil)
         say("#{statement} ", color)
-        stdin.gets.strip
+        stdin.gets.tap{|text| text.strip! if text}
       end
 
       def ask_filtered(statement, answer_set, *args)
