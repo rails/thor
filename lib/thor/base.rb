@@ -74,7 +74,7 @@ class Thor
       to_parse += opts.remaining unless self.class.strict_args_position?(config)
 
       thor_args = Thor::Arguments.new(self.class.arguments)
-      thor_args.parse(to_parse).each { |k,v| send("#{k}=", v) }
+      thor_args.parse(to_parse).each { |k,v| __send__("#{k}=", v) }
       @args = thor_args.remaining
     end
 

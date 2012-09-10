@@ -414,5 +414,9 @@ HELP
       klass.start(["unknown", "--bar", "baz"]).should == []
       klass.start(["unknown", "foo", "--bar", "baz"]).should == ["foo"]
     end
+
+    it "send as a task name" do
+      MyScript.start(["send"]).should == true
+    end
   end
 end
