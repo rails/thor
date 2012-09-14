@@ -45,6 +45,10 @@ class Thor
         self
       end
 
+      def has_key?(key)
+        super(convert_key(key))
+      end
+
       protected
 
         def convert_key(key)
