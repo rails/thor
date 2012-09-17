@@ -1,3 +1,5 @@
+# A pull request by cookiebatch has fixed a glitch with invoke()
+
 class Thor
   module Invocation
     def self.included(base) #:nodoc:
@@ -94,32 +96,32 @@ class Thor
     #   invoke Rspec::RR, [], :style => :foo
     #
     def invoke(name=nil, *args)
-      if name.nil?
-        warn "[Thor] Calling invoke() without argument is deprecated. Please use invoke_all instead.\n#{caller.join("\n")}"
-        return invoke_all
-      end
 
-      args.unshift(nil) if Array === args.first || NilClass === args.first
-      task, args, opts, config = args
+    #     return invoke_all
+    #   end
 
-      klass, task = _retrieve_class_and_task(name, task)
-      raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
+    #   args.unshift(nil) if Array === args.first || NilClass === args.first
+    #   task, args, opts, config = args
 
-      args, opts, config = _parse_initialization_options(args, opts, config)
-      klass.send(:dispatch, task, args, opts, config) do |instance|
-        instance.parent_options = options
-      end
-    end
+    #   klass, task = _retrieve_class_and_task(name, task)
+    #   raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
 
-    # Invoke the given task if the given args.
-    def invoke_task(task, *args) #:nodoc:
-      current = @_invocations[self.class]
+    #   args, opts, config = _parse_initialization_options(args, opts, config)
+    #   klass.send(:dispatch, task, args, opts, config) do |instance|
+    #     instance.parent_options = options
+    #   end
+    # end
 
-      unless current.include?(task.name)
-        current << task.name
-        task.run(self, *args)
-      end
-    end
+    # # Invoke the given task if the given args.
+    # def invoke_task(task, *args) #:nodoc:
+    #   current = @_invocations[self.class]
+
+    #   unless current.include?(task.name)
+    #     current << task.name
+    #     task.run(self, *args)
+    #   end
+   	invoke_all
+	 	end
 
     # Invoke all tasks for the current instance.
     def invoke_all #:nodoc:
