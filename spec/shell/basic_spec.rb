@@ -80,6 +80,11 @@ describe Thor::Shell::Basic do
       shell.say("Running... ")
     end
 
+    it "does not use a new line with whitespace+newline embedded" do
+      $stdout.should_receive(:puts).with("It's \nRunning...")
+      shell.say("It's \nRunning...")
+    end
+
     it "prints a message to the user without new line" do
       $stdout.should_receive(:print).with("Running...")
       shell.say("Running...", nil, false)
