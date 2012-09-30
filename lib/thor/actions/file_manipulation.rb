@@ -10,7 +10,9 @@ class Thor
     # ==== Parameters
     # source<String>:: the relative path to the source root.
     # destination<String>:: the relative path to the destination root.
-    # config<Hash>:: give :verbose => false to not log the status.
+    # config<Hash>:: give :verbose => false to not log the status, and 
+    #                :mode => :preserve, to preserve the file mode from the source.
+
     #
     # ==== Examples
     #
@@ -27,6 +29,10 @@ class Thor
         content = File.binread(source)
         content = block.call(content) if block
         content
+      end
+      if config[:mode] == :preserve
+        mode = File.stat(source).mode
+        chmod(destination, mode, config)
       end
     end
 
