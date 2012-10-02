@@ -57,6 +57,12 @@ class Thor
         match, is_switch = current_is_switch?
         shifted = shift
 
+        if shifted == '--'
+          @extra += @pile
+          @pile.clear
+          break
+        end
+
         if is_switch
           case shifted
             when SHORT_SQ_RE
