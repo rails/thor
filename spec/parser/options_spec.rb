@@ -143,6 +143,30 @@ describe Thor::Options do
       remaining.should == %w[moo --foo def -a]
     end
 
+    it "ignores -- when looking for single option values" do
+      create(:foo => :string, :bar => :required)
+      parse(%w[--bar -- --foo def -a]).should == {"bar" => "--foo"}
+      remaining.should == %w[def -a]
+    end
+
+    it "ignores -- when looking for array option values" do
+      create(:foo => :array)
+      parse(%w[--foo a b -- c d -e]).should == {"foo" => %w[a b c d -e]}
+      remaining.should == []
+    end
+
+    it "ignores -- when looking for hash option values" do
+      create(:foo => :hash)
+      parse(%w[--foo a:b -- c:d -e]).should == {"foo" => {'a' => 'b', 'c' => 'd'}}
+      remaining.should == %w[-e]
+    end
+
+    it "ignores trailing --" do
+      create(:foo => :string)
+      parse(%w[--foo --]).should == {"foo" => nil}
+      remaining.should == []
+    end
+
     describe "with no input" do
       it "and no switches returns an empty hash" do
         create({})
