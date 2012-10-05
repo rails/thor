@@ -5,6 +5,7 @@ class Thor
     EQ_RE       = /^(--\w+(?:-\w+)*|-[a-z])=(.*)$/i
     SHORT_SQ_RE = /^-([a-z]{2,})$/i # Allow either -x -v or -xv style for single char args
     SHORT_NUM   = /^(-[a-z])#{NUMERIC}$/i
+    OPTS_END    = '--'.freeze
 
     # Receives a hash and makes it switches.
     def self.to_switches(options)
@@ -50,33 +51,51 @@ class Thor
       @extra
     end
 
+    def peek
+      return super unless @parsing_options
+
+      result = super
+      if result == OPTS_END
+        shift
+        @parsing_options = false
+        super
+      else
+        result
+      end
+    end
+
     def parse(args)
       @pile = args.dup
+      @parsing_options = true
 
       while peek
-        match, is_switch = current_is_switch?
-        shifted = shift
+        if parsing_options?
+          match, is_switch = current_is_switch?
+          shifted = shift
 
-        if is_switch
-          case shifted
-            when SHORT_SQ_RE
-              unshift($1.split('').map { |f| "-#{f}" })
-              next
-            when EQ_RE, SHORT_NUM
-              unshift($2)
-              switch = $1
-            when LONG_RE, SHORT_RE
-              switch = $1
+          if is_switch
+            case shifted
+              when SHORT_SQ_RE
+                unshift($1.split('').map { |f| "-#{f}" })
+                next
+              when EQ_RE, SHORT_NUM
+                unshift($2)
+                switch = $1
+              when LONG_RE, SHORT_RE
+                switch = $1
+            end
+
+            switch = normalize_switch(switch)
+            option = switch_option(switch)
+            @assigns[option.human_name] = parse_peek(switch, option)
+          elsif match
+            @extra << shifted
+            @extra << shift while peek && peek !~ /^-/
+          else
+            @extra << shifted
           end
-
-          switch = normalize_switch(switch)
-          option = switch_option(switch)
-          @assigns[option.human_name] = parse_peek(switch, option)
-        elsif match
-          @extra << shifted
-          @extra << shift while peek && peek !~ /^-/
         else
-          @extra << shifted
+          @extra << shift
         end
       end
 
@@ -117,6 +136,10 @@ class Thor
         end
       end
 
+      def current_is_value?
+        peek && (!parsing_options? || super)
+      end
+
       def switch?(arg)
         switch_option(normalize_switch(arg))
       end
@@ -133,6 +156,11 @@ class Thor
       #
       def normalize_switch(arg)
         (@shorts[arg] || arg).tr('_', '-')
+      end
+
+      def parsing_options?
+        peek
+        @parsing_options
       end
 
       # Parse boolean values which can be given as --foo=true, --foo or --no-foo.
@@ -156,7 +184,7 @@ class Thor
       # Parse the value at the peek analyzing if it requires an input or not.
       #
       def parse_peek(switch, option)
-        if current_is_switch_formatted? || last?
+        if parsing_options? && (current_is_switch_formatted? || last?)
           if option.boolean?
             # No problem for boolean types
           elsif no_or_skip?(switch)

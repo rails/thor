@@ -18,6 +18,10 @@ describe Thor::Options do
     @opt.check_unknown!
   end
 
+  def remaining
+    @opt.remaining
+  end
+
   describe "#to_switches" do
     it "turns true values into a flag" do
       Thor::Options.to_switches(:color => true).should == "--color"
@@ -131,6 +135,36 @@ describe Thor::Options do
       create :foo_bar => :string, :baz_foo => :string
       parse("--foo_bar", "baz")["foo_bar"].should == "baz"
       parse("--baz_foo", "foo bar")["baz_foo"].should == "foo bar"
+    end
+
+    it "interprets everything after -- as args instead of options" do
+      create(:foo => :string, :bar => :required)
+      parse(%w[--bar abc moo -- --foo def -a]).should == {"bar" => "abc"}
+      remaining.should == %w[moo --foo def -a]
+    end
+
+    it "ignores -- when looking for single option values" do
+      create(:foo => :string, :bar => :required)
+      parse(%w[--bar -- --foo def -a]).should == {"bar" => "--foo"}
+      remaining.should == %w[def -a]
+    end
+
+    it "ignores -- when looking for array option values" do
+      create(:foo => :array)
+      parse(%w[--foo a b -- c d -e]).should == {"foo" => %w[a b c d -e]}
+      remaining.should == []
+    end
+
+    it "ignores -- when looking for hash option values" do
+      create(:foo => :hash)
+      parse(%w[--foo a:b -- c:d -e]).should == {"foo" => {'a' => 'b', 'c' => 'd'}}
+      remaining.should == %w[-e]
+    end
+
+    it "ignores trailing --" do
+      create(:foo => :string)
+      parse(%w[--foo --]).should == {"foo" => nil}
+      remaining.should == []
     end
 
     describe "with no input" do
