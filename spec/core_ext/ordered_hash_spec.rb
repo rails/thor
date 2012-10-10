@@ -8,7 +8,7 @@ describe Thor::CoreExt::OrderedHash do
 
   describe "without any items" do
     it "returns nil for an undefined key" do
-      @hash["foo"].should be_nil
+      expect(@hash["foo"]).to be_nil
     end
 
     it "doesn't iterate through any items" do
@@ -16,12 +16,12 @@ describe Thor::CoreExt::OrderedHash do
     end
 
     it "has an empty key and values list" do
-      @hash.keys.should be_empty
-      @hash.values.should be_empty
+      expect(@hash.keys).to be_empty
+      expect(@hash.values).to be_empty
     end
 
     it "must be empty" do
-      @hash.should be_empty
+      expect(@hash).to be_empty
     end
   end
 
@@ -35,15 +35,15 @@ describe Thor::CoreExt::OrderedHash do
     end
 
     it "returns nil for an undefined key" do
-      @hash[:boom].should be_nil
+      expect(@hash[:boom]).to be_nil
     end
 
     it "returns the value for each key" do
-      @hash[:foo].should == "Foo!"
-      @hash[:bar].should == "Bar!"
-      @hash[:baz].should == "Baz!"
-      @hash[:bop].should == "Bop!"
-      @hash[:bat].should == "Bat!"
+      expect(@hash[:foo]).to eq("Foo!")
+      expect(@hash[:bar]).to eq("Bar!")
+      expect(@hash[:baz]).to eq("Baz!")
+      expect(@hash[:bop]).to eq("Bop!")
+      expect(@hash[:bat]).to eq("Bat!")
     end
 
     it "iterates through the keys and values in order of assignment" do
@@ -51,27 +51,27 @@ describe Thor::CoreExt::OrderedHash do
       @hash.each do |key, value|
         arr << [key, value]
       end
-      arr.should == [[:foo, "Foo!"], [:bar, "Bar!"], [:baz, "Baz!"],
-                     [:bop, "Bop!"], [:bat, "Bat!"]]
+      expect(arr).to eq([[:foo, "Foo!"], [:bar, "Bar!"], [:baz, "Baz!"],
+                     [:bop, "Bop!"], [:bat, "Bat!"]])
     end
 
     it "returns the keys in order of insertion" do
-      @hash.keys.should == [:foo, :bar, :baz, :bop, :bat]
+      expect(@hash.keys).to eq([:foo, :bar, :baz, :bop, :bat])
     end
 
     it "returns the values in order of insertion" do
-      @hash.values.should == ["Foo!", "Bar!", "Baz!", "Bop!", "Bat!"]
+      expect(@hash.values).to eq(["Foo!", "Bar!", "Baz!", "Bop!", "Bat!"])
     end
 
     it "does not move an overwritten node to the end of the ordering" do
       @hash[:baz] = "Bip!"
-      @hash.values.should == ["Foo!", "Bar!", "Bip!", "Bop!", "Bat!"]
+      expect(@hash.values).to eq(["Foo!", "Bar!", "Bip!", "Bop!", "Bat!"])
 
       @hash[:foo] = "Bip!"
-      @hash.values.should == ["Bip!", "Bar!", "Bip!", "Bop!", "Bat!"]
+      expect(@hash.values).to eq(["Bip!", "Bar!", "Bip!", "Bop!", "Bat!"])
 
       @hash[:bat] = "Bip!"
-      @hash.values.should == ["Bip!", "Bar!", "Bip!", "Bop!", "Bip!"]
+      expect(@hash.values).to eq(["Bip!", "Bar!", "Bip!", "Bop!", "Bip!"])
     end
 
     it "appends another ordered hash while preserving ordering" do
@@ -79,37 +79,37 @@ describe Thor::CoreExt::OrderedHash do
       other_hash[1] = "one"
       other_hash[2] = "two"
       other_hash[3] = "three"
-      @hash.merge(other_hash).values.should == ["Foo!", "Bar!", "Baz!", "Bop!", "Bat!", "one", "two", "three"]
+      expect(@hash.merge(other_hash).values).to eq(["Foo!", "Bar!", "Baz!", "Bop!", "Bat!", "one", "two", "three"])
     end
 
     it "overwrites hash keys with matching appended keys" do
       other_hash = Thor::CoreExt::OrderedHash.new
       other_hash[:bar] = "bar"
-      @hash.merge(other_hash)[:bar].should == "bar"
-      @hash[:bar].should == "Bar!"
+      expect(@hash.merge(other_hash)[:bar]).to eq("bar")
+      expect(@hash[:bar]).to eq("Bar!")
     end
 
     it "converts to an array" do
-      @hash.to_a.should == [[:foo, "Foo!"], [:bar, "Bar!"], [:baz, "Baz!"], [:bop, "Bop!"], [:bat, "Bat!"]]
+      expect(@hash.to_a).to eq([[:foo, "Foo!"], [:bar, "Bar!"], [:baz, "Baz!"], [:bop, "Bop!"], [:bat, "Bat!"]])
     end
 
     it "must not be empty" do
-      @hash.should_not be_empty
+      expect(@hash).not_to be_empty
     end
 
     it "deletes values from hash" do
-      @hash.delete(:baz).should == "Baz!"
-      @hash.values.should == ["Foo!", "Bar!", "Bop!", "Bat!"]
+      expect(@hash.delete(:baz)).to eq("Baz!")
+      expect(@hash.values).to eq(["Foo!", "Bar!", "Bop!", "Bat!"])
 
-      @hash.delete(:foo).should == "Foo!"
-      @hash.values.should == ["Bar!", "Bop!", "Bat!"]
+      expect(@hash.delete(:foo)).to eq("Foo!")
+      expect(@hash.values).to eq(["Bar!", "Bop!", "Bat!"])
 
-      @hash.delete(:bat).should == "Bat!"
-      @hash.values.should == ["Bar!", "Bop!"]
+      expect(@hash.delete(:bat)).to eq("Bat!")
+      expect(@hash.values).to eq(["Bar!", "Bop!"])
     end
 
     it "returns nil if the value to be deleted can't be found" do
-      @hash.delete(:nothing).should be_nil
+      expect(@hash.delete(:nothing)).to be_nil
     end
   end
 end

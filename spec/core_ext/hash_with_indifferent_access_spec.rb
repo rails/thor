@@ -7,37 +7,37 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
   end
 
   it "has values accessible by either strings or symbols" do
-    @hash['foo'].should == 'bar'
-    @hash[:foo].should  == 'bar'
+    expect(@hash['foo']).to eq('bar')
+    expect(@hash[:foo]).to eq('bar')
 
-    @hash.values_at(:foo, :baz).should == ['bar', 'bee']
-    @hash.delete(:foo).should == 'bar'
+    expect(@hash.values_at(:foo, :baz)).to eq(['bar', 'bee'])
+    expect(@hash.delete(:foo)).to eq('bar')
   end
 
   it "handles magic boolean predicates" do
-    @hash.force?.should be_true
-    @hash.foo?.should be_true
-    @hash.nothing?.should be_false
+    expect(@hash.force?).to be_true
+    expect(@hash.foo?).to be_true
+    expect(@hash.nothing?).to be_false
   end
 
   it "handles magic comparisions" do
-    @hash.foo?('bar').should be_true
-    @hash.foo?('bee').should be_false
+    expect(@hash.foo?('bar')).to be_true
+    expect(@hash.foo?('bee')).to be_false
   end
 
   it "maps methods to keys" do
-    @hash.foo.should == @hash['foo']
+    expect(@hash.foo).to eq(@hash['foo'])
   end
 
   it "merges keys independent if they are symbols or strings" do
     @hash.merge!('force' => false, :baz => "boom")
-    @hash[:force].should == false
-    @hash[:baz].should == "boom"
+    expect(@hash[:force]).to eq(false)
+    expect(@hash[:baz]).to eq("boom")
   end
 
   it "creates a new hash by merging keys independent if they are symbols or strings" do
     other = @hash.merge('force' => false, :baz => "boom")
-    other[:force].should == false
-    other[:baz].should == "boom"
+    expect(other[:force]).to eq(false)
+    expect(other[:baz]).to eq("boom")
   end
 end

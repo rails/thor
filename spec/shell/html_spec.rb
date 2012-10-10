@@ -8,17 +8,17 @@ describe Thor::Shell::HTML do
   describe "#say" do
     it "set the color if specified" do
       out = capture(:stdout) { shell.say "Wow! Now we have colors!", :green }
-      out.chomp.should == '<span style="color: green;">Wow! Now we have colors!</span>'
+      expect(out.chomp).to eq('<span style="color: green;">Wow! Now we have colors!</span>')
     end
 
     it "sets bold if specified" do
       out = capture(:stdout) { shell.say "Wow! Now we have colors *and* bold!", [:green, :bold] }
-      out.chomp.should == '<span style="color: green; font-weight: bold;">Wow! Now we have colors *and* bold!</span>'
+      expect(out.chomp).to eq('<span style="color: green; font-weight: bold;">Wow! Now we have colors *and* bold!</span>')
     end
 
     it "does not use a new line even with colors" do
       out = capture(:stdout) { shell.say "Wow! Now we have colors! ", :green }
-      out.chomp.should == '<span style="color: green;">Wow! Now we have colors! </span>'
+      expect(out.chomp).to eq('<span style="color: green;">Wow! Now we have colors! </span>')
     end
   end
 

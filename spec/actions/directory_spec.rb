@@ -28,21 +28,21 @@ describe Thor::Actions::Directory do
       source      = File.join(source_root, source_path, file)
       destination = File.join(destination_root, destination_path, file)
 
-      File.exists?(destination).should be_true
-      FileUtils.identical?(source, destination).should be_true
+      expect(File.exists?(destination)).to be_true
+      expect(FileUtils.identical?(source, destination)).to be_true
     end
   end
 
   describe "#invoke!" do
     it "raises an error if the source does not exist" do
-      lambda {
+      expect {
         invoke! "unknown"
-      }.should raise_error(Thor::Error, /Could not find "unknown" in any of your source paths/)
+      }.to raise_error(Thor::Error, /Could not find "unknown" in any of your source paths/)
     end
 
-    it "should not create a directory in pretend mode" do
+    it "does not create a directory in pretend mode" do
       invoke! "doc", "ghost", :pretend => true
-      File.exists?("ghost").should be_false
+      expect(File.exists?("ghost")).to be_false
     end
 
     it "copies the whole directory recursively to the default destination" do
@@ -59,13 +59,13 @@ describe Thor::Actions::Directory do
       invoke! ".", "tasks", :recursive => false
 
       file = File.join(destination_root, "tasks", "group.thor")
-      File.exists?(file).should be_true
+      expect(File.exists?(file)).to be_true
 
       file = File.join(destination_root, "tasks", "doc")
-      File.exists?(file).should be_false
+      expect(File.exists?(file)).to be_false
 
       file = File.join(destination_root, "tasks", "doc", "README")
-      File.exists?(file).should be_false
+      expect(File.exists?(file)).to be_false
     end
 
     it "copies files from the source relative to the current path" do
@@ -78,47 +78,47 @@ describe Thor::Actions::Directory do
     it "copies and evaluates templates" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "rdoc.rb")
-      File.exists?(file).should be_true
-      File.read(file).should == "FOO = FOO\n"
+      expect(File.exists?(file)).to be_true
+      expect(File.read(file)).to eq("FOO = FOO\n")
     end
 
     it "copies directories and preserved file mode" do
       invoke! "preserve", "preserved", :mode => :preserve
       original = File.join(source_root, "preserve", "script.sh")
       copy = File.join(destination_root, "preserved", "script.sh")
-      File.stat(original).mode.should == File.stat(copy).mode
+      expect(File.stat(original).mode).to eq(File.stat(copy).mode)
     end
 
     it "copies directories" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "components")
-      File.exists?(file).should be_true
-      File.directory?(file).should be_true
+      expect(File.exists?(file)).to be_true
+      expect(File.directory?(file)).to be_true
     end
 
     it "does not copy .empty_directory files" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "components", ".empty_directory")
-      File.exists?(file).should be_false
+      expect(File.exists?(file)).to be_false
     end
 
     it "copies directories even if they are empty" do
       invoke! "doc/components", "docs/components"
       file = File.join(destination_root, "docs", "components")
-      File.exists?(file).should be_true
+      expect(File.exists?(file)).to be_true
     end
 
     it "does not copy empty directories twice" do
       content = invoke!("doc/components", "docs/components")
-      content.should_not =~ /exist/
+      expect(content).not_to match(/exist/)
     end
 
     it "logs status" do
       content = invoke!("doc")
-      content.should =~ /create  doc\/README/
-      content.should =~ /create  doc\/config\.rb/
-      content.should =~ /create  doc\/rdoc\.rb/
-      content.should =~ /create  doc\/components/
+      expect(content).to match(/create  doc\/README/)
+      expect(content).to match(/create  doc\/config\.rb/)
+      expect(content).to match(/create  doc\/rdoc\.rb/)
+      expect(content).to match(/create  doc\/components/)
     end
 
     it "yields a block" do
@@ -126,12 +126,12 @@ describe Thor::Actions::Directory do
       invoke!("doc") do |content|
         checked ||= !!(content =~ /FOO/)
       end
-      checked.should be_true
+      expect(checked).to be_true
     end
 
     it "works with glob characters in the path" do
       content = invoke!("app{1}")
-      content.should =~ /create  app\{1\}\/README/
+      expect(content).to match(/create  app\{1\}\/README/)
     end
   end
 
@@ -140,17 +140,17 @@ describe Thor::Actions::Directory do
       invoke! "doc"
       revoke! "doc"
 
-      File.exists?(File.join(destination_root, "doc", "README")).should be_false
-      File.exists?(File.join(destination_root, "doc", "config.rb")).should be_false
-      File.exists?(File.join(destination_root, "doc", "components")).should be_false
+      expect(File.exists?(File.join(destination_root, "doc", "README"))).to be_false
+      expect(File.exists?(File.join(destination_root, "doc", "config.rb"))).to be_false
+      expect(File.exists?(File.join(destination_root, "doc", "components"))).to be_false
     end
 
     it "works with glob characters in the path" do
       invoke! "app{1}"
-      File.exists?(File.join(destination_root, "app{1}", "README")).should be_true
+      expect(File.exists?(File.join(destination_root, "app{1}", "README"))).to be_true
 
       revoke! "app{1}"
-      File.exists?(File.join(destination_root, "app{1}", "README")).should be_false
+      expect(File.exists?(File.join(destination_root, "app{1}", "README"))).to be_false
     end
   end
 end

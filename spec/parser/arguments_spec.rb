@@ -19,48 +19,48 @@ describe Thor::Arguments do
   describe "#parse" do
     it "parses arguments in the given order" do
       create :string => nil, :numeric => nil
-      parse("name", "13")["string"].should == "name"
-      parse("name", "13")["numeric"].should == 13
+      expect(parse("name", "13")["string"]).to eq("name")
+      expect(parse("name", "13")["numeric"]).to eq(13)
     end
 
     it "accepts hashes" do
       create :string => nil, :hash => nil
-      parse("product", "title:string", "age:integer")["string"].should == "product"
-      parse("product", "title:string", "age:integer")["hash"].should == { "title" => "string", "age" => "integer"}
-      parse("product", "url:http://www.amazon.com/gp/product/123")["hash"].should == { "url" => "http://www.amazon.com/gp/product/123" }
+      expect(parse("product", "title:string", "age:integer")["string"]).to eq("product")
+      expect(parse("product", "title:string", "age:integer")["hash"]).to eq({ "title" => "string", "age" => "integer"})
+      expect(parse("product", "url:http://www.amazon.com/gp/product/123")["hash"]).to eq({ "url" => "http://www.amazon.com/gp/product/123" })
     end
 
     it "accepts arrays" do
       create :string => nil, :array => nil
-      parse("product", "title", "age")["string"].should == "product"
-      parse("product", "title", "age")["array"].should == %w(title age)
+      expect(parse("product", "title", "age")["string"]).to eq("product")
+      expect(parse("product", "title", "age")["array"]).to eq(%w(title age))
     end
 
     describe "with no inputs" do
       it "and no arguments returns an empty hash" do
         create
-        parse.should == {}
+        expect(parse).to eq({})
       end
 
       it "and required arguments raises an error" do
         create :string => nil, :numeric => nil
-        lambda { parse }.should raise_error(Thor::RequiredArgumentMissingError, "No value provided for required arguments 'string', 'numeric'")
+        expect{ parse }.to raise_error(Thor::RequiredArgumentMissingError, "No value provided for required arguments 'string', 'numeric'")
       end
 
       it "and default arguments returns default values" do
         create :string => "name", :numeric => 13
-        parse.should == { "string" => "name", "numeric" => 13 }
+        expect(parse).to eq({ "string" => "name", "numeric" => 13 })
       end
     end
 
     it "returns the input if it's already parsed" do
       create :string => nil, :hash => nil, :array => nil, :numeric => nil
-      parse("", 0, {}, []).should == { "string" => "", "numeric" => 0, "hash" => {}, "array" => [] }
+      expect(parse("", 0, {}, [])).to eq({ "string" => "", "numeric" => 0, "hash" => {}, "array" => [] })
     end
 
     it "returns the default value if none is provided" do
       create :string => "foo", :numeric => 3.0
-      parse("bar").should == { "string" => "bar", "numeric" => 3.0 }
+      expect(parse("bar")).to eq({ "string" => "bar", "numeric" => 3.0 })
     end
   end
 end

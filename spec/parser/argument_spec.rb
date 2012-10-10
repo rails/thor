@@ -9,45 +9,45 @@ describe Thor::Argument do
 
   describe "errors" do
     it "raises an error if name is not supplied" do
-      lambda {
+      expect {
         argument(nil)
-      }.should raise_error(ArgumentError, "Argument name can't be nil.")
+      }.to raise_error(ArgumentError, "Argument name can't be nil.")
     end
 
     it "raises an error if type is unknown" do
-      lambda {
+      expect {
         argument(:task, :type => :unknown)
-      }.should raise_error(ArgumentError, "Type :unknown is not valid for arguments.")
+      }.to raise_error(ArgumentError, "Type :unknown is not valid for arguments.")
     end
 
     it "raises an error if argument is required and have default values" do
-      lambda {
+      expect {
         argument(:task, :type => :string, :default => "bar", :required => true)
-      }.should raise_error(ArgumentError, "An argument cannot be required and have default value.")
+      }.to raise_error(ArgumentError, "An argument cannot be required and have default value.")
     end
 
     it "raises an error if enum isn't an array" do
-      lambda {
+      expect {
         argument(:task, :type => :string, :enum => "bar")
-      }.should raise_error(ArgumentError, "An argument cannot have an enum other than an array.")
+      }.to raise_error(ArgumentError, "An argument cannot have an enum other than an array.")
     end
   end
 
   describe "#usage" do
     it "returns usage for string types" do
-      argument(:foo, :type => :string).usage.should == "FOO"
+      expect(argument(:foo, :type => :string).usage).to eq("FOO")
     end
 
     it "returns usage for numeric types" do
-      argument(:foo, :type => :numeric).usage.should == "N"
+      expect(argument(:foo, :type => :numeric).usage).to eq("N")
     end
 
     it "returns usage for array types" do
-      argument(:foo, :type => :array).usage.should == "one two three"
+      expect(argument(:foo, :type => :array).usage).to eq("one two three")
     end
 
     it "returns usage for hash types" do
-      argument(:foo, :type => :hash).usage.should == "key:value"
+      expect(argument(:foo, :type => :hash).usage).to eq("key:value")
     end
   end
 end

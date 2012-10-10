@@ -12,32 +12,32 @@ describe Thor::Task do
   describe "#formatted_usage" do
     it "includes namespace within usage" do
       object = Struct.new(:namespace, :arguments).new("foo", [])
-      task(:bar => :required).formatted_usage(object).should == "foo:can_has --bar=BAR"
+      expect(task(:bar => :required).formatted_usage(object)).to eq("foo:can_has --bar=BAR")
     end
 
     it "includes subcommand name within subcommand usage" do
       object = Struct.new(:namespace, :arguments).new("main:foo", [])
-      task(:bar => :required).formatted_usage(object, false, true).should == "foo can_has --bar=BAR"
+      expect(task(:bar => :required).formatted_usage(object, false, true)).to eq("foo can_has --bar=BAR")
     end
 
     it "removes default from namespace" do
       object = Struct.new(:namespace, :arguments).new("default:foo", [])
-      task(:bar => :required).formatted_usage(object).should == ":foo:can_has --bar=BAR"
+      expect(task(:bar => :required).formatted_usage(object)).to eq(":foo:can_has --bar=BAR")
     end
 
     it "injects arguments into usage" do
       options = {:required => true, :type => :string}
       object = Struct.new(:namespace, :arguments).new("foo", [Thor::Argument.new(:bar, options)])
-      task(:foo => :required).formatted_usage(object).should == "foo:can_has BAR --foo=FOO"
+      expect(task(:foo => :required).formatted_usage(object)).to eq("foo:can_has BAR --foo=FOO")
     end
   end
 
   describe "#dynamic" do
     it "creates a dynamic task with the given name" do
-      Thor::DynamicTask.new('task').name.should == 'task'
-      Thor::DynamicTask.new('task').description.should == 'A dynamically-generated task'
-      Thor::DynamicTask.new('task').usage.should == 'task'
-      Thor::DynamicTask.new('task').options.should == {}
+      expect(Thor::DynamicTask.new('task').name).to eq('task')
+      expect(Thor::DynamicTask.new('task').description).to eq('A dynamically-generated task')
+      expect(Thor::DynamicTask.new('task').usage).to eq('task')
+      expect(Thor::DynamicTask.new('task').options).to eq({})
     end
 
     it "does not invoke an existing method" do
@@ -51,7 +51,7 @@ describe Thor::Task do
     it "dup options hash" do
       task = Thor::Task.new("can_has", nil, nil, nil, :foo => true, :bar => :required)
       task.dup.options.delete(:foo)
-      task.options[:foo].should be
+      expect(task.options[:foo]).to be
     end
   end
 
@@ -59,7 +59,7 @@ describe Thor::Task do
     it "runs a task by calling a method in the given instance" do
       mock = mock()
       mock.should_receive(:can_has).and_return {|*args| args }
-      task.run(mock, [1, 2, 3]).should == [1, 2, 3]
+      expect(task.run(mock, [1, 2, 3])).to eq([1, 2, 3])
     end
 
     it "raises an error if the method to be invoked is private" do
@@ -74,7 +74,7 @@ describe Thor::Task do
         end
       end
 
-      task.run(klass.new).should == "can_has"
+      expect(task.run(klass.new)).to eq("can_has")
     end
   end
 end

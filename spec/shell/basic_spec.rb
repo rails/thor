@@ -10,10 +10,10 @@ describe Thor::Shell::Basic do
   describe "#padding" do
     it "cannot be set to below zero" do
       shell.padding = 10
-      shell.padding.should == 10
+      expect(shell.padding).to eq(10)
 
       shell.padding = -1
-      shell.padding.should == 0
+      expect(shell.padding).to eq(0)
     end
   end
 
@@ -21,27 +21,27 @@ describe Thor::Shell::Basic do
     it "prints a message to the user and gets the response" do
       $stdout.should_receive(:print).with("Should I overwrite it? ")
       $stdin.should_receive(:gets).and_return('Sure')
-      shell.ask("Should I overwrite it?").should == "Sure"
+      expect(shell.ask("Should I overwrite it?")).to eq("Sure")
     end
 
     it "prints a message and returns nil if EOF is sent to stdin" do
       $stdout.should_receive(:print).with(" ")
       $stdin.should_receive(:gets).and_return(nil)
-      shell.ask("").should == nil
+      expect(shell.ask("")).to eq(nil)
     end
 
 
     it "prints a message to the user with the available options and determines the correctness of the answer" do
       $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor? ["strawberry", "chocolate", "vanilla"] ')
       $stdin.should_receive(:gets).and_return('chocolate')
-      shell.ask("What's your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"]).should == "chocolate"
+      expect(shell.ask("What's your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])).to eq("chocolate")
     end
 
     it "prints a message to the user with the available options and reasks the question after an incorrect repsonse" do
       $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor? ["strawberry", "chocolate", "vanilla"] ').twice
       $stdout.should_receive(:puts).with('Your response must be one of: ["strawberry", "chocolate", "vanilla"]. Please try again.')
       $stdin.should_receive(:gets).and_return('moose tracks', 'chocolate')
-      shell.ask("What's your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"]).should == "chocolate"
+      expect(shell.ask("What's your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])).to eq("chocolate")
     end
   end
 
@@ -49,11 +49,11 @@ describe Thor::Shell::Basic do
     it "asks the user and returns true if the user replies yes" do
       $stdout.should_receive(:print).with("Should I overwrite it? ")
         $stdin.should_receive(:gets).and_return('y')
-      shell.yes?("Should I overwrite it?").should === true
+      expect(shell.yes?("Should I overwrite it?")).to be_true
 
       $stdout.should_receive(:print).with("Should I overwrite it? ")
         $stdin.should_receive(:gets).and_return('n')
-      shell.yes?("Should I overwrite it?").should_not === true
+      expect(shell.yes?("Should I overwrite it?")).not_to be_true
     end
   end
 
@@ -61,11 +61,11 @@ describe Thor::Shell::Basic do
     it "asks the user and returns true if the user replies no" do
       $stdout.should_receive(:print).with("Should I overwrite it? ")
         $stdin.should_receive(:gets).and_return('n')
-      shell.no?("Should I overwrite it?").should === true
+      expect(shell.no?("Should I overwrite it?")).to be_true
 
       $stdout.should_receive(:print).with("Should I overwrite it? ")
         $stdin.should_receive(:gets).and_return('Yes')
-      shell.no?("Should I overwrite it?").should === false
+      expect(shell.no?("Should I overwrite it?")).to be_false
     end
   end
 
@@ -139,8 +139,8 @@ describe Thor::Shell::Basic do
     end
 
     it "prints in columns" do
-      content = capture(:stdout){ shell.print_in_columns(@array) }
-      content.rstrip.should == "1234567890  a           b           c           d           e"
+      content = capture(:stdout) { shell.print_in_columns(@array) }
+      expect(content.rstrip).to eq("1234567890  a           b           c           d           e")
     end
   end
 
@@ -153,8 +153,8 @@ describe Thor::Shell::Basic do
     end
 
     it "prints a table" do
-      content = capture(:stdout){ shell.print_table(@table) }
-      content.should == <<-TABLE
+      content = capture(:stdout) { shell.print_table(@table) }
+      expect(content).to eq(<<-TABLE)
 abc  #123  first three
      #0    empty
 xyz  #786  last three
@@ -162,8 +162,8 @@ TABLE
     end
 
     it "prints a table with indentation" do
-      content = capture(:stdout){ shell.print_table(@table, :indent => 2) }
-      content.should == <<-TABLE
+      content = capture(:stdout) { shell.print_table(@table, :indent => 2) }
+      expect(content).to eq(<<-TABLE)
   abc  #123  first three
        #0    empty
   xyz  #786  last three
@@ -174,8 +174,8 @@ TABLE
       @table << ["def", "#456", "Lançam foo bar"]
       @table << ["ghi", "#789", "بالله  عليكم"]
       shell.should_receive(:terminal_width).and_return(20)
-      content = capture(:stdout){ shell.print_table(@table, :indent => 2, :truncate => true) }
-      content.should == <<-TABLE
+      content = capture(:stdout) { shell.print_table(@table, :indent => 2, :truncate => true) }
+      expect(content).to eq(<<-TABLE)
   abc  #123  firs...
        #0    empty
   xyz  #786  last...
@@ -185,8 +185,8 @@ TABLE
     end
 
     it "honors the colwidth option" do
-      content = capture(:stdout){ shell.print_table(@table, :colwidth => 10)}
-      content.should == <<-TABLE
+      content = capture(:stdout) { shell.print_table(@table, :colwidth => 10)}
+      expect(content).to eq(<<-TABLE)
 abc         #123  first three
             #0    empty
 xyz         #786  last three
@@ -195,8 +195,8 @@ TABLE
 
     it "prints tables with implicit columns" do
       2.times { @table.first.pop }
-      content = capture(:stdout){ shell.print_table(@table) }
-      content.should == <<-TABLE
+      content = capture(:stdout) { shell.print_table(@table) }
+      expect(content).to eq(<<-TABLE)
 abc  
      #0    empty
 xyz  #786  last three
@@ -208,8 +208,8 @@ TABLE
         ["Name", "Number", "Color"],
         ["Erik", 1, "green"]
       ]
-      content = capture(:stdout){ shell.print_table(table) }
-      content.should == <<-TABLE
+      content = capture(:stdout) { shell.print_table(table) }
+      expect(content).to eq(<<-TABLE)
 Name  Number  Color
 Erik       1  green
 TABLE
@@ -220,8 +220,8 @@ TABLE
         ["Name", "Number"],
         ["Erik", 1]
       ]
-      content = capture(:stdout){ shell.print_table(table) }
-      content.should == <<-TABLE
+      content = capture(:stdout) { shell.print_table(table) }
+      expect(content).to eq(<<-TABLE)
 Name  Number
 Erik       1
 TABLE
@@ -232,8 +232,8 @@ TABLE
         ["Name", "Number", "Color"],
         ["Erik", 1234567890123, "green"]
       ]
-      content = capture(:stdout){ shell.print_table(table) }
-      content.should == <<-TABLE
+      content = capture(:stdout) { shell.print_table(table) }
+      expect(content).to eq(<<-TABLE)
 Name  Number         Color
 Erik  1234567890123  green
 TABLE
@@ -250,27 +250,27 @@ TABLE
     it "returns true if the user choose default option" do
       $stdout.stub!(:print)
       $stdin.should_receive(:gets).and_return('')
-      shell.file_collision('foo').should be_true
+      expect(shell.file_collision('foo')).to be_true
     end
 
     it "returns false if the user choose no" do
       $stdout.stub!(:print)
       $stdin.should_receive(:gets).and_return('n')
-      shell.file_collision('foo').should be_false
+      expect(shell.file_collision('foo')).to be_false
     end
 
     it "returns true if the user choose yes" do
       $stdout.stub!(:print)
       $stdin.should_receive(:gets).and_return('y')
-      shell.file_collision('foo').should be_true
+      expect(shell.file_collision('foo')).to be_true
     end
 
     it "shows help usage if the user choose help" do
       $stdout.stub!(:print)
       $stdin.should_receive(:gets).and_return('h')
       $stdin.should_receive(:gets).and_return('n')
-      help = capture(:stdout){ shell.file_collision('foo') }
-      help.should =~ /h \- help, show this help/
+      help = capture(:stdout) { shell.file_collision('foo') }
+      expect(help).to match(/h \- help, show this help/)
     end
 
     it "quits if the user choose quit" do
@@ -278,19 +278,19 @@ TABLE
       $stdout.should_receive(:puts).with('Aborting...')
       $stdin.should_receive(:gets).and_return('q')
 
-      lambda {
+      expect {
         shell.file_collision('foo')
-      }.should raise_error(SystemExit)
+      }.to raise_error(SystemExit)
     end
 
     it "always returns true if the user choose always" do
       $stdout.should_receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqh] ')
       $stdin.should_receive(:gets).and_return('a')
 
-      shell.file_collision('foo').should be_true
+      expect(shell.file_collision('foo')).to be_true
 
       $stdout.should_not_receive(:print)
-      shell.file_collision('foo').should be_true
+      expect(shell.file_collision('foo')).to be_true
     end
 
     describe "when a block is given" do
@@ -305,7 +305,7 @@ TABLE
         $stdin.should_receive(:gets).and_return('d')
         $stdin.should_receive(:gets).and_return('n')
         shell.should_receive(:system).with(/diff -u/)
-        capture(:stdout){ shell.file_collision('foo'){ } }
+        capture(:stdout) { shell.file_collision('foo'){ } }
       end
     end
   end

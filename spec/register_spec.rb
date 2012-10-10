@@ -82,12 +82,12 @@ BoringVendorProvidedCLI.register(
 describe ".register-ing a Thor subclass" do
   it "registers the plugin as a subcommand" do
     fireworks_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[exciting fireworks]) }
-    fireworks_output.should == "kaboom!\n"
+    expect(fireworks_output).to eq("kaboom!\n")
   end
 
   it "includes the plugin's usage in the help" do
     help_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[help]) }
-    help_output.should include('do exciting things')
+    expect(help_output).to include('do exciting things')
   end
 
   context "when $thor_runner is false" do
@@ -95,7 +95,7 @@ describe ".register-ing a Thor subclass" do
       begin
         $thor_runner = false
         help_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[exciting]) }
-        help_output.should include('thor exciting_plugin_c_l_i fireworks')
+        expect(help_output).to include('thor exciting_plugin_c_l_i fireworks')
       ensure
         $thor_runner = true
       end
@@ -105,12 +105,12 @@ describe ".register-ing a Thor subclass" do
   context "when hidden" do
     it "omits the hidden plugin's usage from the help" do
       help_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[help]) }
-      help_output.should_not include('secret stuff')
+      expect(help_output).not_to include('secret stuff')
     end
 
     it "registers the plugin as a subcommand" do
       secret_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[secret squirrel]) }
-      secret_output.should == "I love nuts\n"
+      expect(secret_output).to eq("I love nuts\n")
     end
   end
 end
@@ -118,18 +118,18 @@ end
 describe ".register-ing a Thor::Group subclass" do
   it "registers the group as a single command" do
     group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[groupwork]) }
-    group_output.should == "part one\npart two\n"
+    expect(group_output).to eq("part one\npart two\n")
   end
 end
 
 describe "1.8 and 1.9 syntax compatibility" do
   it "is compatible with both 1.8 and 1.9 syntax w/o task options" do
     group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[zoo]) }
-    group_output.should match /zebra/
+    expect(group_output).to match(/zebra/)
   end
 
   it "is compatible with both 1.8 and 1.9 syntax w/task options" do
     group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[zoo -w lion]) }
-    group_output.should match /lion/
+    expect(group_output).to match(/lion/)
   end
 end

@@ -32,41 +32,41 @@ end
 
 describe Thor::RakeCompat do
   it "sets the rakefile application" do
-    ["rake_compat_spec.rb", "Thorfile"].should include(Rake.application.rakefile)
+    expect(["rake_compat_spec.rb", "Thorfile"]).to include(Rake.application.rakefile)
   end
 
   it "adds rake tasks to thor classes too" do
     task = ThorTask.tasks["cool"]
-    task.should be
+    expect(task).to be
   end
 
   it "uses rake tasks descriptions on thor" do
-    ThorTask.tasks["cool"].description.should == "Say it's cool"
+    expect(ThorTask.tasks["cool"].description).to eq("Say it's cool")
   end
 
   it "gets usage from rake tasks name" do
-    ThorTask.tasks["cool"].usage.should == "cool"
+    expect(ThorTask.tasks["cool"].usage).to eq("cool")
   end
 
   it "uses non namespaced name as description if non is available" do
-    ThorTask::HiperMega.tasks["super"].description.should == "super"
+    expect(ThorTask::HiperMega.tasks["super"].description).to eq("super")
   end
 
   it "converts namespaces to classes" do
-    ThorTask.const_get(:HiperMega).should == ThorTask::HiperMega
+    expect(ThorTask.const_get(:HiperMega)).to eq(ThorTask::HiperMega)
   end
 
   it "does not add tasks from higher namespaces in lowers namespaces" do
-    ThorTask.tasks["super"].should_not be
+    expect(ThorTask.tasks["super"]).not_to be
   end
 
   it "invoking the thor task invokes the rake task" do
-    capture(:stdout) do
+    expect(capture(:stdout) {
       ThorTask.start ["cool"]
-    end.should == "COOL\n"
+    }).to eq("COOL\n")
 
-    capture(:stdout) do
+    expect(capture(:stdout) {
       ThorTask::HiperMega.start ["super"]
-    end.should == "HIPER MEGA SUPER\n"
+    }).to eq("HIPER MEGA SUPER\n")
   end
 end

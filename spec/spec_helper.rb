@@ -34,6 +34,10 @@ RSpec.configure do |config|
     ARGV.replace []
   end
 
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
+  end
+
   def capture(stream)
     begin
       stream = stream.to_s
