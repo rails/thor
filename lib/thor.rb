@@ -275,7 +275,7 @@ class Thor
         # to lookup the task by the given method name. If nothing found then use
         # the default task. The given_args will be intact for later since
         # dup was used.
-        if via_subcommand && given_args.size == 1 && default_task != "help" && given_args.first != default_task
+        if via_subcommand && given_args.size >= 1 && default_task != "help" && given_args.first != default_task
           meth ||= retrieve_task_name(given_args.dup)
           task = all_tasks[normalize_task_name(meth)]
           task ||= all_tasks[normalize_task_name(default_task)]
