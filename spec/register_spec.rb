@@ -72,6 +72,16 @@ class PluginWithDefaultMultipleArguments < Thor
   default_task :say
 end
 
+class PluginWithDefaultTaskAndDeclaredArgument < Thor
+  desc "say MSG [MSG]", "print multiple messages"
+  argument :msg
+  def say
+    puts msg
+  end
+
+  default_task :say
+end
+
 BoringVendorProvidedCLI.register(
   ExcitingPluginCLI,
   "exciting",
@@ -109,6 +119,12 @@ BoringVendorProvidedCLI.register(
   'say message',
   'subcommands ftw')
 
+BoringVendorProvidedCLI.register(
+  PluginWithDefaultTaskAndDeclaredArgument,
+  'say_argument',
+  'say message',
+  'subcommands ftw')
+
 describe ".register-ing a Thor subclass" do
   it "registers the plugin as a subcommand" do
     fireworks_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[exciting fireworks]) }
@@ -129,6 +145,11 @@ describe ".register-ing a Thor subclass" do
     output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say_multiple hello adam]) }
     expect(output).to include("hello")
     expect(output).to include("adam")
+  end
+
+  it "invokes the default task correctly with a declared argument" do
+    output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say_argument hello]) }
+    expect(output).to include("hello")
   end
 
   context "when $thor_runner is false" do
