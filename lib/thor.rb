@@ -210,6 +210,7 @@ class Thor
 
       define_method(subcommand) do |*args|
         args, opts = Thor::Arguments.split(args)
+        opts << "--invoked-via-subcommand"
         invoke subcommand_class, args, opts
       end
     end
@@ -255,8 +256,33 @@ class Thor
 
       # The method responsible for dispatching given the args.
       def dispatch(meth, given_args, given_opts, config) #:nodoc:
-        meth ||= retrieve_task_name(given_args)
-        task = all_tasks[normalize_task_name(meth)]
+        if given_opts
+          #FIXME: is there a better way to pass information from the
+          # subcommand invocation? It has to go through invoke which
+          # only accepts *args
+          via_subcommand = !!given_opts.delete('--invoked-via-subcommand')
+        else
+          via_sucommand = false
+        end
+
+        # This is an edge case. If this is dispathced from a subcommand
+        # and there is may be one argument. This causes a problem when
+        # the given argument is an argument for the default task. This situation
+        # can only occur when there one argument and a real default task 
+        # is present. Thor use "help" by default so we skip that case.
+        # Note the call to retreive_task_name. It's called with 
+        # given_args.dup since that method calls args.shift. First Attempt 
+        # to lookup the task by the given method name. If nothing found then use
+        # the default task. The given_args will be intact for later since
+        # dup was used.
+        if via_subcommand && given_args.size == 1 && default_task != "help" && given_args.first != default_task
+          meth ||= retrieve_task_name(given_args.dup)
+          task = all_tasks[normalize_task_name(meth)]
+          task ||= all_tasks[normalize_task_name(default_task)]
+        else
+          meth ||= retrieve_task_name(given_args)
+          task = all_tasks[normalize_task_name(meth)]
+        end
 
         if task
           args, opts = Thor::Options.split(given_args)
