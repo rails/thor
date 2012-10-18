@@ -272,6 +272,12 @@ class Thor
         yield instance if block_given?
         args = instance.args
         trailing = args[Range.new(arguments.size, -1)]
+        class_options.each do |option_name, option_obj|
+          if !instance.options[option_name].nil?
+            handle_method = "handle_#{option_name}"
+            instance.send(handle_method) if instance.respond_to?(handle_method)
+          end
+        end
         instance.invoke_task(task, trailing || [])
       end
 
