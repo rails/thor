@@ -54,6 +54,34 @@ class CompatibleWith19Plugin < ClassOptionGroupPlugin
   end
 end
 
+class PluginWithDefault < Thor
+  desc "say MSG", "print MSG"
+  def say(msg)
+    puts msg
+  end
+
+  default_task :say
+end
+
+class PluginWithDefaultMultipleArguments < Thor
+  desc "say MSG [MSG]", "print multiple messages"
+  def say(*args)
+    puts args
+  end
+
+  default_task :say
+end
+
+class PluginWithDefaultTaskAndDeclaredArgument < Thor
+  desc "say MSG [MSG]", "print multiple messages"
+  argument :msg
+  def say
+    puts msg
+  end
+
+  default_task :say
+end
+
 BoringVendorProvidedCLI.register(
   ExcitingPluginCLI,
   "exciting",
@@ -79,6 +107,24 @@ BoringVendorProvidedCLI.register(
   "zoo [-w animal]",
   "Shows a provided animal or just zebra")
 
+BoringVendorProvidedCLI.register(
+  PluginWithDefault,
+  'say',
+  'say message',
+  'subcommands ftw')
+
+BoringVendorProvidedCLI.register(
+  PluginWithDefaultMultipleArguments,
+  'say_multiple',
+  'say message',
+  'subcommands ftw')
+
+BoringVendorProvidedCLI.register(
+  PluginWithDefaultTaskAndDeclaredArgument,
+  'say_argument',
+  'say message',
+  'subcommands ftw')
+
 describe ".register-ing a Thor subclass" do
   it "registers the plugin as a subcommand" do
     fireworks_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[exciting fireworks]) }
@@ -88,6 +134,22 @@ describe ".register-ing a Thor subclass" do
   it "includes the plugin's usage in the help" do
     help_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[help]) }
     expect(help_output).to include('do exciting things')
+  end
+
+  it "invokes the default task correctly" do
+    output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say hello]) }
+    expect(output).to include("hello")
+  end
+
+  it "invokes the default task correctly with multiple args" do
+    output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say_multiple hello adam]) }
+    expect(output).to include("hello")
+    expect(output).to include("adam")
+  end
+
+  it "invokes the default task correctly with a declared argument" do
+    output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say_argument hello]) }
+    expect(output).to include("hello")
   end
 
   context "when $thor_runner is false" do

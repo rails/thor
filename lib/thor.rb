@@ -210,7 +210,7 @@ class Thor
 
       define_method(subcommand) do |*args|
         args, opts = Thor::Arguments.split(args)
-        invoke subcommand_class, args, opts
+        invoke subcommand_class, args, opts, :invoked_via_subcommand => true
       end
     end
 
@@ -255,8 +255,24 @@ class Thor
 
       # The method responsible for dispatching given the args.
       def dispatch(meth, given_args, given_opts, config) #:nodoc:
-        meth ||= retrieve_task_name(given_args)
-        task = all_tasks[normalize_task_name(meth)]
+        # There is an edge case when dispatching from a subcommand.
+        # A problem occurs invoking the default task. This case occurs
+        # when arguments are passed and a default task is defined, and
+        # the first given_args does not match the default task.
+        # Thor use "help" by default so we skip that case.
+        # Note the call to retrieve_task_name. It's called with
+        # given_args.dup since that method calls args.shift. Then lookup
+        # the task normally. If the first item in given_args is not
+        # a task then use the default task. The given_args will be
+        # intact later since dup was used.
+        if config[:invoked_via_subcommand] && given_args.size >= 1 && default_task != "help" && given_args.first != default_task
+          meth ||= retrieve_task_name(given_args.dup)
+          task = all_tasks[normalize_task_name(meth)]
+          task ||= all_tasks[normalize_task_name(default_task)]
+        else
+          meth ||= retrieve_task_name(given_args)
+          task = all_tasks[normalize_task_name(meth)]
+        end
 
         if task
           args, opts = Thor::Options.split(given_args)
