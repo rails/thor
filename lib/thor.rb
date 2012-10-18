@@ -265,16 +265,16 @@ class Thor
           via_sucommand = false
         end
 
-        # This is an edge case. If this is dispathced from a subcommand
-        # and there is may be one argument. This causes a problem when
-        # the given argument is an argument for the default task. This situation
-        # can only occur when there one argument and a real default task 
-        # is present. Thor use "help" by default so we skip that case.
-        # Note the call to retreive_task_name. It's called with 
-        # given_args.dup since that method calls args.shift. First Attempt 
-        # to lookup the task by the given method name. If nothing found then use
-        # the default task. The given_args will be intact for later since
-        # dup was used.
+        # There is an edge case when dispatching from a subcommand.
+        # A problem occurs invoking the default task. This case occurs
+        # when arguments are passed and a default task is defined, and
+        # the first given_args does not match the default task.
+        # Thor use "help" by default so we skip that case.
+        # Note the call to retrieve_task_name. It's called with
+        # given_args.dup since that method calls args.shift. Then lookup
+        # the task normally. If the first item in given_args is not
+        # a task then use the default task. The given_args will be
+        # intact later since dup was used.
         if via_subcommand && given_args.size >= 1 && default_task != "help" && given_args.first != default_task
           meth ||= retrieve_task_name(given_args.dup)
           task = all_tasks[normalize_task_name(meth)]
