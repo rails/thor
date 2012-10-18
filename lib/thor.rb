@@ -210,8 +210,7 @@ class Thor
 
       define_method(subcommand) do |*args|
         args, opts = Thor::Arguments.split(args)
-        opts << "--invoked-via-subcommand"
-        invoke subcommand_class, args, opts
+        invoke subcommand_class, args, opts, :invoked_via_subcommand => true
       end
     end
 
@@ -256,15 +255,6 @@ class Thor
 
       # The method responsible for dispatching given the args.
       def dispatch(meth, given_args, given_opts, config) #:nodoc:
-        if given_opts
-          #FIXME: is there a better way to pass information from the
-          # subcommand invocation? It has to go through invoke which
-          # only accepts *args
-          via_subcommand = !!given_opts.delete('--invoked-via-subcommand')
-        else
-          via_sucommand = false
-        end
-
         # There is an edge case when dispatching from a subcommand.
         # A problem occurs invoking the default task. This case occurs
         # when arguments are passed and a default task is defined, and
@@ -275,7 +265,7 @@ class Thor
         # the task normally. If the first item in given_args is not
         # a task then use the default task. The given_args will be
         # intact later since dup was used.
-        if via_subcommand && given_args.size >= 1 && default_task != "help" && given_args.first != default_task
+        if config[:invoked_via_subcommand] && given_args.size >= 1 && default_task != "help" && given_args.first != default_task
           meth ||= retrieve_task_name(given_args.dup)
           task = all_tasks[normalize_task_name(meth)]
           task ||= all_tasks[normalize_task_name(default_task)]
