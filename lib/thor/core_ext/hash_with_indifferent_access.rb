@@ -45,6 +45,11 @@ class Thor
         self
       end
 
+      # Convert to a Hash with String keys.
+      def to_hash
+        Hash.new(default).merge!(self)
+      end
+
       protected
 
         def convert_key(key)
