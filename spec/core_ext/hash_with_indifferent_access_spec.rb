@@ -40,4 +40,9 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
     expect(other[:force]).to eq(false)
     expect(other[:baz]).to eq("boom")
   end
+
+  it "converts to a traditional hash" do
+    expect(@hash.to_hash.class).to eq(Hash)
+    expect(@hash).to eq({ 'foo' => 'bar', 'baz' => 'bee', 'force' => true })
+  end
 end
