@@ -25,7 +25,7 @@ class Thor::Runner < Thor #:nodoc:
   end
 
   # If a task is not found on Thor::Runner, method missing is invoked and
-  # Thor::Runner is then responsable for finding the task in all classes.
+  # Thor::Runner is then responsible for finding the task in all classes.
   #
   def method_missing(meth, *args)
     meth = meth.to_s
