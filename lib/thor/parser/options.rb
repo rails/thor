@@ -70,7 +70,7 @@ class Thor
 
       while peek
         if parsing_options?
-          match, is_switch = current_is_switch?
+          is_switch = current_is_switch?
           shifted = shift
 
           if is_switch
@@ -88,11 +88,9 @@ class Thor
             switch = normalize_switch(switch)
             option = switch_option(switch)
             @assigns[option.human_name] = parse_peek(switch, option)
-          elsif match
+          elsif
             @extra << shifted
             @extra << shift while peek && peek !~ /^-/
-          else
-            @extra << shifted
           end
         else
           @extra << shift
@@ -119,11 +117,11 @@ class Thor
       def current_is_switch?
         case peek
         when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
-          [true, switch?($1)]
+          switch?($1)
         when SHORT_SQ_RE
-          [true, $1.split('').any? { |f| switch?("-#{f}") }]
+          $1.split('').any? { |f| switch?("-#{f}") }
         else
-          [false, false]
+          false
         end
       end
 
