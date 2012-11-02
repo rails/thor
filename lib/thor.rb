@@ -1,3 +1,4 @@
+require 'set'
 require 'thor/base'
 
 class Thor
@@ -251,12 +252,21 @@ class Thor
       end
     end
 
-    def stop_on_unknown_option!
-      @stop_on_unknown_option = true
+    # Stop parsing of options as soon as an unknown option or a regular
+    # argument is encountered.  All remaining arguments are passed to the task.
+    # This is useful if you have a task that can receive arbitrary additional
+    # options, and where those additional options should not be handled by
+    # Thor.
+    #
+    # ==== Parameters
+    # Symbol ...:: A list of tasks that should be affected.
+    def stop_on_unknown_option!(*task_names)
+      @stop_on_unknown_option ||= Set.new
+      @stop_on_unknown_option.merge(task_names)
     end
 
-    def stop_on_unknown_option? #:nodoc:
-      !!@stop_on_unknown_option
+    def stop_on_unknown_option?(task) #:nodoc:
+      !!@stop_on_unknown_option && @stop_on_unknown_option.include?(task.name.to_sym)
     end
 
     protected
@@ -284,7 +294,7 @@ class Thor
 
         if task
           args, opts = Thor::Options.split(given_args)
-          if stop_on_unknown_option? && !args.empty?
+          if stop_on_unknown_option?(task) && !args.empty?
             # given_args starts with a non-option, so we treat everything as
             # ordinary arguments
             args.concat opts

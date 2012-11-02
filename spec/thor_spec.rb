@@ -94,10 +94,15 @@ describe Thor do
       class_option "verbose",   :type => :boolean
       class_option "mode",      :type => :string
 
-      stop_on_unknown_option!
+      stop_on_unknown_option! :exec
 
       desc "exec", "Run a command"
       def exec(*args)
+        return options, args
+      end
+
+      desc "boring", "An ordinary task"
+      def boring(*args)
         return options, args
       end
     end
@@ -120,6 +125,33 @@ describe Thor do
 
     it "still passes everything after -- to task" do
       expect(my_script.start(%w[exec -- --verbose])).to eq [{}, ["--verbose"]]
+    end
+
+    it "does not affect ordinary tasks"  do
+      expect(my_script.start(%w[boring command --verbose])).to eq [{"verbose" => true}, ["command"]]
+    end
+
+    context "when provided with multiple task names" do
+      klass = Class.new(Thor) do
+        stop_on_unknown_option! :foo, :bar
+      end
+      it "affects all specified tasks" do
+        expect(klass.stop_on_unknown_option?(mock :name => "foo")).to be_true
+        expect(klass.stop_on_unknown_option?(mock :name => "bar")).to be_true
+        expect(klass.stop_on_unknown_option?(mock :name => "baz")).to be_false
+      end
+    end
+
+    context "when invoked several times" do
+      klass = Class.new(Thor) do
+        stop_on_unknown_option! :foo
+        stop_on_unknown_option! :bar
+      end
+      it "affects all specified tasks" do
+        expect(klass.stop_on_unknown_option?(mock :name => "foo")).to be_true
+        expect(klass.stop_on_unknown_option?(mock :name => "bar")).to be_true
+        expect(klass.stop_on_unknown_option?(mock :name => "baz")).to be_false
+      end
     end
   end
 

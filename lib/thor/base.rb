@@ -59,7 +59,7 @@ class Thor
       # Let Thor::Options parse the options first, so it can remove
       # declared options from the array. This will leave us with
       # a list of arguments that weren't declared.
-      stop_on_unknown = self.class.stop_on_unknown_option?
+      stop_on_unknown = self.class.stop_on_unknown_option? config[:current_task]
       opts = Thor::Options.new(parse_options, hash_options, stop_on_unknown)
       self.options = opts.parse(array_options)
 
@@ -147,7 +147,7 @@ class Thor
       # If true, option parsing is suspended as soon as an unknown option or a
       # regular argument is encountered.  All remaining arguments are passed to
       # the task as regular arguments.
-      def stop_on_unknown_option? #:nodoc:
+      def stop_on_unknown_option?(task_name) #:nodoc:
         false
       end
 
