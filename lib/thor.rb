@@ -251,6 +251,14 @@ class Thor
       end
     end
 
+    def stop_on_unknown_option!
+      @stop_on_unknown_option = true
+    end
+
+    def stop_on_unknown_option? #:nodoc:
+      !!@stop_on_unknown_option
+    end
+
     protected
 
       # The method responsible for dispatching given the args.
@@ -276,6 +284,12 @@ class Thor
 
         if task
           args, opts = Thor::Options.split(given_args)
+          if stop_on_unknown_option? && !args.empty?
+            # given_args starts with a non-option, so we treat everything as
+            # ordinary arguments
+            args.concat opts
+            opts.clear
+          end
         else
           args, opts = given_args, nil
           task = Thor::DynamicTask.new(meth)
