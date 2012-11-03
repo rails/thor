@@ -114,8 +114,10 @@ class Thor
 
     protected
 
-      # Returns true if the current value in peek is a registered switch.
+      # Check if the current value in peek is a registered switch.
       #
+      # Two booleans are returned.  The first is true if the current value
+      # starts with a hyphen; the second is true if it is a registered switch.
       def current_is_switch?
         case peek
         when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
