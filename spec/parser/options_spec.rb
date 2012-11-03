@@ -2,12 +2,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'thor/parser'
 
 describe Thor::Options do
-  def create(opts, defaults={})
+  def create(opts, defaults={}, stop_on_unknown=false)
     opts.each do |key, value|
       opts[key] = Thor::Option.parse(key, value) unless value.is_a?(Thor::Option)
     end
 
-    @opt = Thor::Options.new(opts, defaults)
+    @opt = Thor::Options.new(opts, defaults, stop_on_unknown)
   end
 
   def parse(*args)
@@ -205,6 +205,37 @@ describe Thor::Options do
         options = {:required => true, :type => :string, :default => "baz"}
         create :foo => Thor::Option.new("foo", options), :bar => :boolean
         expect{ parse("--bar") }.not_to raise_error
+      end
+    end
+
+    context "when stop_on_unknown is true" do
+      before do
+        create({:foo => :string, :verbose => :boolean}, {}, true)
+      end
+
+      it "stops parsing on first non-option" do
+        expect(parse(%w[foo --verbose])).to eq({})
+        expect(remaining).to eq(["foo", "--verbose"])
+      end
+
+      it "stops parsing on unknown option" do
+        expect(parse(%w[--bar --verbose])).to eq({})
+        expect(remaining).to eq(["--bar", "--verbose"])
+      end
+
+      it "still accepts options that are given before non-options" do
+        expect(parse(%w[--verbose foo])).to eq({"verbose" => true})
+        expect(remaining).to eq(["foo"])
+      end
+
+      it "still accepts options that require a value" do
+        expect(parse(%w[--foo bar baz])).to eq({"foo" => "bar"})
+        expect(remaining).to eq(["baz"])
+      end
+
+      it "still interprets everything after -- as args instead of options" do
+        expect(parse(%w[-- --verbose])).to eq({})
+        expect(remaining).to eq(["--verbose"])
       end
     end
 

@@ -26,7 +26,11 @@ class Thor
     end
 
     # Takes a hash of Thor::Option and a hash with defaults.
-    def initialize(hash_options={}, defaults={})
+    #
+    # If +stop_on_unknown+ is true, #parse will stop as soon as it encounters
+    # an unknown option or a regular argument.
+    def initialize(hash_options={}, defaults={}, stop_on_unknown=false)
+      @stop_on_unknown = stop_on_unknown
       options = hash_options.values
       super(options)
 
@@ -88,6 +92,10 @@ class Thor
             switch = normalize_switch(switch)
             option = switch_option(switch)
             @assigns[option.human_name] = parse_peek(switch, option)
+          elsif @stop_on_unknown
+            @extra << shifted
+            @extra << shift while peek
+            break
           elsif match
             @extra << shifted
             @extra << shift while peek && peek !~ /^-/

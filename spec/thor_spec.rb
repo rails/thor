@@ -89,6 +89,72 @@ describe Thor do
     end
   end
 
+  describe "#stop_on_unknown_option!" do
+    my_script = Class.new(Thor) do
+      class_option "verbose",   :type => :boolean
+      class_option "mode",      :type => :string
+
+      stop_on_unknown_option! :exec
+
+      desc "exec", "Run a command"
+      def exec(*args)
+        return options, args
+      end
+
+      desc "boring", "An ordinary task"
+      def boring(*args)
+        return options, args
+      end
+    end
+
+    it "passes remaining args to task when it encounters a non-option" do
+      expect(my_script.start(%w[exec command --verbose])).to eq [{}, ["command", "--verbose"]]
+    end
+
+    it "passes remaining args to task when it encounters an unknown option" do
+      expect(my_script.start(%w[exec --foo command --bar])).to eq [{}, ["--foo", "command", "--bar"]]
+    end
+
+    it "still accepts options that are given before non-options" do
+      expect(my_script.start(%w[exec --verbose command --foo])).to eq [{"verbose" => true}, ["command", "--foo"]]
+    end
+
+    it "still accepts options that require a value" do
+      expect(my_script.start(%w[exec --mode rashly command])).to eq [{"mode" => "rashly"}, ["command"]]
+    end
+
+    it "still passes everything after -- to task" do
+      expect(my_script.start(%w[exec -- --verbose])).to eq [{}, ["--verbose"]]
+    end
+
+    it "does not affect ordinary tasks"  do
+      expect(my_script.start(%w[boring command --verbose])).to eq [{"verbose" => true}, ["command"]]
+    end
+
+    context "when provided with multiple task names" do
+      klass = Class.new(Thor) do
+        stop_on_unknown_option! :foo, :bar
+      end
+      it "affects all specified tasks" do
+        expect(klass.stop_on_unknown_option?(mock :name => "foo")).to be_true
+        expect(klass.stop_on_unknown_option?(mock :name => "bar")).to be_true
+        expect(klass.stop_on_unknown_option?(mock :name => "baz")).to be_false
+      end
+    end
+
+    context "when invoked several times" do
+      klass = Class.new(Thor) do
+        stop_on_unknown_option! :foo
+        stop_on_unknown_option! :bar
+      end
+      it "affects all specified tasks" do
+        expect(klass.stop_on_unknown_option?(mock :name => "foo")).to be_true
+        expect(klass.stop_on_unknown_option?(mock :name => "bar")).to be_true
+        expect(klass.stop_on_unknown_option?(mock :name => "baz")).to be_false
+      end
+    end
+  end
+
   describe "#map" do
     it "calls the alias of a method if one is provided" do
       expect(MyScript.start(["-T", "fish"])).to eq(["fish"])
