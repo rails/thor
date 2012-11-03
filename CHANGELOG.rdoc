@@ -1,3 +1,6 @@
+== next
+ * Add better support for tasks that accept arbitrary additional arguments (e.g. things like `bundle exec`).
+
 == 0.16.0, release 2012-08-14
 * Add enum to string arguments
 
