@@ -262,7 +262,8 @@ The full list of metadata you can provide for an option:
   option cannot be both `:required` and have a `:default`.
 * `:type`: `:string`, `:hash`, `:array`, `:numeric`, or `:boolean`
 * `:aliases`: A list of aliases for this option. Typically, you would
-  use aliases to provide short versions of the option.
+  use aliases to provide short versions of the option. Each alias is a string
+  and it has a prepended dash (for example: `"-f"`).
 
 You can use a shorthand to specify a number of options at once if you
 just want to specify the type of the options. You could rewrite the
@@ -374,7 +375,7 @@ module GitCLI
   class Git < Thor
     desc "fetch <repository> [<refspec>...]", "Download objects and refs from another repository"
     options :all => :boolean, :multiple => :boolean
-    option :append, :type => :boolean, :aliases => :a
+    option :append, :type => :boolean, :aliases => "-a"
     def fetch(respository, *refspec)
       # implement git fetch here
     end
