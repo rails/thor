@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ['CHANGELOG.rdoc', 'LICENSE.md', 'README.md', 'Thorfile']
   s.files = `git ls-files`.split("\n")
   s.homepage = 'http://whatisthor.com/'
+  s.licenses = ['MIT']
   s.name = 'thor'
   s.rdoc_options = ['--charset=UTF-8']
   s.require_paths = ['lib']
