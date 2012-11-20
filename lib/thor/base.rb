@@ -471,8 +471,12 @@ class Thor
         msg = "#{basename} #{task.name}"
         if arity
           required = arity < 0 ? (-1 - arity) : arity
-          msg << " requires at least #{required} argument"
-          msg << "s" if required > 1
+          if required == 0
+            msg << " should have no arguments"
+          else
+            msg << " requires at least #{required} argument"
+            msg << "s" if required > 1
+          end
         else
           msg = "call #{msg} as"
         end
