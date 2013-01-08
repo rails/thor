@@ -74,9 +74,9 @@ class Thor
         def execute!
           lookup = Util.escape_globs(source)
           lookup = config[:recursive] ? File.join(lookup, '**') : lookup
-          lookup = File.join(lookup, '{*,.[a-z]*}')
+          lookup = file_level_lookup(lookup)
 
-          Dir[lookup].sort.each do |file_source|
+          files(lookup).sort.each do |file_source|
             next if File.directory?(file_source)
             file_destination = File.join(given_destination, file_source.gsub(source, '.'))
             file_destination.gsub!('/./', '/')
@@ -91,6 +91,24 @@ class Thor
               else
                 destination = base.copy_file(file_source, file_destination, config, &@block)
             end
+          end
+        end
+
+        if RUBY_VERSION < '2.0'
+          def file_level_lookup(previous_lookup)
+            File.join(previous_lookup, '{*,.[a-z]*}')
+          end
+
+          def files(lookup)
+            Dir[lookup]
+          end
+        else
+          def file_level_lookup(previous_lookup)
+            File.join(previous_lookup, '*')
+          end
+
+          def files(lookup)
+            Dir.glob(lookup, File::FNM_DOTMATCH)
           end
         end
 
