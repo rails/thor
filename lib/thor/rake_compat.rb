@@ -6,11 +6,12 @@ class Thor
   # rake package tasks. For example, to use rspec rake tasks, one can do:
   #
   #   require 'thor/rake_compat'
+  #   require 'rspec/core/rake_task'
   #
   #   class Default < Thor
   #     include Thor::RakeCompat
   #
-  #     Spec::Rake::SpecTask.new(:spec) do |t|
+  #     RSpec::Core::RakeTask.new(:spec) do |t|
   #       t.spec_opts = ['--options', "spec/spec.opts"]
   #       t.spec_files = FileList['spec/**/*_spec.rb']
   #     end
