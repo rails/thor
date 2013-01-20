@@ -194,7 +194,12 @@ class Thor
       end
       list.sort!{ |a,b| a[0] <=> b[0] }
 
-      shell.say "Tasks:"
+      if @package_name
+        shell.say "#{@package_name} tasks:"
+      else
+        shell.say "Tasks:"
+      end
+
       shell.print_table(list, :indent => 2, :truncate => true)
       shell.say
       class_options_help(shell)
