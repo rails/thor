@@ -160,7 +160,10 @@ class Barn < Thor
   def paint(color='red')
     puts "#{options[:coats]} coats of #{color} paint"
   end
+end
 
+class PackageNameScript < Thor
+  package_name "Baboon"
 end
 
 module Scripts
