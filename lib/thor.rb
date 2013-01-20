@@ -3,6 +3,16 @@ require 'thor/base'
 
 class Thor
   class << self
+    # Allows for custom "Command" package naming.
+    #
+    # === Parameters
+    # name<String>
+    # options<Hash>
+    #
+    def package_name(name, options={})
+      @package_name = name.nil? || name == '' ? nil : name
+    end
+
     # Sets the default command when thor is executed without an explicit command to be called.
     #
     # ==== Parameters
