@@ -14,12 +14,12 @@ class Thor::Group
     # description<String>:: The description for this Thor::Group.
     #
     def desc(description=nil)
-      case description
-        when nil
-          @desc ||= from_superclass(:desc, nil)
-        else
-          @desc = description
-      end
+      @desc = case description
+              when nil
+                @desc || from_superclass(:desc, nil)
+              else
+                description
+              end
     end
 
     # Prints help information.

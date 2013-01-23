@@ -313,12 +313,12 @@ class Thor
       # name<String|Symbol>
       #
       def group(name=nil)
-        case name
-          when nil
-            @group ||= from_superclass(:group, 'standard')
-          else
-            @group = name.to_s
-        end
+        @group = case name
+                 when nil
+                   @group || from_superclass(:group, 'standard')
+                 else
+                   name.to_s
+                 end
       end
 
       # Returns the tasks for this Thor class.
@@ -413,12 +413,12 @@ class Thor
       #   thor :my_task
       #
       def namespace(name=nil)
-        case name
-        when nil
-          @namespace ||= Thor::Util.namespace_from_thor_class(self)
-        else
-          @namespace = name.to_s
-        end
+        @namespace = case name
+                     when nil
+                       @namespace || Thor::Util.namespace_from_thor_class(self)
+                     else
+                       @namespace = name.to_s
+                     end
       end
 
       # Parses the task and options from the given args, instantiate the class
