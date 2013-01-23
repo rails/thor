@@ -2,6 +2,8 @@ source 'https://rubygems.org'
 
 gemspec
 
+gem 'rspec-mocks', :github => 'rspec/rspec-mocks', :branch => 'master'
+
 platforms :mri_18 do
   gem 'ruby-debug', '>= 0.10.3'
 end
