@@ -14,6 +14,6 @@ group :test do
   gem 'childlabor'
   gem 'fakeweb', '~> 1.3'
   gem 'rspec', '~> 2.11'
-  gem 'rspec-mocks'
+  gem 'rspec-mocks', :git => 'git://github.com/rspec/rspec-mocks.git'
   gem 'simplecov'
 end
