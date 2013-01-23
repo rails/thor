@@ -15,11 +15,11 @@ class Thor::Group
     #
     def desc(description=nil)
       @desc = case description
-              when nil
-                @desc || from_superclass(:desc, nil)
-              else
-                description
-              end
+      when nil
+        @desc || from_superclass(:desc, nil)
+      else
+        description
+      end
     end
 
     # Prints help information.

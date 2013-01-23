@@ -226,20 +226,20 @@ class Thor
           answer = ask %[Overwrite #{destination}? (enter "h" for help) #{options}]
 
           case answer
-            when is?(:yes), is?(:force), ""
-              return true
-            when is?(:no), is?(:skip)
-              return false
-            when is?(:always)
-              return @always_force = true
-            when is?(:quit)
-              say 'Aborting...'
-              raise SystemExit
-            when is?(:diff)
-              show_diff(destination, yield) if block_given?
-              say 'Retrying...'
-            else
-              say file_collision_help
+          when is?(:yes), is?(:force), ""
+            return true
+          when is?(:no), is?(:skip)
+            return false
+          when is?(:always)
+            return @always_force = true
+          when is?(:quit)
+            say 'Aborting...'
+            raise SystemExit
+          when is?(:diff)
+            show_diff(destination, yield) if block_given?
+            say 'Retrying...'
+          else
+            say file_collision_help
           end
         end
       end
