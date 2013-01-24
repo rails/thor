@@ -1,5 +1,10 @@
-== next
- * Add better support for tasks that accept arbitrary additional arguments (e.g. things like `bundle exec`).
+== 0.17.0, release 2013-01-24
+* Add better support for tasks that accept arbitrary additional arguments (e.g. things like `bundle exec`)
+* Add #stop_on_unknown_option!
+* Only strip from stdin.gets if it wasn't ended with EOF
+* Allow "send" as a task name
+* Allow passing options as arguments after "--"
+* Autoload Thor::Group
 
 == 0.16.0, release 2012-08-14
 * Add enum to string arguments
