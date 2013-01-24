@@ -1,6 +1,6 @@
 require 'fileutils'
 require 'uri'
-require 'thor/core_ext/file_binary_read'
+require 'thor/core_ext/io_binary_read'
 require 'thor/actions/create_file'
 require 'thor/actions/create_link'
 require 'thor/actions/directory'
