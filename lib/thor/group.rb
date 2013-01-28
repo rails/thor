@@ -230,7 +230,6 @@ class Thor::Group
 
         instance = new(args, opts, config)
         yield instance if block_given?
-        args = instance.args
 
         if task
           instance.invoke_task(all_tasks[task])
