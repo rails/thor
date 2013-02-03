@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.description = %q{A scripting framework that replaces rake, sake and rubigen}
   spec.email = 'ruby-thor@googlegroups.com'
   spec.executables = %w(thor)
-  spec.files = %w(.document CHANGELOG.md LICENSE.md README.md Thorfile thor.gemspec)
+  spec.files = %w(.document CHANGELOG.rdoc LICENSE.md README.md Thorfile thor.gemspec)
   spec.files += Dir.glob("bin/**/*")
   spec.files += Dir.glob("lib/**/*.rb")
   spec.files += Dir.glob("spec/**/*")
