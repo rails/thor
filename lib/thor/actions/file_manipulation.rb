@@ -129,7 +129,7 @@ class Thor
     #
     # ==== Example
     #
-    #   chmod "script/*", 0755
+    #   chmod "script/server", 0755
     #
     def chmod(path, mode, config={})
       return unless behavior == :invoke
