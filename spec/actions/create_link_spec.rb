@@ -23,6 +23,10 @@ describe Thor::Actions::CreateLink do
     capture(:stdout) { @action.invoke! }
   end
 
+  def revoke!
+    capture(:stdout) { @action.revoke! }
+  end
+
   def silence!
     @silence = true
   end
@@ -76,6 +80,16 @@ describe Thor::Actions::CreateLink do
       expect(@action.identical?).to be_false
       invoke!
       expect(@action.identical?).to be_true
+    end
+  end
+
+  describe "#revoke!" do
+    it "removes the symbolic link of non-existent destination" do
+      create_link("doc/config.rb")
+      invoke!
+      File.delete(@tempfile.path)
+      revoke!
+      expect(File.symlink?(@action.destination)).to be_false
     end
   end
 end
