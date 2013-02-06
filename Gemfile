@@ -13,7 +13,7 @@ group :test do
   gem 'fakeweb', '>= 1.3'
   gem 'rspec', '>= 2.11'
   gem 'rspec-mocks', '>= 2.12.2'
-  gem 'simplecov'
+  gem 'simplecov', :require => false
 end
 
 gemspec
