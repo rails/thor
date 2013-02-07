@@ -93,7 +93,7 @@ END
     end
   end
 
-  desc "send", "send as a task name" 
+  desc "send", "send as a task name"
   def send
     true
   end

@@ -1,27 +1,24 @@
-# -*- encoding: utf-8 -*-
-require File.expand_path('../lib/thor/version', __FILE__)
+# coding: utf-8
+lib = File.expand_path('../lib/', __FILE__)
+$:.unshift lib unless $:.include?(lib)
+require 'thor/version'
 
-Gem::Specification.new do |s|
-  s.add_development_dependency 'bundler', '~> 1.0'
-  s.add_development_dependency 'fakeweb', '~> 1.3'
-  s.add_development_dependency 'rake', '~> 0.9'
-  s.add_development_dependency 'rdoc', '~> 3.9'
-  s.add_development_dependency 'rspec', '~> 2.11'
-  s.add_development_dependency 'simplecov', '~> 0.4'
-  s.add_development_dependency 'childlabor'
-  s.authors = ['Yehuda Katz', 'José Valim']
-  s.description = %q{A scripting framework that replaces rake, sake and rubigen}
-  s.email = 'ruby-thor@googlegroups.com'
-  s.executables = `git ls-files -- bin/*`.split("\n").map{|f| File.basename(f)}
-  s.extra_rdoc_files = ['CHANGELOG.rdoc', 'LICENSE.md', 'README.md', 'Thorfile']
-  s.files = `git ls-files`.split("\n")
-  s.homepage = 'http://whatisthor.com/'
-  s.licenses = ['MIT']
-  s.name = 'thor'
-  s.rdoc_options = ['--charset=UTF-8']
-  s.require_paths = ['lib']
-  s.required_rubygems_version = Gem::Requirement.new('>= 1.3.6')
-  s.summary = s.description
-  s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.version = Thor::VERSION
+Gem::Specification.new do |spec|
+  spec.add_development_dependency 'bundler', '~> 1.0'
+  spec.authors = ['Yehuda Katz', 'José Valim']
+  spec.description = %q{A scripting framework that replaces rake, sake and rubigen}
+  spec.email = 'ruby-thor@googlegroups.com'
+  spec.executables = %w(thor)
+  spec.files = %w(.document CHANGELOG.md LICENSE.md README.md Thorfile thor.gemspec)
+  spec.files += Dir.glob("bin/**/*")
+  spec.files += Dir.glob("lib/**/*.rb")
+  spec.files += Dir.glob("spec/**/*")
+  spec.homepage = 'http://whatisthor.com/'
+  spec.licenses = ['MIT']
+  spec.name = 'thor'
+  spec.require_paths = ['lib']
+  spec.required_rubygems_version = '>= 1.3.6'
+  spec.summary = spec.description
+  spec.test_files = Dir.glob("spec/**/*")
+  spec.version = Thor::VERSION
 end

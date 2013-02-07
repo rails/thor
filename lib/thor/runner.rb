@@ -1,6 +1,6 @@
 require 'thor'
 require 'thor/group'
-require 'thor/core_ext/file_binary_read'
+require 'thor/core_ext/io_binary_read'
 
 require 'fileutils'
 require 'open-uri'

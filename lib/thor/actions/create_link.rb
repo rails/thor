@@ -52,6 +52,9 @@ class Thor
         given_destination
       end
 
+      def exists?
+        super || File.symlink?(destination)
+      end
     end
   end
 end

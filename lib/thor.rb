@@ -19,13 +19,13 @@ class Thor
     # meth<Symbol>:: name of the default task
     #
     def default_task(meth=nil)
-      case meth
-        when :none
-          @default_task = 'help'
-        when nil
-          @default_task ||= from_superclass(:default_task, 'help')
-        else
-          @default_task = meth.to_s
+      @default_task = case meth
+      when :none
+        'help'
+      when nil
+        @default_task || from_superclass(:default_task, 'help')
+      else
+        meth.to_s
       end
     end
 

@@ -11,16 +11,16 @@ class Thor
     def self.to_switches(options)
       options.map do |key, value|
         case value
-          when true
-            "--#{key}"
-          when Array
-            "--#{key} #{value.map{ |v| v.inspect }.join(' ')}"
-          when Hash
-            "--#{key} #{value.map{ |k,v| "#{k}:#{v}" }.join(' ')}"
-          when nil, false
-            ""
-          else
-            "--#{key} #{value.inspect}"
+        when true
+          "--#{key}"
+        when Array
+          "--#{key} #{value.map{ |v| v.inspect }.join(' ')}"
+        when Hash
+          "--#{key} #{value.map{ |k,v| "#{k}:#{v}" }.join(' ')}"
+        when nil, false
+          ""
+        else
+          "--#{key} #{value.inspect}"
         end
       end.join(" ")
     end
@@ -79,14 +79,14 @@ class Thor
 
           if is_switch
             case shifted
-              when SHORT_SQ_RE
-                unshift($1.split('').map { |f| "-#{f}" })
-                next
-              when EQ_RE, SHORT_NUM
-                unshift($2)
-                switch = $1
-              when LONG_RE, SHORT_RE
-                switch = $1
+            when SHORT_SQ_RE
+              unshift($1.split('').map { |f| "-#{f}" })
+              next
+            when EQ_RE, SHORT_NUM
+              unshift($2)
+              switch = $1
+            when LONG_RE, SHORT_RE
+              switch = $1
             end
 
             switch = normalize_switch(switch)

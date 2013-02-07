@@ -313,11 +313,11 @@ class Thor
       # name<String|Symbol>
       #
       def group(name=nil)
-        case name
-          when nil
-            @group ||= from_superclass(:group, 'standard')
-          else
-            @group = name.to_s
+        @group = case name
+        when nil
+          @group || from_superclass(:group, 'standard')
+        else
+          name.to_s
         end
       end
 
@@ -413,9 +413,9 @@ class Thor
       #   thor :my_task
       #
       def namespace(name=nil)
-        case name
+        @namespace = case name
         when nil
-          @namespace ||= Thor::Util.namespace_from_thor_class(self)
+          @namespace || Thor::Util.namespace_from_thor_class(self)
         else
           @namespace = name.to_s
         end

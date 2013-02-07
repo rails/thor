@@ -1,6 +1,6 @@
 require 'fileutils'
 require 'uri'
-require 'thor/core_ext/file_binary_read'
+require 'thor/core_ext/io_binary_read'
 require 'thor/actions/create_file'
 require 'thor/actions/create_link'
 require 'thor/actions/directory'
@@ -73,13 +73,13 @@ class Thor
     #
     def initialize(args=[], options={}, config={})
       self.behavior = case config[:behavior].to_s
-        when "force", "skip"
-          _cleanup_options_and_set(options, config[:behavior])
-          :invoke
-        when "revoke"
-          :revoke
-        else
-          :invoke
+      when "force", "skip"
+        _cleanup_options_and_set(options, config[:behavior])
+        :invoke
+      when "revoke"
+        :revoke
+      else
+        :invoke
       end
 
       super
@@ -305,12 +305,12 @@ class Thor
 
       def _cleanup_options_and_set(options, key) #:nodoc:
         case options
-          when Array
-            %w(--force -f --skip -s).each { |i| options.delete(i) }
-            options << "--#{key}"
-          when Hash
-            [:force, :skip, "force", "skip"].each { |i| options.delete(i) }
-            options.merge!(key => true)
+        when Array
+          %w(--force -f --skip -s).each { |i| options.delete(i) }
+          options << "--#{key}"
+        when Hash
+          [:force, :skip, "force", "skip"].each { |i| options.delete(i) }
+          options.merge!(key => true)
         end
       end
 

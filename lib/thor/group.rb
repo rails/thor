@@ -14,11 +14,11 @@ class Thor::Group
     # description<String>:: The description for this Thor::Group.
     #
     def desc(description=nil)
-      case description
-        when nil
-          @desc ||= from_superclass(:desc, nil)
-        else
-          @desc = description
+      @desc = case description
+      when nil
+        @desc || from_superclass(:desc, nil)
+      else
+        description
       end
     end
 
@@ -230,7 +230,6 @@ class Thor::Group
 
         instance = new(args, opts, config)
         yield instance if block_given?
-        args = instance.args
 
         if task
           instance.invoke_task(all_tasks[task])
