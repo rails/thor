@@ -19,10 +19,12 @@ Installation
 
 Usage and documentation
 -----------------------
-Please see [the wiki](https://github.com/wycats/thor/wiki) for basic usage and other documentation on using Thor.
+Please see the [wiki][] for basic usage and other documentation on using Thor.
+
+[wiki]: https://github.com/wycats/thor/wiki
 
 License
 -------
-Released under the MIT License.  See the [LICENSE][license] file for further details.
+Released under the MIT License.  See the [LICENSE][] file for further details.
 
-[license]: https://github.com/wycats/thor/blob/master/LICENSE.md
+[license]: LICENSE.md
