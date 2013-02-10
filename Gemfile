@@ -1,7 +1,7 @@
 source :rubygems
 
-gem 'rake', '~> 0.9'
-gem 'rdoc', '~> 3.9'
+gem 'rake', '>= 0.9'
+gem 'rdoc', '>= 3.9'
 
 group :development do
   gem 'pry'
