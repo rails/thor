@@ -1,6 +1,6 @@
 [![Gem Version](https://badge.fury.io/rb/thor.png)](https://rubygems.org/gems/thor)
 [![Build Status](https://secure.travis-ci.org/wycats/thor.png?branch=master)](http://travis-ci.org/wycats/thor)
-[![Dependency Status](https://gemnasium.com/wycats/thor.png?travis)][https://gemnasium.com/wycats/thor]
+[![Dependency Status](https://gemnasium.com/wycats/thor.png?travis)](https://gemnasium.com/wycats/thor)
 [![Code Climate](https://codeclimate.com/github/wycats/thor.png)](https://codeclimate.com/github/wycats/thor)
 
 Thor
