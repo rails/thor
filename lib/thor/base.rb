@@ -469,7 +469,7 @@ class Thor
 
       def handle_argument_error(task, error, arity=nil) #:nodoc:
         msg = "#{basename} #{task.name}"
-        if arity
+        if arity && arity != 0
           required = arity < 0 ? (-1 - arity) : arity
           if required == 0
             msg << " should have no arguments"
