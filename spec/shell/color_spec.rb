@@ -5,13 +5,26 @@ describe Thor::Shell::Color do
     @shell ||= Thor::Shell::Color.new
   end
 
+  before do
+    StringIO.any_instance.stub(:tty?).and_return(true)
+  end
+
   describe "#say" do
-    it "set the color if specified" do
+    it "set the color if specified and tty?" do
       out = capture(:stdout) do
         shell.say "Wow! Now we have colors!", :green
       end
 
       expect(out.chomp).to eq("\e[32mWow! Now we have colors!\e[0m")
+    end
+
+    it "does not set the color if output is not a tty" do
+      out = capture(:stdout) do
+        $stdout.should_receive(:tty?).and_return(false)
+        shell.say "Wow! Now we have colors!", :green
+      end
+
+      expect(out.chomp).to eq("Wow! Now we have colors!")
     end
 
     it "does not use a new line even with colors" do
@@ -68,6 +81,7 @@ describe Thor::Shell::Color do
     describe "when a block is given" do
       it "invokes the diff command" do
         $stdout.stub!(:print)
+        $stdout.stub!(:tty?).and_return(true)
         $stdin.should_receive(:gets).and_return('d')
         $stdin.should_receive(:gets).and_return('n')
 

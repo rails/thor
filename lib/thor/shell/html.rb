@@ -73,6 +73,10 @@ class Thor
 
       protected
 
+        def can_display_colors?
+          true
+        end
+
         # Overwrite show_diff to show diff with colors if Diff::LCS is
         # available.
         #
