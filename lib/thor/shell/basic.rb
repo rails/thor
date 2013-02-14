@@ -61,7 +61,7 @@ class Thor
       def say(message="", color=nil, force_new_line=(message.to_s !~ /( |\t)\Z/))
         message = message.to_s
 
-        message = set_color(message, *color) if color
+        message = set_color(message, *color) if color && can_display_colors?
 
         spaces = "  " * padding
 
@@ -274,6 +274,10 @@ class Thor
       end
 
     protected
+
+      def can_display_colors?
+        false
+      end
 
       def lookup_color(color)
         return color unless color.is_a?(Symbol)
