@@ -1,4 +1,7 @@
+[![Gem Version](https://badge.fury.io/rb/thor.png)](https://rubygems.org/gems/thor)
 [![Build Status](https://secure.travis-ci.org/wycats/thor.png?branch=master)](http://travis-ci.org/wycats/thor)
+[![Dependency Status](https://gemnasium.com/wycats/thor.png?travis)](https://gemnasium.com/wycats/thor)
+[![Code Climate](https://codeclimate.com/github/wycats/thor.png)](https://codeclimate.com/github/wycats/thor)
 
 Thor
 ====
@@ -19,10 +22,12 @@ Installation
 
 Usage and documentation
 -----------------------
-Please see [the wiki](https://github.com/wycats/thor/wiki) for basic usage and other documentation on using Thor.
+Please see the [wiki][] for basic usage and other documentation on using Thor.
+
+[wiki]: https://github.com/wycats/thor/wiki
 
 License
 -------
-Released under the MIT License.  See the [LICENSE][license] file for further details.
+Released under the MIT License.  See the [LICENSE][] file for further details.
 
-[license]: https://github.com/wycats/thor/blob/master/LICENSE.md
+[license]: LICENSE.md
