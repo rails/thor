@@ -93,6 +93,7 @@ class Thor
             option = switch_option(switch)
             @assigns[option.human_name] = parse_peek(switch, option)
           elsif @stop_on_unknown
+            @parsing_options = false
             @extra << shifted
             @extra << shift while peek
             break

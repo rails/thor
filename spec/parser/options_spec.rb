@@ -223,6 +223,11 @@ describe Thor::Options do
         expect(remaining).to eq(["--bar", "--verbose"])
       end
 
+      it "retains -- after it has stopped parsing" do
+        expect(parse(%w[--bar -- whatever])).to eq({})
+        expect(remaining).to eq(["--bar", "--", "whatever"])
+      end
+
       it "still accepts options that are given before non-options" do
         expect(parse(%w[--verbose foo])).to eq({"verbose" => true})
         expect(remaining).to eq(["foo"])
