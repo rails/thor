@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'helper'
 
 describe Thor do
   describe "#method_option" do

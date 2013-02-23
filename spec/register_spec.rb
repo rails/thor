@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'helper'
 
 class BoringVendorProvidedCLI < Thor
   desc "boring", "do boring stuff"

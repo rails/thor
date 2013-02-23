@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'helper'
 
 module Thor::Util
   def self.clear_user_home!

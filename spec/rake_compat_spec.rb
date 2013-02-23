@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'helper'
 require 'thor/rake_compat'
 require 'rake/tasklib'
 
