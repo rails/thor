@@ -203,6 +203,31 @@ describe Thor do
     end
   end
 
+  describe "#disable" do
+    context "when the passed block evaluates to true" do
+      before do
+        $block_disable = true
+      end
+      it "does not show the task in help" do
+        capture(:stdout) { MyScript.start(["help"]) }.should_not =~ /This task is currenly enabled/m
+      end
+      it "raises an exception instead of running the task" do
+        expect { MyScript.start(["disabled"]) }.to raise_error(Exception, /This task is currently disabled/)
+      end
+    end
+    context "when the passed block evaluates to false" do
+      before do
+        $block_disable = false
+      end
+      it "does show the task in help" do
+        capture(:stdout) { MyScript.start(["help"]) }.should =~ /This task is currenly enabled/m
+      end
+      it "can run the task as normal" do
+        MyScript.start(["disabled"]).should == "ran"
+      end
+    end
+  end
+
   describe "#method_options" do
     it "sets default options if called before an initializer" do
       options = MyChildScript.class_options

@@ -35,6 +35,14 @@ class MyScript < Thor
     [type]
   end
 
+  desc "disabled", "This task is currenly enabled"
+  disable "This task is currently disabled" do
+    $block_disable
+  end
+  def disabled
+    "ran"
+  end
+
   map "fu" => "zoo"
 
   desc "foo BAR", <<END

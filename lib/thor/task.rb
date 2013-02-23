@@ -12,12 +12,31 @@ class Thor
     end
 
     def hidden?
-      false
+      if @disable.nil?
+        false
+      else
+        disabled?
+      end
+    end
+
+    def disable(message="disabled task", proc)
+      @disable, @disable_message = proc, message
+    end
+
+    def disabled?
+      begin
+        @disable.call
+      rescue NoMethodError
+        false
+      end
     end
 
     # By default, a task invokes a method in the thor class. You can change this
     # implementation to create custom tasks.
     def run(instance, args=[])
+
+      raise Exception.new(@disable_message) if disabled?
+
       arity = nil
 
       if private_method?(instance)
