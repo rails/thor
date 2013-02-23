@@ -267,8 +267,8 @@ describe Thor do
         expect(MyScript.start(["z"])).to eq(MyScript.start(["zoo"]))
       end
 
-      it "invokes a command, even when there's an alias the resolves to the same command" do
-        expect(MyScript.start(["hi"])).to eq(MyScript.start(["hidden"]))
+      it "invokes a command, even when there's an alias it resolves to the same command" do
+        expect(MyScript.start(["hi", "arg"])).to eq(MyScript.start(["hidden", "arg"]))
       end
 
       it "invokes an alias" do
