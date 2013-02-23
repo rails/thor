@@ -211,7 +211,7 @@ class Thor
 
       define_method(subcommand) do |*args|
         args, opts = Thor::Arguments.split(args)
-        invoke subcommand_class, args, opts, :invoked_via_subcommand => true
+        invoke subcommand_class, args, opts, :invoked_via_subcommand => true, :class_options => options
       end
     end
 

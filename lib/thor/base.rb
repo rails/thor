@@ -62,6 +62,7 @@ class Thor
       stop_on_unknown = self.class.stop_on_unknown_option? config[:current_task]
       opts = Thor::Options.new(parse_options, hash_options, stop_on_unknown)
       self.options = opts.parse(array_options)
+      self.options = config[:class_options].merge(self.options) if config[:class_options]
 
       # If unknown options are disallowed, make sure that none of the
       # remaining arguments looks like an option.
