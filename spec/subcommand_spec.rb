@@ -1,0 +1,24 @@
+require 'helper'
+
+describe Thor do
+
+  describe "#subcommand" do
+    it "maps a given subcommand to another Thor subclass" do
+      barn_help = capture(:stdout) { Scripts::MyDefaults.start(["barn"]) }
+      expect(barn_help).to include("barn help [COMMAND]  # Describe subcommands or one specific subcommand")
+    end
+
+    it "passes commands to subcommand classes" do
+      expect(capture(:stdout) { Scripts::MyDefaults.start(["barn", "open"]) }.strip).to eq("Open sesame!")
+    end
+
+    it "passes arguments to subcommand classes" do
+      expect(capture(:stdout) { Scripts::MyDefaults.start(["barn", "open", "shotgun"]) }.strip).to eq("That's going to leave a mark.")
+    end
+
+    it "ignores unknown options (the subcommand class will handle them)" do
+      expect(capture(:stdout) { Scripts::MyDefaults.start(["barn", "paint", "blue", "--coats", "4"])}.strip).to eq("4 coats of blue paint")
+    end
+  end
+
+end
