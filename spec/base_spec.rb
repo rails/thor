@@ -69,6 +69,16 @@ describe Thor::Base do
     end
   end
 
+  describe ":aliases" do
+    it "supports string aliases without a dash prefix" do
+      expect(MyCounter.start(["1", "2", "-z", "3"])[4]).to eq(3)
+    end
+
+    it "supports symbol aliases" do
+      expect(MyCounter.start(["1", "2", "-y", "3"])[5]).to eq(3)
+    end
+  end
+
   describe "#class_option" do
     it "sets options class wise" do
       expect(MyCounter.start(["1", "2", "--third", "3"])[2]).to eq(3)

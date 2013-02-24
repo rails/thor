@@ -9,12 +9,14 @@ class MyCounter < Thor::Group
   source_root File.expand_path(File.dirname(__FILE__))
   source_paths << File.expand_path("broken", File.dirname(__FILE__))
 
-  argument :first,     :type => :numeric
-  argument :second,    :type => :numeric, :default => 2
+  argument :first,       :type => :numeric
+  argument :second,      :type => :numeric, :default => 2
 
-  class_option :third,  :type => :numeric, :desc => "The third argument", :default => 3,
-                        :banner => "THREE", :aliases => "-t"
-  class_option :fourth, :type => :numeric, :desc => "The fourth argument"
+  class_option :third,    :type => :numeric, :desc => "The third argument", :default => 3,
+                          :banner => "THREE", :aliases => "-t"
+  class_option :fourth,   :type => :numeric, :desc => "The fourth argument"
+  class_option :simple,   :type => :numeric, :aliases => 'z'
+  class_option :symbolic, :type => :numeric, :aliases => :y
 
   desc <<-FOO
 Description:
@@ -31,6 +33,18 @@ FOO
 
   def three
     options[:third]
+  end
+
+  def four
+    options[:fourth]
+  end
+
+  def five
+    options[:simple]
+  end
+
+  def six
+    options[:symbolic]
   end
 
   def self.inherited(base)

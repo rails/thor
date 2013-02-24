@@ -81,7 +81,7 @@ describe Thor::Runner do
 
     it "invokes a Thor::Group" do
       ARGV.replace ["my_counter", "1", "2", "--third", "3"]
-      expect(Thor::Runner.start).to eq([1, 2, 3])
+      expect(Thor::Runner.start).to eq([1, 2, 3, nil, nil, nil])
     end
 
     it "raises an error if class/task can't be found" do

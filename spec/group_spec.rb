@@ -10,15 +10,15 @@ describe Thor::Group do
 
   describe "#start" do
     it "invokes all the tasks under the Thor group" do
-      expect(MyCounter.start(["1", "2", "--third", "3"])).to eq([ 1, 2, 3 ])
+      expect(MyCounter.start(["1", "2", "--third", "3"])).to eq([ 1, 2, 3, nil, nil, nil ])
     end
 
     it "uses argument default value" do
-      expect(MyCounter.start(["1", "--third", "3"])).to eq([ 1, 2, 3 ])
+      expect(MyCounter.start(["1", "--third", "3"])).to eq([ 1, 2, 3, nil, nil, nil ])
     end
 
     it "invokes all the tasks in the Thor group and his parents" do
-      expect(BrokenCounter.start(["1", "2", "--third", "3"])).to eq([ nil, 2, 3, false, 5 ])
+      expect(BrokenCounter.start(["1", "2", "--third", "3"])).to eq([ nil, 2, 3, false, 5, nil ])
     end
 
     it "raises an error if a required argument is added after a non-required" do
