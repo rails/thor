@@ -20,7 +20,7 @@ class MyCounter < Thor::Group
 
   desc <<-FOO
 Description:
-  This generator runs three tasks: one, two and three.
+  This generator runs three commands: one, two and three.
 FOO
 
   def one
@@ -52,7 +52,7 @@ FOO
     base.source_paths.unshift(File.expand_path(File.join(File.dirname(__FILE__), "doc")))
   end
 
-  no_tasks do
+  no_commands do
     def world(&block)
       result = capture(&block)
       concat(result.strip + " world!")
@@ -101,8 +101,8 @@ class WhinyGenerator < Thor::Group
   end
 end
 
-class TaskConflict < Thor::Group
-  desc "A group with the same name as a default task"
+class CommandConflict < Thor::Group
+  desc "A group with the same name as a default command"
   def group
     puts "group"
   end
@@ -124,5 +124,5 @@ class ChildGroup < ParentGroup
     "bar"
   end
 
-  public_task :foo, :baz
+  public_command :foo, :baz
 end

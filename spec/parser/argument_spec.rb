@@ -16,19 +16,19 @@ describe Thor::Argument do
 
     it "raises an error if type is unknown" do
       expect {
-        argument(:task, :type => :unknown)
+        argument(:command, :type => :unknown)
       }.to raise_error(ArgumentError, "Type :unknown is not valid for arguments.")
     end
 
     it "raises an error if argument is required and have default values" do
       expect {
-        argument(:task, :type => :string, :default => "bar", :required => true)
+        argument(:command, :type => :string, :default => "bar", :required => true)
       }.to raise_error(ArgumentError, "An argument cannot be required and have default value.")
     end
 
     it "raises an error if enum isn't an array" do
       expect {
-        argument(:task, :type => :string, :enum => "bar")
+        argument(:command, :type => :string, :enum => "bar")
       }.to raise_error(ArgumentError, "An argument cannot have an enum other than an array.")
     end
   end

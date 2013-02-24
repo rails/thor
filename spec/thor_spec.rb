@@ -48,44 +48,44 @@ describe Thor do
     end
 
     describe "when :for is supplied" do
-      it "updates an already defined task" do
+      it "updates an already defined command" do
         args, options = MyChildScript.start(["animal", "horse", "--other=fish"])
         expect(options[:other]).to eq("fish")
       end
 
       describe "and the target is on the parent class" do
-        it "updates an already defined task" do
-          args = ["example_default_task", "my_param", "--new-option=verified"]
+        it "updates an already defined command" do
+          args = ["example_default_command", "my_param", "--new-option=verified"]
           options = Scripts::MyScript.start(args)
           expect(options[:new_option]).to eq("verified")
         end
 
-        it "adds a task to the tasks list if the updated task is on the parent class" do
-          expect(Scripts::MyScript.tasks["example_default_task"]).to be
+        it "adds a command to the command list if the updated command is on the parent class" do
+          expect(Scripts::MyScript.commands["example_default_command"]).to be
         end
 
-        it "clones the parent task" do
-          expect(Scripts::MyScript.tasks["example_default_task"]).not_to eq(MyChildScript.tasks["example_default_task"])
+        it "clones the parent command" do
+          expect(Scripts::MyScript.commands["example_default_command"]).not_to eq(MyChildScript.commands["example_default_command"])
         end
       end
     end
   end
 
-  describe "#default_task" do
-    it "sets a default task" do
-      expect(MyScript.default_task).to eq("example_default_task")
+  describe "#default_command" do
+    it "sets a default command" do
+      expect(MyScript.default_command).to eq("example_default_command")
     end
 
-    it "invokes the default task if no command is specified" do
-      expect(MyScript.start([])).to eq("default task")
+    it "invokes the default command if no command is specified" do
+      expect(MyScript.start([])).to eq("default command")
     end
 
-    it "invokes the default task if no command is specified even if switches are given" do
+    it "invokes the default command if no command is specified even if switches are given" do
       expect(MyScript.start(["--with", "option"])).to eq({"with"=>"option"})
     end
 
-    it "inherits the default task from parent" do
-      expect(MyChildScript.default_task).to eq("example_default_task")
+    it "inherits the default command from parent" do
+      expect(MyChildScript.default_command).to eq("example_default_command")
     end
   end
 
@@ -101,17 +101,17 @@ describe Thor do
         return options, args
       end
 
-      desc "boring", "An ordinary task"
+      desc "boring", "An ordinary command"
       def boring(*args)
         return options, args
       end
     end
 
-    it "passes remaining args to task when it encounters a non-option" do
+    it "passes remaining args to command when it encounters a non-option" do
       expect(my_script.start(%w[exec command --verbose])).to eq [{}, ["command", "--verbose"]]
     end
 
-    it "passes remaining args to task when it encounters an unknown option" do
+    it "passes remaining args to command when it encounters an unknown option" do
       expect(my_script.start(%w[exec --foo command --bar])).to eq [{}, ["--foo", "command", "--bar"]]
     end
 
@@ -123,19 +123,19 @@ describe Thor do
       expect(my_script.start(%w[exec --mode rashly command])).to eq [{"mode" => "rashly"}, ["command"]]
     end
 
-    it "still passes everything after -- to task" do
+    it "still passes everything after -- to command" do
       expect(my_script.start(%w[exec -- --verbose])).to eq [{}, ["--verbose"]]
     end
 
-    it "does not affect ordinary tasks"  do
+    it "does not affect ordinary commands"  do
       expect(my_script.start(%w[boring command --verbose])).to eq [{"verbose" => true}, ["command"]]
     end
 
-    context "when provided with multiple task names" do
+    context "when provided with multiple command names" do
       klass = Class.new(Thor) do
         stop_on_unknown_option! :foo, :bar
       end
-      it "affects all specified tasks" do
+      it "affects all specified commands" do
         expect(klass.stop_on_unknown_option?(mock :name => "foo")).to be_true
         expect(klass.stop_on_unknown_option?(mock :name => "bar")).to be_true
         expect(klass.stop_on_unknown_option?(mock :name => "baz")).to be_false
@@ -147,7 +147,7 @@ describe Thor do
         stop_on_unknown_option! :foo
         stop_on_unknown_option! :bar
       end
-      it "affects all specified tasks" do
+      it "affects all specified commands" do
         expect(klass.stop_on_unknown_option?(mock :name => "foo")).to be_true
         expect(klass.stop_on_unknown_option?(mock :name => "bar")).to be_true
         expect(klass.stop_on_unknown_option?(mock :name => "baz")).to be_false
@@ -166,12 +166,12 @@ describe Thor do
     end
 
     it "inherits all mappings from parent" do
-      expect(MyChildScript.default_task).to eq("example_default_task")
+      expect(MyChildScript.default_command).to eq("example_default_command")
     end
   end
 
   describe "#desc" do
-    it "provides description for a task" do
+    it "provides description for a command" do
       content = capture(:stdout) { MyScript.start(["help"]) }
       expect(content).to match(/thor my_script:zoo\s+# zoo around/m)
     end
@@ -187,17 +187,17 @@ describe Thor do
     end
 
     describe "when :for is supplied" do
-      it "overwrites a previous defined task" do
+      it "overwrites a previous defined command" do
         expect(capture(:stdout) { MyChildScript.start(["help"]) }).to match(/animal KIND \s+# fish around/m)
       end
     end
 
     describe "when :hide is supplied" do
-      it "does not show the task in help" do
+      it "does not show the command in help" do
         expect(capture(:stdout) { MyScript.start(["help"]) }).not_to match(/this is hidden/m)
       end
 
-      it "but the task is still invokcable not show the task in help" do
+      it "but the command is still invokcable not show the command in help" do
         expect(MyScript.start(["hidden", "yesyes"])).to eq(["yesyes"])
       end
     end
@@ -241,8 +241,8 @@ describe Thor do
       expect(capture(:stderr) { MyScript.start(["animal"]) }.strip).to eq('thor animal requires at least 1 argument: "thor my_script:animal TYPE".')
     end
 
-    it "raises an error if the invoked task does not exist" do
-      expect(capture(:stderr) { Amazing.start(["animal"]) }.strip).to eq('Could not find task "animal" in "amazing" namespace.')
+    it "raises an error if the invoked command does not exist" do
+      expect(capture(:stderr) { Amazing.start(["animal"]) }.strip).to eq('Could not find command "animal" in "amazing" namespace.')
     end
 
     it "calls method_missing if an unknown method is passed in" do
@@ -250,15 +250,15 @@ describe Thor do
     end
 
     it "does not call a private method no matter what" do
-      expect(capture(:stderr) { MyScript.start(["what"]) }.strip).to eq('Could not find task "what" in "my_script" namespace.')
+      expect(capture(:stderr) { MyScript.start(["what"]) }.strip).to eq('Could not find command "what" in "my_script" namespace.')
     end
 
-    it "uses task default options" do
+    it "uses command default options" do
       options = MyChildScript.start(["animal", "fish"]).last
       expect(options).to eq({ "other" => "method default" })
     end
 
-    it "raises when an exception happens within the task call" do
+    it "raises when an exception happens within the command call" do
       expect{ MyScript.start(["call_myself_with_wrong_arity"]) }.to raise_error(ArgumentError)
     end
 
@@ -278,11 +278,11 @@ describe Thor do
 
     context "when the user enters an ambiguous substring of a command" do
       it "raises an exception that explains the ambiguity" do
-        expect{ MyScript.start(["call"]) }.to raise_error(ArgumentError, 'Ambiguous task call matches [call_myself_with_wrong_arity, call_unexistent_method]')
+        expect{ MyScript.start(["call"]) }.to raise_error(ArgumentError, 'Ambiguous command call matches [call_myself_with_wrong_arity, call_unexistent_method]')
       end
 
       it "raises an exception when there is an alias" do
-        expect{ MyScript.start(["f"]) }.to raise_error(ArgumentError, 'Ambiguous task f matches [foo, fu]')
+        expect{ MyScript.start(["f"]) }.to raise_error(ArgumentError, 'Ambiguous command f matches [foo, fu]')
       end
     end
 
@@ -299,24 +299,24 @@ describe Thor do
       end
 
       it "provides useful help info for the help method itself" do
-        expect(@content).to match(/help \[TASK\]\s+# Describe available tasks/)
+        expect(@content).to match(/help \[COMMAND\]\s+# Describe available commands/)
       end
 
       it "provides useful help info for a method with params" do
         expect(@content).to match(/animal TYPE\s+# horse around/)
       end
 
-      it "uses the maximum terminal size to show tasks" do
+      it "uses the maximum terminal size to show commands" do
         @shell.should_receive(:terminal_width).and_return(80)
         content = capture(:stdout) { MyScript.help(shell) }
         expect(content).to match(/aaa\.\.\.$/)
       end
 
-      it "provides description for tasks from classes in the same namespace" do
+      it "provides description for commands from classes in the same namespace" do
         expect(@content).to match(/baz\s+# do some bazing/)
       end
 
-      it "shows superclass tasks" do
+      it "shows superclass commands" do
         content = capture(:stdout) { MyChildScript.help(shell) }
         expect(content).to match(/foo BAR \s+# do some fooing/)
       end
@@ -333,9 +333,9 @@ describe Thor do
       end
     end
 
-    describe "for a specific task" do
-      it "provides full help info when talking about a specific task" do
-        expect(capture(:stdout) { MyScript.task_help(shell, "foo") }).to eq(<<-END)
+    describe "for a specific command" do
+      it "provides full help info when talking about a specific command" do
+        expect(capture(:stdout) { MyScript.command_help(shell, "foo") }).to eq(<<-END)
 Usage:
   thor my_script:foo BAR
 
@@ -348,18 +348,18 @@ do some fooing
 END
       end
 
-      it "raises an error if the task can't be found" do
+      it "raises an error if the command can't be found" do
         expect {
-          MyScript.task_help(shell, "unknown")
-        }.to raise_error(Thor::UndefinedTaskError, 'Could not find task "unknown" in "my_script" namespace.')
+          MyScript.command_help(shell, "unknown")
+        }.to raise_error(Thor::UndefinedCommandError, 'Could not find command "unknown" in "my_script" namespace.')
       end
 
       it "normalizes names before claiming they don't exist" do
-        expect(capture(:stdout) { MyScript.task_help(shell, "name-with-dashes") }).to match(/thor my_script:name-with-dashes/)
+        expect(capture(:stdout) { MyScript.command_help(shell, "name-with-dashes") }).to match(/thor my_script:name-with-dashes/)
       end
 
       it "uses the long description if it exists" do
-        expect(capture(:stdout) { MyScript.task_help(shell, "long_description") }).to eq(<<-HELP)
+        expect(capture(:stdout) { MyScript.command_help(shell, "long_description") }).to eq(<<-HELP)
 Usage:
   thor my_script:long_description
 
@@ -370,16 +370,16 @@ Description:
 HELP
       end
 
-      it "doesn't assign the long description to the next task without one" do
+      it "doesn't assign the long description to the next command without one" do
         expect(capture(:stdout) {
-          MyScript.task_help(shell, "name_with_dashes")
+          MyScript.command_help(shell, "name_with_dashes")
         }).not_to match(/so very long/i)
       end
     end
 
     describe "instance method" do
       it "calls the class method" do
-        expect(capture(:stdout) { MyScript.start(["help"]) }).to match(/Tasks:/)
+        expect(capture(:stdout) { MyScript.start(["help"]) }).to match(/Commands:/)
       end
 
       it "calls the class method" do
@@ -388,15 +388,15 @@ HELP
     end
   end
 
-  describe "when creating tasks" do
+  describe "when creating commands" do
     it "prints a warning if a public method is created without description or usage" do
       expect(capture(:stdout) {
         klass = Class.new(Thor)
         klass.class_eval "def hello_from_thor; end"
-      }).to match(/\[WARNING\] Attempted to create task "hello_from_thor" without usage or description/)
+      }).to match(/\[WARNING\] Attempted to create command "hello_from_thor" without usage or description/)
     end
 
-    it "does not print if overwriting a previous task" do
+    it "does not print if overwriting a previous command" do
       expect(capture(:stdout) {
         klass = Class.new(Thor)
         klass.class_eval "def help; end"
@@ -462,7 +462,7 @@ HELP
       expect(klass.start(["unknown", "foo", "--bar", "baz"])).to eq(["foo"])
     end
 
-    it "send as a task name" do
+    it "send as a command name" do
       expect(MyScript.start(["send"])).to eq(true)
     end
   end

@@ -92,8 +92,8 @@ describe Thor::Shell::Basic do
 
   describe "#say_status" do
     it "prints a message to the user with status" do
-      $stdout.should_receive(:puts).with("      create  ~/.thor/task.thor")
-      shell.say_status(:create, "~/.thor/task.thor")
+      $stdout.should_receive(:puts).with("      create  ~/.thor/command.thor")
+      shell.say_status(:create, "~/.thor/command.thor")
     end
 
     it "always use new line" do
@@ -106,7 +106,7 @@ describe Thor::Shell::Basic do
       $stdout.should_not_receive(:puts)
 
       shell.mute do
-        shell.say_status(:created, "~/.thor/task.thor")
+        shell.say_status(:created, "~/.thor/command.thor")
       end
     end
 
@@ -116,18 +116,18 @@ describe Thor::Shell::Basic do
 
       $stdout.should_not_receive(:puts)
       shell.base = base
-      shell.say_status(:created, "~/.thor/task.thor")
+      shell.say_status(:created, "~/.thor/command.thor")
     end
 
     it "does not print a message if log status is set to false" do
       $stdout.should_not_receive(:puts)
-      shell.say_status(:created, "~/.thor/task.thor", false)
+      shell.say_status(:created, "~/.thor/command.thor", false)
     end
 
     it "uses padding to set messages left margin" do
       shell.padding = 2
-      $stdout.should_receive(:puts).with("      create      ~/.thor/task.thor")
-      shell.say_status(:create, "~/.thor/task.thor")
+      $stdout.should_receive(:puts).with("      create      ~/.thor/command.thor")
+      shell.say_status(:create, "~/.thor/command.thor")
     end
   end
 

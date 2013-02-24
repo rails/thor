@@ -56,15 +56,15 @@ describe Thor::Actions::Directory do
     end
 
     it "copies only the first level files if recursive" do
-      invoke! ".", "tasks", :recursive => false
+      invoke! ".", "commands", :recursive => false
 
-      file = File.join(destination_root, "tasks", "group.thor")
+      file = File.join(destination_root, "commands", "group.thor")
       expect(File.exists?(file)).to be_true
 
-      file = File.join(destination_root, "tasks", "doc")
+      file = File.join(destination_root, "commands", "doc")
       expect(File.exists?(file)).to be_false
 
-      file = File.join(destination_root, "tasks", "doc", "README")
+      file = File.join(destination_root, "commands", "doc", "README")
       expect(File.exists?(file)).to be_false
     end
 
