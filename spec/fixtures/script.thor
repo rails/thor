@@ -6,7 +6,7 @@ class MyScript < Thor
   attr_reader :another_attribute
 
   group :script
-  default_task :example_default_task
+  default_command :example_default_command
 
   map "-T" => :animal, ["-f", "--foo"] => :foo
 
@@ -19,8 +19,8 @@ class MyScript < Thor
 
   desc "animal TYPE", "horse around"
 
-  no_tasks do
-    def this_is_not_a_task
+  no_commands do
+    def this_is_not_a_command
     end
   end
 
@@ -47,10 +47,10 @@ END
     [bar, options]
   end
 
-  desc "example_default_task", "example!"
+  desc "example_default_command", "example!"
   method_options :with => :string
-  def example_default_task
-    options.empty? ? "default task" : options
+  def example_default_command
+    options.empty? ? "default command" : options
   end
 
   desc "call_myself_with_wrong_arity", "get the right error"
@@ -58,7 +58,7 @@ END
     call_myself_with_wrong_arity(4)
   end
 
-  desc "call_unexistent_method", "Call unexistent method inside a task"
+  desc "call_unexistent_method", "Call unexistent method inside a command"
   def call_unexistent_method
     boom!
   end
@@ -73,7 +73,7 @@ END
   def long_description
   end
 
-  desc "name-with-dashes", "Ensure normalization of task names"
+  desc "name-with-dashes", "Ensure normalization of command names"
   def name_with_dashes
   end
 
@@ -93,7 +93,7 @@ END
     end
   end
 
-  desc "send", "send as a task name"
+  desc "send", "send as a command name"
   def send
     true
   end
@@ -114,7 +114,7 @@ END
 end
 
 class MyChildScript < MyScript
-  remove_task :bar
+  remove_command :bar
 
   method_options :force => :boolean, :param => :numeric
   def initialize(*args)
@@ -138,7 +138,7 @@ class MyChildScript < MyScript
   def boom
   end
 
-  remove_task :boom, :undefine => true
+  remove_command :boom, :undefine => true
 end
 
 class Barn < Thor
@@ -163,7 +163,7 @@ module Scripts
   class MyScript < MyChildScript
     argument :accessor, :type => :string
     class_options :force => :boolean
-    method_option :new_option, :type => :string, :for => :example_default_task
+    method_option :new_option, :type => :string, :for => :example_default_command
 
     def zoo
       self.accessor
@@ -179,9 +179,9 @@ module Scripts
       puts "moo"
     end
 
-    desc "task_conflict", "only gets called when prepended with a colon"
-    def task_conflict
-      puts "task"
+    desc "command_conflict", "only gets called when prepended with a colon"
+    def command_conflict
+      puts "command"
     end
 
     desc "barn", "commands to manage the barn"

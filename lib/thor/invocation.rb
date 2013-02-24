@@ -6,12 +6,12 @@ class Thor
 
     module ClassMethods
       # This method is responsible for receiving a name and find the proper
-      # class and task for it. The key is an optional parameter which is
+      # class and command for it. The key is an optional parameter which is
       # available only in class methods invocations (i.e. in Thor::Group).
       def prepare_for_invocation(key, name) #:nodoc:
         case name
         when Symbol, String
-          Thor::Util.find_class_and_task_by_namespace(name.to_s, !key)
+          Thor::Util.find_class_and_command_by_namespace(name.to_s, !key)
         else
           name
         end
@@ -25,15 +25,15 @@ class Thor
       super
     end
 
-    # Receives a name and invokes it. The name can be a string (either "task" or
-    # "namespace:task"), a Thor::Task, a Class or a Thor instance. If the task
-    # cannot be guessed by name, it can also be supplied as second argument.
+    # Receives a name and invokes it. The name can be a string (either "command" or
+    # "namespace:command"), a Thor::Command, a Class or a Thor instance. If the
+    # command cannot be guessed by name, it can also be supplied as second argument.
     #
     # You can also supply the arguments, options and configuration values for
-    # the task to be invoked, if none is given, the same values used to
+    # the command to be invoked, if none is given, the same values used to
     # initialize the invoker are used to initialize the invoked.
     #
-    # When no name is given, it will invoke the default task of the current class.
+    # When no name is given, it will invoke the default command of the current class.
     #
     # ==== Examples
     #
@@ -54,16 +54,16 @@ class Thor
     #     end
     #   end
     #
-    # You can notice that the method "foo" above invokes two tasks: "bar",
+    # You can notice that the method "foo" above invokes two commands: "bar",
     # which belongs to the same class and "hello" which belongs to the class B.
     #
-    # By using an invocation system you ensure that a task is invoked only once.
+    # By using an invocation system you ensure that a command is invoked only once.
     # In the example above, invoking "foo" will invoke "b:hello" just once, even
     # if it's invoked later by "bar" method.
     #
     # When class A invokes class B, all arguments used on A initialization are
     # supplied to B. This allows lazy parse of options. Let's suppose you have
-    # some rspec tasks:
+    # some rspec commands:
     #
     #   class Rspec < Thor::Group
     #     class_option :mock_framework, :type => :string, :default => :rr
@@ -100,30 +100,31 @@ class Thor
       end
 
       args.unshift(nil) if Array === args.first || NilClass === args.first
-      task, args, opts, config = args
+      command, args, opts, config = args
 
-      klass, task = _retrieve_class_and_task(name, task)
+      klass, command = _retrieve_class_and_command(name, command)
       raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
 
       args, opts, config = _parse_initialization_options(args, opts, config)
-      klass.send(:dispatch, task, args, opts, config) do |instance|
+      klass.send(:dispatch, command, args, opts, config) do |instance|
         instance.parent_options = options
       end
     end
 
-    # Invoke the given task if the given args.
-    def invoke_task(task, *args) #:nodoc:
+    # Invoke the given command if the given args.
+    def invoke_command(command, *args) #:nodoc:
       current = @_invocations[self.class]
 
-      unless current.include?(task.name)
-        current << task.name
-        task.run(self, *args)
+      unless current.include?(command.name)
+        current << command.name
+        command.run(self, *args)
       end
     end
+    alias invoke_task invoke_command
 
-    # Invoke all tasks for the current instance.
+    # Invoke all commands for the current instance.
     def invoke_all #:nodoc:
-      self.class.all_tasks.map { |_, task| invoke_task(task) }
+      self.class.all_commands.map { |_, command| invoke_command(command) }
     end
 
     # Invokes using shell padding.
@@ -138,21 +139,22 @@ class Thor
         { :invocations => @_invocations }
       end
 
-      # This method simply retrieves the class and task to be invoked.
-      # If the name is nil or the given name is a task in the current class,
+      # This method simply retrieves the class and command to be invoked.
+      # If the name is nil or the given name is a command in the current class,
       # use the given name and return self as class. Otherwise, call
       # prepare_for_invocation in the current class.
-      def _retrieve_class_and_task(name, sent_task=nil) #:nodoc:
+      def _retrieve_class_and_command(name, sent_command=nil) #:nodoc:
         case
         when name.nil?
           [self.class, nil]
-        when self.class.all_tasks[name.to_s]
+        when self.class.all_commands[name.to_s]
           [self.class, name.to_s]
         else
-          klass, task = self.class.prepare_for_invocation(nil, name)
-          [klass, task || sent_task]
+          klass, command = self.class.prepare_for_invocation(nil, name)
+          [klass, command || sent_command]
         end
       end
+      alias _retrieve_class_and_task _retrieve_class_and_command
 
       # Initialize klass using values stored in the @_initializer.
       def _parse_initialization_options(args, opts, config) #:nodoc:

@@ -16,33 +16,33 @@ class Thor::Runner < Thor #:nodoc:
   def help(meth = nil)
     if meth && !self.respond_to?(meth)
       initialize_thorfiles(meth)
-      klass, task = Thor::Util.find_class_and_task_by_namespace(meth)
-      self.class.handle_no_task_error(task, false) if klass.nil?
-      klass.start(["-h", task].compact, :shell => self.shell)
+      klass, command = Thor::Util.find_class_and_command_by_namespace(meth)
+      self.class.handle_no_command_error(command, false) if klass.nil?
+      klass.start(["-h", command].compact, :shell => self.shell)
     else
       super
     end
   end
 
-  # If a task is not found on Thor::Runner, method missing is invoked and
-  # Thor::Runner is then responsible for finding the task in all classes.
+  # If a command is not found on Thor::Runner, method missing is invoked and
+  # Thor::Runner is then responsible for finding the command in all classes.
   #
   def method_missing(meth, *args)
     meth = meth.to_s
     initialize_thorfiles(meth)
-    klass, task = Thor::Util.find_class_and_task_by_namespace(meth)
-    self.class.handle_no_task_error(task, false) if klass.nil?
-    args.unshift(task) if task
+    klass, command = Thor::Util.find_class_and_command_by_namespace(meth)
+    self.class.handle_no_command_error(command, false) if klass.nil?
+    args.unshift(command) if command
     klass.start(args, :shell => self.shell)
   end
 
-  desc "install NAME", "Install an optionally named Thor file into your system tasks"
+  desc "install NAME", "Install an optionally named Thor file into your system commands"
   method_options :as => :string, :relative => :boolean, :force => :boolean
   def install(name)
     initialize_thorfiles
 
     # If a directory name is provided as the argument, look for a 'main.thor'
-    # task in said directory.
+    # command in said directory.
     begin
       if File.directory?(File.expand_path(name))
         base, package = File.join(name, "main.thor"), :directory
@@ -143,14 +143,14 @@ class Thor::Runner < Thor #:nodoc:
     end
   end
 
-  desc "installed", "List the installed Thor modules and tasks"
+  desc "installed", "List the installed Thor modules and commands"
   method_options :internal => :boolean
   def installed
     initialize_thorfiles(nil, true)
     display_klasses(true, options["internal"])
   end
 
-  desc "list [SEARCH]", "List the available thor tasks (--substring means .*SEARCH)"
+  desc "list [SEARCH]", "List the available thor commands (--substring means .*SEARCH)"
   method_options :substring => :boolean, :group => :string, :all => :boolean, :debug => :boolean
   def list(search="")
     initialize_thorfiles
@@ -168,8 +168,8 @@ class Thor::Runner < Thor #:nodoc:
 
   private
 
-    def self.banner(task, all = false, subcommand = false)
-      "thor " + task.formatted_usage(self, all, subcommand)
+    def self.banner(command, all = false, subcommand = false)
+      "thor " + command.formatted_usage(self, all, subcommand)
     end
 
     def thor_root
@@ -276,25 +276,25 @@ class Thor::Runner < Thor #:nodoc:
     def display_klasses(with_modules=false, show_internal=false, klasses=Thor::Base.subclasses)
       klasses -= [Thor, Thor::Runner, Thor::Group] unless show_internal
 
-      raise Error, "No Thor tasks available" if klasses.empty?
+      raise Error, "No Thor commands available" if klasses.empty?
       show_modules if with_modules && !thor_yaml.empty?
 
       list = Hash.new { |h,k| h[k] = [] }
       groups = klasses.select { |k| k.ancestors.include?(Thor::Group) }
 
       # Get classes which inherit from Thor
-      (klasses - groups).each { |k| list[k.namespace.split(":").first] += k.printable_tasks(false) }
+      (klasses - groups).each { |k| list[k.namespace.split(":").first] += k.printable_commands(false) }
 
       # Get classes which inherit from Thor::Base
-      groups.map! { |k| k.printable_tasks(false).first }
+      groups.map! { |k| k.printable_commands(false).first }
       list["root"] = groups
 
       # Order namespaces with default coming first
       list = list.sort{ |a,b| a[0].sub(/^default/, '') <=> b[0].sub(/^default/, '') }
-      list.each { |n, tasks| display_tasks(n, tasks) unless tasks.empty? }
+      list.each { |n, commands| display_commands(n, commands) unless commands.empty? }
     end
 
-    def display_tasks(namespace, list) #:nodoc:
+    def display_commands(namespace, list) #:nodoc:
       list.sort!{ |a,b| a[0] <=> b[0] }
 
       say shell.set_color(namespace, :blue, true)
@@ -303,6 +303,7 @@ class Thor::Runner < Thor #:nodoc:
       print_table(list, :truncate => true)
       say
     end
+    alias display_tasks display_commands
 
     def show_modules #:nodoc:
       info  = []

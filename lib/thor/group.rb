@@ -1,9 +1,9 @@
 require 'thor/base'
 
 # Thor has a special class called Thor::Group. The main difference to Thor class
-# is that it invokes all tasks at once. It also include some methods that allows
+# is that it invokes all commands at once. It also include some methods that allows
 # invocations to be done at the class method, which are not available to Thor
-# tasks.
+# commands.
 class Thor::Group
   class << self
     # The description for this Thor::Group. If none is provided, but a source root
@@ -48,7 +48,7 @@ class Thor::Group
     end
 
     # Invoke the given namespace or class given. It adds an instance
-    # method that will invoke the klass and task. You can give a block to
+    # method that will invoke the klass and command. You can give a block to
     # configure how it will be invoked.
     #
     # The namespace/class given will have its options showed on the help
@@ -64,12 +64,12 @@ class Thor::Group
 
         class_eval <<-METHOD, __FILE__, __LINE__
           def _invoke_#{name.to_s.gsub(/\W/, '_')}
-            klass, task = self.class.prepare_for_invocation(nil, #{name.inspect})
+            klass, command = self.class.prepare_for_invocation(nil, #{name.inspect})
 
             if klass
               say_status :invoke, #{name.inspect}, #{verbose.inspect}
               block = self.class.invocation_blocks[#{name.inspect}]
-              _invoke_for_class_method klass, task, &block
+              _invoke_for_class_method klass, command, &block
             else
               say_status :error, %(#{name.inspect} [not found]), :red
             end
@@ -100,7 +100,7 @@ class Thor::Group
     # In some cases you want to customize how a specified hook is going to be
     # invoked. You can do that by overwriting the class method
     # prepare_for_invocation. The class method must necessarily return a klass
-    # and an optional task.
+    # and an optional command.
     #
     # ==== Custom invocations
     #
@@ -127,12 +127,12 @@ class Thor::Group
 
             value = options[#{name.inspect}]
             value = #{name.inspect} if TrueClass === value
-            klass, task = self.class.prepare_for_invocation(#{name.inspect}, value)
+            klass, command = self.class.prepare_for_invocation(#{name.inspect}, value)
 
             if klass
               say_status :invoke, value, #{verbose.inspect}
               block = self.class.invocation_blocks[#{name.inspect}]
-              _invoke_for_class_method klass, task, &block
+              _invoke_for_class_method klass, command, &block
             else
               say_status :error, %(\#{value} [not found]), :red
             end
@@ -149,7 +149,7 @@ class Thor::Group
     #
     def remove_invocation(*names)
       names.each do |name|
-        remove_task(name)
+        remove_command(name)
         remove_class_option(name)
         invocations.delete(name)
         invocation_blocks.delete(name)
@@ -196,21 +196,22 @@ class Thor::Group
       end
     end
 
-    # Returns tasks ready to be printed.
-    def printable_tasks(*)
+    # Returns commands ready to be printed.
+    def printable_commands(*)
       item = []
       item << banner
       item << (desc ? "# #{desc.gsub(/\s+/m,' ')}" : "")
       [item]
     end
+    alias printable_tasks printable_commands
 
-    def handle_argument_error(task, error, arity=nil) #:nodoc:
+    def handle_argument_error(command, error, arity=nil) #:nodoc:
       if arity > 0
-        msg = "#{basename} #{task.name} takes #{arity} argument"
+        msg = "#{basename} #{command.name} takes #{arity} argument"
         msg << "s" if arity > 1
         msg << ", but it should not."
       else
-        msg = "You should not pass arguments to #{basename} #{task.name}."
+        msg = "You should not pass arguments to #{basename} #{command.name}."
       end
 
       raise error, msg
@@ -219,7 +220,7 @@ class Thor::Group
     protected
 
       # The method responsible for dispatching given the args.
-      def dispatch(task, given_args, given_opts, config) #:nodoc:
+      def dispatch(command, given_args, given_opts, config) #:nodoc:
         if Thor::HELP_MAPPINGS.include?(given_args.first)
           help(config[:shell])
           return
@@ -231,8 +232,8 @@ class Thor::Group
         instance = new(args, opts, config)
         yield instance if block_given?
 
-        if task
-          instance.invoke_task(all_tasks[task])
+        if command
+          instance.invoke_command(all_commands[command])
         else
           instance.invoke_all
         end
@@ -241,22 +242,24 @@ class Thor::Group
       # The banner for this class. You can customize it if you are invoking the
       # thor class by another ways which is not the Thor::Runner.
       def banner
-        "#{basename} #{self_task.formatted_usage(self, false)}"
+        "#{basename} #{self_command.formatted_usage(self, false)}"
       end
 
-      # Represents the whole class as a task.
-      def self_task #:nodoc:
-        Thor::DynamicTask.new(self.namespace, class_options)
+      # Represents the whole class as a command.
+      def self_command #:nodoc:
+        Thor::DynamicCommand.new(self.namespace, class_options)
       end
+      alias self_task self_command
 
       def baseclass #:nodoc:
         Thor::Group
       end
 
-      def create_task(meth) #:nodoc:
-        tasks[meth.to_s] = Thor::Task.new(meth, nil, nil, nil, nil)
+      def create_command(meth) #:nodoc:
+        commands[meth.to_s] = Thor::Command.new(meth, nil, nil, nil, nil)
         true
       end
+      alias create_task create_command
   end
 
   include Thor::Base
@@ -265,19 +268,19 @@ class Thor::Group
 
   # Shortcut to invoke with padding and block handling. Use internally by
   # invoke and invoke_from_option class methods.
-  def _invoke_for_class_method(klass, task=nil, *args, &block) #:nodoc:
+  def _invoke_for_class_method(klass, command=nil, *args, &block) #:nodoc:
     with_padding do
       if block
         case block.arity
         when 3
-          block.call(self, klass, task)
+          block.call(self, klass, command)
         when 2
           block.call(self, klass)
         when 1
           instance_exec(klass, &block)
         end
       else
-        invoke klass, task, *args
+        invoke klass, command, *args
       end
     end
   end

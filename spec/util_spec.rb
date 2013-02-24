@@ -30,7 +30,7 @@ describe Thor::Util do
   end
 
   describe "#namespace_from_thor_class" do
-    it "replaces constant nesting with task namespacing" do
+    it "replaces constant nesting with command namespacing" do
       expect(Thor::Util.namespace_from_thor_class("Foo::Bar::Baz")).to eq("foo:bar:baz")
     end
 
@@ -87,27 +87,27 @@ describe Thor::Util do
     end
   end
 
-  describe "#find_class_and_task_by_namespace" do
+  describe "#find_class_and_command_by_namespace" do
     it "returns a Thor::Group class if full namespace matches" do
-      expect(Thor::Util.find_class_and_task_by_namespace("my_counter")).to eq([MyCounter, nil])
+      expect(Thor::Util.find_class_and_command_by_namespace("my_counter")).to eq([MyCounter, nil])
     end
 
     it "returns a Thor class if full namespace matches" do
-      expect(Thor::Util.find_class_and_task_by_namespace("thor")).to eq([Thor, nil])
+      expect(Thor::Util.find_class_and_command_by_namespace("thor")).to eq([Thor, nil])
     end
 
-    it "returns a Thor class and the task name" do
-      expect(Thor::Util.find_class_and_task_by_namespace("thor:help")).to eq([Thor, "help"])
+    it "returns a Thor class and the command name" do
+      expect(Thor::Util.find_class_and_command_by_namespace("thor:help")).to eq([Thor, "help"])
     end
 
-    it "falls back in the namespace:task look up even if a full namespace does not match" do
+    it "falls back in the namespace:command look up even if a full namespace does not match" do
       Thor.const_set(:Help, Module.new)
-      expect(Thor::Util.find_class_and_task_by_namespace("thor:help")).to eq([Thor, "help"])
+      expect(Thor::Util.find_class_and_command_by_namespace("thor:help")).to eq([Thor, "help"])
       Thor.send :remove_const, :Help
     end
 
     it "falls back on the default namespace class if nothing else matches" do
-      expect(Thor::Util.find_class_and_task_by_namespace("test")).to eq([Scripts::MyDefaults, "test"])
+      expect(Thor::Util.find_class_and_command_by_namespace("test")).to eq([Scripts::MyDefaults, "test"])
     end
   end
 

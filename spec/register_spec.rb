@@ -20,7 +20,7 @@ class ExcitingPluginCLI < Thor
 end
 
 class SuperSecretPlugin < Thor
-  default_task :squirrel
+  default_command :squirrel
 
   desc "squirrel", "All of secret squirrel's secrets"
   def squirrel
@@ -60,7 +60,7 @@ class PluginWithDefault < Thor
     puts msg
   end
 
-  default_task :say
+  default_command :say
 end
 
 class PluginWithDefaultMultipleArguments < Thor
@@ -69,17 +69,17 @@ class PluginWithDefaultMultipleArguments < Thor
     puts args
   end
 
-  default_task :say
+  default_command :say
 end
 
-class PluginWithDefaultTaskAndDeclaredArgument < Thor
+class PluginWithDefaultcommandAndDeclaredArgument < Thor
   desc "say MSG [MSG]", "print multiple messages"
   argument :msg
   def say
     puts msg
   end
 
-  default_task :say
+  default_command :say
 end
 
 BoringVendorProvidedCLI.register(
@@ -120,7 +120,7 @@ BoringVendorProvidedCLI.register(
   'subcommands ftw')
 
 BoringVendorProvidedCLI.register(
-  PluginWithDefaultTaskAndDeclaredArgument,
+  PluginWithDefaultcommandAndDeclaredArgument,
   'say_argument',
   'say message',
   'subcommands ftw')
@@ -136,18 +136,18 @@ describe ".register-ing a Thor subclass" do
     expect(help_output).to include('do exciting things')
   end
 
-  it "invokes the default task correctly" do
+  it "invokes the default command correctly" do
     output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say hello]) }
     expect(output).to include("hello")
   end
 
-  it "invokes the default task correctly with multiple args" do
+  it "invokes the default command correctly with multiple args" do
     output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say_multiple hello adam]) }
     expect(output).to include("hello")
     expect(output).to include("adam")
   end
 
-  it "invokes the default task correctly with a declared argument" do
+  it "invokes the default command correctly with a declared argument" do
     output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say_argument hello]) }
     expect(output).to include("hello")
   end
@@ -185,12 +185,12 @@ describe ".register-ing a Thor::Group subclass" do
 end
 
 describe "1.8 and 1.9 syntax compatibility" do
-  it "is compatible with both 1.8 and 1.9 syntax w/o task options" do
+  it "is compatible with both 1.8 and 1.9 syntax w/o command options" do
     group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[zoo]) }
     expect(group_output).to match(/zebra/)
   end
 
-  it "is compatible with both 1.8 and 1.9 syntax w/task options" do
+  it "is compatible with both 1.8 and 1.9 syntax w/command options" do
     group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[zoo -w lion]) }
     expect(group_output).to match(/lion/)
   end

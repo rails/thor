@@ -1,5 +1,5 @@
 class Thor
-  class Task < Struct.new(:name, :description, :long_description, :usage, :options)
+  class Command < Struct.new(:name, :description, :long_description, :usage, :options)
     FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
 
     def initialize(name, description, long_description, usage, options=nil)
@@ -15,27 +15,27 @@ class Thor
       false
     end
 
-    # By default, a task invokes a method in the thor class. You can change this
-    # implementation to create custom tasks.
+    # By default, a command invokes a method in the thor class. You can change this
+    # implementation to create custom commands.
     def run(instance, args=[])
       arity = nil
 
       if private_method?(instance)
-        instance.class.handle_no_task_error(name)
+        instance.class.handle_no_command_error(name)
       elsif public_method?(instance)
         arity = instance.method(name).arity
         instance.__send__(name, *args)
       elsif local_method?(instance, :method_missing)
         instance.__send__(:method_missing, name.to_sym, *args)
       else
-        instance.class.handle_no_task_error(name)
+        instance.class.handle_no_command_error(name)
       end
     rescue ArgumentError => e
       handle_argument_error?(instance, e, caller) ?
         instance.class.handle_argument_error(self, e, arity) : (raise e)
     rescue NoMethodError => e
       handle_no_method_error?(instance, e, caller) ?
-        instance.class.handle_no_task_error(name) : (raise e)
+        instance.class.handle_no_command_error(name) : (raise e)
     end
 
     # Returns the formatted usage by injecting given required arguments
@@ -107,26 +107,30 @@ class Thor
         error.message =~ /^undefined method `#{name}' for #{Regexp.escape(instance.to_s)}$/
     end
   end
+  Task = Command
 
-  # A task that is hidden in help messages but still invocable.
-  class HiddenTask < Task
+  # A command that is hidden in help messages but still invocable.
+  class HiddenCommand < Command
     def hidden?
       true
     end
   end
+  HiddenTask = HiddenCommand
 
-  # A dynamic task that handles method missing scenarios.
-  class DynamicTask < Task
+  # A dynamic command that handles method missing scenarios.
+  class DynamicCommand < Command
     def initialize(name, options=nil)
-      super(name.to_s, "A dynamically-generated task", name.to_s, name.to_s, options)
+      super(name.to_s, "A dynamically-generated command", name.to_s, name.to_s, options)
     end
 
     def run(instance, args=[])
       if (instance.methods & [name.to_s, name.to_sym]).empty?
         super
       else
-        instance.class.handle_no_task_error(name)
+        instance.class.handle_no_command_error(name)
       end
     end
   end
+  DynamicTask = DynamicCommand
+
 end

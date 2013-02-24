@@ -30,7 +30,7 @@ class A < Thor
     number == 5
   end
 
-  desc "invoker", "invoke a b task"
+  desc "invoker", "invoke a b command"
   def invoker(*args)
     invoke :b, :one, ["Jose"]
   end
@@ -96,8 +96,8 @@ class E < Thor::Group
 end
 
 class F < Thor::Group
-  invoke "b:one" do |instance, klass, task|
-    instance.invoke klass, task, [ "Jose" ], :last_name => "Valim"
+  invoke "b:one" do |instance, klass, command|
+    instance.invoke klass, command, [ "Jose" ], :last_name => "Valim"
   end
 end
 

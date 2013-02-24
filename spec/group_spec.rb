@@ -1,15 +1,15 @@
 require 'helper'
 
 describe Thor::Group do
-  describe "task" do
-    it "allows to use private methods from parent class as tasks" do
+  describe "command" do
+    it "allows to use private methods from parent class as commands" do
       expect(ChildGroup.start).to eq(["bar", "foo", "baz"])
       expect(ChildGroup.new.baz("bar")).to eq("bar")
     end
   end
 
   describe "#start" do
-    it "invokes all the tasks under the Thor group" do
+    it "invokes all the commands under the Thor group" do
       expect(MyCounter.start(["1", "2", "--third", "3"])).to eq([ 1, 2, 3, nil, nil, nil ])
     end
 
@@ -17,7 +17,7 @@ describe Thor::Group do
       expect(MyCounter.start(["1", "--third", "3"])).to eq([ 1, 2, 3, nil, nil, nil ])
     end
 
-    it "invokes all the tasks in the Thor group and his parents" do
+    it "invokes all the commands in the Thor group and his parents" do
       expect(BrokenCounter.start(["1", "2", "--third", "3"])).to eq([ nil, 2, 3, false, 5, nil ])
     end
 
@@ -27,11 +27,11 @@ describe Thor::Group do
       }.to raise_error(ArgumentError, 'You cannot have "foo" as required argument after the non-required argument "second".')
     end
 
-    it "raises when an exception happens within the task call" do
+    it "raises when an exception happens within the command call" do
       expect{ BrokenCounter.start(["1", "2", "--fail"]) }.to raise_error
     end
 
-    it "raises an error when a Thor group task expects arguments" do
+    it "raises an error when a Thor group command expects arguments" do
       expect{ WhinyGenerator.start }.to raise_error(ArgumentError, /thor wrong_arity takes 1 argument, but it should not/)
     end
 
@@ -43,11 +43,11 @@ describe Thor::Group do
 
   describe "#desc" do
     it "sets the description for a given class" do
-      expect(MyCounter.desc).to eq("Description:\n  This generator runs three tasks: one, two and three.\n")
+      expect(MyCounter.desc).to eq("Description:\n  This generator runs three commands: one, two and three.\n")
     end
 
     it "can be inherited" do
-      expect(BrokenCounter.desc).to eq("Description:\n  This generator runs three tasks: one, two and three.\n")
+      expect(BrokenCounter.desc).to eq("Description:\n  This generator runs three commands: one, two and three.\n")
     end
 
     it "can be nil" do
@@ -66,7 +66,7 @@ describe Thor::Group do
 
     it "shows description" do
       expect(@content).to match(/Description:/)
-      expect(@content).to match(/This generator runs three tasks: one, two and three./)
+      expect(@content).to match(/This generator runs three commands: one, two and three./)
     end
 
     it "shows options information" do
