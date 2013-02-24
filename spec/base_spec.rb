@@ -191,7 +191,7 @@ describe Thor::Base do
     it "returns tracked subclasses, grouped by the files they come from" do
       thorfile = File.join(File.dirname(__FILE__), "fixtures", "script.thor")
       expect(Thor::Base.subclass_files[File.expand_path(thorfile)]).to eq([
-        MyScript, MyScript::AnotherScript, MyChildScript, Barn,
+        MyScript, MyScript::AnotherScript, MyChildScript, Barn, PackageNameScript,
         Scripts::MyScript, Scripts::MyDefaults, Scripts::ChildDefault
       ])
     end

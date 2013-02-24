@@ -3,6 +3,16 @@ require 'thor/base'
 
 class Thor
   class << self
+    # Allows for custom "Task" package naming.
+    #
+    # === Parameters
+    # name<String>
+    # options<Hash>
+    #
+    def package_name(name, options={})
+      @package_name = name.nil? || name == '' ? nil : name
+    end
+    
     # Sets the default task when thor is executed without an explicit task to be called.
     #
     # ==== Parameters
@@ -184,7 +194,12 @@ class Thor
       end
       list.sort!{ |a,b| a[0] <=> b[0] }
 
-      shell.say "Tasks:"
+      if @package_name
+        shell.say "#{@package_name} tasks:"
+      else
+        shell.say "Tasks:"
+      end
+
       shell.print_table(list, :indent => 2, :truncate => true)
       shell.say
       class_options_help(shell)

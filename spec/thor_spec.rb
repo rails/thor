@@ -169,6 +169,19 @@ describe Thor do
       expect(MyChildScript.default_task).to eq("example_default_task")
     end
   end
+  
+  describe "#package_name" do
+    it "provides a proper description for a task when the package_name is assigned" do
+      content = capture(:stdout) { PackageNameScript.start(["help"]) }
+      expect(content).to match(/Baboon tasks:/m)
+    end
+    
+    # TODO: remove this, might be redundant, just wanted to prove full coverage
+    it "provides a proper description for a task when the package_name is NOT assigned" do
+      content = capture(:stdout) { MyScript.start(["help"]) }
+      expect(content).to match(/Tasks:/m)
+    end
+  end
 
   describe "#desc" do
     it "provides description for a task" do
