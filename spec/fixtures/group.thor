@@ -16,7 +16,7 @@ class MyCounter < Thor::Group
                           :banner => "THREE", :aliases => "-t"
   class_option :fourth,   :type => :numeric, :desc => "The fourth argument"
   class_option :simple,   :type => :numeric, :aliases => 'z'
-  class_option :symbolic, :type => :numeric, :aliases => :y
+  class_option :symbolic, :type => :numeric, :aliases => [:y, :r]
 
   desc <<-FOO
 Description:

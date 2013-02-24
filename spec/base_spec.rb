@@ -76,6 +76,7 @@ describe Thor::Base do
 
     it "supports symbol aliases" do
       expect(MyCounter.start(["1", "2", "-y", "3"])[5]).to eq(3)
+      expect(MyCounter.start(["1", "2", "-r", "3"])[5]).to eq(3)
     end
   end
 
@@ -138,7 +139,7 @@ describe Thor::Base do
 
     it "use padding in options that does not have aliases" do
       expect(@content).to match(/^  -t, \[--third/)
-      expect(@content).to match(/^      \[--fourth/)
+      expect(@content).to match(/^          \[--fourth/)
     end
 
     it "allows extra options to be given" do
