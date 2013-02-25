@@ -45,10 +45,10 @@ describe Thor::Base do
     end
   end
 
-  describe "#no_tasks" do
-    it "avoids methods being added as tasks" do
-      expect(MyScript.tasks.keys).to include("animal")
-      expect(MyScript.tasks.keys).not_to include("this_is_not_a_task")
+  describe "#no_commands" do
+    it "avoids methods being added as commands" do
+      expect(MyScript.commands.keys).to include("animal")
+      expect(MyScript.commands.keys).not_to include("this_is_not_a_command")
     end
   end
 
@@ -198,37 +198,37 @@ describe Thor::Base do
     end
 
     it "tracks a single subclass across multiple files" do
-      thorfile = File.join(File.dirname(__FILE__), "fixtures", "task.thor")
+      thorfile = File.join(File.dirname(__FILE__), "fixtures", "command.thor")
       expect(Thor::Base.subclass_files[File.expand_path(thorfile)]).to include(Amazing)
       expect(Thor::Base.subclass_files[File.expand_path(__FILE__)]).to include(Amazing)
     end
   end
 
-  describe "#tasks" do
-    it "returns a list with all tasks defined in this class" do
+  describe "#commands" do
+    it "returns a list with all commands defined in this class" do
       expect(MyChildScript.new).to respond_to("animal")
-      expect(MyChildScript.tasks.keys).to include("animal")
+      expect(MyChildScript.commands.keys).to include("animal")
     end
 
-    it "raises an error if a task with reserved word is defined" do
+    it "raises an error if a command with reserved word is defined" do
       expect {
         klass = Class.new(Thor::Group)
         klass.class_eval "def shell; end"
-      }.to raise_error(RuntimeError, /"shell" is a Thor reserved word and cannot be defined as task/)
+      }.to raise_error(RuntimeError, /"shell" is a Thor reserved word and cannot be defined as command/)
     end
   end
 
-  describe "#all_tasks" do
-    it "returns a list with all tasks defined in this class plus superclasses" do
+  describe "#all_commands" do
+    it "returns a list with all commands defined in this class plus superclasses" do
       expect(MyChildScript.new).to respond_to("foo")
-      expect(MyChildScript.all_tasks.keys).to include("foo")
+      expect(MyChildScript.all_commands.keys).to include("foo")
     end
   end
 
-  describe "#remove_task" do
-    it "removes the task from its tasks hash" do
-      expect(MyChildScript.tasks.keys).not_to include("bar")
-      expect(MyChildScript.tasks.keys).not_to include("boom")
+  describe "#remove_command" do
+    it "removes the command from its commands hash" do
+      expect(MyChildScript.commands.keys).not_to include("bar")
+      expect(MyChildScript.commands.keys).not_to include("boom")
     end
 
     it "undefines the method if desired" do
@@ -248,7 +248,7 @@ describe Thor::Base do
         ENV["THOR_DEBUG"] = 1
         expect {
           MyScript.start ["what", "--debug"]
-        }.to raise_error(Thor::UndefinedTaskError, 'Could not find task "what" in "my_script" namespace.')
+        }.to raise_error(Thor::UndefinedcommandError, 'Could not find command "what" in "my_script" namespace.')
       rescue
         ENV["THOR_DEBUG"] = nil
       end
@@ -274,15 +274,15 @@ describe Thor::Base do
   end
 
   describe "attr_*" do
-    it "does not add attr_reader as a task" do
+    it "does not add attr_reader as a command" do
       expect(capture(:stderr){ MyScript.start(["another_attribute"]) }).to match(/Could not find/)
     end
 
-    it "does not add attr_writer as a task" do
+    it "does not add attr_writer as a command" do
       expect(capture(:stderr){ MyScript.start(["another_attribute=", "foo"]) }).to match(/Could not find/)
     end
 
-    it "does not add attr_accessor as a task" do
+    it "does not add attr_accessor as a command" do
       expect(capture(:stderr){ MyScript.start(["some_attribute"]) }).to match(/Could not find/)
       expect(capture(:stderr){ MyScript.start(["some_attribute=", "foo"]) }).to match(/Could not find/)
     end

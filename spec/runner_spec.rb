@@ -14,13 +14,13 @@ describe Thor::Runner do
 
   describe "#help" do
     it "shows information about Thor::Runner itself" do
-      expect(capture(:stdout) { Thor::Runner.start(["help"]) }).to match(/List the available thor tasks/)
+      expect(capture(:stdout) { Thor::Runner.start(["help"]) }).to match(/List the available thor commands/)
     end
 
-    it "shows information about an specific Thor::Runner task" do
+    it "shows information about a specific Thor::Runner command" do
       content = capture(:stdout) { Thor::Runner.start(["help", "list"]) }
-      expect(content).to match(/List the available thor tasks/)
-      expect(content).not_to match(/help \[TASK\]/)
+      expect(content).to match(/List the available thor commands/)
+      expect(content).not_to match(/help \[COMMAND\]/)
     end
 
     it "shows information about a specific Thor class" do
@@ -28,10 +28,10 @@ describe Thor::Runner do
       expect(content).to match(/zoo\s+# zoo around/m)
     end
 
-    it "shows information about an specific task from an specific Thor class" do
+    it "shows information about an specific command from an specific Thor class" do
       content = capture(:stdout) { Thor::Runner.start(["help", "my_script:zoo"]) }
       expect(content).to match(/zoo around/)
-      expect(content).not_to match(/help \[TASK\]/)
+      expect(content).not_to match(/help \[COMMAND\]/)
     end
 
     it "shows information about a specific Thor group class" do
@@ -39,42 +39,42 @@ describe Thor::Runner do
       expect(content).to match(/my_counter N/)
     end
 
-    it "raises error if a class/task cannot be found" do
+    it "raises error if a class/command cannot be found" do
       content = capture(:stderr){ Thor::Runner.start(["help", "unknown"]) }
-      expect(content.strip).to eq('Could not find task "unknown" in "default" namespace.')
+      expect(content.strip).to eq('Could not find command "unknown" in "default" namespace.')
     end
 
-    it "raises error if a class/task cannot be found for a setup without thorfiles" do
+    it "raises error if a class/command cannot be found for a setup without thorfiles" do
       when_no_thorfiles_exist do
         Thor::Runner.should_receive :exit
         content = capture(:stderr){ Thor::Runner.start(["help", "unknown"]) }
-        expect(content.strip).to eq('Could not find task "unknown".')
+        expect(content.strip).to eq('Could not find command "unknown".')
       end
     end
   end
 
   describe "#start" do
-    it "invokes a task from Thor::Runner" do
+    it "invokes a command from Thor::Runner" do
       ARGV.replace ["list"]
       expect(capture(:stdout) { Thor::Runner.start }).to match(/my_counter N/)
     end
 
-    it "invokes a task from a specific Thor class" do
+    it "invokes a command from a specific Thor class" do
       ARGV.replace ["my_script:zoo"]
       expect(Thor::Runner.start).to be_true
     end
 
-    it "invokes the default task from a specific Thor class if none is specified" do
+    it "invokes the default command from a specific Thor class if none is specified" do
       ARGV.replace ["my_script"]
-      expect(Thor::Runner.start).to eq("default task")
+      expect(Thor::Runner.start).to eq("default command")
     end
 
-    it "forwads arguments to the invoked task" do
+    it "forwads arguments to the invoked command" do
       ARGV.replace ["my_script:animal", "horse"]
       expect(Thor::Runner.start).to eq(["horse"])
     end
 
-    it "invokes tasks through shortcuts" do
+    it "invokes commands through shortcuts" do
       ARGV.replace ["my_script", "-T", "horse"]
       expect(Thor::Runner.start).to eq(["horse"])
     end
@@ -84,18 +84,18 @@ describe Thor::Runner do
       expect(Thor::Runner.start).to eq([1, 2, 3, nil, nil, nil])
     end
 
-    it "raises an error if class/task can't be found" do
+    it "raises an error if class/command can't be found" do
       ARGV.replace ["unknown"]
       content = capture(:stderr){ Thor::Runner.start }
-      expect(content.strip).to eq('Could not find task "unknown" in "default" namespace.')
+      expect(content.strip).to eq('Could not find command "unknown" in "default" namespace.')
     end
 
-    it "raises an error if class/task can't be found in a setup without thorfiles" do
+    it "raises an error if class/command can't be found in a setup without thorfiles" do
       when_no_thorfiles_exist do
         ARGV.replace ["unknown"]
         Thor::Runner.should_receive :exit
         content = capture(:stderr){ Thor::Runner.start }
-        expect(content.strip).to eq('Could not find task "unknown".')
+        expect(content.strip).to eq('Could not find command "unknown".')
       end
     end
 
@@ -116,9 +116,9 @@ describe Thor::Runner do
     end
   end
 
-  describe "tasks" do
+  describe "commands" do
     before do
-      @location = "#{File.dirname(__FILE__)}/fixtures/task.thor"
+      @location = "#{File.dirname(__FILE__)}/fixtures/command.thor"
       @original_yaml = {
         "random" => {
           :location  => @location,
@@ -136,7 +136,7 @@ describe Thor::Runner do
     end
 
     describe "list" do
-      it "gives a list of the available tasks" do
+      it "gives a list of the available commands" do
         ARGV.replace ["list"]
         content = capture(:stdout) { Thor::Runner.start }
         expect(content).to match(/amazing:describe NAME\s+# say that someone is amazing/m)
@@ -147,7 +147,7 @@ describe Thor::Runner do
         expect(capture(:stdout) { Thor::Runner.start }).to match(/my_counter N/)
       end
 
-      it "can filter a list of the available tasks by --group" do
+      it "can filter a list of the available commands by --group" do
         ARGV.replace ["list", "--group", "standard"]
         expect(capture(:stdout) { Thor::Runner.start }).to match(/amazing:describe NAME/)
         ARGV.replace []
@@ -156,34 +156,34 @@ describe Thor::Runner do
         expect(capture(:stdout) { Thor::Runner.start }).to match(/my_script:animal TYPE/)
       end
 
-      it "can skip all filters to show all tasks using --all" do
+      it "can skip all filters to show all commands using --all" do
         ARGV.replace ["list", "--all"]
         content = capture(:stdout) { Thor::Runner.start }
         expect(content).to match(/amazing:describe NAME/)
         expect(content).to match(/my_script:animal TYPE/)
       end
 
-      it "doesn't list superclass tasks in the subclass" do
+      it "doesn't list superclass commands in the subclass" do
         ARGV.replace ["list"]
         expect(capture(:stdout) { Thor::Runner.start }).not_to match(/amazing:help/)
       end
 
-      it "presents tasks in the default namespace with an empty namespace" do
+      it "presents commands in the default namespace with an empty namespace" do
         ARGV.replace ["list"]
         expect(capture(:stdout) { Thor::Runner.start }).to match(/^thor :cow\s+# prints 'moo'/m)
       end
 
-      it "runs tasks with an empty namespace from the default namespace" do
-        ARGV.replace [":task_conflict"]
-        expect(capture(:stdout) { Thor::Runner.start }).to eq("task\n")
+      it "runs commands with an empty namespace from the default namespace" do
+        ARGV.replace [":command_conflict"]
+        expect(capture(:stdout) { Thor::Runner.start }).to eq("command\n")
       end
 
-      it "runs groups even when there is a task with the same name" do
-        ARGV.replace ["task_conflict"]
+      it "runs groups even when there is a command with the same name" do
+        ARGV.replace ["command_conflict"]
         expect(capture(:stdout) { Thor::Runner.start }).to eq("group\n")
       end
 
-      it "runs tasks with no colon in the default namespace" do
+      it "runs commands with no colon in the default namespace" do
         ARGV.replace ["cow"]
         expect(capture(:stdout) { Thor::Runner.start }).to eq("moo\n")
       end

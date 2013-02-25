@@ -52,13 +52,13 @@ describe Thor::Actions do
 
   describe "#copy_file" do
     it "copies file from source to default destination" do
-      action :copy_file, "task.thor"
-      exists_and_identical?("task.thor", "task.thor")
+      action :copy_file, "command.thor"
+      exists_and_identical?("command.thor", "command.thor")
     end
 
     it "copies file from source to the specified destination" do
-      action :copy_file, "task.thor", "foo.thor"
-      exists_and_identical?("task.thor", "foo.thor")
+      action :copy_file, "command.thor", "foo.thor"
+      exists_and_identical?("command.thor", "foo.thor")
     end
 
     it "copies file from the source relative to the current path" do
@@ -76,26 +76,26 @@ describe Thor::Actions do
     end
 
     it "logs status" do
-      expect(action(:copy_file, "task.thor")).to eq("      create  task.thor\n")
+      expect(action(:copy_file, "command.thor")).to eq("      create  command.thor\n")
     end
 
     it "accepts a block to change output" do
-      action :copy_file, "task.thor" do |content|
+      action :copy_file, "command.thor" do |content|
         "OMG" + content
       end
-      expect(File.read(File.join(destination_root, "task.thor"))).to match(/^OMG/)
+      expect(File.read(File.join(destination_root, "command.thor"))).to match(/^OMG/)
     end
   end
 
   describe "#link_file" do
     it "links file from source to default destination" do
-      action :link_file, "task.thor"
-      exists_and_identical?("task.thor", "task.thor")
+      action :link_file, "command.thor"
+      exists_and_identical?("command.thor", "command.thor")
     end
 
     it "links file from source to the specified destination" do
-      action :link_file, "task.thor", "foo.thor"
-      exists_and_identical?("task.thor", "foo.thor")
+      action :link_file, "command.thor", "foo.thor"
+      exists_and_identical?("command.thor", "foo.thor")
     end
 
     it "links file from the source relative to the current path" do
@@ -106,7 +106,7 @@ describe Thor::Actions do
     end
 
     it "logs status" do
-      expect(action(:link_file, "task.thor")).to eq("      create  task.thor\n")
+      expect(action(:link_file, "command.thor")).to eq("      create  command.thor\n")
     end
   end
 

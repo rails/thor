@@ -268,8 +268,8 @@ class Thor
     # switches.
     #
     # ==== Parameters
-    # task<String>:: the task to be invoked
-    # args<Array>:: arguments to the task
+    # command<String>:: the command to be invoked
+    # args<Array>:: arguments to the command
     # config<Hash>:: give :verbose => false to not log the status, :capture => true to hide to output.
     #                Other options are given as parameter to Thor.
     #
@@ -282,13 +282,13 @@ class Thor
     #   thor :list, :all => true, :substring => 'rails'
     #   #=> thor list --all --substring=rails
     #
-    def thor(task, *args)
+    def thor(command, *args)
       config  = args.last.is_a?(Hash) ? args.pop : {}
       verbose = config.key?(:verbose) ? config.delete(:verbose) : true
       pretend = config.key?(:pretend) ? config.delete(:pretend) : false
       capture = config.key?(:capture) ? config.delete(:capture) : false
 
-      args.unshift task
+      args.unshift(command)
       args.push Thor::Options.to_switches(config)
       command = args.join(' ').strip
 

@@ -5,17 +5,15 @@ class Thor
   # Errors that are caused by the developer, like declaring a method which
   # overwrites a thor keyword, it SHOULD NOT raise a Thor::Error. This way, we
   # ensure that developer errors are shown with full backtrace.
-  #
   class Error < StandardError
   end
 
-  # Raised when a task was not found.
-  #
-  class UndefinedTaskError < Error
+  # Raised when a command was not found.
+  class UndefinedCommandError < Error
   end
+  UndefinedTaskError = UndefinedCommandError
 
-  # Raised when a task was found, but not invoked properly.
-  #
+  # Raised when a command was found, but not invoked properly.
   class InvocationError < Error
   end
 
@@ -29,7 +27,6 @@ class Thor
   end
 
   # Raised when a user tries to call a private method encoded in templated filename.
-  #
   class PrivateMethodEncodedError < Error
   end
 end
