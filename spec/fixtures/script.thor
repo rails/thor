@@ -5,6 +5,10 @@ class MyScript < Thor
   attr_writer :another_attribute
   attr_reader :another_attribute
 
+  private
+  attr_reader :private_attribute
+
+  public
   group :script
   default_command :example_default_command
 
