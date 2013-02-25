@@ -598,8 +598,7 @@ class Thor
           end
 
           # Return if it's not a public instance method
-          return unless public_instance_methods.include?(meth) ||
-                        public_instance_methods.include?(meth.to_sym)
+          return unless public_method_defined?(meth.to_sym)
 
           return if @no_commands || !create_command(meth)
 
