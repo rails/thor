@@ -1,10 +1,13 @@
 $TESTING=true
 
 require 'simplecov'
-SimpleCov.start do
-  add_group 'Libraries', 'lib'
-  add_group 'Specs', 'spec'
-end
+require 'coveralls'
+
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+    SimpleCov::Formatter::HTMLFormatter,
+      Coveralls::SimpleCov::Formatter
+]
+SimpleCov.start
 
 $:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 require 'thor'
