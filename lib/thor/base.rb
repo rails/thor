@@ -119,18 +119,6 @@ class Thor
     end
 
     module ClassMethods
-      def attr_reader(*) #:nodoc:
-        no_commands { super }
-      end
-
-      def attr_writer(*) #:nodoc:
-        no_commands { super }
-      end
-
-      def attr_accessor(*) #:nodoc:
-        no_commands { super }
-      end
-
       # If you want to raise an error for unknown options, call check_unknown_options!
       # This is disabled by default to allow dynamic invocations.
       def check_unknown_options!
@@ -599,6 +587,9 @@ class Thor
 
           # Return if it's not a public instance method
           return unless public_method_defined?(meth.to_sym)
+
+          # Return if attr_* added the method
+          return if caller.first.to_s[/`attr_(reader|writer|accessor)'/]
 
           return if @no_commands || !create_command(meth)
 

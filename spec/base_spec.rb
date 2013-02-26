@@ -286,5 +286,9 @@ describe Thor::Base do
       expect(capture(:stderr){ MyScript.start(["some_attribute"]) }).to match(/Could not find/)
       expect(capture(:stderr){ MyScript.start(["some_attribute=", "foo"]) }).to match(/Could not find/)
     end
+
+    it "respects visibility" do
+      expect(MyScript.public_instance_methods).to_not include(:private_attribute)
+    end
   end
 end
