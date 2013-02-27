@@ -466,12 +466,8 @@ class Thor
         msg = "#{basename} #{command.name}"
         if arity && arity != 0
           required = arity < 0 ? (-1 - arity) : arity
-          if required == 0
-            msg << " should have no arguments"
-          else
-            msg << " requires at least #{required} argument"
-            msg << "s" if required > 1
-          end
+          msg << " requires at least #{required} argument"
+          msg << "s" if required > 1
         else
           msg = "call #{msg} as"
         end
