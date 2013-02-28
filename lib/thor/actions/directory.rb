@@ -39,6 +39,7 @@ class Thor
     # config<Hash>:: give :verbose => false to not log the status.
     #                If :recursive => false, does not look for paths recursively.
     #                If :mode => :preserve, preserve the file mode from the source.
+    #                If :exclude_pattern => /regexp/, prevents copying files that match that regexp.
     #
     # ==== Examples
     #
@@ -78,6 +79,7 @@ class Thor
 
           files(lookup).sort.each do |file_source|
             next if File.directory?(file_source)
+            next if config[:exclude_pattern] && file_source.match(config[:exclude_pattern])
             file_destination = File.join(given_destination, file_source.gsub(source, '.'))
             file_destination.gsub!('/./', '/')
 
