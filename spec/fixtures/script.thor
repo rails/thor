@@ -199,22 +199,18 @@ module Scripts
   class Arities < Thor
     desc "zero_args", "takes zero args"
     def zero_args
-      []
     end
 
     desc "one_arg ARG", "takes one arg"
     def one_arg(arg)
-      [arg]
     end
 
     desc "two_args ARG1 ARG2", "takes two args"
     def two_args(arg1, arg2)
-      [arg1, arg2]
     end
 
     desc "optional_arg [ARG]", "takes an optional arg"
     def optional_arg(arg='default')
-      [arg]
     end
   end
 end
