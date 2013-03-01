@@ -242,12 +242,12 @@ describe Thor do
         stderr = capture(:stderr) { Scripts::Arities.start(args) }
         expect(stderr.strip).to eq(msg)
       end
-      arity_asserter.call ["zero_args",    "one"         ], 'thor zero_args was called with args ["one"], usage: "thor scripts:arities:zero_args".'
-      arity_asserter.call ["one_arg"                     ], 'thor one_arg was called with no args, usage: "thor scripts:arities:one_arg ARG".'
-      arity_asserter.call ["one_arg",      "one", "two"  ], 'thor one_arg was called with args ["one", "two"], usage: "thor scripts:arities:one_arg ARG".'
-      arity_asserter.call ["one_arg",      "one", "two"  ], 'thor one_arg was called with args ["one", "two"], usage: "thor scripts:arities:one_arg ARG".'
-      arity_asserter.call ["two_args",     "one"         ], 'thor two_args was called with args ["one"], usage: "thor scripts:arities:two_args ARG1 ARG2".'
-      arity_asserter.call ["optional_arg", "one", "two"  ], 'thor optional_arg was called with args ["one", "two"], usage: "thor scripts:arities:optional_arg [ARG]".'
+      arity_asserter.call ["zero_args",    "one"         ], %Q'ERROR: thor zero_args was called with arguments ["one"]\nUsage: "thor scripts:arities:zero_args".'
+      arity_asserter.call ["one_arg"                     ], %Q'ERROR: thor one_arg was called with no arguments\nUsage: "thor scripts:arities:one_arg ARG".'
+      arity_asserter.call ["one_arg",      "one", "two"  ], %Q'ERROR: thor one_arg was called with arguments ["one", "two"]\nUsage: "thor scripts:arities:one_arg ARG".'
+      arity_asserter.call ["one_arg",      "one", "two"  ], %Q'ERROR: thor one_arg was called with arguments ["one", "two"]\nUsage: "thor scripts:arities:one_arg ARG".'
+      arity_asserter.call ["two_args",     "one"         ], %Q'ERROR: thor two_args was called with arguments ["one"]\nUsage: "thor scripts:arities:two_args ARG1 ARG2".'
+      arity_asserter.call ["optional_arg", "one", "two"  ], %Q'ERROR: thor optional_arg was called with arguments ["one", "two"]\nUsage: "thor scripts:arities:optional_arg [ARG]".'
     end
 
     it "raises an error if the invoked command does not exist" do
