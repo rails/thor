@@ -205,13 +205,13 @@ class Thor::Group
     end
     alias printable_tasks printable_commands
 
-    def handle_argument_error(command, error, arity=nil) #:nodoc:
+    def handle_argument_error(command, error, args, arity=nil) #:nodoc:
       if arity > 0
         msg = "#{basename} #{command.name} takes #{arity} argument"
         msg << "s" if arity > 1
         msg << ", but it should not."
       else
-        msg = "You should not pass arguments to #{basename} #{command.name}."
+        msg = "You should not pass arguments to #{basename} #{command.name}." # this line isn't tested, and doesn't look like it can ever get called
       end
 
       raise error, msg

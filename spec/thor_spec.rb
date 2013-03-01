@@ -237,8 +237,17 @@ describe Thor do
       expect(MyScript.start(["with_optional", "--all"])).to eq([nil, { "all" => true }, []])
     end
 
-    it "raises an error if a required param is not provided" do
-      expect(capture(:stderr) { MyScript.start(["animal"]) }.strip).to eq('thor animal requires at least 1 argument: "thor my_script:animal TYPE".')
+    it "raises an error if the wrong number of params are provided" do
+      arity_asserter = lambda do |args, msg|
+        stderr = capture(:stderr) { Scripts::Arities.start(args) }
+        expect(stderr.strip).to eq(msg)
+      end
+      arity_asserter.call ["zero_args",    "one"         ], 'thor zero_args was called with args ["one"], usage: "thor scripts:arities:zero_args".'
+      arity_asserter.call ["one_arg"                     ], 'thor one_arg was called with no args, usage: "thor scripts:arities:one_arg ARG".'
+      arity_asserter.call ["one_arg",      "one", "two"  ], 'thor one_arg was called with args ["one", "two"], usage: "thor scripts:arities:one_arg ARG".'
+      arity_asserter.call ["one_arg",      "one", "two"  ], 'thor one_arg was called with args ["one", "two"], usage: "thor scripts:arities:one_arg ARG".'
+      arity_asserter.call ["two_args",     "one"         ], 'thor two_args was called with args ["one"], usage: "thor scripts:arities:two_args ARG1 ARG2".'
+      arity_asserter.call ["optional_arg", "one", "two"  ], 'thor optional_arg was called with args ["one", "two"], usage: "thor scripts:arities:optional_arg [ARG]".'
     end
 
     it "raises an error if the invoked command does not exist" do
