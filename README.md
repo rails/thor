@@ -23,9 +23,10 @@ Installation
 
 Usage and documentation
 -----------------------
-Please see the [wiki][] for basic usage and other documentation on using Thor.
+Please see the [wiki][] for basic usage and other documentation on using Thor. You can also checkout the [official homepage][homepage].
 
 [wiki]: https://github.com/wycats/thor/wiki
+[homepage]: http://whatisthor.com/
 
 License
 -------
