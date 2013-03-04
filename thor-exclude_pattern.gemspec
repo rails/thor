@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ['Yehuda Katz', 'José Valim']
   spec.description = %q{A scripting framework that replaces rake, sake and rubigen}
   spec.email = 'ruby-thor@googlegroups.com'
-  spec.executables = %w(thor)
-  spec.files = %w(.document CHANGELOG.md LICENSE.md README.md Thorfile thor.gemspec)
+  spec.executables = %w(thor-exclude_pattern)
+  spec.files = %w(.document CHANGELOG.md LICENSE.md README.md Thorfile thor-exclude_pattern.gemspec)
   spec.files += Dir.glob("bin/**/*")
   spec.files += Dir.glob("lib/**/*.rb")
   spec.files += Dir.glob("spec/**/*")

@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/elgalu/thor-exclude_pattern.png?branch=master)](http://travis-ci.org/elgalu/thor-exclude_pattern)
+[![Build Status](https://travis-ci.org/elgalu/thor-exclude_pattern.png?branch=exclude_pattern)](https://travis-ci.org/elgalu/thor-exclude_pattern/builds)
 
 Thor with exclude_pattern
 =========================
@@ -31,6 +31,7 @@ end
 ```
 
 [![Gem Version](https://badge.fury.io/rb/thor.png)](https://rubygems.org/gems/thor)
+[![Build Status](https://secure.travis-ci.org/wycats/thor.png?branch=master)](http://travis-ci.org/wycats/thor)
 [![Dependency Status](https://gemnasium.com/wycats/thor.png?travis)](https://gemnasium.com/wycats/thor)
 [![Code Climate](https://codeclimate.com/github/wycats/thor.png)](https://codeclimate.com/github/wycats/thor)
 [![Coverage Status](https://coveralls.io/repos/wycats/thor/badge.png?branch=master)](https://coveralls.io/r/wycats/thor)
