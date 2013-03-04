@@ -68,6 +68,19 @@ describe Thor::Actions::Directory do
       expect(File.exists?(file)).to be_false
     end
 
+    it "ignores files within excluding/ directories when exclude_pattern is provided" do
+      invoke! "doc", "docs", :exclude_pattern => /excluding\//
+      file = File.join(destination_root, "docs", "excluding", "rdoc.rb")
+      expect(File.exists?(file)).to be_false
+    end
+
+    it "copies and evalutes files within excluding/ directory when no exclude_pattern is present" do
+      invoke! "doc", "docs"
+      file = File.join(destination_root, "docs", "excluding", "rdoc.rb")
+      expect(File.exists?(file)).to be_true
+      expect(File.read(file)).to eq("BAR = BAR\n")
+    end
+
     it "copies files from the source relative to the current path" do
       invoker.inside "doc" do
         invoke! "."
