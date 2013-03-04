@@ -4,8 +4,35 @@
 [![Code Climate](https://codeclimate.com/github/wycats/thor.png)](https://codeclimate.com/github/wycats/thor)
 [![Coverage Status](https://coveralls.io/repos/wycats/thor/badge.png?branch=master)](https://coveralls.io/r/wycats/thor)
 
-Thor
-====
+Thor with exclude_pattern
+=========================
+
+This fork adds a new option :exclude_pattern => /regexp/ to the directory() method.
+
+Directory method
+----------------
+
+> Copies recursively the files from source directory to root directory. If any of the files finishes with .tt, it's considered to be a template and is placed in the destination without the extension .tt. If any empty directory is found, it's copied and all .empty_directory files are ignored. If any file name is wrapped within % signs, the text within the % signs will be executed as a method and replaced with the returned value.
+
+If :exclude_pattern => /regexp/, it prevents copying files that match that regexp.
+
+Specs for the added option
+--------------------------
+
+```ruby
+it "ignores files within excluding/ directories when exclude_pattern is provided" do
+  invoke! "doc", "docs", :exclude_pattern => /excluding\//
+  file = File.join(destination_root, "docs", "excluding", "rdoc.rb")
+  expect(File.exists?(file)).to be_false
+end
+
+it "copies and evalutes files within excluding/ directory when no exclude_pattern is present" do
+  invoke! "doc", "docs"
+  file = File.join(destination_root, "docs", "excluding", "rdoc.rb")
+  expect(File.exists?(file)).to be_true
+  expect(File.read(file)).to eq("BAR = BAR\n")
+end
+```
 
 Description
 -----------

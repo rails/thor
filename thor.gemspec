@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.files += Dir.glob("spec/**/*")
   spec.homepage = 'http://whatisthor.com/'
   spec.licenses = ['MIT']
-  spec.name = 'thor'
+  spec.name = 'thor-exclude_pattern'
   spec.require_paths = ['lib']
   spec.required_rubygems_version = '>= 1.3.6'
   spec.summary = spec.description
