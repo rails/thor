@@ -193,7 +193,7 @@ describe Thor::Base do
       thorfile = File.join(File.dirname(__FILE__), "fixtures", "script.thor")
       expect(Thor::Base.subclass_files[File.expand_path(thorfile)]).to eq([
         MyScript, MyScript::AnotherScript, MyChildScript, Barn,
-        Scripts::MyScript, Scripts::MyDefaults, Scripts::ChildDefault
+        Scripts::MyScript, Scripts::MyDefaults, Scripts::ChildDefault, Scripts::Arities
       ])
     end
 
