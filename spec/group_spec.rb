@@ -17,7 +17,7 @@ describe Thor::Group do
       expect(MyCounter.start(["1", "--third", "3"])).to eq([ 1, 2, 3, nil, nil, nil ])
     end
 
-    it "invokes all the commands in the Thor group and his parents" do
+    it "invokes all the commands in the Thor group and its parents" do
       expect(BrokenCounter.start(["1", "2", "--third", "3"])).to eq([ nil, 2, 3, false, 5, nil ])
     end
 

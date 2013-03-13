@@ -32,7 +32,7 @@ class Thor
       end
     rescue ArgumentError => e
       handle_argument_error?(instance, e, caller) ?
-        instance.class.handle_argument_error(self, e, arity) : (raise e)
+        instance.class.handle_argument_error(self, e, args, arity) : (raise e)
     rescue NoMethodError => e
       handle_no_method_error?(instance, e, caller) ?
         instance.class.handle_no_command_error(name) : (raise e)
