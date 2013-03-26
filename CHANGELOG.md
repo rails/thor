@@ -1,3 +1,12 @@
+## 0.18.0, release 2013-03-26
+* Remove rake2thor
+* Only display colors if output medium supports colors
+* Pass parent_options to subcommands
+* Fix non-dash-prefixed aliases
+* Make error messages more helpful
+* Rename "task" to "command"
+* Add the method to allow for custom package name
+
 ## 0.17.0, release 2013-01-24
 * Add better support for tasks that accept arbitrary additional arguments (e.g. things like `bundle exec`)
 * Add #stop_on_unknown_option!
