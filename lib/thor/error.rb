@@ -25,8 +25,4 @@ class Thor
 
   class MalformattedArgumentError < InvocationError
   end
-
-  # Raised when a user tries to call a private method encoded in templated filename.
-  class PrivateMethodEncodedError < Error
-  end
 end
