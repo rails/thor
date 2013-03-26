@@ -107,23 +107,22 @@ describe Thor::Actions::EmptyDirectory do
         expect(@action.send(:convert_encoded_instructions, "%file_name%.txt")).to eq("expected.txt")
       end
 
+      it "accepts and executes a private %\w+% encoded instruction" do
+        @action.base.extend Module.new {
+          private
+          def private_file_name
+            "expected"
+          end
+        }
+        expect(@action.send(:convert_encoded_instructions, "%private_file_name%.txt")).to eq("expected.txt")
+      end
+
       it "ignores an 'illegal' %\w+% encoded instruction" do
         expect(@action.send(:convert_encoded_instructions, "%some_name%.txt")).to eq("%some_name%.txt")
       end
 
       it "ignores incorrectly encoded instruction" do
         expect(@action.send(:convert_encoded_instructions, "%some.name%.txt")).to eq("%some.name%.txt")
-      end
-
-      it "raises an error if the instruction refers to a private method" do
-        module PrivExt
-          private
-          def private_file_name
-            "something_hidden"
-          end
-        end
-        @action.base.extend(PrivExt)
-        expect { @action.send(:convert_encoded_instructions, "%private_file_name%.txt") }.to raise_error Thor::PrivateMethodEncodedError
       end
     end
   end
