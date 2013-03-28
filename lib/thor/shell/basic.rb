@@ -376,7 +376,11 @@ HELP
         default = options[:default]
         message = [statement, ("(#{default.inspect})" if default), nil].uniq.join(" ")
         say(message, color)
-        result = stdin.gets.tap{|text| text.strip! if text}
+        result = stdin.gets
+
+        return unless result
+
+        result.strip!
 
         if default && result == ""
           default
