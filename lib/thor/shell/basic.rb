@@ -48,7 +48,7 @@ class Thor
       def ask(statement, *args)
         options = args.last.is_a?(Hash) ? args.pop : {}
 
-        options[:limited_to] ? ask_filtered(statement, options[:limited_to], *args) : ask_simply(statement, *args)
+        options[:limited_to] ? ask_filtered(statement, options, *args) : ask_simply(statement, options, *args)
       end
 
       # Say (print) something to the user. If the sentence ends with a whitespace
@@ -372,15 +372,24 @@ HELP
         end
       end
 
-      def ask_simply(statement, color=nil)
-        say("#{statement} ", color)
-        stdin.gets.tap{|text| text.strip! if text}
+      def ask_simply(statement, options = {}, color=nil)
+        default = options[:default]
+        message = [statement, ("(#{default.inspect})" if default), nil].uniq.join(" ")
+        say(message, color)
+        result = stdin.gets.tap{|text| text.strip! if text}
+
+        if default && result == ""
+          default
+        else
+          result
+        end
       end
 
-      def ask_filtered(statement, answer_set, *args)
+      def ask_filtered(statement, options = {}, *args)
+        answer_set = options[:limited_to]
         correct_answer = nil
         until correct_answer
-          answer = ask_simply("#{statement} #{answer_set.inspect}", *args)
+          answer = ask_simply("#{statement} #{answer_set.inspect}", options, *args)
           correct_answer = answer_set.include?(answer) ? answer : nil
           answers = answer_set.map(&:inspect).join(", ")
           say("Your response must be one of: [#{answers}]. Please try again.") unless correct_answer
