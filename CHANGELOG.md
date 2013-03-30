@@ -1,3 +1,6 @@
+## 0.18.1, release 2013-03-30
+* Revert regressions found in 0.18.0
+
 ## 0.18.0, release 2013-03-26
 * Remove rake2thor
 * Only display colors if output medium supports colors
