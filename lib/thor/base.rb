@@ -418,11 +418,10 @@ class Thor
       #   thor :my_command
       #
       def namespace(name=nil)
-        @namespace = case name
-        when nil
-          @namespace || Thor::Util.namespace_from_thor_class(self)
-        else
+        if name
           @namespace = name.to_s
+        else
+          @namespace ||= Thor::Util.namespace_from_thor_class(self)
         end
       end
 
