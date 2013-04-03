@@ -379,7 +379,7 @@ HELP
 
       def ask_simply(statement, color, options)
         default = options[:default]
-        message = [statement, ("(#{default.inspect})" if default), nil].uniq.join(" ")
+        message = [statement, ("(#{default})" if default), nil].uniq.join(" ")
         say(message, color)
         result = stdin.gets
 
@@ -398,9 +398,9 @@ HELP
         answer_set = options[:limited_to]
         correct_answer = nil
         until correct_answer
-          answer = ask_simply("#{statement} #{answer_set.inspect}", color, options)
+          answers = answer_set.join(", ")
+          answer = ask_simply("#{statement} [#{answers}]", color, options)
           correct_answer = answer_set.include?(answer) ? answer : nil
-          answers = answer_set.map(&:inspect).join(", ")
           say("Your response must be one of: [#{answers}]. Please try again.") unless correct_answer
         end
         correct_answer
