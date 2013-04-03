@@ -69,7 +69,7 @@ describe Thor::Runner do
       expect(Thor::Runner.start).to eq("default command")
     end
 
-    it "forwads arguments to the invoked command" do
+    it "forwards arguments to the invoked command" do
       ARGV.replace ["my_script:animal", "horse"]
       expect(Thor::Runner.start).to eq(["horse"])
     end

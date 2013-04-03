@@ -20,7 +20,7 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
     expect(@hash.nothing?).to be_false
   end
 
-  it "handles magic comparisions" do
+  it "handles magic comparisons" do
     expect(@hash.foo?('bar')).to be_true
     expect(@hash.foo?('bee')).to be_false
   end

@@ -206,7 +206,7 @@ class Thor::Runner < Thor #:nodoc:
     # in the thor_root instead of loading them all.
     #
     # By default, it also traverses the current path until find Thor files, as
-    # described in thorfiles. This look up can be skipped by suppliying
+    # described in thorfiles. This look up can be skipped by supplying
     # skip_lookup true.
     #
     def initialize_thorfiles(relevant_to=nil, skip_lookup=false)
