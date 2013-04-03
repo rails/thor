@@ -86,7 +86,7 @@ describe Thor::Actions do
         expect(runner.relative_to_original_destination_root('/test/file')).to eq("/test/file")
       end
 
-      it "does not fail with files constaining regexp characters" do
+      it "does not fail with files containing regexp characters" do
         runner = MyCounter.new([1], {}, { :destination_root => File.join(destination_root, "fo[o-b]ar") })
         expect(runner.relative_to_original_destination_root("bar")).to eq("bar")
       end

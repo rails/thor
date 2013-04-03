@@ -177,7 +177,7 @@ describe Thor::Actions do
       expect(File.exists?(file)).to be_true
     end
 
-    it "converts enconded instructions" do
+    it "converts encoded instructions" do
       runner.should_receive(:file_name).and_return("rdoc")
       action :template, "doc/%file_name%.rb.tt"
       file = File.join(destination_root, "doc/rdoc.rb")

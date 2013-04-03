@@ -227,7 +227,7 @@ class Thor
     # ==== Parameters
     # command<String>:: the command to be executed.
     # config<Hash>:: give :verbose => false to not log the status, :capture => true to hide to output. Specify :with
-    #                to append an executable to command executation.
+    #                to append an executable to command execution.
     #
     # ==== Example
     #

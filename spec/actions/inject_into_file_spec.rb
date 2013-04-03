@@ -113,7 +113,7 @@ describe Thor::Actions::InjectIntoFile do
       expect(File.read(file)).to eq("another stuff\n__start__\nREADME\n__end__\n")
     end
 
-    it "substracts when prepending" do
+    it "subtracts when prepending" do
       invoke! "doc/README", "more content\n", :after => /\A/
       invoke! "doc/README", "another stuff\n", :after => /\A/
       revoke! "doc/README", "more content\n", :after => /\A/
