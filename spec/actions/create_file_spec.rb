@@ -101,7 +101,7 @@ describe Thor::Actions::CreateFile do
           expect(invoke!).to eq("        skip  doc/config.rb\n")
         end
 
-        it "shows conflict status to ther user" do
+        it "shows conflict status to the user" do
           expect(create_file("doc/config.rb")).not_to be_identical
           $stdin.should_receive(:gets).and_return('s')
           file = File.join(destination_root, 'doc/config.rb')
