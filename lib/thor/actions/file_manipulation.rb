@@ -293,8 +293,9 @@ class Thor
     end
     alias :remove_dir :remove_file
 
-  private
-    attr_accessor :output_buffer
+  attr_accessor :output_buffer
+
+  private :output_buffer
     def concat(string)
       @output_buffer.concat(string)
     end
