@@ -12,8 +12,7 @@ group :test do
   gem 'childlabor'
   gem 'coveralls', '>=0.5.7', :require => false
   gem 'fakeweb', '>= 1.3'
-  gem 'rspec', '>= 2.11'
-  gem 'rspec-mocks', '>= 2.12.2'
+  gem 'rspec', '>= 2.13'
   gem 'simplecov', :require => false
 end
 
