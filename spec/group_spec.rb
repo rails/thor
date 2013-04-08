@@ -126,8 +126,14 @@ describe Thor::Group do
       end
 
       it "allows to invoke a class from the class binding by the given option" do
-        content = capture(:stdout) { G.start(["--invoked", "e"]) }
+        error = nil
+        content = capture(:stdout) {
+          error = capture(:stderr) {
+            G.start(["--invoked", "e"])
+          }
+        }
         expect(content).to match(/invoke  e/)
+        expect(error).to match(/ERROR: thor two was called with arguments/)
       end
 
       it "shows invocation information to the user" do
