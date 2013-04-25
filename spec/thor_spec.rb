@@ -153,6 +153,10 @@ describe Thor do
         expect(klass.stop_on_unknown_option?(mock :name => "baz")).to be_false
       end
     end
+
+    it "doesn't break new" do
+      expect(my_script.new).to be_a(Thor)
+    end
   end
 
   describe "#map" do

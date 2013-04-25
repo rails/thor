@@ -314,7 +314,7 @@ class Thor
     end
 
     def stop_on_unknown_option?(command) #:nodoc:
-      !!@stop_on_unknown_option && @stop_on_unknown_option.include?(command.name.to_sym)
+      command && !@stop_on_unknown_option.nil? && @stop_on_unknown_option.include?(command.name.to_sym)
     end
 
   protected
