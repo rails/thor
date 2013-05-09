@@ -6,7 +6,7 @@ describe Thor do
 
     it "maps a given subcommand to another Thor subclass" do
       barn_help = capture(:stdout) { Scripts::MyDefaults.start(%w[barn]) }
-      expect(barn_help).to include("barn help [COMMAND]  # Describe subcommands or one specific subcommand")
+      expect(barn_help).to include("thor barn help [COMMAND]  # Describe subcommands or one specific subcommand")
     end
 
     it "passes commands to subcommand classes" do

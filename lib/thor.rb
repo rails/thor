@@ -454,7 +454,11 @@ class Thor
 
     def subcommand_help(cmd)
       desc "help [COMMAND]", "Describe subcommands or one specific subcommand"
-      class_eval <<-RUBY
+      class_eval <<-RUBY 
+        @subcommand_name = "#{cmd.to_s}"
+        def self.subcommand_name()
+          @subcommand_name
+        end
         def help(command = nil, subcommand = true); super; end
       RUBY
     end

@@ -145,7 +145,7 @@ class MyChildScript < MyScript
   remove_command :boom, :undefine => true
 end
 
-class Barn < Thor
+class BarnCli < Thor
   desc "open [ITEM]", "open the barn door"
   def open(item = nil)
     if item == "shotgun"
@@ -192,7 +192,7 @@ module Scripts
     end
 
     desc "barn", "commands to manage the barn"
-    subcommand "barn", Barn
+    subcommand "barn", BarnCli
   end
 
   class ChildDefault < Thor
