@@ -29,6 +29,11 @@ describe Thor::Shell::Basic do
       expect(shell.ask("")).to eq(nil)
     end
 
+    it "prints a message to the user and does not echo stdin if the noecho option is set to true" do
+      $stdout.should_receive(:print).with('What\'s your password? ')
+      $stdin.should_receive(:noecho).and_return('mysecretpass')
+      expect(shell.ask("What's your password?", :noecho => true)).to eq("mysecretpass")
+    end
 
     it "prints a message to the user with the available options and determines the correctness of the answer" do
       $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ')

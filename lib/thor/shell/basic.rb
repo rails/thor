@@ -1,4 +1,5 @@
 require 'tempfile'
+require 'io/console'
 
 class Thor
   module Shell
@@ -381,7 +382,12 @@ HELP
         default = options[:default]
         message = [statement, ("(#{default})" if default), nil].uniq.join(" ")
         say(message, color)
-        result = stdin.gets
+
+        result = if options[:noecho]
+          stdin.noecho(&:gets)
+        else
+          stdin.gets
+        end
 
         return unless result
 
