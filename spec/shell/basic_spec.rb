@@ -20,6 +20,7 @@ describe Thor::Shell::Basic do
     it "prints a message to the user and gets the response" do
       $stdout.should_receive(:print).with("Should I overwrite it? ")
       $stdin.should_receive(:gets).and_return('Sure')
+      $stdin.should_not_receive(:noecho).and_return('Sure')
       expect(shell.ask("Should I overwrite it?")).to eq("Sure")
     end
 
@@ -29,6 +30,11 @@ describe Thor::Shell::Basic do
       expect(shell.ask("")).to eq(nil)
     end
 
+    it "prints a message to the user and does not echo stdin if the echo option is set to false" do
+      $stdout.should_receive(:print).with('What\'s your password? ')
+      $stdin.should_receive(:noecho).and_return('mysecretpass')
+      expect(shell.ask("What's your password?", :echo => false)).to eq("mysecretpass")
+    end
 
     it "prints a message to the user with the available options and determines the correctness of the answer" do
       $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ')
