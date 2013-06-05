@@ -13,6 +13,10 @@ class Thor
   end
   UndefinedTaskError = UndefinedCommandError
 
+  # Optionally raised when a run action fails
+  class CommandFailedError < Error
+  end
+
   # Raised when a command was found, but not invoked properly.
   class InvocationError < Error
   end

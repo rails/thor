@@ -273,6 +273,32 @@ describe Thor::Actions do
       runner.shell.should_receive(:say_status).with(:run, 'ls from "."', :yellow)
       action :run, "ls", :verbose => :yellow
     end
+
+  end
+
+  describe "#run with a failing command" do
+    before do
+      runner.should_receive(:system).with("none_such_command")
+    end
+
+    it "doesn't raise without :raise_error" do
+      expect(action :run, "none_such_command").to eq("         run  none_such_command from \".\"\n")
+    end
+
+    [
+      [nil, "none_such_command failed with no exit status (likely force killed)"],
+      [127, "none_such_command failed with exit status 127"]
+    ].each do |exitstatus, error|
+      describe "with :raise_error => true and exitstatus #{exitstatus}" do
+        before do
+          $?.should_receive(:exitstatus).at_least(1).times.and_return(exitstatus)
+        end
+
+        it "raises an error for a failed command" do
+          expect { action :run, "none_such_command", :raise_error => true }.to raise_error(Thor::CommandFailedError, error)
+        end
+      end
+    end
   end
 
   describe "#run_ruby_script" do
