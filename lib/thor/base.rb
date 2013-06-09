@@ -603,13 +603,16 @@ class Thor
           else
             value = superclass.send(method)
 
-            if value
-              if value.is_a?(TrueClass) || value.is_a?(Symbol)
-                value
-              else
-                value.dup
-              end
+            # Ruby implements `dup` on Object, but raises a `TypeError`
+            # if the method is called on immediates. As a result, we
+            # don't have a good way to check whether dup will succeed
+            # without calling it and rescuing the TypeError.
+            begin
+              value.dup
+            rescue TypeError
+              value
             end
+
           end
         end
 
