@@ -137,7 +137,7 @@ describe Thor::Base do
       expect(@content).to match(/\-p, \[\-\-pretend\]/)
     end
 
-    it "use padding in options that does not have aliases" do
+    it "use padding in options that do not have aliases" do
       expect(@content).to match(/^  -t, \[--third/)
       expect(@content).to match(/^          \[--fourth/)
     end
@@ -244,7 +244,7 @@ describe Thor::Base do
   end
 
   describe "#start" do
-    it "raises an error instead of rescueing if THOR_DEBUG=1 is given" do
+    it "raises an error instead of rescuing if THOR_DEBUG=1 is given" do
       begin
         ENV["THOR_DEBUG"] = 1
         expect {
