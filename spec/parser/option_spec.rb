@@ -19,7 +19,7 @@ describe Thor::Option do
           expect(parse(:foo, :numeric).type).to eq(:numeric)
         end
 
-        it "has not default value" do
+        it "has no default value" do
           expect(parse(:foo, :string).default).to be_nil
           expect(parse(:foo, :numeric).default).to be_nil
         end
@@ -36,7 +36,7 @@ describe Thor::Option do
       end
 
       describe "and symbol is not a reserved key" do
-        it "has type equals to :string" do
+        it "has type equal to :string" do
           expect(parse(:foo, :bar).type).to eq(:string)
         end
 
@@ -51,7 +51,7 @@ describe Thor::Option do
         expect(parse(:foo, :a => :b).type).to eq(:hash)
       end
 
-      it "has default value equals to the hash" do
+      it "has default value equal to the hash" do
         expect(parse(:foo, :a => :b).default).to eq({ :a => :b })
       end
     end
@@ -61,7 +61,7 @@ describe Thor::Option do
         expect(parse(:foo, [:a, :b]).type).to eq(:array)
       end
 
-      it "has default value equals to the array" do
+      it "has default value equal to the array" do
         expect(parse(:foo, [:a, :b]).default).to eq([:a, :b])
       end
     end
@@ -71,7 +71,7 @@ describe Thor::Option do
         expect(parse(:foo, "bar").type).to eq(:string)
       end
 
-      it "has default value equals to the string" do
+      it "has default value equal to the string" do
         expect(parse(:foo, "bar").default).to eq("bar")
       end
     end
@@ -81,7 +81,7 @@ describe Thor::Option do
         expect(parse(:foo, 2.0).type).to eq(:numeric)
       end
 
-      it "has default value equals to the numeric" do
+      it "has default value equal to the numeric" do
         expect(parse(:foo, 2.0).default).to eq(2.0)
       end
     end
@@ -92,14 +92,14 @@ describe Thor::Option do
         expect(parse(:foo, false).type).to eq(:boolean)
       end
 
-      it "has default value equals to the boolean" do
+      it "has default value equal to the boolean" do
         expect(parse(:foo, true).default).to eq(true)
         expect(parse(:foo, false).default).to eq(false)
       end
     end
 
     describe "with key as a symbol" do
-      it "sets the name equals to the key" do
+      it "sets the name equal to the key" do
         expect(parse(:foo, true).name).to eq("foo")
       end
     end
@@ -135,7 +135,7 @@ describe Thor::Option do
     expect(option).to be_required
   end
 
-  it "cannot be required and have type boolean" do
+  it "boolean options cannot be required" do
     expect {
       option("foo", :required => true, :type => :boolean)
     }.to raise_error(ArgumentError, "An option cannot be boolean and required.")
@@ -175,15 +175,15 @@ describe Thor::Option do
       expect(parse(:foo, :boolean).usage).to eq("[--foo]")
     end
 
-    it "uses padding when no aliases is given" do
-      expect(parse(:foo, :boolean).usage(4)).to eq("    [--foo]")
+    it "uses padding when no aliases are given" do
+      expect(parse(:foo, :boolean).usageu4)).to eq("    [--foo]")
     end
 
     it "uses banner when supplied" do
       expect(option(:foo, :required => false, :type => :string, :banner => "BAR").usage).to eq("[--foo=BAR]")
     end
 
-    it "checkes when banner is an empty string" do
+    it "checks when banner is an empty string" do
       expect(option(:foo, :required => false, :type => :string, :banner => "").usage).to eq("[--foo]")
     end
 
