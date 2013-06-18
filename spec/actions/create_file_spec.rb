@@ -160,7 +160,7 @@ describe Thor::Actions::CreateFile do
   end
 
   describe "#identical?" do
-    it "returns true if the destination file and is identical" do
+    it "returns true if the destination file exists and is identical" do
       create_file("doc/config.rb")
       expect(@action.identical?).to be_false
       invoke!
