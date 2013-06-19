@@ -95,7 +95,7 @@ describe Thor::Actions::Directory do
       expect(File.read(file)).to eq("FOO = FOO\n")
     end
 
-    it "copies directories and preserved file mode" do
+    it "copies directories in preserved file mode" do
       invoke! "preserve", "preserved", :mode => :preserve
       original = File.join(source_root, "preserve", "script.sh")
       copy = File.join(destination_root, "preserved", "script.sh")
