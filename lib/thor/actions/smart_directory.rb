@@ -64,23 +64,6 @@ class Thor
         end
       end
 
-      if RUBY_VERSION < '2.0'
-        def file_level_lookup(previous_lookup)
-          File.join(previous_lookup, '{*,.[a-z]*}')
-        end
-
-        def files(lookup)
-          Dir[lookup]
-        end
-      else
-        def file_level_lookup(previous_lookup)
-          File.join(previous_lookup, '*')
-        end
-
-        def files(lookup)
-          Dir.glob(lookup, File::FNM_DOTMATCH)
-        end
-      end
     end
 
   end
