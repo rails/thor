@@ -176,7 +176,7 @@ describe Thor::Option do
     end
 
     it "uses padding when no aliases are given" do
-      expect(parse(:foo, :boolean).usageu4)).to eq("    [--foo]")
+      expect(parse(:foo, :boolean).usage)).to eq("    [--foo]")
     end
 
     it "uses banner when supplied" do
