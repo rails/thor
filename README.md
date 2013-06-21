@@ -1,8 +1,8 @@
 [![Gem Version](https://badge.fury.io/rb/thor.png)](https://rubygems.org/gems/thor)
-[![Build Status](https://secure.travis-ci.org/wycats/thor.png?branch=master)](http://travis-ci.org/wycats/thor)
-[![Dependency Status](https://gemnasium.com/wycats/thor.png?travis)](https://gemnasium.com/wycats/thor)
-[![Code Climate](https://codeclimate.com/github/wycats/thor.png)](https://codeclimate.com/github/wycats/thor)
-[![Coverage Status](https://coveralls.io/repos/wycats/thor/badge.png?branch=master)](https://coveralls.io/r/wycats/thor)
+[![Build Status](https://secure.travis-ci.org/erikhuda/thor.png?branch=master)](http://travis-ci.org/erikhuda/thor)
+[![Dependency Status](https://gemnasium.com/erikhuda/thor.png?travis)](https://gemnasium.com/erikhuda/thor)
+[![Code Climate](https://codeclimate.com/github/erikhuda/thor.png)](https://codeclimate.com/github/erikhuda/thor)
+[![Coverage Status](https://coveralls.io/repos/erikhuda/thor/badge.png?branch=master)](https://coveralls.io/r/erikhuda/thor)
 
 Thor
 ====
@@ -25,7 +25,7 @@ Usage and documentation
 -----------------------
 Please see the [wiki][] for basic usage and other documentation on using Thor. You can also checkout the [official homepage][homepage].
 
-[wiki]: https://github.com/wycats/thor/wiki
+[wiki]: https://github.com/erikhuda/thor/wiki
 [homepage]: http://whatisthor.com/
 
 License
