@@ -59,7 +59,7 @@ class Thor
           when /\.zc$/
             _inject_into_template_counterpart(file_source, file_destination)
           else
-            destination = base.copy_file(file_source, file_destination, config, &@block) unless File.exist? file_destination
+            destination = base.copy_file(file_source, file_destination, config, &@block) unless File.exist?(file_destination) || File.exist?(file_destination[0..-4])
           end
         end
       end
