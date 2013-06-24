@@ -98,7 +98,7 @@ describe Thor::Base do
   end
 
   describe "#remove_argument" do
-    it "removes previous defined arguments from class" do
+    it "removes previously defined arguments from class" do
       expect(ClearCounter.arguments).to be_empty
     end
 
@@ -119,7 +119,7 @@ describe Thor::Base do
       @content = capture(:stdout) { MyCounter.help(Thor::Base.shell.new) }
     end
 
-    it "shows options description" do
+    it "shows option's description" do
       expect(@content).to match(/# The third argument/)
     end
 
@@ -127,7 +127,7 @@ describe Thor::Base do
       expect(@content).to match(/\[\-\-third=THREE\]/)
     end
 
-    it "shows default values below description" do
+    it "shows default values below descriptions" do
       expect(@content).to match(/# Default: 3/)
     end
 

@@ -164,7 +164,7 @@ describe Thor do
       expect(MyScript.start(["-T", "fish"])).to eq(["fish"])
     end
 
-    it "calls the alias of a method if several are provided via .map" do
+    it "calls the alias of a method if several are provided via #map" do
       expect(MyScript.start(["-f", "fish"])).to eq(["fish", {}])
       expect(MyScript.start(["--foo", "fish"])).to eq(["fish", {}])
     end
@@ -214,7 +214,7 @@ describe Thor do
         expect(capture(:stdout) { MyScript.start(["help"]) }).not_to match(/this is hidden/m)
       end
 
-      it "but the command is still invokcable not show the command in help" do
+      it "but the command is still invokable, does not show the command in help" do
         expect(MyScript.start(["hidden", "yesyes"])).to eq(["yesyes"])
       end
     end
