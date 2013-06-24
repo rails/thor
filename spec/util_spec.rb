@@ -124,11 +124,11 @@ describe Thor::Util do
       Thor::Util.clear_user_home!
     end
 
-    it "returns the user path if none variable is set on the environment" do
+    it "returns the user path if no variable is set on the environment" do
       expect(Thor::Util.user_home).to eq(File.expand_path("~"))
     end
 
-    it "returns the *unix system path if file cannot be expanded and separator does not exist" do
+    it "returns the *nix system path if file cannot be expanded and separator does not exist" do
       File.should_receive(:expand_path).with("~").and_raise(RuntimeError)
       previous_value = File::ALT_SEPARATOR
       capture(:stderr){ File.const_set(:ALT_SEPARATOR, false) }
