@@ -76,13 +76,13 @@ describe Thor::Invocation do
       expect(capture(:stdout) { base.invoke("c:one") }).to be_empty
     end
 
-    it "raises Thor::UndefinedcommandError if the command can't be found" do
+    it "raises Thor::UndefinedCommandError if the command can't be found" do
       expect {
         A.new.invoke("foo:bar")
       }.to raise_error(Thor::UndefinedCommandError)
     end
 
-    it "raises Thor::UndefinedcommandError if the command can't be found even if all commands were already executed" do
+    it "raises Thor::UndefinedCommandError if the command can't be found even if all commands were already executed" do
       base = C.new
       silence(:stdout){ base.invoke_all }
 

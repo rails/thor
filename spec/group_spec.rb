@@ -13,7 +13,7 @@ describe Thor::Group do
       expect(MyCounter.start(["1", "2", "--third", "3"])).to eq([ 1, 2, 3, nil, nil, nil ])
     end
 
-    it "uses argument default value" do
+    it "uses argument's default value" do
       expect(MyCounter.start(["1", "--third", "3"])).to eq([ 1, 2, 3, nil, nil, nil ])
     end
 
@@ -35,7 +35,7 @@ describe Thor::Group do
       expect{ WhinyGenerator.start }.to raise_error(ArgumentError, /thor wrong_arity takes 1 argument, but it should not/)
     end
 
-    it "invokes help message if any of the shortcuts is given" do
+    it "invokes help message if any of the shortcuts are given" do
       MyCounter.should_receive(:help)
       MyCounter.start(["-h"])
     end
