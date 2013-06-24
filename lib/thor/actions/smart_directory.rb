@@ -29,7 +29,7 @@ class Thor
         error_msg = "Cannot load such a file -- #{target_file} -- did you forget to write a #{full_target_filepath}.tt file \n"
         error_msg += "destination: #{destination} | given_destination: #{given_destination} | target_file: #{target_file}"
         raise LoadError.new(error_msg) unless File.exist? full_target_filepath
-        base.insert_into_file(File.join(given_destination, target_file), contents, :after => "### Inject section ###\n")
+        base.insert_into_file(File.join(given_destination, target_file), contents, :after => "###\n")
       end
 
       def _delete_temp_file(temp_file)
