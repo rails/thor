@@ -164,7 +164,7 @@ describe Thor do
       expect(MyScript.start(["-T", "fish"])).to eq(["fish"])
     end
 
-    it "calls the alias of a method if several are provided via .map" do
+    it "calls the alias of a method if several are provided via #map" do
       expect(MyScript.start(["-f", "fish"])).to eq(["fish", {}])
       expect(MyScript.start(["--foo", "fish"])).to eq(["fish", {}])
     end
