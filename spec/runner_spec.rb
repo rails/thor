@@ -28,7 +28,7 @@ describe Thor::Runner do
       expect(content).to match(/zoo\s+# zoo around/m)
     end
 
-    it "shows information about an specific command from an specific Thor class" do
+    it "shows information about a specific command from an specific Thor class" do
       content = capture(:stdout) { Thor::Runner.start(["help", "my_script:zoo"]) }
       expect(content).to match(/zoo around/)
       expect(content).not_to match(/help \[COMMAND\]/)
