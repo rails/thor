@@ -48,18 +48,21 @@ class Thor
           next if config[:exclude_pattern] && file_source.match(config[:exclude_pattern])
           file_destination = File.join(given_destination, file_source.gsub(source, '.'))
           file_destination.gsub!('/./', '/')
-
+          absolute_file_destination = File.join destination, file_source.gsub(source, '.')
+          absolute_file_destination.gsub!('/./', '/')
           case file_source
           when /\.empty_directory$/
             dirname = File.dirname(file_destination).gsub(/\/\.$/, '')
             next if dirname == given_destination
             base.empty_directory(dirname, config)
           when /\.tt$/
+            next if File.exists?(absolute_file_destination[0..-4])
             destination = base.template(file_source, file_destination[0..-4], config, &@block)
           when /\.zc$/
             _inject_into_template_counterpart(file_source, file_destination)
           else
-            destination = base.copy_file(file_source, file_destination, config, &@block) unless File.exist?(file_destination) || File.exist?(file_destination[0..-4])
+            next if File.exists?(absolute_file_destination)
+            destination = base.copy_file(file_source, file_destination, config, &@block)
           end
         end
       end
