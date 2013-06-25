@@ -109,7 +109,7 @@ describe Thor::Shell::Basic do
       shell.say_status(:create, "~/.thor/command.thor")
     end
 
-    it "always use new line" do
+    it "always uses new line" do
       $stdout.should_receive(:puts).with("      create  ")
       shell.say_status(:create, "")
     end
@@ -137,7 +137,7 @@ describe Thor::Shell::Basic do
       shell.say_status(:created, "~/.thor/command.thor", false)
     end
 
-    it "uses padding to set messages left margin" do
+    it "uses padding to set message's left margin" do
       shell.padding = 2
       $stdout.should_receive(:puts).with("      create      ~/.thor/command.thor")
       shell.say_status(:create, "~/.thor/command.thor")
@@ -259,25 +259,25 @@ TABLE
       shell.file_collision('foo')
     end
 
-    it "returns true if the user choose default option" do
+    it "returns true if the user chooses default option" do
       $stdout.stub!(:print)
       $stdin.should_receive(:gets).and_return('')
       expect(shell.file_collision('foo')).to be_true
     end
 
-    it "returns false if the user choose no" do
+    it "returns false if the user chooses no" do
       $stdout.stub!(:print)
       $stdin.should_receive(:gets).and_return('n')
       expect(shell.file_collision('foo')).to be_false
     end
 
-    it "returns true if the user choose yes" do
+    it "returns true if the user chooses yes" do
       $stdout.stub!(:print)
       $stdin.should_receive(:gets).and_return('y')
       expect(shell.file_collision('foo')).to be_true
     end
 
-    it "shows help usage if the user choose help" do
+    it "shows help usage if the user chooses help" do
       $stdout.stub!(:print)
       $stdin.should_receive(:gets).and_return('h')
       $stdin.should_receive(:gets).and_return('n')
@@ -285,7 +285,7 @@ TABLE
       expect(help).to match(/h \- help, show this help/)
     end
 
-    it "quits if the user choose quit" do
+    it "quits if the user chooses quit" do
       $stdout.stub!(:print)
       $stdout.should_receive(:puts).with('Aborting...')
       $stdin.should_receive(:gets).and_return('q')
@@ -295,7 +295,7 @@ TABLE
       }.to raise_error(SystemExit)
     end
 
-    it "always returns true if the user choose always" do
+    it "always returns true if the user chooses always" do
       $stdout.should_receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqh] ')
       $stdin.should_receive(:gets).and_return('a')
 

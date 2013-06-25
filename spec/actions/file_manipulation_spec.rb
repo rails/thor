@@ -33,7 +33,7 @@ describe Thor::Actions do
       action :chmod, "foo", 0755
     end
 
-    it "does not execute the command if pretending given" do
+    it "does not execute the command if pretending" do
       FileUtils.should_not_receive(:chmod_R)
       runner(:pretend => true)
       action :chmod, "foo", 0755

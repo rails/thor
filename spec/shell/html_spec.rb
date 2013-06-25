@@ -6,7 +6,7 @@ describe Thor::Shell::HTML do
   end
 
   describe "#say" do
-    it "set the color if specified" do
+    it "sets the color if specified" do
       out = capture(:stdout) { shell.say "Wow! Now we have colors!", :green }
       expect(out.chomp).to eq('<span style="color: green;">Wow! Now we have colors!</span>')
     end
