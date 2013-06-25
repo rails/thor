@@ -74,7 +74,7 @@ describe Thor::Actions::Directory do
       expect(File.exists?(file)).to be_false
     end
 
-    it "copies and evalutes files within excluding/ directory when no exclude_pattern is present" do
+    it "copies and evaluates files within excluding/ directory when no exclude_pattern is present" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "excluding", "rdoc.rb")
       expect(File.exists?(file)).to be_true
@@ -95,7 +95,7 @@ describe Thor::Actions::Directory do
       expect(File.read(file)).to eq("FOO = FOO\n")
     end
 
-    it "copies directories and preserved file mode" do
+    it "copies directories and preserves file mode" do
       invoke! "preserve", "preserved", :mode => :preserve
       original = File.join(source_root, "preserve", "script.sh")
       copy = File.join(destination_root, "preserved", "script.sh")
