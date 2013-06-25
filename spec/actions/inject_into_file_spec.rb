@@ -56,7 +56,7 @@ describe Thor::Actions::InjectIntoFile do
       expect(File.read(file)).to eq("__start__\nREADME\n__end__\n")
     end
 
-    it "does not change the file if already include content" do
+    it "does not change the file if already includes content" do
       invoke! "doc/README", :before => "__end__" do
         "more content\n"
       end
@@ -70,7 +70,7 @@ describe Thor::Actions::InjectIntoFile do
       expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
     end
 
-    it "does change the file if already include content and :force == true" do
+    it "does change the file if already includes content and :force is true" do
       invoke! "doc/README", :before => "__end__" do
         "more content\n"
       end
@@ -87,26 +87,26 @@ describe Thor::Actions::InjectIntoFile do
   end
 
   describe "#revoke!" do
-    it "substracts the destination file after injection" do
+    it "subtracts the destination file after injection" do
       invoke! "doc/README", "\nmore content", :after => "__start__"
       revoke! "doc/README", "\nmore content", :after => "__start__"
       expect(File.read(file)).to eq("__start__\nREADME\n__end__\n")
     end
 
-    it "substracts the destination file before injection" do
+    it "subtracts the destination file before injection" do
       invoke! "doc/README", "more content\n", :before => "__start__"
       revoke! "doc/README", "more content\n", :before => "__start__"
       expect(File.read(file)).to eq("__start__\nREADME\n__end__\n")
     end
 
-    it "substracts even with double after injection" do
+    it "subtracts even with double after injection" do
       invoke! "doc/README", "\nmore content", :after => "__start__"
       invoke! "doc/README", "\nanother stuff", :after => "__start__"
       revoke! "doc/README", "\nmore content", :after => "__start__"
       expect(File.read(file)).to eq("__start__\nanother stuff\nREADME\n__end__\n")
     end
 
-    it "substracts even with double before injection" do
+    it "subtracts even with double before injection" do
       invoke! "doc/README", "more content\n", :before => "__start__"
       invoke! "doc/README", "another stuff\n", :before => "__start__"
       revoke! "doc/README", "more content\n", :before => "__start__"
@@ -120,7 +120,7 @@ describe Thor::Actions::InjectIntoFile do
       expect(File.read(file)).to eq("another stuff\n__start__\nREADME\n__end__\n")
     end
 
-    it "substracts when appending" do
+    it "subtracts when appending" do
       invoke! "doc/README", "more content\n", :before => /\z/
       invoke! "doc/README", "another stuff\n", :before => /\z/
       revoke! "doc/README", "more content\n", :before => /\z/

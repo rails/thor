@@ -20,7 +20,7 @@ describe Thor::Argument do
       }.to raise_error(ArgumentError, "Type :unknown is not valid for arguments.")
     end
 
-    it "raises an error if argument is required and have default values" do
+    it "raises an error if argument is required and has default values" do
       expect {
         argument(:command, :type => :string, :default => "bar", :required => true)
       }.to raise_error(ArgumentError, "An argument cannot be required and have default value.")
