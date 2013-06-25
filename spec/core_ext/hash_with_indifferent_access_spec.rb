@@ -32,13 +32,13 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
   it "merges keys independent if they are symbols or strings" do
     @hash.merge!('force' => false, :baz => "boom")
     expect(@hash[:force]).to eq(false)
-    expect(@hash[:baz]).to eq("boom")
+    expect(@hash["baz"]).to eq("boom")
   end
 
   it "creates a new hash by merging keys independent if they are symbols or strings" do
     other = @hash.merge('force' => false, :baz => "boom")
     expect(other[:force]).to eq(false)
-    expect(other[:baz]).to eq("boom")
+    expect(other["baz"]).to eq("boom")
   end
 
   it "converts to a traditional hash" do
