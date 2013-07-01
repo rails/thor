@@ -58,7 +58,12 @@ describe Thor::Invocation do
       expect(A.new([], :defaulted_value => 'not default').invoke('b:four')).to eq('not default')
     end
 
-    it 'dump configuration values to be used in the invoked class' do
+    it "returns the command chain" do
+      expect(I.new.invoke("two")).to eq([ :two ])
+      expect(J.start(["one", "two" ])).to eq([ :one, :two ])
+    end
+
+    it "dump configuration values to be used in the invoked class" do
       base = A.new
       expect(base.invoke('b:three').shell).to eq(base.shell)
     end
