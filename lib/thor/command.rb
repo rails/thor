@@ -88,12 +88,12 @@ class Thor
     end
 
     def sans_backtrace(backtrace, caller) #:nodoc:
-      saned = backtrace.reject { |frame| frame =~ FILE_REGEXP || (frame =~ /\.java:/ && RUBY_PLATFORM =~ /java/) }
+      saned = backtrace.reject { |frame| frame =~ FILE_REGEXP || (frame =~ /\.java:/ && RUBY_PLATFORM =~ /java/) || (frame =~ /^kernel\// && RUBY_ENGINE =~ /rbx/) }
       saned - caller
     end
 
     def handle_argument_error?(instance, error, caller)
-      not_debugging?(instance) && error.message =~ /wrong number of arguments/ && begin
+      not_debugging?(instance) && (error.message =~ /wrong number of arguments/ || error.message =~ /given \d*, expected \d*/) && begin
         saned = sans_backtrace(error.backtrace, caller)
         # Ruby 1.9 always include the called method in the backtrace
         saned.empty? || (saned.size == 1 && RUBY_VERSION >= '1.9')
