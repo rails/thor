@@ -80,8 +80,8 @@ describe Thor::Shell::Color do
   describe "#file_collision" do
     describe "when a block is given" do
       it "invokes the diff command" do
-        $stdout.stub!(:print)
-        $stdout.stub!(:tty?).and_return(true)
+        $stdout.stub(:print)
+        $stdout.stub(:tty?).and_return(true)
         $stdin.should_receive(:gets).and_return('d')
         $stdin.should_receive(:gets).and_return('n')
 

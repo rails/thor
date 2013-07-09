@@ -130,9 +130,9 @@ describe Thor::Runner do
       root_file = File.join(Thor::Util.thor_root, "thor.yml")
 
       # Stub load and save to avoid thor.yaml from being overwritten
-      YAML.stub!(:load_file).and_return(@original_yaml)
-      File.stub!(:exists?).with(root_file).and_return(true)
-      File.stub!(:open).with(root_file, "w")
+      YAML.stub(:load_file).and_return(@original_yaml)
+      File.stub(:exists?).with(root_file).and_return(true)
+      File.stub(:open).with(root_file, "w")
     end
 
     describe "list" do
@@ -214,9 +214,9 @@ describe Thor::Runner do
 
     describe "install/update" do
       before do
-        FileUtils.stub!(:mkdir_p)
-        FileUtils.stub!(:touch)
-        $stdin.stub!(:gets).and_return("Y")
+        FileUtils.stub(:mkdir_p)
+        FileUtils.stub(:touch)
+        $stdin.stub(:gets).and_return("Y")
 
         path = File.join(Thor::Util.thor_root, Digest::MD5.hexdigest(@location + "random"))
         File.should_receive(:open).with(path, "w")

@@ -277,7 +277,7 @@ describe Thor::Actions do
 
   describe "#run_ruby_script" do
     before do
-      Thor::Util.stub!(:ruby_command).and_return("/opt/jruby")
+      Thor::Util.stub(:ruby_command).and_return("/opt/jruby")
       runner.should_receive(:system).with("/opt/jruby script.rb")
     end
 
