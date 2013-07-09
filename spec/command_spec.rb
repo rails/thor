@@ -41,9 +41,9 @@ describe Thor::Command do
     end
 
     it "does not invoke an existing method" do
-      mock = mock()
-      expect(mock.class).to receive(:handle_no_command_error).with("to_s")
-      Thor::DynamicCommand.new('to_s').run(mock)
+      double = double()
+      expect(double.class).to receive(:handle_no_command_error).with("to_s")
+      Thor::DynamicCommand.new('to_s').run(double)
     end
   end
 
@@ -57,9 +57,9 @@ describe Thor::Command do
 
   describe "#run" do
     it "runs a command by calling a method in the given instance" do
-      mock = mock()
-      expect(mock).to receive(:can_has).and_return {|*args| args }
-      expect(command.run(mock, [1, 2, 3])).to eq([1, 2, 3])
+      double = double()
+      expect(double).to receive(:can_has).and_return {|*args| args }
+      expect(command.run(double, [1, 2, 3])).to eq([1, 2, 3])
     end
 
     it "raises an error if the method to be invoked is private" do
