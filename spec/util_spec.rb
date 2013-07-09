@@ -129,7 +129,7 @@ describe Thor::Util do
     end
 
     it "returns the *nix system path if file cannot be expanded and separator does not exist" do
-      File.should_receive(:expand_path).with("~").and_raise(RuntimeError)
+      expect(File).to receive(:expand_path).with("~").and_raise(RuntimeError)
       previous_value = File::ALT_SEPARATOR
       capture(:stderr){ File.const_set(:ALT_SEPARATOR, false) }
       expect(Thor::Util.user_home).to eq("/")
@@ -137,7 +137,7 @@ describe Thor::Util do
     end
 
     it "returns the windows system path if file cannot be expanded and a separator exists" do
-      File.should_receive(:expand_path).with("~").and_raise(RuntimeError)
+      expect(File).to receive(:expand_path).with("~").and_raise(RuntimeError)
       previous_value = File::ALT_SEPARATOR
       capture(:stderr){ File.const_set(:ALT_SEPARATOR, true) }
       expect(Thor::Util.user_home).to eq("C:/")
@@ -169,7 +169,7 @@ describe Thor::Util do
 
     it "escapes globs in path" do
       ENV.stub(:[]).with("HOME").and_return("/home/user{1}/")
-      Dir.should_receive(:[]).with("/home/user\\{1\\}/.thor/*").and_return([])
+      expect(Dir).to receive(:[]).with("/home/user\\{1\\}/.thor/*").and_return([])
       expect(Thor::Util.thor_root_glob).to eq([])
     end
   end

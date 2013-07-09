@@ -333,7 +333,7 @@ describe Thor do
       end
 
       it "uses the maximum terminal size to show commands" do
-        @shell.should_receive(:terminal_width).and_return(80)
+        expect(@shell).to receive(:terminal_width).and_return(80)
         content = capture(:stdout) { MyScript.help(shell) }
         expect(content).to match(/aaa\.\.\.$/)
       end

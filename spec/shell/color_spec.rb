@@ -20,7 +20,7 @@ describe Thor::Shell::Color do
 
     it "does not set the color if output is not a tty" do
       out = capture(:stdout) do
-        $stdout.should_receive(:tty?).and_return(false)
+        expect($stdout).to receive(:tty?).and_return(false)
         shell.say "Wow! Now we have colors!", :green
       end
 
@@ -82,8 +82,8 @@ describe Thor::Shell::Color do
       it "invokes the diff command" do
         $stdout.stub(:print)
         $stdout.stub(:tty?).and_return(true)
-        $stdin.should_receive(:gets).and_return('d')
-        $stdin.should_receive(:gets).and_return('n')
+        expect($stdin).to receive(:gets).and_return('d')
+        expect($stdin).to receive(:gets).and_return('n')
 
         output = capture(:stdout) { shell.file_collision('spec/fixtures/doc/README'){ "README\nEND\n" } }
         expect(output).to match(/\e\[31m\- __start__\e\[0m/)

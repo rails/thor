@@ -216,19 +216,19 @@ describe Thor::Actions do
 
     it "accepts a URL as the path" do
       @file = "http://gist.github.com/103208.txt"
-      runner.should_receive(:open).with(@file, "Accept" => "application/x-thor-template").and_return(@template)
+      expect(runner).to receive(:open).with(@file, "Accept" => "application/x-thor-template").and_return(@template)
       action(:apply, @file)
     end
 
     it "accepts a secure URL as the path" do
       @file = "https://gist.github.com/103208.txt"
-      runner.should_receive(:open).with(@file, "Accept" => "application/x-thor-template").and_return(@template)
+      expect(runner).to receive(:open).with(@file, "Accept" => "application/x-thor-template").and_return(@template)
       action(:apply, @file)
     end
 
     it "accepts a local file path with spaces" do
       @file = File.expand_path("fixtures/path with spaces", File.dirname(__FILE__))
-      runner.should_receive(:open).with(@file).and_return(@template)
+      expect(runner).to receive(:open).with(@file).and_return(@template)
       action(:apply, @file)
     end
 
@@ -254,7 +254,7 @@ describe Thor::Actions do
 
   describe "#run" do
     before do
-      runner.should_receive(:system).with("ls")
+      expect(runner).to receive(:system).with("ls")
     end
 
     it "executes the command given" do
@@ -270,7 +270,7 @@ describe Thor::Actions do
     end
 
     it "accepts a color as status" do
-      runner.shell.should_receive(:say_status).with(:run, 'ls from "."', :yellow)
+      expect(runner.shell).to receive(:say_status).with(:run, 'ls from "."', :yellow)
       action :run, "ls", :verbose => :yellow
     end
   end
@@ -278,7 +278,7 @@ describe Thor::Actions do
   describe "#run_ruby_script" do
     before do
       Thor::Util.stub(:ruby_command).and_return("/opt/jruby")
-      runner.should_receive(:system).with("/opt/jruby script.rb")
+      expect(runner).to receive(:system).with("/opt/jruby script.rb")
     end
 
     it "executes the ruby script" do
@@ -296,35 +296,35 @@ describe Thor::Actions do
 
   describe "#thor" do
     it "executes the thor command" do
-      runner.should_receive(:system).with("thor list")
+      expect(runner).to receive(:system).with("thor list")
       action :thor, :list, :verbose => true
     end
 
     it "converts extra arguments to command arguments" do
-      runner.should_receive(:system).with("thor list foo bar")
+      expect(runner).to receive(:system).with("thor list foo bar")
       action :thor, :list, "foo", "bar"
     end
 
     it "converts options hash to switches" do
-      runner.should_receive(:system).with("thor list foo bar --foo")
+      expect(runner).to receive(:system).with("thor list foo bar --foo")
       action :thor, :list, "foo", "bar", :foo => true
 
-      runner.should_receive(:system).with("thor list --foo 1 2 3")
+      expect(runner).to receive(:system).with("thor list --foo 1 2 3")
       action :thor, :list, :foo => [1,2,3]
     end
 
     it "logs status" do
-      runner.should_receive(:system).with("thor list")
+      expect(runner).to receive(:system).with("thor list")
       expect(action(:thor, :list)).to eq("         run  thor list from \".\"\n")
     end
 
     it "does not log status if required" do
-      runner.should_receive(:system).with("thor list --foo 1 2 3")
+      expect(runner).to receive(:system).with("thor list --foo 1 2 3")
       expect(action(:thor, :list, :foo => [1,2,3], :verbose => false)).to be_empty
     end
 
     it "captures the output when :capture is given" do
-      runner.should_receive(:`).with("thor foo bar")
+      expect(runner).to receive(:`).with("thor foo bar")
       action(:thor, "foo", "bar", :capture => true)
     end
   end

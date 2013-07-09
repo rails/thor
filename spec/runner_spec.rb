@@ -46,7 +46,7 @@ describe Thor::Runner do
 
     it "raises error if a class/command cannot be found for a setup without thorfiles" do
       when_no_thorfiles_exist do
-        Thor::Runner.should_receive :exit
+        expect(Thor::Runner).to receive :exit
         content = capture(:stderr){ Thor::Runner.start(["help", "unknown"]) }
         expect(content.strip).to eq('Could not find command "unknown".')
       end
@@ -93,7 +93,7 @@ describe Thor::Runner do
     it "raises an error if class/command can't be found in a setup without thorfiles" do
       when_no_thorfiles_exist do
         ARGV.replace ["unknown"]
-        Thor::Runner.should_receive :exit
+        expect(Thor::Runner).to receive :exit
         content = capture(:stderr){ Thor::Runner.start }
         expect(content.strip).to eq('Could not find command "unknown".')
       end
@@ -192,7 +192,7 @@ describe Thor::Runner do
     describe "uninstall" do
       before do
         path = File.join(Thor::Util.thor_root, @original_yaml["random"][:filename])
-        FileUtils.should_receive(:rm_rf).with(path)
+        expect(FileUtils).to receive(:rm_rf).with(path)
       end
 
       it "uninstalls existing thor modules" do
@@ -202,7 +202,7 @@ describe Thor::Runner do
 
     describe "installed" do
       before do
-        Dir.should_receive(:[]).and_return([])
+        expect(Dir).to receive(:[]).and_return([])
       end
 
       it "displays the modules installed in a pretty way" do
@@ -219,15 +219,15 @@ describe Thor::Runner do
         $stdin.stub(:gets).and_return("Y")
 
         path = File.join(Thor::Util.thor_root, Digest::MD5.hexdigest(@location + "random"))
-        File.should_receive(:open).with(path, "w")
+        expect(File).to receive(:open).with(path, "w")
       end
 
       it "updates existing thor files" do
         path = File.join(Thor::Util.thor_root, @original_yaml["random"][:filename])
         if File.directory? path
-          FileUtils.should_receive(:rm_rf).with(path)
+          expect(FileUtils).to receive(:rm_rf).with(path)
         else
-          File.should_receive(:delete).with(path)
+          expect(File).to receive(:delete).with(path)
         end
         silence(:stdout) { Thor::Runner.start(["update", "random"]) }
       end

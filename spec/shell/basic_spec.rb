@@ -18,105 +18,105 @@ describe Thor::Shell::Basic do
 
   describe "#ask" do
     it "prints a message to the user and gets the response" do
-      $stdout.should_receive(:print).with("Should I overwrite it? ")
-      $stdin.should_receive(:gets).and_return('Sure')
+      expect($stdout).to receive(:print).with("Should I overwrite it? ")
+      expect($stdin).to receive(:gets).and_return('Sure')
       expect(shell.ask("Should I overwrite it?")).to eq("Sure")
     end
 
     it "prints a message and returns nil if EOF is sent to stdin" do
-      $stdout.should_receive(:print).with(" ")
-      $stdin.should_receive(:gets).and_return(nil)
+      expect($stdout).to receive(:print).with(" ")
+      expect($stdin).to receive(:gets).and_return(nil)
       expect(shell.ask("")).to eq(nil)
     end
 
 
     it "prints a message to the user with the available options and determines the correctness of the answer" do
-      $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ')
-      $stdin.should_receive(:gets).and_return('chocolate')
+      expect($stdout).to receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ')
+      expect($stdin).to receive(:gets).and_return('chocolate')
       expect(shell.ask("What's your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])).to eq("chocolate")
     end
 
     it "prints a message to the user with the available options and reasks the question after an incorrect repsonse" do
-      $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ').twice
-      $stdout.should_receive(:puts).with('Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.')
-      $stdin.should_receive(:gets).and_return('moose tracks', 'chocolate')
+      expect($stdout).to receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ').twice
+      expect($stdout).to receive(:puts).with('Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.')
+      expect($stdin).to receive(:gets).and_return('moose tracks', 'chocolate')
       expect(shell.ask("What's your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])).to eq("chocolate")
     end
 
     it "prints a message to the user containing a default and sets the default if only enter is pressed" do
-      $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor? (vanilla) ')
-      $stdin.should_receive(:gets).and_return('')
+      expect($stdout).to receive(:print).with('What\'s your favorite Neopolitan flavor? (vanilla) ')
+      expect($stdin).to receive(:gets).and_return('')
       expect(shell.ask("What's your favorite Neopolitan flavor?", :default => "vanilla")).to eq("vanilla")
     end
 
     it "prints a message to the user with the available options and reasks the question after an incorrect repsonse and then returns the default" do
-      $stdout.should_receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ').twice
-      $stdout.should_receive(:puts).with('Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.')
-      $stdin.should_receive(:gets).and_return('moose tracks', '')
+      expect($stdout).to receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ').twice
+      expect($stdout).to receive(:puts).with('Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.')
+      expect($stdin).to receive(:gets).and_return('moose tracks', '')
       expect(shell.ask("What's your favorite Neopolitan flavor?", :default => "vanilla", :limited_to => ["strawberry", "chocolate", "vanilla"])).to eq("vanilla")
     end
   end
 
   describe "#yes?" do
     it "asks the user and returns true if the user replies yes" do
-      $stdout.should_receive(:print).with("Should I overwrite it? ")
-        $stdin.should_receive(:gets).and_return('y')
+      expect($stdout).to receive(:print).with("Should I overwrite it? ")
+        expect($stdin).to receive(:gets).and_return('y')
       expect(shell.yes?("Should I overwrite it?")).to be_true
 
-      $stdout.should_receive(:print).with("Should I overwrite it? ")
-        $stdin.should_receive(:gets).and_return('n')
+      expect($stdout).to receive(:print).with("Should I overwrite it? ")
+        expect($stdin).to receive(:gets).and_return('n')
       expect(shell.yes?("Should I overwrite it?")).not_to be_true
     end
   end
 
   describe "#no?" do
     it "asks the user and returns true if the user replies no" do
-      $stdout.should_receive(:print).with("Should I overwrite it? ")
-        $stdin.should_receive(:gets).and_return('n')
+      expect($stdout).to receive(:print).with("Should I overwrite it? ")
+        expect($stdin).to receive(:gets).and_return('n')
       expect(shell.no?("Should I overwrite it?")).to be_true
 
-      $stdout.should_receive(:print).with("Should I overwrite it? ")
-        $stdin.should_receive(:gets).and_return('Yes')
+      expect($stdout).to receive(:print).with("Should I overwrite it? ")
+        expect($stdin).to receive(:gets).and_return('Yes')
       expect(shell.no?("Should I overwrite it?")).to be_false
     end
   end
 
   describe "#say" do
     it "prints a message to the user" do
-      $stdout.should_receive(:puts).with("Running...")
+      expect($stdout).to receive(:puts).with("Running...")
       shell.say("Running...")
     end
 
     it "prints a message to the user without new line if it ends with a whitespace" do
-      $stdout.should_receive(:print).with("Running... ")
+      expect($stdout).to receive(:print).with("Running... ")
       shell.say("Running... ")
     end
 
     it "does not use a new line with whitespace+newline embedded" do
-      $stdout.should_receive(:puts).with("It's \nRunning...")
+      expect($stdout).to receive(:puts).with("It's \nRunning...")
       shell.say("It's \nRunning...")
     end
 
     it "prints a message to the user without new line" do
-      $stdout.should_receive(:print).with("Running...")
+      expect($stdout).to receive(:print).with("Running...")
       shell.say("Running...", nil, false)
     end
   end
 
   describe "#say_status" do
     it "prints a message to the user with status" do
-      $stdout.should_receive(:puts).with("      create  ~/.thor/command.thor")
+      expect($stdout).to receive(:puts).with("      create  ~/.thor/command.thor")
       shell.say_status(:create, "~/.thor/command.thor")
     end
 
     it "always uses new line" do
-      $stdout.should_receive(:puts).with("      create  ")
+      expect($stdout).to receive(:puts).with("      create  ")
       shell.say_status(:create, "")
     end
 
     it "does not print a message if base is muted" do
-      shell.should_receive(:mute?).and_return(true)
-      $stdout.should_not_receive(:puts)
+      expect(shell).to receive(:mute?).and_return(true)
+      expect($stdout).not_to receive(:puts)
 
       shell.mute do
         shell.say_status(:created, "~/.thor/command.thor")
@@ -125,21 +125,21 @@ describe Thor::Shell::Basic do
 
     it "does not print a message if base is set to quiet" do
       base = MyCounter.new [1,2]
-      base.should_receive(:options).and_return(:quiet => true)
+      expect(base).to receive(:options).and_return(:quiet => true)
 
-      $stdout.should_not_receive(:puts)
+      expect($stdout).not_to receive(:puts)
       shell.base = base
       shell.say_status(:created, "~/.thor/command.thor")
     end
 
     it "does not print a message if log status is set to false" do
-      $stdout.should_not_receive(:puts)
+      expect($stdout).not_to receive(:puts)
       shell.say_status(:created, "~/.thor/command.thor", false)
     end
 
     it "uses padding to set message's left margin" do
       shell.padding = 2
-      $stdout.should_receive(:puts).with("      create      ~/.thor/command.thor")
+      expect($stdout).to receive(:puts).with("      create      ~/.thor/command.thor")
       shell.say_status(:create, "~/.thor/command.thor")
     end
   end
@@ -185,7 +185,7 @@ TABLE
     it "uses maximum terminal width" do
       @table << ["def", "#456", "Lançam foo bar"]
       @table << ["ghi", "#789", "بالله  عليكم"]
-      shell.should_receive(:terminal_width).and_return(20)
+      expect(shell).to receive(:terminal_width).and_return(20)
       content = capture(:stdout) { shell.print_table(@table, :indent => 2, :truncate => true) }
       expect(content).to eq(<<-TABLE)
   abc  #123  firs...
@@ -254,41 +254,41 @@ TABLE
 
   describe "#file_collision" do
     it "shows a menu with options" do
-      $stdout.should_receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqh] ')
-      $stdin.should_receive(:gets).and_return('n')
+      expect($stdout).to receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqh] ')
+      expect($stdin).to receive(:gets).and_return('n')
       shell.file_collision('foo')
     end
 
     it "returns true if the user chooses default option" do
       $stdout.stub(:print)
-      $stdin.should_receive(:gets).and_return('')
+      expect($stdin).to receive(:gets).and_return('')
       expect(shell.file_collision('foo')).to be_true
     end
 
     it "returns false if the user chooses no" do
       $stdout.stub(:print)
-      $stdin.should_receive(:gets).and_return('n')
+      expect($stdin).to receive(:gets).and_return('n')
       expect(shell.file_collision('foo')).to be_false
     end
 
     it "returns true if the user chooses yes" do
       $stdout.stub(:print)
-      $stdin.should_receive(:gets).and_return('y')
+      expect($stdin).to receive(:gets).and_return('y')
       expect(shell.file_collision('foo')).to be_true
     end
 
     it "shows help usage if the user chooses help" do
       $stdout.stub(:print)
-      $stdin.should_receive(:gets).and_return('h')
-      $stdin.should_receive(:gets).and_return('n')
+      expect($stdin).to receive(:gets).and_return('h')
+      expect($stdin).to receive(:gets).and_return('n')
       help = capture(:stdout) { shell.file_collision('foo') }
       expect(help).to match(/h \- help, show this help/)
     end
 
     it "quits if the user chooses quit" do
       $stdout.stub(:print)
-      $stdout.should_receive(:puts).with('Aborting...')
-      $stdin.should_receive(:gets).and_return('q')
+      expect($stdout).to receive(:puts).with('Aborting...')
+      expect($stdin).to receive(:gets).and_return('q')
 
       expect {
         shell.file_collision('foo')
@@ -296,27 +296,27 @@ TABLE
     end
 
     it "always returns true if the user chooses always" do
-      $stdout.should_receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqh] ')
-      $stdin.should_receive(:gets).and_return('a')
+      expect($stdout).to receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqh] ')
+      expect($stdin).to receive(:gets).and_return('a')
 
       expect(shell.file_collision('foo')).to be_true
 
-      $stdout.should_not_receive(:print)
+      expect($stdout).not_to receive(:print)
       expect(shell.file_collision('foo')).to be_true
     end
 
     describe "when a block is given" do
       it "displays diff options to the user" do
-        $stdout.should_receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqdh] ')
-        $stdin.should_receive(:gets).and_return('s')
+        expect($stdout).to receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqdh] ')
+        expect($stdin).to receive(:gets).and_return('s')
         shell.file_collision('foo'){ }
       end
 
       it "invokes the diff command" do
         $stdout.stub(:print)
-        $stdin.should_receive(:gets).and_return('d')
-        $stdin.should_receive(:gets).and_return('n')
-        shell.should_receive(:system).with(/diff -u/)
+        expect($stdin).to receive(:gets).and_return('d')
+        expect($stdin).to receive(:gets).and_return('n')
+        expect(shell).to receive(:system).with(/diff -u/)
         capture(:stdout) { shell.file_collision('foo'){ } }
       end
     end

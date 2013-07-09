@@ -36,7 +36,7 @@ describe Thor::Group do
     end
 
     it "invokes help message if any of the shortcuts are given" do
-      MyCounter.should_receive(:help)
+      expect(MyCounter).to receive(:help)
       MyCounter.start(["-h"])
     end
   end

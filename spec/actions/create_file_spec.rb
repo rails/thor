@@ -103,7 +103,7 @@ describe Thor::Actions::CreateFile do
 
         it "shows conflict status to the user" do
           expect(create_file("doc/config.rb")).not_to be_identical
-          $stdin.should_receive(:gets).and_return('s')
+          expect($stdin).to receive(:gets).and_return('s')
           file = File.join(destination_root, 'doc/config.rb')
 
           content = invoke!
@@ -114,21 +114,21 @@ describe Thor::Actions::CreateFile do
 
         it "creates the file if the file collision menu returns true" do
           create_file("doc/config.rb")
-          $stdin.should_receive(:gets).and_return('y')
+          expect($stdin).to receive(:gets).and_return('y')
           expect(invoke!).to match(/force  doc\/config\.rb/)
         end
 
         it "skips the file if the file collision menu returns false" do
           create_file("doc/config.rb")
-          $stdin.should_receive(:gets).and_return('n')
+          expect($stdin).to receive(:gets).and_return('n')
           expect(invoke!).to match(/skip  doc\/config\.rb/)
         end
 
         it "executes the block given to show file content" do
           create_file("doc/config.rb")
-          $stdin.should_receive(:gets).and_return('d')
-          $stdin.should_receive(:gets).and_return('n')
-          @base.shell.should_receive(:system).with(/diff -u/)
+          expect($stdin).to receive(:gets).and_return('d')
+          expect($stdin).to receive(:gets).and_return('n')
+          expect(@base.shell).to receive(:system).with(/diff -u/)
           invoke!
         end
       end

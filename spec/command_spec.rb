@@ -42,7 +42,7 @@ describe Thor::Command do
 
     it "does not invoke an existing method" do
       mock = mock()
-      mock.class.should_receive(:handle_no_command_error).with("to_s")
+      expect(mock.class).to receive(:handle_no_command_error).with("to_s")
       Thor::DynamicCommand.new('to_s').run(mock)
     end
   end
@@ -58,7 +58,7 @@ describe Thor::Command do
   describe "#run" do
     it "runs a command by calling a method in the given instance" do
       mock = mock()
-      mock.should_receive(:can_has).and_return {|*args| args }
+      expect(mock).to receive(:can_has).and_return {|*args| args }
       expect(command.run(mock, [1, 2, 3])).to eq([1, 2, 3])
     end
 
