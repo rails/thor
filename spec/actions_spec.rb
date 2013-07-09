@@ -208,10 +208,10 @@ describe Thor::Actions do
         @foo = "FOO"
         say_status :cool, :padding
       TEMPLATE
-      @template.stub(:read).and_return(@template)
+      allow(@template).to receive(:read).and_return(@template)
 
       @file = '/'
-      runner.stub(:open).and_return(@template)
+      allow(runner).to receive(:open).and_return(@template)
     end
 
     it "accepts a URL as the path" do
@@ -277,7 +277,7 @@ describe Thor::Actions do
 
   describe "#run_ruby_script" do
     before do
-      Thor::Util.stub(:ruby_command).and_return("/opt/jruby")
+      allow(Thor::Util).to receive(:ruby_command).and_return("/opt/jruby")
       expect(runner).to receive(:system).with("/opt/jruby script.rb")
     end
 

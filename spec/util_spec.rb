@@ -120,7 +120,7 @@ describe Thor::Util do
 
   describe "#user_home" do
     before do
-      ENV.stub(:[])
+      allow(ENV).to receive(:[])
       Thor::Util.clear_user_home!
     end
 
@@ -145,30 +145,30 @@ describe Thor::Util do
     end
 
     it "returns HOME/.thor if set" do
-      ENV.stub(:[]).with("HOME").and_return("/home/user/")
+      allow(ENV).to receive(:[]).with("HOME").and_return("/home/user/")
       expect(Thor::Util.user_home).to eq("/home/user/")
     end
 
     it "returns path with HOMEDRIVE and HOMEPATH if set" do
-      ENV.stub(:[]).with("HOMEDRIVE").and_return("D:/")
-      ENV.stub(:[]).with("HOMEPATH").and_return("Documents and Settings/James")
+      allow(ENV).to receive(:[]).with("HOMEDRIVE").and_return("D:/")
+      allow(ENV).to receive(:[]).with("HOMEPATH").and_return("Documents and Settings/James")
       expect(Thor::Util.user_home).to eq("D:/Documents and Settings/James")
     end
 
     it "returns APPDATA/.thor if set" do
-      ENV.stub(:[]).with("APPDATA").and_return("/home/user/")
+      allow(ENV).to receive(:[]).with("APPDATA").and_return("/home/user/")
       expect(Thor::Util.user_home).to eq("/home/user/")
     end
   end
 
   describe "#thor_root_glob" do
     before do
-      ENV.stub(:[])
+      allow(ENV).to receive(:[])
       Thor::Util.clear_user_home!
     end
 
     it "escapes globs in path" do
-      ENV.stub(:[]).with("HOME").and_return("/home/user{1}/")
+      allow(ENV).to receive(:[]).with("HOME").and_return("/home/user{1}/")
       expect(Dir).to receive(:[]).with("/home/user\\{1\\}/.thor/*").and_return([])
       expect(Thor::Util.thor_root_glob).to eq([])
     end

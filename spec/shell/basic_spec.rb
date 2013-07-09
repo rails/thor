@@ -260,25 +260,25 @@ TABLE
     end
 
     it "returns true if the user chooses default option" do
-      $stdout.stub(:print)
+      allow($stdout).to receive(:print)
       expect($stdin).to receive(:gets).and_return('')
       expect(shell.file_collision('foo')).to be_true
     end
 
     it "returns false if the user chooses no" do
-      $stdout.stub(:print)
+      allow($stdout).to receive(:print)
       expect($stdin).to receive(:gets).and_return('n')
       expect(shell.file_collision('foo')).to be_false
     end
 
     it "returns true if the user chooses yes" do
-      $stdout.stub(:print)
+      allow($stdout).to receive(:print)
       expect($stdin).to receive(:gets).and_return('y')
       expect(shell.file_collision('foo')).to be_true
     end
 
     it "shows help usage if the user chooses help" do
-      $stdout.stub(:print)
+      allow($stdout).to receive(:print)
       expect($stdin).to receive(:gets).and_return('h')
       expect($stdin).to receive(:gets).and_return('n')
       help = capture(:stdout) { shell.file_collision('foo') }
@@ -286,7 +286,7 @@ TABLE
     end
 
     it "quits if the user chooses quit" do
-      $stdout.stub(:print)
+      allow($stdout).to receive(:print)
       expect($stdout).to receive(:puts).with('Aborting...')
       expect($stdin).to receive(:gets).and_return('q')
 
@@ -313,7 +313,7 @@ TABLE
       end
 
       it "invokes the diff command" do
-        $stdout.stub(:print)
+        allow($stdout).to receive(:print)
         expect($stdin).to receive(:gets).and_return('d')
         expect($stdin).to receive(:gets).and_return('n')
         expect(shell).to receive(:system).with(/diff -u/)

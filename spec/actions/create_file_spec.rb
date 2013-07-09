@@ -8,7 +8,7 @@ describe Thor::Actions::CreateFile do
 
   def create_file(destination=nil, config={}, options={})
     @base = MyCounter.new([1, 2], options, { :destination_root => destination_root })
-    @base.stub(:file_name).and_return('rdoc')
+    allow(@base).to receive(:file_name).and_return('rdoc')
 
     @action = Thor::Actions::CreateFile.new(@base, destination, "CONFIGURATION",
                                             { :verbose => !@silence }.merge(config))

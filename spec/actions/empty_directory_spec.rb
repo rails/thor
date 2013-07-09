@@ -100,7 +100,7 @@ describe Thor::Actions::EmptyDirectory do
     describe "#convert_encoded_instructions" do
       before do
         empty_directory("test_dir")
-        @action.base.stub(:file_name).and_return("expected")
+        allow(@action.base).to receive(:file_name).and_return("expected")
       end
 
       it "accepts and executes a 'legal' %\w+% encoded instruction" do

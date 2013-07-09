@@ -11,7 +11,7 @@ describe Thor::Actions::CreateLink do
 
   def create_link(destination=nil, config={}, options={})
     @base = MyCounter.new([1,2], options, { :destination_root => destination_root })
-    @base.stub(:file_name).and_return('rdoc')
+    allow(@base).to receive(:file_name).and_return('rdoc')
 
     @tempfile = Tempfile.new("config.rb")
 

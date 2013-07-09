@@ -4,7 +4,7 @@ require 'thor/actions'
 describe Thor::Actions::Directory do
   before do
     ::FileUtils.rm_rf(destination_root)
-    invoker.stub(:file_name).and_return("rdoc")
+    allow(invoker).to receive(:file_name).and_return("rdoc")
   end
 
   def invoker
