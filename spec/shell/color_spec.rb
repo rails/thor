@@ -6,7 +6,7 @@ describe Thor::Shell::Color do
   end
 
   before do
-    StringIO.any_instance.stub(:tty?).and_return(true)
+    allow_any_instance_of(StringIO).to receive(:tty?).and_return(true)
   end
 
   describe "#say" do
