@@ -474,10 +474,10 @@ class Thor
       alias handle_no_task_error handle_no_command_error
 
       def handle_argument_error(command, error, args, arity) #:nodoc:
-        msg = "ERROR: #{basename} #{command.name} was called with "
+        msg = "ERROR: \"#{basename} #{command.name}\" was called with "
         msg << 'no arguments'               if  args.empty?
         msg << 'arguments ' << args.inspect if !args.empty?
-        msg << "\nUsage: #{self.banner(command).inspect}."
+        msg << "\nUsage: #{self.banner(command).inspect}"
         raise InvocationError, msg
       end
 

@@ -133,7 +133,7 @@ describe Thor::Group do
           }
         }
         expect(content).to match(/invoke  e/)
-        expect(error).to match(/ERROR: thor two was called with arguments/)
+        expect(error).to match(/ERROR: "thor two" was called with arguments/)
       end
 
       it "shows invocation information to the user" do
