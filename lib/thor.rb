@@ -421,7 +421,7 @@ class Thor
 
       possibilities = find_command_possibilities(meth)
       if possibilities.size > 1
-        raise ArgumentError, "Ambiguous command #{meth} matches [#{possibilities.join(', ')}]"
+        raise AmbiguousTaskError, "Ambiguous command #{meth} matches [#{possibilities.join(', ')}]"
       elsif possibilities.size < 1
         meth = meth || default_command
       elsif map[meth]
