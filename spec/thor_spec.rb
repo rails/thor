@@ -303,12 +303,16 @@ describe Thor do
     end
 
     context "when the user enters an ambiguous substring of a command" do
-      it "raises an exception that explains the ambiguity" do
-        expect{ MyScript.start(["call"]) }.to raise_error(ArgumentError, 'Ambiguous command call matches [call_myself_with_wrong_arity, call_unexistent_method]')
+      it "raises an exception and displays a message that explains the ambiguity" do
+        shell = Thor::Base.shell.new
+        expect(shell).to receive(:error).with('Ambiguous command call matches [call_myself_with_wrong_arity, call_unexistent_method]')
+        MyScript.start(["call"], :shell => shell)
       end
 
       it "raises an exception when there is an alias" do
-        expect{ MyScript.start(["f"]) }.to raise_error(ArgumentError, 'Ambiguous command f matches [foo, fu]')
+        shell = Thor::Base.shell.new
+        expect(shell).to receive(:error).with('Ambiguous command f matches [foo, fu]')
+        MyScript.start(["f"], :shell => shell)
       end
     end
 
