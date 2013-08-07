@@ -350,7 +350,7 @@ class Thor
         end
       else
         args, opts = given_args, nil
-        command = Thor::DynamicCommand.new(meth)
+        command = dynamic_command_class.new(meth)
       end
 
       opts = given_opts || opts || []
@@ -374,6 +374,10 @@ class Thor
 
     def baseclass #:nodoc:
       Thor
+    end
+
+    def dynamic_command_class #:nodoc:
+      Thor::DynamicCommand
     end
 
     def create_command(meth) #:nodoc:
