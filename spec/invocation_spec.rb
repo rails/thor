@@ -50,6 +50,14 @@ describe Thor::Invocation do
       expect(A.new([], :foo => :bar).invoke("b:two")).to eq({ "foo" => :bar })
     end
 
+    it "uses default options from invoked class if no matching arguments are given" do
+      expect(A.new([]).invoke("b:four")).to eq("default")
+    end
+
+    it "overrides default options if options are passed to the invoker" do
+      expect(A.new([], { :defaulted_value => "not default"}).invoke("b:four")).to eq("not default")
+    end
+
     it "dump configuration values to be used in the invoked class" do
       base = A.new
       expect(base.invoke("b:three").shell).to eq(base.shell)

@@ -46,9 +46,9 @@ class Thor
       # new, passing in the two halves of the arguments Array as the
       # first two parameters.
 
+      command_options = config.delete(:command_options) # hook for start
+      parse_options = parse_options.merge(command_options) if command_options
       if options.is_a?(Array)
-        command_options = config.delete(:command_options) # hook for start
-        parse_options = parse_options.merge(command_options) if command_options
         array_options, hash_options = options, {}
       else
         # Handle the case where the class was explicitly instantiated

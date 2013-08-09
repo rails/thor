@@ -53,6 +53,12 @@ class B < Thor
   def three
     self
   end
+
+  desc "four", "invoke four"
+  option :defaulted_value, :type => :string, :default => 'default'
+  def four
+    options.defaulted_value
+  end
 end
 
 class C < Thor::Group
