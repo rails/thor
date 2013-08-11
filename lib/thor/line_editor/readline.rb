@@ -8,6 +8,7 @@ class Thor
       end
 
       def readline
+        ::Readline.completion_append_character = nil
         ::Readline.completion_proc = completion_proc
         ::Readline.readline(prompt, add_to_history?)
       end
@@ -19,7 +20,9 @@ class Thor
       end
 
       def completion_proc
-        if completion_options.any?
+        if use_path_completion?
+          Proc.new { |text| PathCompletion.new(text).matches }
+        elsif completion_options.any?
           Proc.new do |text|
             completion_options.select { |option| option.start_with?(text) }
           end
@@ -28,6 +31,46 @@ class Thor
 
       def completion_options
         options.fetch(:limited_to, [])
+      end
+
+      def use_path_completion?
+        options.fetch(:path, false)
+      end
+
+      class PathCompletion
+        def initialize(text)
+          @text = text
+        end
+
+        def matches
+          relative_matches
+        end
+
+        private
+
+        attr_reader :text
+
+        def relative_matches
+          absolute_matches.map { |path| path.sub(base_path, '') }
+        end
+
+        def absolute_matches
+          Dir[glob_pattern].map do |path|
+            if File.directory?(path)
+              "#{path}/"
+            else
+              path
+            end
+          end
+        end
+
+        def glob_pattern
+          "#{base_path}#{text}*"
+        end
+
+        def base_path
+          "#{Dir.pwd}/"
+        end
       end
     end
   end

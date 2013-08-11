@@ -43,12 +43,19 @@ class Thor
       # If asking for sensitive information, the :echo option can be set
       # to false to mask user input from $stdin.
       #
+      # If the required input is a path, then set the path option to
+      # true. This will enable tab completion for file paths relative
+      # to the current working directory on systems that support
+      # Readline.
+      #
       # ==== Example
       # ask("What is your name?")
       #
       # ask("What is your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])
       #
       # ask("What is your password?", :echo => false)
+      #
+      # ask("Where should the file be saved?", :path => true)
       #
       def ask(statement, *args)
         options = args.last.is_a?(Hash) ? args.pop : {}

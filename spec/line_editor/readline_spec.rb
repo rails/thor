@@ -4,6 +4,7 @@ describe Thor::LineEditor::Readline do
   before do
     unless defined? ::Readline
       ::Readline = double('Readline')
+      allow(::Readline).to receive(:completion_append_character=).with(nil)
     end
   end
 
@@ -44,6 +45,16 @@ describe Thor::LineEditor::Readline do
 
       editor = Thor::LineEditor::Readline.new('Best food: ', :limited_to => ['Apples', 'Chicken', 'Chocolate'])
       editor.readline
+    end
+
+    it 'provides path tab completion when given the path option' do
+      expect(::Readline).to receive(:readline)
+      expect(::Readline).to receive(:completion_proc=) do |proc|
+        expect(proc.call('../line_ed').sort).to eq ['../line_editor/', '../line_editor_spec.rb'].sort
+      end
+
+      editor = Thor::LineEditor::Readline.new('Path to file: ', :path => true)
+      Dir.chdir(File.dirname(__FILE__)) { editor.readline }
     end
   end
 end
