@@ -8,7 +8,13 @@ class Thor
       end
 
       def readline
-        ::Readline.readline(prompt)
+        ::Readline.readline(prompt, add_to_history?)
+      end
+
+      private
+
+      def add_to_history?
+        options.fetch(:add_to_history, true)
       end
     end
   end

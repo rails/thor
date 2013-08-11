@@ -21,8 +21,14 @@ describe Thor::LineEditor::Readline do
 
   describe '#readline' do
     it 'invokes the readline library' do
-      expect(::Readline).to receive(:readline).with('> ').and_return('foo')
+      expect(::Readline).to receive(:readline).with('> ', true).and_return('foo')
       editor = Thor::LineEditor::Readline.new('> ', {})
+      expect(editor.readline).to eq('foo')
+    end
+
+    it 'supports the add_to_history option' do
+      expect(::Readline).to receive(:readline).with('> ', false).and_return('foo')
+      editor = Thor::LineEditor::Readline.new('> ', :add_to_history => false)
       expect(editor.readline).to eq('foo')
     end
   end

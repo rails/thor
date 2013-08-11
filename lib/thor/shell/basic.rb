@@ -100,14 +100,14 @@ class Thor
       # "yes".
       #
       def yes?(statement, color = nil)
-        !!(ask(statement, color) =~ is?(:yes))
+        !!(ask(statement, color, :add_to_history => false) =~ is?(:yes))
       end
 
       # Make a question the to user and returns true if the user replies "n" or
       # "no".
       #
       def no?(statement, color = nil)
-        !!(ask(statement, color) =~ is?(:no))
+        !!(ask(statement, color, :add_to_history => false) =~ is?(:no))
       end
 
       # Prints values in columns
@@ -227,7 +227,10 @@ class Thor
         options = block_given? ? '[Ynaqdh]' : '[Ynaqh]'
 
         loop do
-          answer = ask %[Overwrite #{destination}? (enter "h" for help) #{options}]
+          answer = ask(
+            %[Overwrite #{destination}? (enter "h" for help) #{options}],
+            :add_to_history => false
+          )
 
           case answer
           when is?(:yes), is?(:force), ''

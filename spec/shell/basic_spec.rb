@@ -67,34 +67,34 @@ describe Thor::Shell::Basic do
 
   describe '#yes?' do
     it 'asks the user and returns true if the user replies yes' do
-      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', {}).and_return('y')
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', :add_to_history => false).and_return('y')
       expect(shell.yes?('Should I overwrite it?')).to be_true
     end
 
     it 'asks the user and returns false if the user replies no' do
-      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', {}).and_return('n')
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', :add_to_history => false).and_return('n')
       expect(shell.yes?('Should I overwrite it?')).not_to be_true
     end
 
     it 'asks the user and returns false if the user replies with an answer other than yes or no' do
-      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', {}).and_return('foobar')
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', :add_to_history => false).and_return('foobar')
       expect(shell.yes?('Should I overwrite it?')).to be_false
     end
   end
 
   describe '#no?' do
     it 'asks the user and returns true if the user replies no' do
-      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', {}).and_return('n')
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', :add_to_history => false).and_return('n')
       expect(shell.no?('Should I overwrite it?')).to be_true
     end
 
     it 'asks the user and returns false if the user replies yes' do
-      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', {}).and_return('Yes')
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', :add_to_history => false).and_return('Yes')
       expect(shell.no?('Should I overwrite it?')).to be_false
     end
 
     it 'asks the user and returns false if the user replies with an answer other than yes or no' do
-      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', {}).and_return('foobar')
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', :add_to_history => false).and_return('foobar')
       expect(shell.no?('Should I overwrite it?')).to be_false
     end
   end
@@ -272,7 +272,7 @@ TABLE
 
   describe '#file_collision' do
     it 'shows a menu with options' do
-      expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqh] ', {}).and_return('n')
+      expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqh] ', :add_to_history => false).and_return('n')
       shell.file_collision('foo')
     end
 
@@ -307,7 +307,7 @@ TABLE
     end
 
     it 'always returns true if the user chooses always' do
-      expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqh] ', {}).and_return('a')
+      expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqh] ', :add_to_history => false).and_return('a')
 
       expect(shell.file_collision('foo')).to be true
 
@@ -317,7 +317,7 @@ TABLE
 
     describe 'when a block is given' do
       it 'displays diff options to the user' do
-        expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqdh] ', {}).and_return('s')
+        expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqdh] ', :add_to_history => false).and_return('s')
         shell.file_collision('foo'){ }
       end
 
