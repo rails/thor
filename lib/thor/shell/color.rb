@@ -77,7 +77,9 @@ class Thor
       #   :on_cyan
       #   :on_white
       def set_color(string, *colors)
-        if colors.all? { |color| color.is_a?(Symbol) || color.is_a?(String) }
+        if colors.compact.empty? || !can_display_colors?
+          string
+        elsif colors.all? { |color| color.is_a?(Symbol) || color.is_a?(String) }
           ansi_colors = colors.map { |color| lookup_color(color) }
           "#{ansi_colors.join}#{string}#{CLEAR}"
         else

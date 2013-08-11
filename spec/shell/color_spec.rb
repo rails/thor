@@ -6,6 +6,7 @@ describe Thor::Shell::Color do
   end
 
   before do
+    allow($stdout).to receive(:tty?).and_return(true)
     allow_any_instance_of(StringIO).to receive(:tty?).and_return(true)
   end
 
@@ -74,6 +75,20 @@ describe Thor::Shell::Color do
 
       bold = shell.set_color 'hi!', :white, :on_red, :bold
       expect(bold).to eq("\e[37m\e[41m\e[1mhi!\e[0m")
+    end
+
+    it "does nothing when there are no colors" do
+      colorless = shell.set_color "hi!", nil
+      expect(colorless).to eq("hi!")
+
+      colorless = shell.set_color "hi!"
+      expect(colorless).to eq("hi!")
+    end
+
+    it "does nothing when the terminal does not support color" do
+      allow($stdout).to receive(:tty?).and_return(false)
+      colorless = shell.set_color "hi!", :white
+      expect(colorless).to eq("hi!")
     end
   end
 

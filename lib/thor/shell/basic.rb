@@ -69,8 +69,7 @@ class Thor
       # say("I know you knew that.")
       #
       def say(message = '', color = nil, force_new_line = (message.to_s !~ /( |\t)\Z/))
-        message = message.to_s
-        message = set_color(message, *color) if color && can_display_colors?
+        message = set_color(message.to_s, *color)
 
         buffer = '  ' * padding
         buffer << message
