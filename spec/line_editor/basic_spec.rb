@@ -11,7 +11,7 @@ describe Thor::LineEditor::Basic do
     it 'uses $stdin and $stdout to get input from the user' do
       expect($stdout).to receive(:print).with('Enter your name ')
       expect($stdin).to receive(:gets).and_return('George')
-      editor = Thor::LineEditor::Basic.new('Enter your name ')
+      editor = Thor::LineEditor::Basic.new('Enter your name ', {})
       expect(editor.readline).to eq('George')
     end
   end

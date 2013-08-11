@@ -22,7 +22,7 @@ describe Thor::LineEditor::Readline do
   describe '#readline' do
     it 'invokes the readline library' do
       expect(::Readline).to receive(:readline).with('> ').and_return('foo')
-      editor = Thor::LineEditor::Readline.new('> ')
+      editor = Thor::LineEditor::Readline.new('> ', {})
       expect(editor.readline).to eq('foo')
     end
   end

@@ -103,7 +103,7 @@ describe Thor::Actions::CreateFile do
         it 'shows conflict status to the user' do
           file = File.join(destination_root, 'doc/config.rb')
           expect(create_file('doc/config.rb')).not_to be_identical
-          expect(Thor::LineEditor).to receive(:readline).with("Overwrite #{file}? (enter \"h\" for help) [Ynaqdh] ").and_return('s')
+          expect(Thor::LineEditor).to receive(:readline).with("Overwrite #{file}? (enter \"h\" for help) [Ynaqdh] ", anything).and_return('s')
 
           content = invoke!
           expect(content).to match(/conflict  doc\/config\.rb/)

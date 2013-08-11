@@ -381,7 +381,7 @@ class Thor
         default = options[:default]
         message = [statement, ("(#{default})" if default), nil].uniq.join(' ')
         message = prepare_message(message, color)
-        result = Thor::LineEditor.readline(message)
+        result = Thor::LineEditor.readline(message, options)
 
         return unless result
 

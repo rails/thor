@@ -12,10 +12,10 @@ describe Thor::Shell::Color do
 
   describe '#ask' do
     it 'sets the color if specified and tty?' do
-      expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? \e[0m").and_return('yes')
+      expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? \e[0m", anything).and_return('yes')
       shell.ask 'Is this green?', :green
 
-      expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? [Yes, No, Maybe] \e[0m").and_return('Yes')
+      expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? [Yes, No, Maybe] \e[0m", anything).and_return('Yes')
       shell.ask 'Is this green?', :green, :limited_to => ['Yes', 'No', 'Maybe']
     end
   end
