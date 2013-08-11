@@ -11,8 +11,10 @@ describe Thor::LineEditor, 'on a system with Readline support' do
   end
 
   describe '.readline' do
-    it 'invokes the Readline library' do
-      expect(Readline).to receive(:readline).with('Enter your name ').and_return('George')
+    it 'uses the Readline line editor' do
+      editor = double('Readline')
+      expect(Thor::LineEditor::Readline).to receive(:new).with('Enter your name ').and_return(editor)
+      expect(editor).to receive(:readline).and_return('George')
       expect(Thor::LineEditor.readline('Enter your name ')).to eq('George')
     end
   end
@@ -31,9 +33,10 @@ describe Thor::LineEditor, 'on a system without Readline support' do
   end
 
   describe '.readline' do
-    it 'uses $stdout and $stdin to prompt the user for input' do
-      expect($stdout).to receive(:print).with('Enter your name ')
-      expect($stdin).to receive(:gets).and_return('George')
+    it 'uses the Basic line editor' do
+      editor = double('Basic')
+      expect(Thor::LineEditor::Basic).to receive(:new).with('Enter your name ').and_return(editor)
+      expect(editor).to receive(:readline).and_return('George')
       expect(Thor::LineEditor.readline('Enter your name ')).to eq('George')
     end
   end
