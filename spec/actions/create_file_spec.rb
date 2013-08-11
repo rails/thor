@@ -101,32 +101,30 @@ describe Thor::Actions::CreateFile do
         end
 
         it 'shows conflict status to the user' do
-          expect(create_file('doc/config.rb')).not_to be_identical
-          expect($stdin).to receive(:gets).and_return('s')
           file = File.join(destination_root, 'doc/config.rb')
+          expect(create_file('doc/config.rb')).not_to be_identical
+          expect(Thor::LineEditor).to receive(:readline).with("Overwrite #{file}? (enter \"h\" for help) [Ynaqdh] ").and_return('s')
 
           content = invoke!
           expect(content).to match(/conflict  doc\/config\.rb/)
-          expect(content).to match(/Overwrite #{file}\? \(enter "h" for help\) \[Ynaqdh\]/)
           expect(content).to match(/skip  doc\/config\.rb/)
         end
 
         it 'creates the file if the file collision menu returns true' do
           create_file('doc/config.rb')
-          expect($stdin).to receive(:gets).and_return('y')
+          expect(Thor::LineEditor).to receive(:readline).and_return('y')
           expect(invoke!).to match(/force  doc\/config\.rb/)
         end
 
         it 'skips the file if the file collision menu returns false' do
           create_file('doc/config.rb')
-          expect($stdin).to receive(:gets).and_return('n')
+          expect(Thor::LineEditor).to receive(:readline).and_return('n')
           expect(invoke!).to match(/skip  doc\/config\.rb/)
         end
 
         it 'executes the block given to show file content' do
           create_file('doc/config.rb')
-          expect($stdin).to receive(:gets).and_return('d')
-          expect($stdin).to receive(:gets).and_return('n')
+          expect(Thor::LineEditor).to receive(:readline).and_return('d', 'n')
           expect(@base.shell).to receive(:system).with(/diff -u/)
           invoke!
         end

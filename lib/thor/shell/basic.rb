@@ -69,10 +69,7 @@ class Thor
       # say("I know you knew that.")
       #
       def say(message = '', color = nil, force_new_line = (message.to_s !~ /( |\t)\Z/))
-        message = set_color(message.to_s, *color)
-
-        buffer = '  ' * padding
-        buffer << message
+        buffer = prepare_message(message, *color)
         buffer << "\n" if force_new_line && !message.end_with?("\n")
 
         stdout.print(buffer)
@@ -282,6 +279,11 @@ class Thor
 
     protected
 
+      def prepare_message(message, *color)
+        spaces = "  " * padding
+        spaces + set_color(message.to_s, *color)
+      end
+
       def can_display_colors?
         false
       end
@@ -293,10 +295,6 @@ class Thor
 
       def stdout
         $stdout
-      end
-
-      def stdin
-        $stdin
       end
 
       def stderr
@@ -382,13 +380,8 @@ class Thor
       def ask_simply(statement, color, options)
         default = options[:default]
         message = [statement, ("(#{default})" if default), nil].uniq.join(' ')
-        say(message, color)
-
-        result = if options[:echo] == false
-                   stdin.noecho(&:gets)
-                 else
-                   stdin.gets
-                 end
+        message = prepare_message(message, color)
+        result = Thor::LineEditor.readline(message)
 
         return unless result
 

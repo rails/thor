@@ -216,7 +216,7 @@ describe Thor::Runner do
       before do
         allow(FileUtils).to receive(:mkdir_p)
         allow(FileUtils).to receive(:touch)
-        allow($stdin).to receive(:gets).and_return('Y')
+        allow(Thor::LineEditor).to receive(:readline).and_return('Y')
 
         path = File.join(Thor::Util.thor_root, Digest::MD5.hexdigest(@location + 'random'))
         expect(File).to receive(:open).with(path, 'w')

@@ -10,6 +10,16 @@ describe Thor::Shell::Color do
     allow_any_instance_of(StringIO).to receive(:tty?).and_return(true)
   end
 
+  describe '#ask' do
+    it 'sets the color if specified and tty?' do
+      expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? \e[0m").and_return('yes')
+      shell.ask 'Is this green?', :green
+
+      expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? [Yes, No, Maybe] \e[0m").and_return('Yes')
+      shell.ask 'Is this green?', :green, :limited_to => ['Yes', 'No', 'Maybe']
+    end
+  end
+
   describe '#say' do
     it 'set the color if specified and tty?' do
       out = capture(:stdout) do
@@ -97,8 +107,7 @@ describe Thor::Shell::Color do
       it 'invokes the diff command' do
         allow($stdout).to receive(:print)
         allow($stdout).to receive(:tty?).and_return(true)
-        expect($stdin).to receive(:gets).and_return('d')
-        expect($stdin).to receive(:gets).and_return('n')
+        expect(Thor::LineEditor).to receive(:readline).and_return('d', 'n')
 
         output = capture(:stdout) { shell.file_collision('spec/fixtures/doc/README') { "README\nEND\n" } }
         expect(output).to match(/\e\[31m\- __start__\e\[0m/)
