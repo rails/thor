@@ -67,5 +67,14 @@ RSpec.configure do |config|
     File.join(File.dirname(__FILE__), 'sandbox')
   end
 
+  # This code was adapted from Ruby on Rails, available under MIT-LICENSE
+  # Copyright (c) 2004-2013 David Heinemeier Hansson
+  def silence_warnings
+    old_verbose, $VERBOSE = $VERBOSE, nil
+    yield
+  ensure
+    $VERBOSE = old_verbose
+  end
+
   alias silence capture
 end
