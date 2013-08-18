@@ -20,7 +20,7 @@ describe Thor::Shell::Basic do
     it "prints a message to the user and gets the response" do
       expect($stdout).to receive(:print).with("Should I overwrite it? ")
       expect($stdin).to receive(:gets).and_return('Sure')
-      expect($stdin).to_not receive(:noecho).and_return('Sure')
+      expect($stdin).to_not receive(:noecho)
       expect(shell.ask("Should I overwrite it?")).to eq("Sure")
     end
 
