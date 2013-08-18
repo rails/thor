@@ -215,7 +215,7 @@ TABLE
       2.times { @table.first.pop }
       content = capture(:stdout) { shell.print_table(@table) }
       expect(content).to eq(<<-TABLE)
-abc
+abc  
      #0    empty
 xyz  #786  last three
 TABLE
