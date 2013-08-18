@@ -56,5 +56,14 @@ describe Thor::LineEditor::Readline do
       editor = Thor::LineEditor::Readline.new('Path to file: ', :path => true)
       Dir.chdir(File.dirname(__FILE__)) { editor.readline }
     end
+
+    it 'uses STDIN when asked not to echo input' do
+      expect($stdout).to receive(:print).with('Password: ')
+      noecho_stdin = double('noecho_stdin')
+      expect(noecho_stdin).to receive(:gets).and_return('secret')
+      expect($stdin).to receive(:noecho).and_yield(noecho_stdin)
+      editor = Thor::LineEditor::Readline.new('Password: ', :echo => false)
+      expect(editor.readline).to eq('secret')
+    end
   end
 end

@@ -8,9 +8,13 @@ class Thor
       end
 
       def readline
-        ::Readline.completion_append_character = nil
-        ::Readline.completion_proc = completion_proc
-        ::Readline.readline(prompt, add_to_history?)
+        if echo?
+          ::Readline.completion_append_character = nil
+          ::Readline.completion_proc = completion_proc
+          ::Readline.readline(prompt, add_to_history?)
+        else
+          super
+        end
       end
 
       private

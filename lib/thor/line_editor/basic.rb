@@ -14,7 +14,21 @@ class Thor
 
       def readline
         $stdout.print(prompt)
-        $stdin.gets
+        get_input
+      end
+
+      private
+
+      def get_input
+        if echo?
+          $stdin.gets
+        else
+          $stdin.noecho(&:gets)
+        end
+      end
+
+      def echo?
+        options.fetch(:echo, true)
       end
     end
   end
