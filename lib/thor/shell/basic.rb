@@ -1,4 +1,5 @@
 require 'tempfile'
+require 'io/console'
 
 class Thor
   module Shell
@@ -40,10 +41,15 @@ class Thor
       # they will be shown a message stating that one of those answers
       # must be given and re-asked the question.
       #
+      # If asking for sensitive information, the :echo option can be set
+      # to false to mask user input from $stdin.
+      #
       # ==== Example
       # ask("What is your name?")
       #
       # ask("What is your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])
+      #
+      # ask("What is your password?", :echo => false)
       #
       def ask(statement, *args)
         options = args.last.is_a?(Hash) ? args.pop : {}
@@ -381,7 +387,12 @@ HELP
         default = options[:default]
         message = [statement, ("(#{default})" if default), nil].uniq.join(" ")
         say(message, color)
-        result = stdin.gets
+
+        result = if options[:echo] == false
+          stdin.noecho(&:gets)
+        else
+          stdin.gets
+        end
 
         return unless result
 
