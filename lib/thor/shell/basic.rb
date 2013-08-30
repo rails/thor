@@ -71,16 +71,13 @@ class Thor
       #
       def say(message="", color=nil, force_new_line=(message.to_s !~ /( |\t)\Z/))
         message = message.to_s
-
         message = set_color(message, *color) if color && can_display_colors?
 
-        spaces = "  " * padding
+        buffer = "  " * padding
+        buffer << message
+        buffer << "\n" if force_new_line && !message.end_with?("\n")
 
-        if force_new_line
-          stdout.puts(spaces + message)
-        else
-          stdout.print(spaces + message)
-        end
+        stdout.print(buffer)
         stdout.flush
       end
 
@@ -97,7 +94,10 @@ class Thor
         status = status.to_s.rjust(12)
         status = set_color status, color, true if color
 
-        stdout.puts "#{status}#{spaces}#{message}"
+        buffer = "#{status}#{spaces}#{message}"
+        buffer << "\n" unless buffer.end_with?("\n")
+
+        stdout.print(buffer)
         stdout.flush
       end
 
