@@ -44,7 +44,7 @@ describe Thor::Shell::Basic do
 
     it "prints a message to the user with the available options and reasks the question after an incorrect repsonse" do
       expect($stdout).to receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ').twice
-      expect($stdout).to receive(:puts).with('Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.')
+      expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
       expect($stdin).to receive(:gets).and_return('moose tracks', 'chocolate')
       expect(shell.ask("What's your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])).to eq("chocolate")
     end
@@ -57,7 +57,7 @@ describe Thor::Shell::Basic do
 
     it "prints a message to the user with the available options and reasks the question after an incorrect repsonse and then returns the default" do
       expect($stdout).to receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ').twice
-      expect($stdout).to receive(:puts).with('Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.')
+      expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
       expect($stdin).to receive(:gets).and_return('moose tracks', '')
       expect(shell.ask("What's your favorite Neopolitan flavor?", :default => "vanilla", :limited_to => ["strawberry", "chocolate", "vanilla"])).to eq("vanilla")
     end
@@ -89,7 +89,7 @@ describe Thor::Shell::Basic do
 
   describe "#say" do
     it "prints a message to the user" do
-      expect($stdout).to receive(:puts).with("Running...")
+      expect($stdout).to receive(:print).with("Running...\n")
       shell.say("Running...")
     end
 
@@ -99,7 +99,7 @@ describe Thor::Shell::Basic do
     end
 
     it "does not use a new line with whitespace+newline embedded" do
-      expect($stdout).to receive(:puts).with("It's \nRunning...")
+      expect($stdout).to receive(:print).with("It's \nRunning...\n")
       shell.say("It's \nRunning...")
     end
 
@@ -111,18 +111,18 @@ describe Thor::Shell::Basic do
 
   describe "#say_status" do
     it "prints a message to the user with status" do
-      expect($stdout).to receive(:puts).with("      create  ~/.thor/command.thor")
+      expect($stdout).to receive(:print).with("      create  ~/.thor/command.thor\n")
       shell.say_status(:create, "~/.thor/command.thor")
     end
 
     it "always uses new line" do
-      expect($stdout).to receive(:puts).with("      create  ")
+      expect($stdout).to receive(:print).with("      create  \n")
       shell.say_status(:create, "")
     end
 
     it "does not print a message if base is muted" do
       expect(shell).to receive(:mute?).and_return(true)
-      expect($stdout).not_to receive(:puts)
+      expect($stdout).not_to receive(:print)
 
       shell.mute do
         shell.say_status(:created, "~/.thor/command.thor")
@@ -133,19 +133,19 @@ describe Thor::Shell::Basic do
       base = MyCounter.new [1,2]
       expect(base).to receive(:options).and_return(:quiet => true)
 
-      expect($stdout).not_to receive(:puts)
+      expect($stdout).not_to receive(:print)
       shell.base = base
       shell.say_status(:created, "~/.thor/command.thor")
     end
 
     it "does not print a message if log status is set to false" do
-      expect($stdout).not_to receive(:puts)
+      expect($stdout).not_to receive(:print)
       shell.say_status(:created, "~/.thor/command.thor", false)
     end
 
     it "uses padding to set message's left margin" do
       shell.padding = 2
-      expect($stdout).to receive(:puts).with("      create      ~/.thor/command.thor")
+      expect($stdout).to receive(:print).with("      create      ~/.thor/command.thor\n")
       shell.say_status(:create, "~/.thor/command.thor")
     end
   end
@@ -293,7 +293,7 @@ TABLE
 
     it "quits if the user chooses quit" do
       allow($stdout).to receive(:print)
-      expect($stdout).to receive(:puts).with('Aborting...')
+      expect($stdout).to receive(:print).with("Aborting...\n")
       expect($stdin).to receive(:gets).and_return('q')
 
       expect {

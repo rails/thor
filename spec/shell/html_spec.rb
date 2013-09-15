@@ -24,9 +24,8 @@ describe Thor::Shell::HTML do
 
   describe "#say_status" do
     it "uses color to say status" do
-      expect($stdout).to receive(:puts).with('<span style="color: red; font-weight: bold;">    conflict</span>  README')
+      expect($stdout).to receive(:print).with("<span style=\"color: red; font-weight: bold;\">    conflict</span>  README\n")
       shell.say_status :conflict, "README", :red
     end
   end
-
 end
