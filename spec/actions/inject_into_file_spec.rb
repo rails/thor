@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'helper'
 require 'thor/actions'
 
@@ -82,6 +83,16 @@ describe Thor::Actions::InjectIntoFile do
       end
 
       expect(File.read(file)).to eq("__start__\nREADME\nmore content\nmore content\n__end__\n")
+    end
+
+    it "properly inserts utf-8 symbols when file already includes such symbols" do
+      invoke! "doc/README", :after => "__start__" do
+        "\nфайла"
+      end
+      invoke! "doc/README", :after => "__start__" do
+        "\nимя"
+      end
+      expect(File.read(file)).to eq("__start__\nимя\nфайла\nREADME\n__end__\n")
     end
 
   end
