@@ -4,7 +4,6 @@ $:.unshift lib unless $:.include?(lib)
 require 'thor/version'
 
 Gem::Specification.new do |spec|
-  spec.add_development_dependency 'bundler', '~> 1.0'
   spec.authors = ['Yehuda Katz', 'José Valim']
   spec.description = %q{Thor is a toolkit for building powerful command-line interfaces.}
   spec.email = 'ruby-thor@googlegroups.com'
@@ -21,4 +20,8 @@ Gem::Specification.new do |spec|
   spec.summary = spec.description
   spec.test_files = Dir.glob("spec/**/*")
   spec.version = Thor::VERSION
+
+  spec.add_dependency 'rake', '>= 0.9'
+  spec.add_dependency 'rdoc', '>= 3.9'
+  spec.add_development_dependency 'bundler', '~> 1.0'
 end
