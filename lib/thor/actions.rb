@@ -135,7 +135,7 @@ class Thor
 
       source_paths.each do |source|
         source_file = File.expand_path(file, File.join(source, relative_root))
-        return source_file if File.exists?(source_file)
+        return source_file if File.exist?(source_file)
       end
 
       message = "Could not find #{file.inspect} in any of your source paths. "
