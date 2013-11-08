@@ -289,7 +289,7 @@ class Thor
       path  = File.expand_path(path, destination_root)
 
       say_status :remove, relative_to_original_destination_root(path), config.fetch(:verbose, true)
-      ::FileUtils.rm_rf(path) if !options[:pretend] && File.exists?(path)
+      ::FileUtils.rm_rf(path) if !options[:pretend] && File.exist?(path)
     end
     alias :remove_dir :remove_file
 

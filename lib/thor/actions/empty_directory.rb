@@ -43,7 +43,7 @@ class Thor
       # Boolean:: true if the file exists, false otherwise.
       #
       def exists?
-        ::File.exists?(destination)
+        ::File.exist?(destination)
       end
 
       def invoke!

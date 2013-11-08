@@ -179,7 +179,7 @@ class Thor::Runner < Thor #:nodoc:
     def thor_yaml
       @thor_yaml ||= begin
         yaml_file = File.join(thor_root, "thor.yml")
-        yaml = YAML.load_file(yaml_file) if File.exists?(yaml_file)
+        yaml = YAML.load_file(yaml_file) if File.exist?(yaml_file)
         yaml || {}
       end
     end
@@ -189,7 +189,7 @@ class Thor::Runner < Thor #:nodoc:
     def save_yaml(yaml)
       yaml_file = File.join(thor_root, "thor.yml")
 
-      unless File.exists?(yaml_file)
+      unless File.exist?(yaml_file)
         FileUtils.mkdir_p(thor_root)
         yaml_file = File.join(thor_root, "thor.yml")
         FileUtils.touch(yaml_file)
