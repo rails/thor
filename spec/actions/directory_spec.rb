@@ -28,8 +28,8 @@ describe Thor::Actions::Directory do
       source      = File.join(source_root, source_path, file)
       destination = File.join(destination_root, destination_path, file)
 
-      expect(File.exists?(destination)).to be_true
-      expect(FileUtils.identical?(source, destination)).to be_true
+      expect(File.exists?(destination)).to be true
+      expect(FileUtils.identical?(source, destination)).to be true
     end
   end
 
@@ -59,7 +59,7 @@ describe Thor::Actions::Directory do
       invoke! ".", "commands", :recursive => false
 
       file = File.join(destination_root, "commands", "group.thor")
-      expect(File.exists?(file)).to be_true
+      expect(File.exists?(file)).to be true
 
       file = File.join(destination_root, "commands", "doc")
       expect(File.exists?(file)).to be false
@@ -77,7 +77,7 @@ describe Thor::Actions::Directory do
     it "copies and evaluates files within excluding/ directory when no exclude_pattern is present" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "excluding", "rdoc.rb")
-      expect(File.exists?(file)).to be_true
+      expect(File.exists?(file)).to be true
       expect(File.read(file)).to eq("BAR = BAR\n")
     end
 
@@ -91,7 +91,7 @@ describe Thor::Actions::Directory do
     it "copies and evaluates templates" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "rdoc.rb")
-      expect(File.exists?(file)).to be_true
+      expect(File.exists?(file)).to be true
       expect(File.read(file)).to eq("FOO = FOO\n")
     end
 
@@ -105,8 +105,8 @@ describe Thor::Actions::Directory do
     it "copies directories" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "components")
-      expect(File.exists?(file)).to be_true
-      expect(File.directory?(file)).to be_true
+      expect(File.exists?(file)).to be true
+      expect(File.directory?(file)).to be true
     end
 
     it "does not copy .empty_directory files" do
@@ -118,7 +118,7 @@ describe Thor::Actions::Directory do
     it "copies directories even if they are empty" do
       invoke! "doc/components", "docs/components"
       file = File.join(destination_root, "docs", "components")
-      expect(File.exists?(file)).to be_true
+      expect(File.exists?(file)).to be true
     end
 
     it "does not copy empty directories twice" do
@@ -139,7 +139,7 @@ describe Thor::Actions::Directory do
       invoke!("doc") do |content|
         checked ||= !!(content =~ /FOO/)
       end
-      expect(checked).to be_true
+      expect(checked).to be true
     end
 
     it "works with glob characters in the path" do
@@ -160,7 +160,7 @@ describe Thor::Actions::Directory do
 
     it "works with glob characters in the path" do
       invoke! "app{1}"
-      expect(File.exists?(File.join(destination_root, "app{1}", "README"))).to be_true
+      expect(File.exists?(File.join(destination_root, "app{1}", "README"))).to be true
 
       revoke! "app{1}"
       expect(File.exists?(File.join(destination_root, "app{1}", "README"))).to be false

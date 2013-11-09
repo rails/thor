@@ -54,7 +54,7 @@ describe Thor::Actions::EmptyDirectory do
     it "copies the file to the specified destination" do
       empty_directory("doc")
       invoke!
-      expect(File.exists?(File.join(destination_root, "doc"))).to be_true
+      expect(File.exists?(File.join(destination_root, "doc"))).to be true
     end
 
     it "shows created status to the user" do
@@ -92,7 +92,7 @@ describe Thor::Actions::EmptyDirectory do
       empty_directory("doc")
       expect(@action.exists?).to be false
       invoke!
-      expect(@action.exists?).to be_true
+      expect(@action.exists?).to be true
     end
   end
 

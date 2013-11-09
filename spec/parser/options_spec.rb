@@ -79,16 +79,16 @@ describe Thor::Options do
     it "accepts conjoined short switches" do
       create ["--foo", "-f"] => true, ["--bar", "-b"] => true, ["--app", "-a"] => true
       opts = parse("-fba")
-      expect(opts["foo"]).to be_true
-      expect(opts["bar"]).to be_true
-      expect(opts["app"]).to be_true
+      expect(opts["foo"]).to be true
+      expect(opts["bar"]).to be true
+      expect(opts["app"]).to be true
     end
 
     it "accepts conjoined short switches with input" do
       create ["--foo", "-f"] => true, ["--bar", "-b"] => true, ["--app", "-a"] => :required
       opts = parse "-fba", "12"
-      expect(opts["foo"]).to be_true
-      expect(opts["bar"]).to be_true
+      expect(opts["foo"]).to be true
+      expect(opts["bar"]).to be true
       expect(opts["app"]).to eq("12")
     end
 

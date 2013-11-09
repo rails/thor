@@ -34,15 +34,15 @@ describe Thor::Actions do
     it "when behavior is set to force, overwrite options" do
       runner = MyCounter.new([1], { :force => false, :skip => true }, :behavior => :force)
       expect(runner.behavior).to eq(:invoke)
-      expect(runner.options.force).to be_true
-      expect(runner.options.skip).not_to be_true
+      expect(runner.options.force).to be true
+      expect(runner.options.skip).not_to be true
     end
 
     it "when behavior is set to skip, overwrite options" do
       runner = MyCounter.new([1], ["--force"], :behavior => :skip)
       expect(runner.behavior).to eq(:invoke)
-      expect(runner.options.force).not_to be_true
-      expect(runner.options.skip).to be_true
+      expect(runner.options.force).not_to be true
+      expect(runner.options.skip).to be true
     end
   end
 
@@ -146,7 +146,7 @@ describe Thor::Actions do
 
     it "creates the directory if it does not exist" do
       runner.inside("foo") do
-        expect(File.exists?(file)).to be_true
+        expect(File.exists?(file)).to be true
       end
     end
 

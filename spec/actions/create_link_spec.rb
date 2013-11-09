@@ -36,15 +36,15 @@ describe Thor::Actions::CreateLink do
       create_link("doc/config.rb", :symbolic => true)
       invoke!
       destination_path = File.join(destination_root, "doc/config.rb")
-      expect(File.exists?(destination_path)).to be_true
-      expect(File.symlink?(destination_path)).to be_true
+      expect(File.exists?(destination_path)).to be true
+      expect(File.symlink?(destination_path)).to be true
     end
 
     it "creates a hard link for :symbolic => false" do
       create_link(@hardlink_to, :symbolic => false)
       invoke!
       destination_path = @hardlink_to
-      expect(File.exists?(destination_path)).to be_true
+      expect(File.exists?(destination_path)).to be true
       expect(File.symlink?(destination_path)).to be false
     end
 
@@ -52,8 +52,8 @@ describe Thor::Actions::CreateLink do
       create_link("doc/config.rb")
       invoke!
       destination_path = File.join(destination_root, "doc/config.rb")
-      expect(File.exists?(destination_path)).to be_true
-      expect(File.symlink?(destination_path)).to be_true
+      expect(File.exists?(destination_path)).to be true
+      expect(File.symlink?(destination_path)).to be true
     end
 
     it "does not create a link if pretending" do
@@ -79,7 +79,7 @@ describe Thor::Actions::CreateLink do
       create_link("doc/config.rb")
       expect(@action.identical?).to be false
       invoke!
-      expect(@action.identical?).to be_true
+      expect(@action.identical?).to be true
     end
   end
 

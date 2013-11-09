@@ -136,8 +136,8 @@ describe Thor do
         stop_on_unknown_option! :foo, :bar
       end
       it "affects all specified commands" do
-        expect(klass.stop_on_unknown_option?(double(:name => "foo"))).to be_true
-        expect(klass.stop_on_unknown_option?(double(:name => "bar"))).to be_true
+        expect(klass.stop_on_unknown_option?(double(:name => "foo"))).to be true
+        expect(klass.stop_on_unknown_option?(double(:name => "bar"))).to be true
         expect(klass.stop_on_unknown_option?(double(:name => "baz"))).to be false
       end
     end
@@ -148,8 +148,8 @@ describe Thor do
         stop_on_unknown_option! :bar
       end
       it "affects all specified commands" do
-        expect(klass.stop_on_unknown_option?(double(:name => "foo"))).to be_true
-        expect(klass.stop_on_unknown_option?(double(:name => "bar"))).to be_true
+        expect(klass.stop_on_unknown_option?(double(:name => "foo"))).to be true
+        expect(klass.stop_on_unknown_option?(double(:name => "bar"))).to be true
         expect(klass.stop_on_unknown_option?(double(:name => "baz"))).to be false
       end
     end

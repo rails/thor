@@ -16,7 +16,7 @@ describe Thor::Invocation do
     end
 
     it "invokes a command with arguments" do
-      expect(A.new.invoke(:five, [5])).to be_true
+      expect(A.new.invoke(:five, [5])).to be true
       expect(A.new.invoke(:five, [7])).to be false
     end
 

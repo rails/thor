@@ -30,7 +30,7 @@ describe Thor::Actions::CreateFile do
     it "creates a file" do
       create_file("doc/config.rb")
       invoke!
-      expect(File.exists?(File.join(destination_root, "doc/config.rb"))).to be_true
+      expect(File.exists?(File.join(destination_root, "doc/config.rb"))).to be true
     end
 
     it "does not create a file if pretending" do
@@ -59,7 +59,7 @@ describe Thor::Actions::CreateFile do
     it "converts encoded instructions" do
       create_file("doc/%file_name%.rb.tt")
       invoke!
-      expect(File.exists?(File.join(destination_root, "doc/rdoc.rb.tt"))).to be_true
+      expect(File.exists?(File.join(destination_root, "doc/rdoc.rb.tt"))).to be true
     end
 
     describe "when file exists" do
@@ -155,7 +155,7 @@ describe Thor::Actions::CreateFile do
       create_file("doc/config.rb")
       expect(@action.exists?).to be false
       invoke!
-      expect(@action.exists?).to be_true
+      expect(@action.exists?).to be true
     end
   end
 
@@ -164,7 +164,7 @@ describe Thor::Actions::CreateFile do
       create_file("doc/config.rb")
       expect(@action.identical?).to be false
       invoke!
-      expect(@action.identical?).to be_true
+      expect(@action.identical?).to be true
     end
   end
 end

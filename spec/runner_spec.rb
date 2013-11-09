@@ -61,7 +61,7 @@ describe Thor::Runner do
 
     it "invokes a command from a specific Thor class" do
       ARGV.replace ["my_script:zoo"]
-      expect(Thor::Runner.start).to be_true
+      expect(Thor::Runner.start).to be true
     end
 
     it "invokes the default command from a specific Thor class if none is specified" do

@@ -67,11 +67,11 @@ describe Thor::Shell::Basic do
     it "asks the user and returns true if the user replies yes" do
       expect($stdout).to receive(:print).with("Should I overwrite it? ")
         expect($stdin).to receive(:gets).and_return('y')
-      expect(shell.yes?("Should I overwrite it?")).to be_true
+      expect(shell.yes?("Should I overwrite it?")).to be true
 
       expect($stdout).to receive(:print).with("Should I overwrite it? ")
         expect($stdin).to receive(:gets).and_return('n')
-      expect(shell.yes?("Should I overwrite it?")).not_to be_true
+      expect(shell.yes?("Should I overwrite it?")).not_to be true
     end
   end
 
@@ -79,7 +79,7 @@ describe Thor::Shell::Basic do
     it "asks the user and returns true if the user replies no" do
       expect($stdout).to receive(:print).with("Should I overwrite it? ")
         expect($stdin).to receive(:gets).and_return('n')
-      expect(shell.no?("Should I overwrite it?")).to be_true
+      expect(shell.no?("Should I overwrite it?")).to be true
 
       expect($stdout).to receive(:print).with("Should I overwrite it? ")
         expect($stdin).to receive(:gets).and_return('Yes')
@@ -268,7 +268,7 @@ TABLE
     it "returns true if the user chooses default option" do
       allow($stdout).to receive(:print)
       expect($stdin).to receive(:gets).and_return('')
-      expect(shell.file_collision('foo')).to be_true
+      expect(shell.file_collision('foo')).to be true
     end
 
     it "returns false if the user chooses no" do
@@ -280,7 +280,7 @@ TABLE
     it "returns true if the user chooses yes" do
       allow($stdout).to receive(:print)
       expect($stdin).to receive(:gets).and_return('y')
-      expect(shell.file_collision('foo')).to be_true
+      expect(shell.file_collision('foo')).to be true
     end
 
     it "shows help usage if the user chooses help" do
@@ -305,10 +305,10 @@ TABLE
       expect($stdout).to receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqh] ')
       expect($stdin).to receive(:gets).and_return('a')
 
-      expect(shell.file_collision('foo')).to be_true
+      expect(shell.file_collision('foo')).to be true
 
       expect($stdout).not_to receive(:print)
-      expect(shell.file_collision('foo')).to be_true
+      expect(shell.file_collision('foo')).to be true
     end
 
     describe "when a block is given" do
