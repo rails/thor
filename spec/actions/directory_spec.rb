@@ -42,7 +42,7 @@ describe Thor::Actions::Directory do
 
     it "does not create a directory in pretend mode" do
       invoke! "doc", "ghost", :pretend => true
-      expect(File.exists?("ghost")).to be_false
+      expect(File.exists?("ghost")).to be false
     end
 
     it "copies the whole directory recursively to the default destination" do
@@ -62,16 +62,16 @@ describe Thor::Actions::Directory do
       expect(File.exists?(file)).to be_true
 
       file = File.join(destination_root, "commands", "doc")
-      expect(File.exists?(file)).to be_false
+      expect(File.exists?(file)).to be false
 
       file = File.join(destination_root, "commands", "doc", "README")
-      expect(File.exists?(file)).to be_false
+      expect(File.exists?(file)).to be false
     end
 
     it "ignores files within excluding/ directories when exclude_pattern is provided" do
       invoke! "doc", "docs", :exclude_pattern => /excluding\//
       file = File.join(destination_root, "docs", "excluding", "rdoc.rb")
-      expect(File.exists?(file)).to be_false
+      expect(File.exists?(file)).to be false
     end
 
     it "copies and evaluates files within excluding/ directory when no exclude_pattern is present" do
@@ -112,7 +112,7 @@ describe Thor::Actions::Directory do
     it "does not copy .empty_directory files" do
       invoke! "doc", "docs"
       file = File.join(destination_root, "docs", "components", ".empty_directory")
-      expect(File.exists?(file)).to be_false
+      expect(File.exists?(file)).to be false
     end
 
     it "copies directories even if they are empty" do
@@ -153,9 +153,9 @@ describe Thor::Actions::Directory do
       invoke! "doc"
       revoke! "doc"
 
-      expect(File.exists?(File.join(destination_root, "doc", "README"))).to be_false
-      expect(File.exists?(File.join(destination_root, "doc", "config.rb"))).to be_false
-      expect(File.exists?(File.join(destination_root, "doc", "components"))).to be_false
+      expect(File.exists?(File.join(destination_root, "doc", "README"))).to be false
+      expect(File.exists?(File.join(destination_root, "doc", "config.rb"))).to be false
+      expect(File.exists?(File.join(destination_root, "doc", "components"))).to be false
     end
 
     it "works with glob characters in the path" do
@@ -163,7 +163,7 @@ describe Thor::Actions::Directory do
       expect(File.exists?(File.join(destination_root, "app{1}", "README"))).to be_true
 
       revoke! "app{1}"
-      expect(File.exists?(File.join(destination_root, "app{1}", "README"))).to be_false
+      expect(File.exists?(File.join(destination_root, "app{1}", "README"))).to be false
     end
   end
 end

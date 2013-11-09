@@ -215,12 +215,12 @@ describe Thor::Actions do
     describe "#remove_file" do
       it "removes the file given" do
         action :remove_file, "doc/README"
-        expect(File.exists?(file)).to be_false
+        expect(File.exists?(file)).to be false
       end
 
       it "removes directories too" do
         action :remove_dir, "doc"
-        expect(File.exists?(File.join(destination_root, "doc"))).to be_false
+        expect(File.exists?(File.join(destination_root, "doc"))).to be false
       end
 
       it "does not remove if pretending" do

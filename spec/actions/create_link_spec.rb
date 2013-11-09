@@ -45,7 +45,7 @@ describe Thor::Actions::CreateLink do
       invoke!
       destination_path = @hardlink_to
       expect(File.exists?(destination_path)).to be_true
-      expect(File.symlink?(destination_path)).to be_false
+      expect(File.symlink?(destination_path)).to be false
     end
 
     it "creates a symbolic link by default" do
@@ -59,7 +59,7 @@ describe Thor::Actions::CreateLink do
     it "does not create a link if pretending" do
       create_link("doc/config.rb", {}, :pretend => true)
       invoke!
-      expect(File.exists?(File.join(destination_root, "doc/config.rb"))).to be_false
+      expect(File.exists?(File.join(destination_root, "doc/config.rb"))).to be false
     end
 
     it "shows created status to the user" do
@@ -77,7 +77,7 @@ describe Thor::Actions::CreateLink do
   describe "#identical?" do
     it "returns true if the destination link exists and is identical" do
       create_link("doc/config.rb")
-      expect(@action.identical?).to be_false
+      expect(@action.identical?).to be false
       invoke!
       expect(@action.identical?).to be_true
     end
@@ -89,7 +89,7 @@ describe Thor::Actions::CreateLink do
       invoke!
       File.delete(@tempfile.path)
       revoke!
-      expect(File.symlink?(@action.destination)).to be_false
+      expect(File.symlink?(@action.destination)).to be false
     end
   end
 end

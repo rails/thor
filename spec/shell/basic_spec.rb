@@ -83,7 +83,7 @@ describe Thor::Shell::Basic do
 
       expect($stdout).to receive(:print).with("Should I overwrite it? ")
         expect($stdin).to receive(:gets).and_return('Yes')
-      expect(shell.no?("Should I overwrite it?")).to be_false
+      expect(shell.no?("Should I overwrite it?")).to be false
     end
   end
 
@@ -274,7 +274,7 @@ TABLE
     it "returns false if the user chooses no" do
       allow($stdout).to receive(:print)
       expect($stdin).to receive(:gets).and_return('n')
-      expect(shell.file_collision('foo')).to be_false
+      expect(shell.file_collision('foo')).to be false
     end
 
     it "returns true if the user chooses yes" do

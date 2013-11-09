@@ -17,7 +17,7 @@ describe Thor::Invocation do
 
     it "invokes a command with arguments" do
       expect(A.new.invoke(:five, [5])).to be_true
-      expect(A.new.invoke(:five, [7])).to be_false
+      expect(A.new.invoke(:five, [7])).to be false
     end
 
     it "invokes the default command if none is given to a Thor class" do

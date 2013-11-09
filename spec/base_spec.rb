@@ -86,7 +86,7 @@ describe Thor::Base do
     end
 
     it "does not create an accessor for it" do
-      expect(BrokenCounter.start(["1", "2", "--third", "3"])[3]).to be_false
+      expect(BrokenCounter.start(["1", "2", "--third", "3"])[3]).to be false
     end
   end
 

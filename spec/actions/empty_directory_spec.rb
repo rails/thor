@@ -66,7 +66,7 @@ describe Thor::Actions::EmptyDirectory do
       base.inside("foo", :pretend => true) do
         empty_directory("ghost")
       end
-      expect(File.exists?(File.join(base.destination_root, "ghost"))).to be_false
+      expect(File.exists?(File.join(base.destination_root, "ghost"))).to be false
     end
 
     describe "when directory exists" do
@@ -83,14 +83,14 @@ describe Thor::Actions::EmptyDirectory do
       empty_directory("doc")
       invoke!
       revoke!
-      expect(File.exists?(@action.destination)).to be_false
+      expect(File.exists?(@action.destination)).to be false
     end
   end
 
   describe "#exists?" do
     it "returns true if the destination file exists" do
       empty_directory("doc")
-      expect(@action.exists?).to be_false
+      expect(@action.exists?).to be false
       invoke!
       expect(@action.exists?).to be_true
     end

@@ -36,7 +36,7 @@ describe Thor::Actions::CreateFile do
     it "does not create a file if pretending" do
       create_file("doc/config.rb", {}, :pretend => true)
       invoke!
-      expect(File.exists?(File.join(destination_root, "doc/config.rb"))).to be_false
+      expect(File.exists?(File.join(destination_root, "doc/config.rb"))).to be false
     end
 
     it "shows created status to the user" do
@@ -140,20 +140,20 @@ describe Thor::Actions::CreateFile do
       create_file("doc/config.rb")
       invoke!
       revoke!
-      expect(File.exists?(@action.destination)).to be_false
+      expect(File.exists?(@action.destination)).to be false
     end
 
     it "does not raise an error if the file does not exist" do
       create_file("doc/config.rb")
       revoke!
-      expect(File.exists?(@action.destination)).to be_false
+      expect(File.exists?(@action.destination)).to be false
     end
   end
 
   describe "#exists?" do
     it "returns true if the destination file exists" do
       create_file("doc/config.rb")
-      expect(@action.exists?).to be_false
+      expect(@action.exists?).to be false
       invoke!
       expect(@action.exists?).to be_true
     end
@@ -162,7 +162,7 @@ describe Thor::Actions::CreateFile do
   describe "#identical?" do
     it "returns true if the destination file exists and is identical" do
       create_file("doc/config.rb")
-      expect(@action.identical?).to be_false
+      expect(@action.identical?).to be false
       invoke!
       expect(@action.identical?).to be_true
     end

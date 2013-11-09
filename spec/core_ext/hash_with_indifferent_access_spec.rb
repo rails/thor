@@ -17,12 +17,12 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
   it "handles magic boolean predicates" do
     expect(@hash.force?).to be_true
     expect(@hash.foo?).to be_true
-    expect(@hash.nothing?).to be_false
+    expect(@hash.nothing?).to be false
   end
 
   it "handles magic comparisons" do
     expect(@hash.foo?('bar')).to be_true
-    expect(@hash.foo?('bee')).to be_false
+    expect(@hash.foo?('bee')).to be false
   end
 
   it "maps methods to keys" do
