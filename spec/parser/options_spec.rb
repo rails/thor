@@ -266,12 +266,12 @@ describe Thor::Options do
 
       it "accepts a --no-switch format" do
         create "--foo" => "bar"
-        expect(parse("--no-foo")["foo"]).to be_nil
+        expect(parse("--no-foo")["foo"]).to be nil
       end
 
       it "does not consume an argument for --no-switch format" do
         create "--cheese" => :string
-        expect(parse('burger', '--no-cheese', 'fries')["cheese"]).to be_nil
+        expect(parse('burger', '--no-cheese', 'fries')["cheese"]).to be nil
       end
 
       it "accepts a --switch format on non required types" do

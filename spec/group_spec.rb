@@ -51,7 +51,7 @@ describe Thor::Group do
     end
 
     it "can be nil" do
-      expect(WhinyGenerator.desc).to be_nil
+      expect(WhinyGenerator.desc).to be nil
     end
   end
 

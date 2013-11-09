@@ -8,7 +8,7 @@ describe Thor::CoreExt::OrderedHash do
 
   describe "without any items" do
     it "returns nil for an undefined key" do
-      expect(@hash["foo"]).to be_nil
+      expect(@hash["foo"]).to be nil
     end
 
     it "doesn't iterate through any items" do
@@ -35,7 +35,7 @@ describe Thor::CoreExt::OrderedHash do
     end
 
     it "returns nil for an undefined key" do
-      expect(@hash[:boom]).to be_nil
+      expect(@hash[:boom]).to be nil
     end
 
     it "returns the value for each key" do
@@ -109,7 +109,7 @@ describe Thor::CoreExt::OrderedHash do
     end
 
     it "returns nil if the value to be deleted can't be found" do
-      expect(@hash.delete(:nothing)).to be_nil
+      expect(@hash.delete(:nothing)).to be nil
     end
   end
 end

@@ -20,8 +20,8 @@ describe Thor::Option do
         end
 
         it "has no default value" do
-          expect(parse(:foo, :string).default).to be_nil
-          expect(parse(:foo, :numeric).default).to be_nil
+          expect(parse(:foo, :string).default).to be nil
+          expect(parse(:foo, :numeric).default).to be nil
         end
       end
 
@@ -31,7 +31,7 @@ describe Thor::Option do
         end
 
         it "has no default value" do
-          expect(parse(:foo, :required).default).to be_nil
+          expect(parse(:foo, :required).default).to be nil
         end
       end
 
@@ -41,7 +41,7 @@ describe Thor::Option do
         end
 
         it "has no default value" do
-          expect(parse(:foo, :bar).default).to be_nil
+          expect(parse(:foo, :bar).default).to be nil
         end
       end
     end

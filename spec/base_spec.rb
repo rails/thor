@@ -59,7 +59,7 @@ describe Thor::Base do
     end
 
     it "does not set a value in the options hash" do
-      expect(BrokenCounter.start(["1", "2", "--third", "3"])[0]).to be_nil
+      expect(BrokenCounter.start(["1", "2", "--third", "3"])[0]).to be nil
     end
   end
 
@@ -110,7 +110,7 @@ describe Thor::Base do
 
   describe "#remove_class_option" do
     it "removes previous defined class option" do
-      expect(ClearCounter.class_options[:third]).to be_nil
+      expect(ClearCounter.class_options[:third]).to be nil
     end
   end
 

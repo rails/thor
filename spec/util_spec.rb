@@ -17,7 +17,7 @@ describe Thor::Util do
     end
 
     it "returns nil if the namespace can't be found" do
-      expect(Thor::Util.find_by_namespace('thor:core_ext:ordered_hash')).to be_nil
+      expect(Thor::Util.find_by_namespace('thor:core_ext:ordered_hash')).to be nil
     end
 
     it "returns a class if it matches the namespace" do
