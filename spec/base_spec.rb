@@ -65,7 +65,7 @@ describe Thor::Base do
 
   describe "#arguments" do
     it "returns the arguments for the class" do
-      expect(MyCounter.arguments).to have(2).items
+      expect(MyCounter.arguments.size).to be(2)
     end
   end
 
