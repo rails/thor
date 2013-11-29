@@ -3,9 +3,16 @@ language: ruby
 matrix:
   allow_failures:
     - rvm: 1.8.7
+    - rvm: jruby-head
+    - rvm: rbx
+    - rvm: ruby-head
+  fast_finish: true
 rvm:
   - 1.8.7
   - 1.9.2
   - 1.9.3
   - 2.0.0
+  - jruby-head
+  - rbx
+  - ruby-head
 script: bundle exec thor spec
