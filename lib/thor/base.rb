@@ -83,7 +83,7 @@ class Thor
 
     class << self
       def included(base) #:nodoc:
-        base.send :extend,  ClassMethods
+        base.extend ClassMethods
         base.send :include, Invocation
         base.send :include, Shell
       end
