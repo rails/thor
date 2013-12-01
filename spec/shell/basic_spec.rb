@@ -73,6 +73,12 @@ describe Thor::Shell::Basic do
         expect($stdin).to receive(:gets).and_return('n')
       expect(shell.yes?("Should I overwrite it?")).not_to be true
     end
+
+    it "asks the user and returns false if the user replies with an answer other than yes or no" do
+      expect($stdout).to receive(:print).with("Should I overwrite it? ")
+        expect($stdin).to receive(:gets).and_return('foobar')
+      expect(shell.yes?("Should I overwrite it?")).to be_false
+    end
   end
 
   describe "#no?" do
@@ -84,6 +90,12 @@ describe Thor::Shell::Basic do
       expect($stdout).to receive(:print).with("Should I overwrite it? ")
         expect($stdin).to receive(:gets).and_return('Yes')
       expect(shell.no?("Should I overwrite it?")).to be false
+    end
+
+    it "asks the user and returns false if the user replies with an answer other than yes or no" do
+      expect($stdout).to receive(:print).with("Should I overwrite it? ")
+        expect($stdin).to receive(:gets).and_return('foobar')
+      expect(shell.no?("Should I overwrite it?")).to be_false
     end
   end
 

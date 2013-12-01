@@ -112,7 +112,7 @@ class Thor
       # "no".
       #
       def no?(statement, color=nil)
-        !yes?(statement, color)
+        !!(ask(statement, color) =~ is?(:no))
       end
 
       # Prints values in columns
