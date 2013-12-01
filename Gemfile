@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rake', '>= 0.9'
-gem 'rdoc', '>= 3.9'
+gemspec
 
 group :development do
   gem 'pry'
@@ -16,5 +15,3 @@ group :test do
   gem 'rspec-mocks', '>= 2.12.2'
   gem 'simplecov', :require => false
 end
-
-gemspec
