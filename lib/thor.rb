@@ -321,23 +321,14 @@ class Thor
 
     # The method responsible for dispatching given the args.
     def dispatch(meth, given_args, given_opts, config) #:nodoc:
-      # There is an edge case when dispatching from a subcommand.
-      # A problem occurs invoking the default command. This case occurs
-      # when arguments are passed and a default command is defined, and
-      # the first given_args does not match the default command.
-      # Thor use "help" by default so we skip that case.
-      # Note the call to retrieve_command_name. It's called with
-      # given_args.dup since that method calls args.shift. Then lookup
-      # the command normally. If the first item in given_args is not
-      # a command then use the default command. The given_args will be
-      # intact later since dup was used.
-      if config[:invoked_via_subcommand] && given_args.size >= 1 && default_command != "help" && given_args.first != default_command
-        meth ||= retrieve_command_name(given_args.dup)
-        command = all_commands[normalize_command_name(meth)]
-        command ||= all_commands[normalize_command_name(default_command)]
-      else
-        meth ||= retrieve_command_name(given_args)
-        command = all_commands[normalize_command_name(meth)]
+      meth ||= retrieve_command_name(given_args)
+      command = all_commands[normalize_command_name(meth)]
+
+      if !command && config[:invoked_via_subcommand]
+        # We're a subcommand and our first argument didn't match any of our
+        # commands. So we put it back and call our default command.
+        given_args.unshift(meth)
+        command = all_commands[normalize_command_name(default_command)]
       end
 
       if command

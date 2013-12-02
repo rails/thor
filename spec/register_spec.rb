@@ -82,6 +82,20 @@ class PluginWithDefaultcommandAndDeclaredArgument < Thor
   default_command :say
 end
 
+class SubcommandWithDefault < Thor
+  default_command :default
+  
+  desc 'default', 'default subcommand'
+  def default
+    puts 'default'
+  end
+
+  desc 'with_args', 'subcommand with arguments'
+  def with_args(*args)
+    puts 'received arguments: ' + args.join(',')
+  end
+end
+
 BoringVendorProvidedCLI.register(
   ExcitingPluginCLI,
   "exciting",
@@ -124,6 +138,9 @@ BoringVendorProvidedCLI.register(
   'say_argument',
   'say message',
   'subcommands ftw')
+  
+BoringVendorProvidedCLI.register(SubcommandWithDefault,
+  'subcommand', 'subcommand', 'Run subcommands')
 
 describe ".register-ing a Thor subclass" do
   it "registers the plugin as a subcommand" do
@@ -135,21 +152,34 @@ describe ".register-ing a Thor subclass" do
     help_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[help]) }
     expect(help_output).to include('do exciting things')
   end
+  
+  context 'with a default command,' do
+    it 'invokes the default command correctly' do
+      output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say hello]) }
+      expect(output).to include('hello')
+    end
 
-  it "invokes the default command correctly" do
-    output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say hello]) }
-    expect(output).to include("hello")
-  end
+    it 'invokes the default command correctly with multiple args' do
+      output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say_multiple hello adam]) }
+      expect(output).to include('hello')
+      expect(output).to include('adam')
+    end
 
-  it "invokes the default command correctly with multiple args" do
-    output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say_multiple hello adam]) }
-    expect(output).to include("hello")
-    expect(output).to include("adam")
-  end
-
-  it "invokes the default command correctly with a declared argument" do
-    output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say_argument hello]) }
-    expect(output).to include("hello")
+    it 'invokes the default command correctly with a declared argument' do
+      output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[say_argument hello]) }
+      expect(output).to include('hello')
+    end
+    
+    it "displays the subcommand's help message" do
+      output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[subcommand help]) }
+      expect(output).to include('default subcommand')
+      expect(output).to include('subcommand with argument')
+    end
+    
+    it "invokes commands with their actual args" do
+      output = capture(:stdout) { BoringVendorProvidedCLI.start(%w[subcommand with_args actual_argument]) }
+      expect(output.strip).to eql('received arguments: actual_argument')
+    end
   end
 
   context "when $thor_runner is false" do
