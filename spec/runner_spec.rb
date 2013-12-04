@@ -131,7 +131,7 @@ describe Thor::Runner do
 
       # Stub load and save to avoid thor.yaml from being overwritten
       allow(YAML).to receive(:load_file).and_return(@original_yaml)
-      allow(File).to receive(:exists?).with(root_file).and_return(true)
+      allow(File).to receive(:exist?).with(root_file).and_return(true)
       allow(File).to receive(:open).with(root_file, "w")
     end
 
