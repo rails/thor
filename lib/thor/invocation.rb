@@ -103,6 +103,7 @@ class Thor
       command, args, opts, config = args
 
       klass, command = _retrieve_class_and_command(name, command)
+      fail "Missing Thor class for invoke #{name}" unless klass
       fail "Expected Thor class, got #{klass}" unless klass <= Thor::Base
 
       args, opts, config = _parse_initialization_options(args, opts, config)
