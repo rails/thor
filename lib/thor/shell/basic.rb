@@ -1,5 +1,4 @@
 require 'tempfile'
-require 'io/console'
 
 class Thor
   module Shell
