@@ -1,5 +1,4 @@
 require 'tempfile'
-require 'io/console' if RUBY_VERSION > '1.9.2'
 
 class Thor
   module Shell
