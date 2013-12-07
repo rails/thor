@@ -229,6 +229,7 @@ class Thor
 
       define_method(subcommand) do |*args|
         args, opts = Thor::Arguments.split(args)
+        args.unshift("help") if opts.include? "--help"
         invoke subcommand_class, args, opts, :invoked_via_subcommand => true, :class_options => options
       end
     end
@@ -352,6 +353,7 @@ class Thor
         args, opts = given_args, nil
         command = Thor::DynamicCommand.new(meth)
       end
+
 
       opts = given_opts || opts || []
       config.merge!(:current_command => command, :command_options => command.options)
