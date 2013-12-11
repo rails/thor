@@ -1,18 +1,26 @@
 bundler_args: --without development
 language: ruby
-matrix:
-  allow_failures:
-    - rvm: 1.8.7
-    - rvm: jruby-head
-    - rvm: rbx
-    - rvm: ruby-head
-  fast_finish: true
 rvm:
   - 1.8.7
   - 1.9.2
   - 1.9.3
   - 2.0.0
-  - jruby-head
   - rbx
   - ruby-head
+matrix:
+  include:
+    - rvm: jruby-19mode
+      env: JRUBY_OPTS="$JRUBY_OPTS --debug"
+    - rvm: jruby-20mode
+      env: JRUBY_OPTS="$JRUBY_OPTS --debug"
+    - rvm: jruby-head
+      env: JRUBY_OPTS="$JRUBY_OPTS --debug"
+  allow_failures:
+    - rvm: 1.8.7
+    - rvm: jruby-19mode
+    - rvm: jruby-20mode
+    - rvm: jruby-head
+    - rvm: rbx
+    - rvm: ruby-head
+  fast_finish: true
 script: bundle exec thor spec
