@@ -131,7 +131,7 @@ class Thor
     # Receives a file or directory and search for it in the source paths.
     #
     def find_in_source_paths(file)
-      files = [file, "#{file}.tt"]
+      files = [file, file + TEMPLATE_EXTNAME]
       relative_root = relative_to_original_destination_root(destination_root, false)
 
       source_paths.each do |source|
