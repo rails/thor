@@ -232,7 +232,7 @@ class Thor
         return true if @always_force
         options = block_given? ? "[Ynaqdh]" : "[Ynaqh]"
 
-        while true
+        loop do
           answer = ask %[Overwrite #{destination}? (enter "h" for help) #{options}]
 
           case answer
