@@ -131,11 +131,11 @@ class Thor
     # Receives a file or directory and search for it in the source paths.
     #
     def find_in_source_paths(file)
-      files = [file, file + TEMPLATE_EXTNAME]
+      possible_files = [file, file + TEMPLATE_EXTNAME]
       relative_root = relative_to_original_destination_root(destination_root, false)
 
       source_paths.each do |source|
-        files.each do |f|
+        possible_files.each do |f|
           source_file = File.expand_path(f, File.join(source, relative_root))
           return source_file if File.exist?(source_file)
         end
