@@ -17,6 +17,7 @@ group :test do
   gem 'fakeweb', '>= 1.3'
   gem 'rspec', '>= 2.14'
   gem 'rspec-mocks', '>= 2.12.2'
+  gem 'rubocop', '>= 0.15', :platforms => [:ruby_19, :ruby_20]
   gem 'simplecov', :require => false
 end
 
