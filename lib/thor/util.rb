@@ -155,7 +155,7 @@ class Thor
 
         begin
           Thor::Sandbox.class_eval(content, path)
-        rescue Exception => e
+        rescue StandardError => e
           $stderr.puts("WARNING: unable to load thorfile #{path.inspect}: #{e.message}")
           if debug
             $stderr.puts(*e.backtrace)
