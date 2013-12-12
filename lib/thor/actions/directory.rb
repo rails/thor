@@ -88,10 +88,10 @@ class Thor
               dirname = File.dirname(file_destination).gsub(/\/\.$/, '')
               next if dirname == given_destination
               base.empty_directory(dirname, config)
-            when /\.tt$/
-              destination = base.template(file_source, file_destination[0..-4], config, &@block)
+            when /#{TEMPLATE_EXTNAME}$/
+              base.template(file_source, file_destination[0..-4], config, &@block)
             else
-              destination = base.copy_file(file_source, file_destination, config, &@block)
+              base.copy_file(file_source, file_destination, config, &@block)
             end
           end
         end

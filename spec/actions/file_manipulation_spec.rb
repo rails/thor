@@ -184,6 +184,13 @@ describe Thor::Actions do
       expect(File.exists?(file)).to be true
     end
 
+    it "accepts filename without .tt for template method" do
+      expect(runner).to receive(:file_name).and_return("rdoc")
+      action :template, "doc/%file_name%.rb"
+      file = File.join(destination_root, "doc/rdoc.rb")
+      expect(File.exists?(file)).to be true
+    end
+
     it "logs status" do
       expect(capture(:stdout) { runner.template("doc/config.rb") }).to eq("      create  doc/config.rb\n")
     end

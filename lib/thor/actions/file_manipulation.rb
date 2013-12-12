@@ -108,7 +108,7 @@ class Thor
     #
     def template(source, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
-      destination = args.first || source.sub(/\.tt$/, '')
+      destination = args.first || source.sub(/#{TEMPLATE_EXTNAME}$/, '')
 
       source  = File.expand_path(find_in_source_paths(source.to_s))
       context = instance_eval('binding')

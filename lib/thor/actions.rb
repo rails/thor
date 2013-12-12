@@ -131,11 +131,14 @@ class Thor
     # Receives a file or directory and search for it in the source paths.
     #
     def find_in_source_paths(file)
+      possible_files = [file, file + TEMPLATE_EXTNAME]
       relative_root = relative_to_original_destination_root(destination_root, false)
 
       source_paths.each do |source|
-        source_file = File.expand_path(file, File.join(source, relative_root))
-        return source_file if File.exist?(source_file)
+        possible_files.each do |f|
+          source_file = File.expand_path(f, File.join(source, relative_root))
+          return source_file if File.exist?(source_file)
+        end
       end
 
       message = "Could not find #{file.inspect} in any of your source paths. "

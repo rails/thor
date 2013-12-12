@@ -19,6 +19,8 @@ class Thor
   THOR_RESERVED_WORDS = %w(invoke shell options behavior root destination_root relative_root
                            action add_file create_file in_root inside run run_ruby_script)
 
+  TEMPLATE_EXTNAME = '.tt'
+
   module Base
     attr_accessor :options, :parent_options, :args
 
