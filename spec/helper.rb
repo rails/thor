@@ -7,7 +7,11 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
   SimpleCov::Formatter::HTMLFormatter,
   Coveralls::SimpleCov::Formatter
 ]
-SimpleCov.start
+
+SimpleCov.start do
+  add_filter '/spec/'
+  minimum_coverage(92.21)
+end
 
 $:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 require 'thor'
