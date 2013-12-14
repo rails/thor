@@ -11,11 +11,11 @@ class Thor
   # Raised when a command was not found.
   class UndefinedCommandError < Error
   end
-  UndefinedTaskError = UndefinedCommandError
+  UndefinedTaskError = UndefinedCommandError # rubocop:disable ConstantName
 
   class AmbiguousCommandError < Error
   end
-  AmbiguousTaskError = AmbiguousCommandError
+  AmbiguousTaskError = AmbiguousCommandError # rubocop:disable ConstantName
 
   # Raised when a command was found, but not invoked properly.
   class InvocationError < Error

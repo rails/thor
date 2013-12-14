@@ -26,7 +26,7 @@ class Thor
       end
 
       # Stores and return the source root for this class
-      def source_root(path=nil)
+      def source_root(path = nil)
         @_source_root = path if path
         @_source_root
       end
@@ -39,8 +39,8 @@ class Thor
       #
       def source_paths_for_search
         paths = []
-        paths += self.source_paths
-        paths << self.source_root if self.source_root
+        paths += source_paths
+        paths << source_root if source_root
         paths += from_superclass(:source_paths, [])
         paths
       end
@@ -48,17 +48,17 @@ class Thor
       # Add runtime options that help actions execution.
       #
       def add_runtime_options!
-        class_option :force, :type => :boolean, :aliases => "-f", :group => :runtime,
-                             :desc => "Overwrite files that already exist"
+        class_option :force, :type => :boolean, :aliases => '-f', :group => :runtime,
+                             :desc => 'Overwrite files that already exist'
 
-        class_option :pretend, :type => :boolean, :aliases => "-p", :group => :runtime,
-                               :desc => "Run but do not make any changes"
+        class_option :pretend, :type => :boolean, :aliases => '-p', :group => :runtime,
+                               :desc => 'Run but do not make any changes'
 
-        class_option :quiet, :type => :boolean, :aliases => "-q", :group => :runtime,
-                             :desc => "Suppress status output"
+        class_option :quiet, :type => :boolean, :aliases => '-q', :group => :runtime,
+                             :desc => 'Suppress status output'
 
-        class_option :skip, :type => :boolean, :aliases => "-s", :group => :runtime,
-                            :desc => "Skip files that already exist"
+        class_option :skip, :type => :boolean, :aliases => '-s', :group => :runtime,
+                            :desc => 'Skip files that already exist'
       end
     end
 
@@ -71,17 +71,16 @@ class Thor
     #
     # destination_root<String>:: The root directory needed for some actions.
     #
-    def initialize(args=[], options={}, config={})
+    def initialize(args = [], options = {}, config = {})
       self.behavior = case config[:behavior].to_s
-      when "force", "skip"
-        _cleanup_options_and_set(options, config[:behavior])
-        :invoke
-      when "revoke"
-        :revoke
-      else
-        :invoke
-      end
-
+                      when 'force', 'skip'
+                        _cleanup_options_and_set(options, config[:behavior])
+                        :invoke
+                      when 'revoke'
+                        :revoke
+                      else
+                        :invoke
+                      end
       super
       self.destination_root = config[:destination_root]
     end
@@ -113,7 +112,7 @@ class Thor
     # Returns the given path relative to the absolute root (ie, root where
     # the script started).
     #
-    def relative_to_original_destination_root(path, remove_dot=true)
+    def relative_to_original_destination_root(path, remove_dot = true)
       path = path.dup
       if path.gsub!(@destination_stack[0], '.')
         remove_dot ? (path[2..-1] || '') : path
@@ -130,7 +129,7 @@ class Thor
 
     # Receives a file or directory and search for it in the source paths.
     #
-    def find_in_source_paths(file)
+    def find_in_source_paths(file) # rubocop:disable MethodLength
       possible_files = [file, file + TEMPLATE_EXTNAME]
       relative_root = relative_to_original_destination_root(destination_root, false)
 
@@ -148,12 +147,12 @@ class Thor
       end
 
       if source_paths.empty?
-        message << "Currently you have no source paths."
+        message << 'Currently you have no source paths.'
       else
         message << "Your current source paths are: \n#{source_paths.join("\n")}"
       end
 
-      raise Error, message
+      fail Error, message
     end
 
     # Do something in the root or on a provided subfolder. If a relative path
@@ -165,7 +164,7 @@ class Thor
     # dir<String>:: the directory to move to.
     # config<Hash>:: give :verbose => true to log and use padding.
     #
-    def inside(dir='', config={}, &block)
+    def inside(dir = '', config = {}, &block)
       verbose = config.fetch(:verbose, false)
       pretend = options[:pretend]
 
@@ -207,7 +206,7 @@ class Thor
     #
     #   apply "recipes/jquery.rb"
     #
-    def apply(path, config={})
+    def apply(path, config = {})
       verbose = config.fetch(:verbose, true)
       is_uri  = path =~ %r{^https?\://}
       path    = find_in_source_paths(path) unless is_uri
@@ -216,9 +215,9 @@ class Thor
       shell.padding += 1 if verbose
 
       if is_uri
-        contents = open(path, "Accept" => "application/x-thor-template") {|io| io.read }
+        contents = open(path, 'Accept' => 'application/x-thor-template') { |io| io.read }
       else
-        contents = open(path) {|io| io.read }
+        contents = open(path) { |io| io.read }
       end
 
       instance_eval(contents, path)
@@ -238,7 +237,7 @@ class Thor
     #     run('ln -s ~/edge rails')
     #   end
     #
-    def run(command, config={})
+    def run(command, config = {})
       return unless behavior == :invoke
 
       destination = relative_to_original_destination_root(destination_root, false)
@@ -262,7 +261,7 @@ class Thor
     # command<String>:: the command to be executed.
     # config<Hash>:: give :verbose => false to not log the status.
     #
-    def run_ruby_script(command, config={})
+    def run_ruby_script(command, config = {})
       return unless behavior == :invoke
       run command, config.merge(:with => Thor::Util.ruby_command)
     end
@@ -298,24 +297,23 @@ class Thor
       run command, :with => :thor, :verbose => verbose, :pretend => pretend, :capture => capture
     end
 
-    protected
+  protected
 
-      # Allow current root to be shared between invocations.
-      #
-      def _shared_configuration #:nodoc:
-        super.merge!(:destination_root => self.destination_root)
+    # Allow current root to be shared between invocations.
+    #
+    def _shared_configuration #:nodoc:
+      super.merge!(:destination_root => destination_root)
+    end
+
+    def _cleanup_options_and_set(options, key) #:nodoc:
+      case options
+      when Array
+        %w(--force -f --skip -s).each { |i| options.delete(i) }
+        options << "--#{key}"
+      when Hash
+        [:force, :skip, 'force', 'skip'].each { |i| options.delete(i) }
+        options.merge!(key => true)
       end
-
-      def _cleanup_options_and_set(options, key) #:nodoc:
-        case options
-        when Array
-          %w(--force -f --skip -s).each { |i| options.delete(i) }
-          options << "--#{key}"
-        when Hash
-          [:force, :skip, "force", "skip"].each { |i| options.delete(i) }
-          options.merge!(key => true)
-        end
-      end
-
+    end
   end
 end

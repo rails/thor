@@ -2,7 +2,6 @@ require 'thor/actions/create_file'
 
 class Thor
   module Actions
-
     # Create a new file relative to the destination root from the given source.
     #
     # ==== Parameters
@@ -20,7 +19,7 @@ class Thor
       source = args.first
       action CreateLink.new(self, destination, source, config)
     end
-    alias :add_link :create_link
+    alias_method :add_link, :create_link
 
     # CreateLink is a subset of CreateFile, which instead of taking a block of
     # data, just takes a source string from the user.

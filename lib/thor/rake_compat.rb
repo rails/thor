@@ -12,7 +12,7 @@ class Thor
   #     include Thor::RakeCompat
   #
   #     RSpec::Core::RakeTask.new(:spec) do |t|
-  #       t.spec_opts = ['--options', "./.rspec"]
+  #       t.spec_opts = ['--options', './.rspec']
   #       t.spec_files = FileList['spec/**/*_spec.rb']
   #     end
   #   end
@@ -28,23 +28,23 @@ class Thor
       # Hack. Make rakefile point to invoker, so rdoc task is generated properly.
       rakefile = File.basename(caller[0].match(/(.*):\d+/)[1])
       Rake.application.instance_variable_set(:@rakefile, rakefile)
-      self.rake_classes << base
+      rake_classes << base
     end
   end
 end
 
 # override task on (main), for compatibility with Rake 0.9
-self.instance_eval do
+instance_eval do
   alias rake_namespace namespace
 
   def task(*)
     task = super
 
-    if klass = Thor::RakeCompat.rake_classes.last
+    if klass = Thor::RakeCompat.rake_classes.last # rubocop:disable AssignmentInCondition
       non_namespaced_name = task.name.split(':').last
 
       description = non_namespaced_name
-      description << task.arg_names.map{ |n| n.to_s.upcase }.join(' ')
+      description << task.arg_names.map { |n| n.to_s.upcase }.join(' ')
       description.strip!
 
       klass.desc description, Rake.application.last_description || non_namespaced_name
@@ -58,7 +58,7 @@ self.instance_eval do
   end
 
   def namespace(name)
-    if klass = Thor::RakeCompat.rake_classes.last
+    if klass = Thor::RakeCompat.rake_classes.last # rubocop:disable AssignmentInCondition
       const_name = Thor::Util.camel_case(name.to_s).to_sym
       klass.const_set(const_name, Class.new(Thor))
       new_klass = klass.const_get(const_name)
@@ -69,4 +69,3 @@ self.instance_eval do
     Thor::RakeCompat.rake_classes.pop
   end
 end
-

@@ -55,10 +55,10 @@ class Thor
     class Directory < EmptyDirectory #:nodoc:
       attr_reader :source
 
-      def initialize(base, source, destination=nil, config={}, &block)
+      def initialize(base, source, destination = nil, config = {}, &block)
         @source = File.expand_path(base.find_in_source_paths(source.to_s))
         @block  = block
-        super(base, destination, { :recursive => true }.merge(config))
+        super(base, destination, {:recursive => true}.merge(config))
       end
 
       def invoke!
@@ -70,50 +70,49 @@ class Thor
         execute!
       end
 
-      protected
+    protected
 
-        def execute!
-          lookup = Util.escape_globs(source)
-          lookup = config[:recursive] ? File.join(lookup, '**') : lookup
-          lookup = file_level_lookup(lookup)
+      def execute! # rubocop:disable MethodLength
+        lookup = Util.escape_globs(source)
+        lookup = config[:recursive] ? File.join(lookup, '**') : lookup
+        lookup = file_level_lookup(lookup)
 
-          files(lookup).sort.each do |file_source|
-            next if File.directory?(file_source)
-            next if config[:exclude_pattern] && file_source.match(config[:exclude_pattern])
-            file_destination = File.join(given_destination, file_source.gsub(source, '.'))
-            file_destination.gsub!('/./', '/')
+        files(lookup).sort.each do |file_source|
+          next if File.directory?(file_source)
+          next if config[:exclude_pattern] && file_source.match(config[:exclude_pattern])
+          file_destination = File.join(given_destination, file_source.gsub(source, '.'))
+          file_destination.gsub!('/./', '/')
 
-            case file_source
-            when /\.empty_directory$/
-              dirname = File.dirname(file_destination).gsub(/\/\.$/, '')
-              next if dirname == given_destination
-              base.empty_directory(dirname, config)
-            when /#{TEMPLATE_EXTNAME}$/
-              base.template(file_source, file_destination[0..-4], config, &@block)
-            else
-              base.copy_file(file_source, file_destination, config, &@block)
-            end
+          case file_source
+          when /\.empty_directory$/
+            dirname = File.dirname(file_destination).gsub(/\/\.$/, '')
+            next if dirname == given_destination
+            base.empty_directory(dirname, config)
+          when /#{TEMPLATE_EXTNAME}$/
+            base.template(file_source, file_destination[0..-4], config, &@block)
+          else
+            base.copy_file(file_source, file_destination, config, &@block)
           end
         end
+      end
 
-        if RUBY_VERSION < '2.0'
-          def file_level_lookup(previous_lookup)
-            File.join(previous_lookup, '{*,.[a-z]*}')
-          end
-
-          def files(lookup)
-            Dir[lookup]
-          end
-        else
-          def file_level_lookup(previous_lookup)
-            File.join(previous_lookup, '*')
-          end
-
-          def files(lookup)
-            Dir.glob(lookup, File::FNM_DOTMATCH)
-          end
+      if RUBY_VERSION < '2.0'
+        def file_level_lookup(previous_lookup)
+          File.join(previous_lookup, '{*,.[a-z]*}')
         end
 
+        def files(lookup)
+          Dir[lookup]
+        end
+      else
+        def file_level_lookup(previous_lookup)
+          File.join(previous_lookup, '*')
+        end
+
+        def files(lookup)
+          Dir.glob(lookup, File::FNM_DOTMATCH)
+        end
+      end
     end
   end
 end

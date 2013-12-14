@@ -1,7 +1,7 @@
 require 'set'
 require 'thor/base'
 
-class Thor
+class Thor # rubocop:disable ClassLength
   class << self
     # Allows for custom "Command" package naming.
     #
@@ -9,7 +9,7 @@ class Thor
     # name<String>
     # options<Hash>
     #
-    def package_name(name, options={})
+    def package_name(name, options = {})
       @package_name = name.nil? || name == '' ? nil : name
     end
 
@@ -18,17 +18,17 @@ class Thor
     # ==== Parameters
     # meth<Symbol>:: name of the default command
     #
-    def default_command(meth=nil)
+    def default_command(meth = nil)
       @default_command = case meth
-      when :none
-        'help'
-      when nil
-        @default_command || from_superclass(:default_command, 'help')
-      else
-        meth.to_s
-      end
+                         when :none
+                           'help'
+                         when nil
+                           @default_command || from_superclass(:default_command, 'help')
+                         else
+                           meth.to_s
+                         end
     end
-    alias default_task default_command
+    alias_method :default_task, :default_command
 
     # Registers another Thor subclass as a command.
     #
@@ -37,7 +37,7 @@ class Thor
     # command<String>:: Subcommand name to use
     # usage<String>:: Short usage for the subcommand
     # description<String>:: Description for the subcommand
-    def register(klass, subcommand_name, usage, description, options={})
+    def register(klass, subcommand_name, usage, description, options = {})
       if klass <= Thor::Group
         desc usage, description, options
         define_method(subcommand_name) { |*args| invoke(klass, args) }
@@ -54,7 +54,7 @@ class Thor
     # description<String>
     # options<String>
     #
-    def desc(usage, description, options={})
+    def desc(usage, description, options = {})
       if options[:for]
         command = find_and_refresh_command(options[:for])
         command.usage = usage             if usage
@@ -69,7 +69,7 @@ class Thor
     # ==== Parameters
     # long description<String>
     #
-    def long_desc(long_description, options={})
+    def long_desc(long_description, options = {})
       if options[:for]
         command = find_and_refresh_command(options[:for])
         command.long_description = long_description if long_description
@@ -91,13 +91,13 @@ class Thor
     # ==== Parameters
     # Hash[String|Array => Symbol]:: Maps the string or the strings in the array to the given command.
     #
-    def map(mappings=nil)
+    def map(mappings = nil)
       @map ||= from_superclass(:map, {})
 
       if mappings
         mappings.each do |key, value|
           if key.respond_to?(:each)
-            key.each {|subkey| @map[subkey] = value}
+            key.each { |subkey| @map[subkey] = value }
           else
             @map[key] = value
           end
@@ -114,13 +114,13 @@ class Thor
     # is the type of the option. Can be :string, :array, :hash, :boolean, :numeric
     # or :required (string). If you give a value, the type of the value is used.
     #
-    def method_options(options=nil)
+    def method_options(options = nil)
       @method_options ||= {}
       build_options(options, @method_options) if options
       @method_options
     end
 
-    alias options method_options
+    alias_method :options, :method_options
 
     # Adds an option to the set of method options. If :for is given as option,
     # it allows you to change the options from a previous defined command.
@@ -148,16 +148,16 @@ class Thor
     # :banner   - String to show on usage notes.
     # :hide     - If you want to hide this option from the help.
     #
-    def method_option(name, options={})
+    def method_option(name, options = {})
       scope = if options[:for]
-        find_and_refresh_command(options[:for]).options
-      else
-        method_options
-      end
+                find_and_refresh_command(options[:for]).options
+              else
+                method_options
+              end
 
       build_option(name, options, scope)
     end
-    alias option method_option
+    alias_method :option, :method_option
 
     # Prints help information for the given command.
     #
@@ -170,18 +170,18 @@ class Thor
       command = all_commands[meth]
       handle_no_command_error(meth) unless command
 
-      shell.say "Usage:"
+      shell.say 'Usage:'
       shell.say "  #{banner(command)}"
       shell.say
       class_options_help(shell, nil => command.options.map { |_, o| o })
       if command.long_description
-        shell.say "Description:"
+        shell.say 'Description:'
         shell.print_wrapped(command.long_description, :indent => 2)
       else
         shell.say command.description
       end
     end
-    alias task_help command_help
+    alias_method :task_help, :command_help
 
     # Prints help information for this class.
     #
@@ -193,12 +193,12 @@ class Thor
       Thor::Util.thor_classes_in(self).each do |klass|
         list += klass.printable_commands(false)
       end
-      list.sort!{ |a,b| a[0] <=> b[0] }
+      list.sort! { |a, b| a[0] <=> b[0] }
 
       if @package_name
         shell.say "#{@package_name} commands:"
       else
-        shell.say "Commands:"
+        shell.say 'Commands:'
       end
 
       shell.print_table(list, :indent => 2, :truncate => true)
@@ -212,19 +212,19 @@ class Thor
         next if command.hidden?
         item = []
         item << banner(command, false, subcommand)
-        item << (command.description ? "# #{command.description.gsub(/\s+/m,' ')}" : "")
+        item << (command.description ? "# #{command.description.gsub(/\s+/m, ' ')}" : '')
         item
       end.compact
     end
-    alias printable_tasks printable_commands
+    alias_method :printable_tasks, :printable_commands
 
     def subcommands
       @subcommands ||= from_superclass(:subcommands, [])
     end
-    alias subtasks subcommands
+    alias_method :subtasks, :subcommands
 
     def subcommand(subcommand, subcommand_class)
-      self.subcommands << subcommand.to_s
+      subcommands << subcommand.to_s
       subcommand_class.subcommand_help subcommand
 
       define_method(subcommand) do |*args|
@@ -232,14 +232,14 @@ class Thor
         invoke subcommand_class, args, opts, :invoked_via_subcommand => true, :class_options => options
       end
     end
-    alias subtask subcommand
+    alias_method :subtask, :subcommand
 
     # Extend check unknown options to accept a hash of conditions.
     #
     # === Parameters
     # options<Hash>: A hash containing :only and/or :except keys
-    def check_unknown_options!(options={})
-      @check_unknown_options ||= Hash.new
+    def check_unknown_options!(options = {})
+      @check_unknown_options ||= {}
       options.each do |key, value|
         if value
           @check_unknown_options[key] = Array(value)
@@ -320,7 +320,7 @@ class Thor
   protected
 
     # The method responsible for dispatching given the args.
-    def dispatch(meth, given_args, given_opts, config) #:nodoc:
+    def dispatch(meth, given_args, given_opts, config) #:nodoc: # rubocop:disable MethodLength
       # There is an edge case when dispatching from a subcommand.
       # A problem occurs invoking the default command. This case occurs
       # when arguments are passed and a default command is defined, and
@@ -331,7 +331,7 @@ class Thor
       # the command normally. If the first item in given_args is not
       # a command then use the default command. The given_args will be
       # intact later since dup was used.
-      if config[:invoked_via_subcommand] && given_args.size >= 1 && default_command != "help" && given_args.first != default_command
+      if config[:invoked_via_subcommand] && given_args.size >= 1 && default_command != 'help' && given_args.first != default_command
         meth ||= retrieve_command_name(given_args.dup)
         command = all_commands[normalize_command_name(meth)]
         command ||= all_commands[normalize_command_name(default_command)]
@@ -382,16 +382,16 @@ class Thor
         commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
         @usage, @desc, @long_desc, @method_options, @hide = nil
         true
-      elsif self.all_commands[meth] || meth == "method_missing"
+      elsif all_commands[meth] || meth == 'method_missing'
         true
       else
         puts "[WARNING] Attempted to create command #{meth.inspect} without usage or description. " <<
-             "Call desc if you want this method to be available as command or declare it inside a " <<
+             'Call desc if you want this method to be available as command or declare it inside a ' <<
              "no_commands{} block. Invoked from #{caller[1].inspect}."
         false
       end
     end
-    alias create_task create_command
+    alias_method :create_task, :create_command
 
     def initialize_added #:nodoc:
       class_options.merge!(method_options)
@@ -407,7 +407,7 @@ class Thor
         nil
       end
     end
-    alias retrieve_task_name retrieve_command_name
+    alias_method :retrieve_task_name, :retrieve_command_name
 
     # receives a (possibly nil) command name and returns a name that is in
     # the commands hash. In addition to normalizing aliases, this logic
@@ -421,7 +421,7 @@ class Thor
 
       possibilities = find_command_possibilities(meth)
       if possibilities.size > 1
-        raise AmbiguousTaskError, "Ambiguous command #{meth} matches [#{possibilities.join(', ')}]"
+        fail AmbiguousTaskError, "Ambiguous command #{meth} matches [#{possibilities.join(', ')}]"
       elsif possibilities.size < 1
         meth = meth || default_command
       elsif map[meth]
@@ -430,9 +430,9 @@ class Thor
         meth = possibilities.first
       end
 
-      meth.to_s.gsub('-','_') # treat foo-bar as foo_bar
+      meth.to_s.gsub('-', '_') # treat foo-bar as foo_bar
     end
-    alias normalize_task_name normalize_command_name
+    alias_method :normalize_task_name, :normalize_command_name
 
     # this is the logic that takes the command name passed in by the user
     # and determines whether it is an unambiguous substrings of a command or
@@ -450,23 +450,22 @@ class Thor
         possibilities
       end
     end
-    alias find_task_possibilities find_command_possibilities
+    alias_method :find_task_possibilities, :find_command_possibilities
 
     def subcommand_help(cmd)
-      desc "help [COMMAND]", "Describe subcommands or one specific subcommand"
-      class_eval <<-RUBY
+      desc 'help [COMMAND]', 'Describe subcommands or one specific subcommand'
+      class_eval "
         def help(command = nil, subcommand = true); super; end
-      RUBY
+"
     end
-    alias subtask_help subcommand_help
-
+    alias_method :subtask_help, :subcommand_help
   end
 
   include Thor::Base
 
   map HELP_MAPPINGS => :help
 
-  desc "help [COMMAND]", "Describe available commands or one specific command"
+  desc 'help [COMMAND]', 'Describe available commands or one specific command'
   def help(command = nil, subcommand = false)
     command ? self.class.command_help(shell, command) : self.class.help(shell, subcommand)
   end

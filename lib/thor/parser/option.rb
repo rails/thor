@@ -4,7 +4,7 @@ class Thor
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
-    def initialize(name, options={})
+    def initialize(name, options = {})
       options[:required] = false unless options.key?(:required)
       super
       @lazy_default = options[:lazy_default]
@@ -40,7 +40,7 @@ class Thor
     #
     # By default all options are optional, unless :required is given.
     #
-    def self.parse(key, value)
+    def self.parse(key, value) # rubocop:disable MethodLength
       if key.is_a?(Array)
         name, *aliases = key
       else
@@ -51,21 +51,21 @@ class Thor
       default = value
 
       type = case value
-      when Symbol
-        default = nil
-        if VALID_TYPES.include?(value)
-          value
-        elsif required = (value == :required)
-          :string
-        end
-      when TrueClass, FalseClass
-        :boolean
-      when Numeric
-        :numeric
-      when Hash, Array, String
-        value.class.name.downcase.to_sym
-      end
-      self.new(name.to_s, :required => required, :type => type, :default => default, :aliases => aliases)
+             when Symbol
+               default = nil
+               if VALID_TYPES.include?(value)
+                 value
+               elsif required = (value == :required) # rubocop:disable AssignmentInCondition
+                 :string
+               end
+             when TrueClass, FalseClass
+               :boolean
+             when Numeric
+               :numeric
+             when Hash, Array, String
+               value.class.name.downcase.to_sym
+             end
+      new(name.to_s, :required => required, :type => type, :default => default, :aliases => aliases)
     end
 
     def switch_name
@@ -76,17 +76,17 @@ class Thor
       @human_name ||= dasherized? ? undasherize(name) : name
     end
 
-    def usage(padding=0)
+    def usage(padding = 0)
       sample = if banner && !banner.to_s.empty?
-        "#{switch_name}=#{banner}"
-      else
-        switch_name
-      end
+                 "#{switch_name}=#{banner}"
+               else
+                 switch_name
+               end
 
       sample = "[#{sample}]" unless required?
 
       if aliases.empty?
-        (" " * padding) << sample
+        (' ' * padding) << sample
       else
         "#{aliases.join(', ')}, #{sample}"
       end
@@ -103,7 +103,7 @@ class Thor
   protected
 
     def validate!
-      raise ArgumentError, "An option cannot be boolean and required." if boolean? && required?
+      fail ArgumentError, 'An option cannot be boolean and required.' if boolean? && required?
     end
 
     def dasherized?
@@ -115,7 +115,7 @@ class Thor
     end
 
     def dasherize(str)
-      (str.length > 1 ? "--" : "-") + str.gsub('_', '-')
+      (str.length > 1 ? '--' : '-') + str.gsub('_', '-')
     end
   end
 end

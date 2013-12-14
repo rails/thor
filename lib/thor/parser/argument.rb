@@ -1,17 +1,17 @@
 class Thor
   class Argument #:nodoc:
-    VALID_TYPES = [ :numeric, :hash, :array, :string ]
+    VALID_TYPES = [:numeric, :hash, :array, :string]
 
     attr_reader :name, :description, :enum, :required, :type, :default, :banner
-    alias :human_name :name
+    alias_method :human_name, :name
 
-    def initialize(name, options={})
-      class_name = self.class.name.split("::").last
+    def initialize(name, options = {})
+      class_name = self.class.name.split('::').last
 
       type = options[:type]
 
-      raise ArgumentError, "#{class_name} name can't be nil."                         if name.nil?
-      raise ArgumentError, "Type :#{type} is not valid for #{class_name.downcase}s."  if type && !valid_type?(type)
+      fail ArgumentError, "#{class_name} name can't be nil."                         if name.nil?
+      fail ArgumentError, "Type :#{type} is not valid for #{class_name.downcase}s."  if type && !valid_type?(type)
 
       @name        = name.to_s
       @description = options[:desc]
@@ -41,34 +41,33 @@ class Thor
       end
     end
 
-    protected
+  protected
 
-      def validate!
-        if required? && !default.nil?
-          raise ArgumentError, "An argument cannot be required and have default value."
-        elsif @enum && !@enum.is_a?(Array)
-          raise ArgumentError, "An argument cannot have an enum other than an array."
-        end
+    def validate!
+      if required? && !default.nil?
+        fail ArgumentError, 'An argument cannot be required and have default value.'
+      elsif @enum && !@enum.is_a?(Array)
+        fail ArgumentError, 'An argument cannot have an enum other than an array.'
       end
+    end
 
-      def valid_type?(type)
-        self.class::VALID_TYPES.include?(type.to_sym)
+    def valid_type?(type)
+      self.class::VALID_TYPES.include?(type.to_sym)
+    end
+
+    def default_banner
+      case type
+      when :boolean
+        nil
+      when :string, :default
+        human_name.upcase
+      when :numeric
+        'N'
+      when :hash
+        'key:value'
+      when :array
+        'one two three'
       end
-
-      def default_banner
-        case type
-        when :boolean
-          nil
-        when :string, :default
-          human_name.upcase
-        when :numeric
-          "N"
-        when :hash
-          "key:value"
-        when :array
-          "one two three"
-        end
-      end
-
+    end
   end
 end

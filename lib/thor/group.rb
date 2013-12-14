@@ -4,7 +4,7 @@ require 'thor/base'
 # is that it invokes all commands at once. It also include some methods that allows
 # invocations to be done at the class method, which are not available to Thor
 # commands.
-class Thor::Group
+class Thor::Group # rubocop:disable ClassLength
   class << self
     # The description for this Thor::Group. If none is provided, but a source root
     # exists, tries to find the USAGE one folder above it, otherwise searches
@@ -13,13 +13,13 @@ class Thor::Group
     # ==== Parameters
     # description<String>:: The description for this Thor::Group.
     #
-    def desc(description=nil)
+    def desc(description = nil)
       @desc = case description
-      when nil
-        @desc || from_superclass(:desc, nil)
-      else
-        description
-      end
+              when nil
+                @desc || from_superclass(:desc, nil)
+              else
+                description
+              end
     end
 
     # Prints help information.
@@ -28,11 +28,11 @@ class Thor::Group
     # short:: When true, shows only usage.
     #
     def help(shell)
-      shell.say "Usage:"
+      shell.say 'Usage:'
       shell.say "  #{banner}\n"
       shell.say
       class_options_help(shell)
-      shell.say self.desc if self.desc
+      shell.say desc if desc
     end
 
     # Stores invocations for this class merging with superclass values.
@@ -54,7 +54,7 @@ class Thor::Group
     # The namespace/class given will have its options showed on the help
     # usage. Check invoke_from_option for more information.
     #
-    def invoke(*names, &block)
+    def invoke(*names, &block) # rubocop:disable MethodLength
       options = names.last.is_a?(Hash) ? names.pop : {}
       verbose = options.fetch(:verbose, true)
 
@@ -108,14 +108,14 @@ class Thor::Group
     # invoked. The block receives two parameters, an instance of the current
     # class and the klass to be invoked.
     #
-    def invoke_from_option(*names, &block)
+    def invoke_from_option(*names, &block) # rubocop:disable MethodLength
       options = names.last.is_a?(Hash) ? names.pop : {}
       verbose = options.fetch(:verbose, :white)
 
       names.each do |name|
         unless class_options.key?(name)
-          raise ArgumentError, "You have to define the option #{name.inspect} " <<
-                               "before setting invoke_from_option."
+          fail ArgumentError, "You have to define the option #{name.inspect} " <<
+                               'before setting invoke_from_option.'
         end
 
         invocations[name] = true
@@ -159,7 +159,7 @@ class Thor::Group
     # Overwrite class options help to allow invoked generators options to be
     # shown recursively when invoking a generator.
     #
-    def class_options_help(shell, groups={}) #:nodoc:
+    def class_options_help(shell, groups = {}) #:nodoc:
       get_options_from_invocations(groups, class_options) do |klass|
         klass.send(:get_options_from_invocations, groups, class_options)
       end
@@ -170,14 +170,14 @@ class Thor::Group
     # options are added to group_options hash. Options that already exists
     # in base_options are not added twice.
     #
-    def get_options_from_invocations(group_options, base_options) #:nodoc:
+    def get_options_from_invocations(group_options, base_options) #:nodoc: # rubocop:disable MethodLength
       invocations.each do |name, from_option|
         value = if from_option
-          option = class_options[name]
-          option.type == :boolean ? name : option.default
-        else
-          name
-        end
+                  option = class_options[name]
+                  option.type == :boolean ? name : option.default
+                else
+                  name
+                end
         next unless value
 
         klass, _ = prepare_for_invocation(name, value)
@@ -200,70 +200,70 @@ class Thor::Group
     def printable_commands(*)
       item = []
       item << banner
-      item << (desc ? "# #{desc.gsub(/\s+/m,' ')}" : "")
+      item << (desc ? "# #{desc.gsub(/\s+/m, ' ')}" : '')
       [item]
     end
-    alias printable_tasks printable_commands
+    alias_method :printable_tasks, :printable_commands
 
     def handle_argument_error(command, error, args, arity) #:nodoc:
       msg = "#{basename} #{command.name} takes #{arity} argument"
-      msg << "s" if arity > 1
-      msg << ", but it should not."
-      raise error, msg
+      msg << 's' if arity > 1
+      msg << ', but it should not.'
+      fail error, msg
     end
 
-    protected
+  protected
 
-      # The method responsible for dispatching given the args.
-      def dispatch(command, given_args, given_opts, config) #:nodoc:
-        if Thor::HELP_MAPPINGS.include?(given_args.first)
-          help(config[:shell])
-          return
-        end
-
-        args, opts = Thor::Options.split(given_args)
-        opts = given_opts || opts
-
-        instance = new(args, opts, config)
-        yield instance if block_given?
-
-        if command
-          instance.invoke_command(all_commands[command])
-        else
-          instance.invoke_all
-        end
+    # The method responsible for dispatching given the args.
+    def dispatch(command, given_args, given_opts, config) #:nodoc:
+      if Thor::HELP_MAPPINGS.include?(given_args.first)
+        help(config[:shell])
+        return
       end
 
-      # The banner for this class. You can customize it if you are invoking the
-      # thor class by another ways which is not the Thor::Runner.
-      def banner
-        "#{basename} #{self_command.formatted_usage(self, false)}"
-      end
+      args, opts = Thor::Options.split(given_args)
+      opts = given_opts || opts
 
-      # Represents the whole class as a command.
-      def self_command #:nodoc:
-        Thor::DynamicCommand.new(self.namespace, class_options)
-      end
-      alias self_task self_command
+      instance = new(args, opts, config)
+      yield instance if block_given?
 
-      def baseclass #:nodoc:
-        Thor::Group
+      if command
+        instance.invoke_command(all_commands[command])
+      else
+        instance.invoke_all
       end
+    end
 
-      def create_command(meth) #:nodoc:
-        commands[meth.to_s] = Thor::Command.new(meth, nil, nil, nil, nil)
-        true
-      end
-      alias create_task create_command
+    # The banner for this class. You can customize it if you are invoking the
+    # thor class by another ways which is not the Thor::Runner.
+    def banner
+      "#{basename} #{self_command.formatted_usage(self, false)}"
+    end
+
+    # Represents the whole class as a command.
+    def self_command #:nodoc:
+      Thor::DynamicCommand.new(namespace, class_options)
+    end
+    alias_method :self_task, :self_command
+
+    def baseclass #:nodoc:
+      Thor::Group
+    end
+
+    def create_command(meth) #:nodoc:
+      commands[meth.to_s] = Thor::Command.new(meth, nil, nil, nil, nil)
+      true
+    end
+    alias_method :create_task, :create_command
   end
 
   include Thor::Base
 
-  protected
+protected
 
   # Shortcut to invoke with padding and block handling. Use internally by
   # invoke and invoke_from_option class methods.
-  def _invoke_for_class_method(klass, command=nil, *args, &block) #:nodoc:
+  def _invoke_for_class_method(klass, command = nil, *args, &block) #:nodoc:
     with_padding do
       if block
         case block.arity

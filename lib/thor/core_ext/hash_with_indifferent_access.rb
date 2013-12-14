@@ -1,6 +1,5 @@
 class Thor
   module CoreExt #:nodoc:
-
     # A hash with indifferent access and magic predicates.
     #
     #   hash = Thor::CoreExt::HashWithIndifferentAccess.new 'foo' => 'bar', 'baz' => 'bee', 'force' => true
@@ -10,8 +9,7 @@ class Thor
     #   hash.foo?   #=> true
     #
     class HashWithIndifferentAccess < ::Hash #:nodoc:
-
-      def initialize(hash={})
+      def initialize(hash = {})
         super()
         hash.each do |key, value|
           self[convert_key(key)] = value
@@ -31,7 +29,7 @@ class Thor
       end
 
       def values_at(*indices)
-        indices.collect { |key| self[convert_key(key)] }
+        indices.map { |key| self[convert_key(key)] }
       end
 
       def merge(other)
@@ -50,31 +48,30 @@ class Thor
         Hash.new(default).merge!(self)
       end
 
-      protected
+    protected
 
-        def convert_key(key)
-          key.is_a?(Symbol) ? key.to_s : key
-        end
+      def convert_key(key)
+        key.is_a?(Symbol) ? key.to_s : key
+      end
 
-        # Magic predicates. For instance:
-        #
-        #   options.force?                  # => !!options['force']
-        #   options.shebang                 # => "/usr/lib/local/ruby"
-        #   options.test_framework?(:rspec) # => options[:test_framework] == :rspec
-        #
-        def method_missing(method, *args, &block)
-          method = method.to_s
-          if method =~ /^(\w+)\?$/
-            if args.empty?
-              !!self[$1]
-            else
-              self[$1] == args.first
-            end
+      # Magic predicates. For instance:
+      #
+      #   options.force?                  # => !!options['force']
+      #   options.shebang                 # => "/usr/lib/local/ruby"
+      #   options.test_framework?(:rspec) # => options[:test_framework] == :rspec
+      #
+      def method_missing(method, *args, &block)
+        method = method.to_s
+        if method =~ /^(\w+)\?$/
+          if args.empty?
+            !!self[$1]
           else
-            self[method]
+            self[$1] == args.first
           end
+        else
+          self[method]
         end
-
+      end
     end
   end
 end

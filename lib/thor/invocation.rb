@@ -19,9 +19,9 @@ class Thor
     end
 
     # Make initializer aware of invocations and the initialization args.
-    def initialize(args=[], options={}, config={}, &block) #:nodoc:
-      @_invocations = config[:invocations] || Hash.new { |h,k| h[k] = [] }
-      @_initializer = [ args, options, config ]
+    def initialize(args = [], options = {}, config = {}, &block) #:nodoc:
+      @_invocations = config[:invocations] || Hash.new { |h, k| h[k] = [] }
+      @_initializer = [args, options, config]
       super
     end
 
@@ -40,11 +40,11 @@ class Thor
     #   class A < Thor
     #     def foo
     #       invoke :bar
-    #       invoke "b:hello", ["José"]
+    #       invoke "b:hello", ["Erik"]
     #     end
     #
     #     def bar
-    #       invoke "b:hello", ["José"]
+    #       invoke "b:hello", ["Erik"]
     #     end
     #   end
     #
@@ -93,17 +93,17 @@ class Thor
     #
     #   invoke Rspec::RR, [], :style => :foo
     #
-    def invoke(name=nil, *args)
+    def invoke(name = nil, *args)
       if name.nil?
         warn "[Thor] Calling invoke() without argument is deprecated. Please use invoke_all instead.\n#{caller.join("\n")}"
         return invoke_all
       end
 
-      args.unshift(nil) if Array === args.first || NilClass === args.first
+      args.unshift(nil) if args.first.is_a?(Array) || args.first.nil?
       command, args, opts, config = args
 
       klass, command = _retrieve_class_and_command(name, command)
-      raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
+      fail "Expected Thor class, got #{klass}" unless klass <= Thor::Base
 
       args, opts, config = _parse_initialization_options(args, opts, config)
       klass.send(:dispatch, command, args, opts, config) do |instance|
@@ -120,7 +120,7 @@ class Thor
         command.run(self, *args)
       end
     end
-    alias invoke_task invoke_command
+    alias_method :invoke_task, :invoke_command
 
     # Invoke all commands for the current instance.
     def invoke_all #:nodoc:
@@ -132,41 +132,41 @@ class Thor
       with_padding { invoke(*args) }
     end
 
-    protected
+  protected
 
-      # Configuration values that are shared between invocations.
-      def _shared_configuration #:nodoc:
-        { :invocations => @_invocations }
+    # Configuration values that are shared between invocations.
+    def _shared_configuration #:nodoc:
+      {:invocations => @_invocations}
+    end
+
+    # This method simply retrieves the class and command to be invoked.
+    # If the name is nil or the given name is a command in the current class,
+    # use the given name and return self as class. Otherwise, call
+    # prepare_for_invocation in the current class.
+    def _retrieve_class_and_command(name, sent_command = nil) #:nodoc:
+      case
+      when name.nil?
+        [self.class, nil]
+      when self.class.all_commands[name.to_s]
+        [self.class, name.to_s]
+      else
+        klass, command = self.class.prepare_for_invocation(nil, name)
+        [klass, command || sent_command]
       end
+    end
+    alias_method :_retrieve_class_and_task, :_retrieve_class_and_command
 
-      # This method simply retrieves the class and command to be invoked.
-      # If the name is nil or the given name is a command in the current class,
-      # use the given name and return self as class. Otherwise, call
-      # prepare_for_invocation in the current class.
-      def _retrieve_class_and_command(name, sent_command=nil) #:nodoc:
-        case
-        when name.nil?
-          [self.class, nil]
-        when self.class.all_commands[name.to_s]
-          [self.class, name.to_s]
-        else
-          klass, command = self.class.prepare_for_invocation(nil, name)
-          [klass, command || sent_command]
-        end
-      end
-      alias _retrieve_class_and_task _retrieve_class_and_command
+    # Initialize klass using values stored in the @_initializer.
+    def _parse_initialization_options(args, opts, config) #:nodoc:
+      stored_args, stored_opts, stored_config = @_initializer
 
-      # Initialize klass using values stored in the @_initializer.
-      def _parse_initialization_options(args, opts, config) #:nodoc:
-        stored_args, stored_opts, stored_config = @_initializer
+      args ||= stored_args.dup
+      opts ||= stored_opts.dup
 
-        args ||= stored_args.dup
-        opts ||= stored_opts.dup
+      config ||= {}
+      config = stored_config.merge(_shared_configuration).merge!(config)
 
-        config ||= {}
-        config = stored_config.merge(_shared_configuration).merge!(config)
-
-        [ args, opts, config ]
-      end
+      [args, opts, config]
+    end
   end
 end

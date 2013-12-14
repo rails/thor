@@ -1,6 +1,5 @@
 class Thor
   module CoreExt #:nodoc:
-
     if RUBY_VERSION >= '1.9'
       class OrderedHash < ::Hash
       end
@@ -24,7 +23,7 @@ class Thor
         end
 
         def []=(key, value)
-          if node = @hash[key]
+          if node = @hash[key] # rubocop:disable AssignmentInCondition
             node.value = value
           else
             node = Node.new(key, value)
@@ -43,7 +42,7 @@ class Thor
         end
 
         def delete(key)
-          if node = @hash[key]
+          if node = @hash[key] # rubocop:disable AssignmentInCondition
             prev_node = node.prev
             next_node = node.next
 
@@ -61,25 +60,25 @@ class Thor
         end
 
         def keys
-          self.map { |k, v| k }
+          map { |k, v| k }
         end
 
         def values
-          self.map { |k, v| v }
+          map { |k, v| v }
         end
 
         def each
           return unless @first
           yield [@first.key, @first.value]
           node = @first
-          yield [node.key, node.value] while node = node.next
+          yield [node.key, node.value] while node = node.next # rubocop:disable AssignmentInCondition
           self
         end
 
         def merge(other)
           hash = self.class.new
 
-          self.each do |key, value|
+          each do |key, value|
             hash[key] = value
           end
 
@@ -95,6 +94,5 @@ class Thor
         end
       end
     end
-
   end
 end

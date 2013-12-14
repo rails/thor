@@ -1,6 +1,5 @@
 class Thor
   module Actions
-
     # Creates an empty directory.
     #
     # ==== Parameters
@@ -11,7 +10,7 @@ class Thor
     #
     #   empty_directory "doc"
     #
-    def empty_directory(destination, config={})
+    def empty_directory(destination, config = {})
       action EmptyDirectory.new(self, destination, config)
     end
 
@@ -32,8 +31,8 @@ class Thor
       # destination<String>:: Relative path to the destination of this file
       # config<Hash>:: give :verbose => false to not log the status.
       #
-      def initialize(base, destination, config={})
-        @base, @config   = base, { :verbose => true }.merge(config)
+      def initialize(base, destination, config = {})
+        @base, @config   = base, {:verbose => true}.merge(config)
         self.destination = destination
       end
 
@@ -58,80 +57,79 @@ class Thor
         given_destination
       end
 
-      protected
+    protected
 
-        # Shortcut for pretend.
-        #
-        def pretend?
-          base.options[:pretend]
+      # Shortcut for pretend.
+      #
+      def pretend?
+        base.options[:pretend]
+      end
+
+      # Sets the absolute destination value from a relative destination value.
+      # It also stores the given and relative destination. Let's suppose our
+      # script is being executed on "dest", it sets the destination root to
+      # "dest". The destination, given_destination and relative_destination
+      # are related in the following way:
+      #
+      #   inside "bar" do
+      #     empty_directory "baz"
+      #   end
+      #
+      #   destination          #=> dest/bar/baz
+      #   relative_destination #=> bar/baz
+      #   given_destination    #=> baz
+      #
+      def destination=(destination)
+        if destination
+          @given_destination = convert_encoded_instructions(destination.to_s)
+          @destination = ::File.expand_path(@given_destination, base.destination_root)
+          @relative_destination = base.relative_to_original_destination_root(@destination)
+        end
+      end
+
+      # Filenames in the encoded form are converted. If you have a file:
+      #
+      #   %file_name%.rb
+      #
+      # It calls #file_name from the base and replaces %-string with the
+      # return value (should be String) of #file_name:
+      #
+      #   user.rb
+      #
+      # The method referenced can be either public or private.
+      #
+      def convert_encoded_instructions(filename)
+        filename.gsub(/%(.*?)%/) do |initial_string|
+          method = $1.strip
+          base.respond_to?(method, true) ? base.send(method) : initial_string
+        end
+      end
+
+      # Receives a hash of options and just execute the block if some
+      # conditions are met.
+      #
+      def invoke_with_conflict_check(&block)
+        if exists?
+          on_conflict_behavior(&block)
+        else
+          say_status :create, :green
+          block.call unless pretend?
         end
 
-        # Sets the absolute destination value from a relative destination value.
-        # It also stores the given and relative destination. Let's suppose our
-        # script is being executed on "dest", it sets the destination root to
-        # "dest". The destination, given_destination and relative_destination
-        # are related in the following way:
-        #
-        #   inside "bar" do
-        #     empty_directory "baz"
-        #   end
-        #
-        #   destination          #=> dest/bar/baz
-        #   relative_destination #=> bar/baz
-        #   given_destination    #=> baz
-        #
-        def destination=(destination)
-          if destination
-            @given_destination = convert_encoded_instructions(destination.to_s)
-            @destination = ::File.expand_path(@given_destination, base.destination_root)
-            @relative_destination = base.relative_to_original_destination_root(@destination)
-          end
-        end
+        destination
+      end
 
-        # Filenames in the encoded form are converted. If you have a file:
-        #
-        #   %file_name%.rb
-        #
-        # It calls #file_name from the base and replaces %-string with the
-        # return value (should be String) of #file_name:
-        #
-        #   user.rb
-        #
-        # The method referenced can be either public or private.
-        #
-        def convert_encoded_instructions(filename)
-          filename.gsub(/%(.*?)%/) do |initial_string|
-            method = $1.strip
-            base.respond_to?(method, true) ? base.send(method) : initial_string
-          end
-        end
+      # What to do when the destination file already exists.
+      #
+      def on_conflict_behavior(&block)
+        say_status :exist, :blue
+      end
 
-        # Receives a hash of options and just execute the block if some
-        # conditions are met.
-        #
-        def invoke_with_conflict_check(&block)
-          if exists?
-            on_conflict_behavior(&block)
-          else
-            say_status :create, :green
-            block.call unless pretend?
-          end
-
-          destination
-        end
-
-        # What to do when the destination file already exists.
-        #
-        def on_conflict_behavior(&block)
-          say_status :exist, :blue
-        end
-
-        # Shortcut to say_status shell method.
-        #
-        def say_status(status, color)
-          base.shell.say_status status, relative_destination, color if config[:verbose]
-        end
-
+      # Shortcut to say_status shell method.
+      #
+      def say_status(status, color)
+        base.shell.say_status status, relative_destination, color if config[:verbose]
+      end
     end
   end
 end

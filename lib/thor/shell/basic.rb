@@ -2,7 +2,7 @@ require 'tempfile'
 
 class Thor
   module Shell
-    class Basic
+    class Basic # rubocop:disable ClassLength
       attr_accessor :base
       attr_reader   :padding
 
@@ -23,7 +23,7 @@ class Thor
 
       # Check if base is muted
       #
-      def mute?
+      def mute? # rubocop:disable TrivialAccessors
         @mute
       end
 
@@ -68,11 +68,11 @@ class Thor
       # ==== Example
       # say("I know you knew that.")
       #
-      def say(message="", color=nil, force_new_line=(message.to_s !~ /( |\t)\Z/))
+      def say(message = '', color = nil, force_new_line = (message.to_s !~ /( |\t)\Z/))
         message = message.to_s
         message = set_color(message, *color) if color && can_display_colors?
 
-        buffer = "  " * padding
+        buffer = '  ' * padding
         buffer << message
         buffer << "\n" if force_new_line && !message.end_with?("\n")
 
@@ -85,9 +85,9 @@ class Thor
       # in log_status, avoiding the message from being shown. If a Symbol is
       # given in log_status, it's used as the color.
       #
-      def say_status(status, message, log_status=true)
+      def say_status(status, message, log_status = true)
         return if quiet? || log_status == false
-        spaces = "  " * (padding + 1)
+        spaces = '  ' * (padding + 1)
         color  = log_status.is_a?(Symbol) ? log_status : :green
 
         status = status.to_s.rjust(12)
@@ -103,14 +103,14 @@ class Thor
       # Make a question the to user and returns true if the user replies "y" or
       # "yes".
       #
-      def yes?(statement, color=nil)
+      def yes?(statement, color = nil)
         !!(ask(statement, color) =~ is?(:yes))
       end
 
       # Make a question the to user and returns true if the user replies "n" or
       # "no".
       #
-      def no?(statement, color=nil)
+      def no?(statement, color = nil)
         !!(ask(statement, color) =~ is?(:no))
       end
 
@@ -121,7 +121,7 @@ class Thor
       #
       def print_in_columns(array)
         return if array.empty?
-        colwidth = (array.map{|el| el.to_s.size}.max || 0) + 2
+        colwidth = (array.map { |el| el.to_s.size }.max || 0) + 2
         array.each_with_index do |value, index|
           # Don't output trailing spaces when printing the last column
           if ((((index + 1) % (terminal_width / colwidth))).zero? && !index.zero?) || index + 1 == array.length
@@ -141,7 +141,7 @@ class Thor
       # indent<Integer>:: Indent the first column by indent value.
       # colwidth<Integer>:: Force the first column to colwidth spaces wide.
       #
-      def print_table(array, options={})
+      def print_table(array, options = {}) # rubocop:disable MethodLength
         return if array.empty?
 
         formats, indent, colwidth = [], options[:indent].to_i, options[:colwidth]
@@ -150,26 +150,26 @@ class Thor
         formats << "%-#{colwidth + 2}s" if colwidth
         start = colwidth ? 1 : 0
 
-        colcount = array.max{|a,b| a.size <=> b.size }.size
+        colcount = array.max { |a, b| a.size <=> b.size }.size
 
         maximas = []
 
         start.upto(colcount - 1) do |index|
-          maxima = array.map {|row| row[index] ? row[index].to_s.size : 0 }.max
+          maxima = array.map { |row| row[index] ? row[index].to_s.size : 0 }.max
           maximas << maxima
           if index == colcount - 1
             # Don't output 2 trailing spaces when printing the last column
-            formats << "%-s"
+            formats << '%-s'
           else
             formats << "%-#{maxima + 2}s"
           end
         end
 
-        formats[0] = formats[0].insert(0, " " * indent)
-        formats << "%s"
+        formats[0] = formats[0].insert(0, ' ' * indent)
+        formats << '%s'
 
         array.each do |row|
-          sentence = ""
+          sentence = ''
 
           row.each_with_index do |column, index|
             maxima = maximas[index]
@@ -201,20 +201,18 @@ class Thor
       # ==== Options
       # indent<Integer>:: Indent each line of the printed paragraph by indent value.
       #
-      def print_wrapped(message, options={})
+      def print_wrapped(message, options = {})
         indent = options[:indent] || 0
         width = terminal_width - indent
         paras = message.split("\n\n")
 
         paras.map! do |unwrapped|
-          unwrapped.strip.gsub(/\n/, " ").squeeze(" ").
-          gsub(/.{1,#{width}}(?:\s|\Z)/){($& + 5.chr).
-          gsub(/\n\005/,"\n").gsub(/\005/,"\n")}
+          unwrapped.strip.gsub(/\n/, ' ').squeeze(' ').gsub(/.{1,#{width}}(?:\s|\Z)/) { ($& + 5.chr).gsub(/\n\005/, "\n").gsub(/\005/, "\n") }
         end
 
         paras.each do |para|
           para.split("\n").each do |line|
-            stdout.puts line.insert(0, " " * indent)
+            stdout.puts line.insert(0, ' ' * indent)
           end
           stdout.puts unless para == paras.last
         end
@@ -228,15 +226,15 @@ class Thor
       # destination<String>:: the destination file to solve conflicts
       # block<Proc>:: an optional block that returns the value to be used in diff
       #
-      def file_collision(destination)
+      def file_collision(destination) # rubocop:disable MethodLength
         return true if @always_force
-        options = block_given? ? "[Ynaqdh]" : "[Ynaqh]"
+        options = block_given? ? '[Ynaqdh]' : '[Ynaqh]'
 
         loop do
           answer = ask %[Overwrite #{destination}? (enter "h" for help) #{options}]
 
           case answer
-          when is?(:yes), is?(:force), ""
+          when is?(:yes), is?(:force), ''
             return true
           when is?(:no), is?(:skip)
             return false
@@ -244,7 +242,7 @@ class Thor
             return @always_force = true
           when is?(:quit)
             say 'Aborting...'
-            raise SystemExit
+            fail SystemExit
           when is?(:diff)
             show_diff(destination, yield) if block_given?
             say 'Retrying...'
@@ -262,7 +260,7 @@ class Thor
         else
           result = unix? ? dynamic_width : 80
         end
-        (result < 10) ? 80 : result
+        result < 10 ? 80 : result
       rescue
         80
       end
@@ -312,19 +310,19 @@ class Thor
         if value.size == 1
           /\A#{value}\z/i
         else
-          /\A(#{value}|#{value[0,1]})\z/i
+          /\A(#{value}|#{value[0, 1]})\z/i
         end
       end
 
       def file_collision_help #:nodoc:
-<<HELP
-Y - yes, overwrite
-n - no, do not overwrite
-a - all, overwrite this and all others
-q - quit, abort
-d - diff, show the differences between the old and the new
-h - help, show this help
-HELP
+        <<-HELP
+        Y - yes, overwrite
+        n - no, do not overwrite
+        a - all, overwrite this and all others
+        q - quit, abort
+        d - diff, show the differences between the old and the new
+        h - help, show this help
+        HELP
       end
 
       def show_diff(destination, content) #:nodoc:
@@ -364,18 +362,18 @@ HELP
           if chars.length <= width
             chars.join
           else
-            ( chars[0, width-3].join ) + "..."
+            ( chars[0, width - 3].join) + '...'
           end
         end
       end
 
-      if "".respond_to?(:encode)
+      if ''.respond_to?(:encode)
         def as_unicode
           yield
         end
       else
         def as_unicode
-          old, $KCODE = $KCODE, "U"
+          old, $KCODE = $KCODE, 'U'
           yield
         ensure
           $KCODE = old
@@ -384,20 +382,20 @@ HELP
 
       def ask_simply(statement, color, options)
         default = options[:default]
-        message = [statement, ("(#{default})" if default), nil].uniq.join(" ")
+        message = [statement, ("(#{default})" if default), nil].uniq.join(' ')
         say(message, color)
 
         result = if options[:echo] == false
-          stdin.noecho(&:gets)
-        else
-          stdin.gets
-        end
+                   stdin.noecho(&:gets)
+                 else
+                   stdin.gets
+                 end
 
         return unless result
 
         result.strip!
 
-        if default && result == ""
+        if default && result == ''
           default
         else
           result
@@ -408,14 +406,13 @@ HELP
         answer_set = options[:limited_to]
         correct_answer = nil
         until correct_answer
-          answers = answer_set.join(", ")
+          answers = answer_set.join(', ')
           answer = ask_simply("#{statement} [#{answers}]", color, options)
           correct_answer = answer_set.include?(answer) ? answer : nil
           say("Your response must be one of: [#{answers}]. Please try again.") unless correct_answer
         end
         correct_answer
       end
-
     end
   end
 end

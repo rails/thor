@@ -1,4 +1,4 @@
-$TESTING=true
+$TESTING = true
 
 require 'simplecov'
 require 'coveralls'
@@ -13,7 +13,7 @@ SimpleCov.start do
   minimum_coverage(92.21)
 end
 
-$:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'thor'
 require 'thor/group'
 require 'stringio'
@@ -24,18 +24,18 @@ require 'diff/lcs' # You need diff/lcs installed to run specs (but not to run Th
 require 'fakeweb'  # You need fakeweb installed to run specs (but not to run Thor).
 
 # Set shell to basic
-$0 = "thor"
+$0 = 'thor'
 $thor_runner = true
 ARGV.clear
 Thor::Base.shell = Thor::Shell::Basic
 
 # Load fixtures
-load File.join(File.dirname(__FILE__), "fixtures", "enum.thor")
-load File.join(File.dirname(__FILE__), "fixtures", "group.thor")
-load File.join(File.dirname(__FILE__), "fixtures", "invoke.thor")
-load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
-load File.join(File.dirname(__FILE__), "fixtures", "subcommand.thor")
-load File.join(File.dirname(__FILE__), "fixtures", "command.thor")
+load File.join(File.dirname(__FILE__), 'fixtures', 'enum.thor')
+load File.join(File.dirname(__FILE__), 'fixtures', 'group.thor')
+load File.join(File.dirname(__FILE__), 'fixtures', 'invoke.thor')
+load File.join(File.dirname(__FILE__), 'fixtures', 'script.thor')
+load File.join(File.dirname(__FILE__), 'fixtures', 'subcommand.thor')
+load File.join(File.dirname(__FILE__), 'fixtures', 'command.thor')
 
 RSpec.configure do |config|
   config.before do
@@ -67,5 +67,5 @@ RSpec.configure do |config|
     File.join(File.dirname(__FILE__), 'sandbox')
   end
 
-  alias :silence :capture
+  alias silence capture
 end

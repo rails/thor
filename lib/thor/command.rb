@@ -2,7 +2,7 @@ class Thor
   class Command < Struct.new(:name, :description, :long_description, :usage, :options)
     FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
 
-    def initialize(name, description, long_description, usage, options=nil)
+    def initialize(name, description, long_description, usage, options = nil)
       super(name.to_s, description, long_description, usage, options || {})
     end
 
@@ -17,7 +17,7 @@ class Thor
 
     # By default, a command invokes a method in the thor class. You can change this
     # implementation to create custom commands.
-    def run(instance, args=[])
+    def run(instance, args = [])
       arity = nil
 
       if private_method?(instance)
@@ -31,11 +31,9 @@ class Thor
         instance.class.handle_no_command_error(name)
       end
     rescue ArgumentError => e
-      handle_argument_error?(instance, e, caller) ?
-        instance.class.handle_argument_error(self, e, args, arity) : (raise e)
+      handle_argument_error?(instance, e, caller) ? instance.class.handle_argument_error(self, e, args, arity) : (raise e)
     rescue NoMethodError => e
-      handle_no_method_error?(instance, e, caller) ?
-        instance.class.handle_no_command_error(name) : (raise e)
+      handle_no_method_error?(instance, e, caller) ? instance.class.handle_no_command_error(name) : (fail e)
     end
 
     # Returns the formatted usage by injecting given required arguments
@@ -43,20 +41,20 @@ class Thor
     def formatted_usage(klass, namespace = true, subcommand = false)
       if namespace
         namespace = klass.namespace
-        formatted = "#{namespace.gsub(/^(default)/,'')}:"
+        formatted = "#{namespace.gsub(/^(default)/, '')}:"
       end
       formatted = "#{klass.namespace.split(':').last} " if subcommand
 
-      formatted ||= ""
+      formatted ||= ''
 
       # Add usage with required arguments
       formatted << if klass && !klass.arguments.empty?
-        usage.to_s.gsub(/^#{name}/) do |match|
-          match << " " << klass.arguments.map{ |a| a.usage }.compact.join(' ')
-        end
-      else
-        usage.to_s
-      end
+                     usage.to_s.gsub(/^#{name}/) do |match|
+                       match << ' ' << klass.arguments.map { |a| a.usage }.compact.join(' ')
+                     end
+                   else
+                     usage.to_s
+                   end
 
       # Add required options
       formatted << " #{required_options}"
@@ -72,7 +70,7 @@ class Thor
     end
 
     def required_options
-      @required_options ||= options.map{ |_, o| o.usage if o.required? }.compact.sort.join(" ")
+      @required_options ||= options.map { |_, o| o.usage if o.required? }.compact.sort.join(' ')
     end
 
     # Given a target, checks if this class name is a public method.
@@ -90,15 +88,15 @@ class Thor
     end
 
     def sans_backtrace(backtrace, caller) #:nodoc:
-      saned  = backtrace.reject { |frame| frame =~ FILE_REGEXP || (frame =~ /\.java:/ && RUBY_PLATFORM =~ /java/) }
-      saned -= caller
+      saned = backtrace.reject { |frame| frame =~ FILE_REGEXP || (frame =~ /\.java:/ && RUBY_PLATFORM =~ /java/) }
+      saned - caller
     end
 
     def handle_argument_error?(instance, error, caller)
       not_debugging?(instance) && error.message =~ /wrong number of arguments/ && begin
         saned = sans_backtrace(error.backtrace, caller)
         # Ruby 1.9 always include the called method in the backtrace
-        saned.empty? || (saned.size == 1 && RUBY_VERSION >= "1.9")
+        saned.empty? || (saned.size == 1 && RUBY_VERSION >= '1.9')
       end
     end
 
@@ -107,7 +105,7 @@ class Thor
         error.message =~ /^undefined method `#{name}' for #{Regexp.escape(instance.to_s)}$/
     end
   end
-  Task = Command
+  Task = Command # rubocop:disable ConstantName
 
   # A command that is hidden in help messages but still invocable.
   class HiddenCommand < Command
@@ -115,15 +113,15 @@ class Thor
       true
     end
   end
-  HiddenTask = HiddenCommand
+  HiddenTask = HiddenCommand # rubocop:disable ConstantName
 
   # A dynamic command that handles method missing scenarios.
   class DynamicCommand < Command
-    def initialize(name, options=nil)
-      super(name.to_s, "A dynamically-generated command", name.to_s, name.to_s, options)
+    def initialize(name, options = nil)
+      super(name.to_s, 'A dynamically-generated command', name.to_s, name.to_s, options)
     end
 
-    def run(instance, args=[])
+    def run(instance, args = [])
       if (instance.methods & [name.to_s, name.to_sym]).empty?
         super
       else
@@ -131,6 +129,5 @@ class Thor
       end
     end
   end
-  DynamicTask = DynamicCommand
-
+  DynamicTask = DynamicCommand # rubocop:disable ConstantName
 end

@@ -13,12 +13,12 @@ class RakeTask < Rake::TaskLib
     $main.instance_eval do
       desc "Say it's cool"
       task :cool do
-        puts "COOL"
+        puts 'COOL'
       end
 
       namespace :hiper_mega do
         task :super do
-          puts "HIPER MEGA SUPER"
+          puts 'HIPER MEGA SUPER'
         end
       end
     end
@@ -31,42 +31,42 @@ class ThorTask < Thor
 end
 
 describe Thor::RakeCompat do
-  it "sets the rakefile application" do
-    expect(["rake_compat_spec.rb", "Thorfile"]).to include(Rake.application.rakefile)
+  it 'sets the rakefile application' do
+    expect(%w[rake_compat_spec.rb Thorfile]).to include(Rake.application.rakefile)
   end
 
-  it "adds rake tasks to thor classes too" do
-    task = ThorTask.tasks["cool"]
+  it 'adds rake tasks to thor classes too' do
+    task = ThorTask.tasks['cool']
     expect(task).to be
   end
 
-  it "uses rake tasks descriptions on thor" do
-    expect(ThorTask.tasks["cool"].description).to eq("Say it's cool")
+  it 'uses rake tasks descriptions on thor' do
+    expect(ThorTask.tasks['cool'].description).to eq("Say it's cool")
   end
 
-  it "gets usage from rake tasks name" do
-    expect(ThorTask.tasks["cool"].usage).to eq("cool")
+  it 'gets usage from rake tasks name' do
+    expect(ThorTask.tasks['cool'].usage).to eq('cool')
   end
 
-  it "uses non namespaced name as description if non is available" do
-    expect(ThorTask::HiperMega.tasks["super"].description).to eq("super")
+  it 'uses non namespaced name as description if non is available' do
+    expect(ThorTask::HiperMega.tasks['super'].description).to eq('super')
   end
 
-  it "converts namespaces to classes" do
+  it 'converts namespaces to classes' do
     expect(ThorTask.const_get(:HiperMega)).to eq(ThorTask::HiperMega)
   end
 
-  it "does not add tasks from higher namespaces in lowers namespaces" do
-    expect(ThorTask.tasks["super"]).not_to be
+  it 'does not add tasks from higher namespaces in lowers namespaces' do
+    expect(ThorTask.tasks['super']).not_to be
   end
 
-  it "invoking the thor task invokes the rake task" do
-    expect(capture(:stdout) {
-      ThorTask.start ["cool"]
-    }).to eq("COOL\n")
+  it 'invoking the thor task invokes the rake task' do
+    expect(capture(:stdout) do
+      ThorTask.start %w[cool]
+    end).to eq("COOL\n")
 
-    expect(capture(:stdout) {
-      ThorTask::HiperMega.start ["super"]
-    }).to eq("HIPER MEGA SUPER\n")
+    expect(capture(:stdout) do
+      ThorTask::HiperMega.start %w[super]
+    end).to eq("HIPER MEGA SUPER\n")
   end
 end
