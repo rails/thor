@@ -354,7 +354,6 @@ class Thor
         command = Thor::DynamicCommand.new(meth)
       end
 
-
       opts = given_opts || opts || []
       config.merge!(:current_command => command, :command_options => command.options)
 
