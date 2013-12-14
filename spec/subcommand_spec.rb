@@ -25,6 +25,19 @@ describe Thor do
       output = capture(:stdout) { TestSubcommands::Parent.start(%w[sub print_opt --opt output]) }
       expect(output).to eq('output')
     end
+
+    it "accepts the help switch and calls the help command on the subcommand" do
+      output = capture(:stdout) { TestSubcommands::Parent.start(%w[sub print_opt --help])}
+      sub_help = capture(:stdout) { TestSubcommands::Parent.start(%w[sub help print_opt])}
+      expect(output).to eq(sub_help)
+    end
+
+    it "accepts the help short switch and calls the help command on the subcommand" do
+      output = capture(:stdout) { TestSubcommands::Parent.start(%w[sub print_opt -h])}
+      sub_help = capture(:stdout) { TestSubcommands::Parent.start(%w[sub help print_opt])}
+      expect(output).to eq(sub_help)
+    end
+
   end
 
 end
