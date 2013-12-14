@@ -229,7 +229,7 @@ class Thor
 
       define_method(subcommand) do |*args|
         args, opts = Thor::Arguments.split(args)
-        args.unshift("help") if opts.include? "--help"
+        args.unshift("help") if opts.include? "--help" or opts.include? "-h"
         invoke subcommand_class, args, opts, :invoked_via_subcommand => true, :class_options => options
       end
     end
