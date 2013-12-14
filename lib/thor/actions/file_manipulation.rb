@@ -79,7 +79,7 @@ class Thor
       config = args.last.is_a?(Hash) ? args.pop : {}
       destination = args.first
 
-      source = File.expand_path(find_in_source_paths(source.to_s)) unless source =~ /^https?\:\/\//
+      source = File.expand_path(find_in_source_paths(source.to_s)) unless source =~ %r{^https?\://}
       render = open(source) {|input| input.binmode.read }
 
       destination ||= if block_given?

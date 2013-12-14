@@ -209,7 +209,7 @@ class Thor
     #
     def apply(path, config={})
       verbose = config.fetch(:verbose, true)
-      is_uri  = path =~ /^https?\:\/\//
+      is_uri  = path =~ %r{^https?\://}
       path    = find_in_source_paths(path) unless is_uri
 
       say_status :apply, path, verbose

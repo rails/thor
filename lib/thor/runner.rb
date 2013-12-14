@@ -75,7 +75,7 @@ class Thor::Runner < Thor #:nodoc:
       as = basename if as.empty?
     end
 
-    location = if options[:relative] || name =~ /^https?:\/\//
+    location = if options[:relative] || name =~ %r{^https?://}
       name
     else
       File.expand_path(name)
