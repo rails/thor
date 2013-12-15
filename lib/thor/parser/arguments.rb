@@ -121,6 +121,7 @@ class Thor
     end
 
     # Check if the peek is numeric format and return a Float or Integer.
+    # Check if the peek is included in enum if enum is provided.
     # Otherwise raises an error.
     #
     def parse_numeric(name)
@@ -130,12 +131,19 @@ class Thor
         fail MalformattedArgumentError, "Expected numeric value for '#{name}'; got #{peek.inspect}"
       end
 
-      $&.index('.') ? shift.to_f : shift.to_i
+      value = $&.index('.') ? shift.to_f : shift.to_i
+        if @switches.is_a?(Hash) && switch = @switches[name]
+          if switch.enum && !switch.enum.include?(value)
+            raise MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
+          end
+        end
+      value
     end
 
     # Parse string:
     # for --string-arg, just return the current value in the pile
     # for --no-string-arg, nil
+    # Check if the peek is included in enum if enum is provided. Otherwise raises an error.
     #
     def parse_string(name)
       if no_or_skip?(name)
