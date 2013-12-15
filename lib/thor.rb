@@ -223,9 +223,14 @@ class Thor # rubocop:disable ClassLength
     end
     alias_method :subtasks, :subcommands
 
+    def subcommand_classes
+      @subcommand_classes ||= {}
+    end
+
     def subcommand(subcommand, subcommand_class)
       subcommands << subcommand.to_s
       subcommand_class.subcommand_help subcommand
+      subcommand_classes[subcommand.to_s] = subcommand_class
 
       define_method(subcommand) do |*args|
         args, opts = Thor::Arguments.split(args)
@@ -472,6 +477,14 @@ class Thor # rubocop:disable ClassLength
 
   desc 'help [COMMAND]', 'Describe available commands or one specific command'
   def help(command = nil, subcommand = false)
-    command ? self.class.command_help(shell, command) : self.class.help(shell, subcommand)
+    if command
+      if self.class.subcommands.include? command
+        self.class.subcommand_classes[command].help(shell, true)
+      else
+        self.class.command_help(shell, command)
+      end
+    else
+      self.class.help(shell, subcommand)
+    end
   end
 end

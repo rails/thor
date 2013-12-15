@@ -38,6 +38,11 @@ describe Thor do
       expect(output).to eq(sub_help)
     end
 
+    it "the help command on the subcommand and after it should result in the same output" do
+      output = capture(:stdout) { TestSubcommands::Parent.start(%w[sub help])}
+      sub_help = capture(:stdout) { TestSubcommands::Parent.start(%w[help sub])}
+      expect(output).to eq(sub_help)
+    end
   end
 
 end
