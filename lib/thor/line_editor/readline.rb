@@ -1,4 +1,7 @@
-require 'readline' rescue nil
+begin
+  require 'readline'
+rescue LoadError
+end
 
 class Thor
   module LineEditor
