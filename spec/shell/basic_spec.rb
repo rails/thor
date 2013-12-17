@@ -18,15 +18,18 @@ describe Thor::Shell::Basic do
 
   describe '#ask' do
     it 'prints a message to the user and gets the response' do
-      expect($stdout).to receive(:print).with('Should I overwrite it? ')
-      expect($stdin).to receive(:gets).and_return('Sure')
-      expect($stdin).to_not receive(:noecho)
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', {}).and_return('Sure')
       expect(shell.ask('Should I overwrite it?')).to eq('Sure')
     end
 
-    it 'prints a message and returns nil if EOF is sent to stdin' do
-      expect($stdout).to receive(:print).with(' ')
-      expect($stdin).to receive(:gets).and_return(nil)
+    it 'prints a message to the user prefixed with the current padding' do
+      expect(Thor::LineEditor).to receive(:readline).with('    Enter your name: ', {}).and_return('George')
+      shell.padding = 2
+      shell.ask('Enter your name:')
+    end
+
+    it 'prints a message and returns nil if EOF is given as input' do
+      expect(Thor::LineEditor).to receive(:readline).with(' ', {}).and_return(nil)
       expect(shell.ask('')).to eq(nil)
     end
 
@@ -37,65 +40,62 @@ describe Thor::Shell::Basic do
     end
 
     it 'prints a message to the user with the available options and determines the correctness of the answer' do
-      expect($stdout).to receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ')
-      expect($stdin).to receive(:gets).and_return('chocolate')
-      expect(shell.ask("What's your favorite Neopolitan flavor?", :limited_to => %w[strawberry chocolate vanilla])).to eq('chocolate')
+      flavors = %w[strawberry chocolate vanilla]
+      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', :limited_to => flavors).and_return('chocolate')
+      expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq('chocolate')
     end
 
     it 'prints a message to the user with the available options and reasks the question after an incorrect repsonse' do
-      expect($stdout).to receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ').twice
+      flavors = %w[strawberry chocolate vanilla]
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
-      expect($stdin).to receive(:gets).and_return('moose tracks', 'chocolate')
-      expect(shell.ask("What's your favorite Neopolitan flavor?", :limited_to => %w[strawberry chocolate vanilla])).to eq('chocolate')
+      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', :limited_to => flavors).and_return('moose tracks', 'chocolate')
+      expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq('chocolate')
     end
 
     it 'prints a message to the user containing a default and sets the default if only enter is pressed' do
-      expect($stdout).to receive(:print).with('What\'s your favorite Neopolitan flavor? (vanilla) ')
-      expect($stdin).to receive(:gets).and_return('')
-      expect(shell.ask("What's your favorite Neopolitan flavor?", :default => 'vanilla')).to eq('vanilla')
+      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? (vanilla) ', :default => 'vanilla').and_return('')
+      expect(shell.ask('What\'s your favorite Neopolitan flavor?', :default => 'vanilla')).to eq('vanilla')
     end
 
     it 'prints a message to the user with the available options and reasks the question after an incorrect repsonse and then returns the default' do
-      expect($stdout).to receive(:print).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ').twice
+      flavors = %w[strawberry chocolate vanilla]
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
-      expect($stdin).to receive(:gets).and_return('moose tracks', '')
-      expect(shell.ask("What's your favorite Neopolitan flavor?", :default => 'vanilla', :limited_to => %w[strawberry chocolate vanilla])).to eq('vanilla')
+      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ', :default => 'vanilla', :limited_to => flavors).and_return('moose tracks', '')
+      expect(shell.ask("What's your favorite Neopolitan flavor?", :default => 'vanilla', :limited_to => flavors)).to eq('vanilla')
     end
   end
 
   describe '#yes?' do
     it 'asks the user and returns true if the user replies yes' do
-      expect($stdout).to receive(:print).with('Should I overwrite it? ')
-        expect($stdin).to receive(:gets).and_return('y')
-      expect(shell.yes?('Should I overwrite it?')).to be true
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', :add_to_history => false).and_return('y')
+      expect(shell.yes?('Should I overwrite it?')).to be_true
+    end
 
-      expect($stdout).to receive(:print).with('Should I overwrite it? ')
-        expect($stdin).to receive(:gets).and_return('n')
-      expect(shell.yes?('Should I overwrite it?')).not_to be true
+    it 'asks the user and returns false if the user replies no' do
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', :add_to_history => false).and_return('n')
+      expect(shell.yes?('Should I overwrite it?')).not_to be_true
     end
 
     it 'asks the user and returns false if the user replies with an answer other than yes or no' do
-      expect($stdout).to receive(:print).with('Should I overwrite it? ')
-        expect($stdin).to receive(:gets).and_return('foobar')
-      expect(shell.yes?('Should I overwrite it?')).to be false
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', :add_to_history => false).and_return('foobar')
+      expect(shell.yes?('Should I overwrite it?')).to be_false
     end
   end
 
   describe '#no?' do
     it 'asks the user and returns true if the user replies no' do
-      expect($stdout).to receive(:print).with('Should I overwrite it? ')
-        expect($stdin).to receive(:gets).and_return('n')
-      expect(shell.no?('Should I overwrite it?')).to be true
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', :add_to_history => false).and_return('n')
+      expect(shell.no?('Should I overwrite it?')).to be_true
+    end
 
-      expect($stdout).to receive(:print).with('Should I overwrite it? ')
-        expect($stdin).to receive(:gets).and_return('Yes')
-      expect(shell.no?('Should I overwrite it?')).to be false
+    it 'asks the user and returns false if the user replies yes' do
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', :add_to_history => false).and_return('Yes')
+      expect(shell.no?('Should I overwrite it?')).to be_false
     end
 
     it 'asks the user and returns false if the user replies with an answer other than yes or no' do
-      expect($stdout).to receive(:print).with('Should I overwrite it? ')
-        expect($stdin).to receive(:gets).and_return('foobar')
-      expect(shell.no?('Should I overwrite it?')).to be false
+      expect(Thor::LineEditor).to receive(:readline).with('Should I overwrite it? ', :add_to_history => false).and_return('foobar')
+      expect(shell.no?('Should I overwrite it?')).to be_false
     end
   end
 
@@ -272,41 +272,34 @@ TABLE
 
   describe '#file_collision' do
     it 'shows a menu with options' do
-      expect($stdout).to receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqh] ')
-      expect($stdin).to receive(:gets).and_return('n')
+      expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqh] ', :add_to_history => false).and_return('n')
       shell.file_collision('foo')
     end
 
     it 'returns true if the user chooses default option' do
-      allow($stdout).to receive(:print)
-      expect($stdin).to receive(:gets).and_return('')
-      expect(shell.file_collision('foo')).to be true
+      expect(Thor::LineEditor).to receive(:readline).and_return('')
+      expect(shell.file_collision('foo')).to be_true
     end
 
     it 'returns false if the user chooses no' do
-      allow($stdout).to receive(:print)
-      expect($stdin).to receive(:gets).and_return('n')
-      expect(shell.file_collision('foo')).to be false
+      expect(Thor::LineEditor).to receive(:readline).and_return('n')
+      expect(shell.file_collision('foo')).to be_false
     end
 
     it 'returns true if the user chooses yes' do
-      allow($stdout).to receive(:print)
-      expect($stdin).to receive(:gets).and_return('y')
-      expect(shell.file_collision('foo')).to be true
+      expect(Thor::LineEditor).to receive(:readline).and_return('y')
+      expect(shell.file_collision('foo')).to be_true
     end
 
     it 'shows help usage if the user chooses help' do
-      allow($stdout).to receive(:print)
-      expect($stdin).to receive(:gets).and_return('h')
-      expect($stdin).to receive(:gets).and_return('n')
+      expect(Thor::LineEditor).to receive(:readline).and_return('h', 'n')
       help = capture(:stdout) { shell.file_collision('foo') }
       expect(help).to match(/h \- help, show this help/)
     end
 
     it 'quits if the user chooses quit' do
-      allow($stdout).to receive(:print)
       expect($stdout).to receive(:print).with("Aborting...\n")
-      expect($stdin).to receive(:gets).and_return('q')
+      expect(Thor::LineEditor).to receive(:readline).and_return('q')
 
       expect do
         shell.file_collision('foo')
@@ -314,8 +307,7 @@ TABLE
     end
 
     it 'always returns true if the user chooses always' do
-      expect($stdout).to receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqh] ')
-      expect($stdin).to receive(:gets).and_return('a')
+      expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqh] ', :add_to_history => false).and_return('a')
 
       expect(shell.file_collision('foo')).to be true
 
@@ -325,15 +317,13 @@ TABLE
 
     describe 'when a block is given' do
       it 'displays diff options to the user' do
-        expect($stdout).to receive(:print).with('Overwrite foo? (enter "h" for help) [Ynaqdh] ')
-        expect($stdin).to receive(:gets).and_return('s')
-        shell.file_collision('foo') {}
+        expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqdh] ', :add_to_history => false).and_return('s')
+        shell.file_collision('foo'){ }
       end
 
       it 'invokes the diff command' do
-        allow($stdout).to receive(:print)
-        expect($stdin).to receive(:gets).and_return('d')
-        expect($stdin).to receive(:gets).and_return('n')
+        expect(Thor::LineEditor).to receive(:readline).and_return('d')
+        expect(Thor::LineEditor).to receive(:readline).and_return('n')
         expect(shell).to receive(:system).with(/diff -u/)
         capture(:stdout) { shell.file_collision('foo') {} }
       end

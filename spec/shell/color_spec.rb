@@ -6,7 +6,18 @@ describe Thor::Shell::Color do
   end
 
   before do
+    allow($stdout).to receive(:tty?).and_return(true)
     allow_any_instance_of(StringIO).to receive(:tty?).and_return(true)
+  end
+
+  describe '#ask' do
+    it 'sets the color if specified and tty?' do
+      expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? \e[0m", anything).and_return('yes')
+      shell.ask 'Is this green?', :green
+
+      expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? [Yes, No, Maybe] \e[0m", anything).and_return('Yes')
+      shell.ask 'Is this green?', :green, :limited_to => ['Yes', 'No', 'Maybe']
+    end
   end
 
   describe '#say' do
@@ -75,6 +86,20 @@ describe Thor::Shell::Color do
       bold = shell.set_color 'hi!', :white, :on_red, :bold
       expect(bold).to eq("\e[37m\e[41m\e[1mhi!\e[0m")
     end
+
+    it "does nothing when there are no colors" do
+      colorless = shell.set_color "hi!", nil
+      expect(colorless).to eq("hi!")
+
+      colorless = shell.set_color "hi!"
+      expect(colorless).to eq("hi!")
+    end
+
+    it "does nothing when the terminal does not support color" do
+      allow($stdout).to receive(:tty?).and_return(false)
+      colorless = shell.set_color "hi!", :white
+      expect(colorless).to eq("hi!")
+    end
   end
 
   describe '#file_collision' do
@@ -82,8 +107,7 @@ describe Thor::Shell::Color do
       it 'invokes the diff command' do
         allow($stdout).to receive(:print)
         allow($stdout).to receive(:tty?).and_return(true)
-        expect($stdin).to receive(:gets).and_return('d')
-        expect($stdin).to receive(:gets).and_return('n')
+        expect(Thor::LineEditor).to receive(:readline).and_return('d', 'n')
 
         output = capture(:stdout) { shell.file_collision('spec/fixtures/doc/README') { "README\nEND\n" } }
         expect(output).to match(/\e\[31m\- __start__\e\[0m/)

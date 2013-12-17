@@ -43,12 +43,19 @@ class Thor
       # If asking for sensitive information, the :echo option can be set
       # to false to mask user input from $stdin.
       #
+      # If the required input is a path, then set the path option to
+      # true. This will enable tab completion for file paths relative
+      # to the current working directory on systems that support
+      # Readline.
+      #
       # ==== Example
       # ask("What is your name?")
       #
       # ask("What is your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])
       #
       # ask("What is your password?", :echo => false)
+      #
+      # ask("Where should the file be saved?", :path => true)
       #
       def ask(statement, *args)
         options = args.last.is_a?(Hash) ? args.pop : {}
@@ -69,11 +76,7 @@ class Thor
       # say("I know you knew that.")
       #
       def say(message = '', color = nil, force_new_line = (message.to_s !~ /( |\t)\Z/))
-        message = message.to_s
-        message = set_color(message, *color) if color && can_display_colors?
-
-        buffer = '  ' * padding
-        buffer << message
+        buffer = prepare_message(message, *color)
         buffer << "\n" if force_new_line && !message.end_with?("\n")
 
         stdout.print(buffer)
@@ -104,14 +107,14 @@ class Thor
       # "yes".
       #
       def yes?(statement, color = nil)
-        !!(ask(statement, color) =~ is?(:yes))
+        !!(ask(statement, color, :add_to_history => false) =~ is?(:yes))
       end
 
       # Make a question the to user and returns true if the user replies "n" or
       # "no".
       #
       def no?(statement, color = nil)
-        !!(ask(statement, color) =~ is?(:no))
+        !!(ask(statement, color, :add_to_history => false) =~ is?(:no))
       end
 
       # Prints values in columns
@@ -231,7 +234,10 @@ class Thor
         options = block_given? ? '[Ynaqdh]' : '[Ynaqh]'
 
         loop do
-          answer = ask %[Overwrite #{destination}? (enter "h" for help) #{options}]
+          answer = ask(
+            %[Overwrite #{destination}? (enter "h" for help) #{options}],
+            :add_to_history => false
+          )
 
           case answer
           when is?(:yes), is?(:force), ''
@@ -283,6 +289,11 @@ class Thor
 
     protected
 
+      def prepare_message(message, *color)
+        spaces = "  " * padding
+        spaces + set_color(message.to_s, *color)
+      end
+
       def can_display_colors?
         false
       end
@@ -294,10 +305,6 @@ class Thor
 
       def stdout
         $stdout
-      end
-
-      def stdin
-        $stdin
       end
 
       def stderr
@@ -383,13 +390,8 @@ class Thor
       def ask_simply(statement, color, options)
         default = options[:default]
         message = [statement, ("(#{default})" if default), nil].uniq.join(' ')
-        say(message, color)
-
-        result = if options[:echo] == false
-                   stdin.noecho(&:gets)
-                 else
-                   stdin.gets
-                 end
+        message = prepare_message(message, color)
+        result = Thor::LineEditor.readline(message, options)
 
         return unless result
 

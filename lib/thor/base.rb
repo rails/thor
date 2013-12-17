@@ -5,6 +5,7 @@ require 'thor/error'
 require 'thor/invocation'
 require 'thor/parser'
 require 'thor/shell'
+require 'thor/line_editor'
 require 'thor/util'
 
 class Thor
