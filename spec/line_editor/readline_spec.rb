@@ -10,12 +10,12 @@ describe Thor::LineEditor::Readline do
 
   describe '.available?' do
     it 'returns true when ::Readline exists' do
-      allow(Kernel).to receive(:const_defined?).with(:Readline).and_return(true)
+      allow(Object).to receive(:const_defined?).with(:Readline).and_return(true)
       expect(described_class).to be_available
     end
 
     it 'returns false when ::Readline does not exist' do
-      allow(Kernel).to receive(:const_defined?).with(:Readline).and_return(false)
+      allow(Object).to receive(:const_defined?).with(:Readline).and_return(false)
       expect(described_class).not_to be_available
     end
   end

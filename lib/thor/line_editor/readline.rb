@@ -7,7 +7,7 @@ class Thor
   module LineEditor
     class Readline < Basic
       def self.available?
-        Kernel.const_defined?(:Readline)
+        Object.const_defined?(:Readline)
       end
 
       def readline
