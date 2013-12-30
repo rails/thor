@@ -256,6 +256,12 @@ describe Thor::Base do
       end
     end
 
+    it 'raises an error instead of rescuing if :debug option is given' do
+      expect do
+        MyScript.start %w[what], :debug => true
+      end.to raise_error(Thor::UndefinedCommandError, 'Could not find command "what" in "my_script" namespace.')
+    end
+
     it 'does not steal args' do
       args = %w[foo bar --force true]
       MyScript.start(args)
