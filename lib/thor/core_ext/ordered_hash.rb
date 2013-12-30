@@ -28,7 +28,7 @@ class Thor
           else
             node = Node.new(key, value)
 
-            if @first.nil?
+            if !defined?(@first) || @first.nil?
               @first = @last = node
             else
               node.prev = @last
@@ -68,7 +68,7 @@ class Thor
         end
 
         def each
-          return unless @first
+          return unless defined?(@first) && @first
           yield [@first.key, @first.value]
           node = @first
           yield [node.key, node.value] while node = node.next # rubocop:disable AssignmentInCondition
