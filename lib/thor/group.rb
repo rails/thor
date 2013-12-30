@@ -14,12 +14,11 @@ class Thor::Group # rubocop:disable ClassLength
     # description<String>:: The description for this Thor::Group.
     #
     def desc(description = nil)
-      @desc = case description
-              when nil
-                @desc || from_superclass(:desc, nil)
-              else
-                description
-              end
+      if description
+        @desc = description
+      else
+        @desc ||= from_superclass(:desc, nil)
+      end
     end
 
     # Prints help information.

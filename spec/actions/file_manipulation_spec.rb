@@ -172,6 +172,7 @@ describe Thor::Actions do
     end
 
     it 'copies the template to the specified destination' do
+      runner.instance_variable_set('@klass', 'Config')
       action :template, 'doc/config.rb', 'doc/configuration.rb'
       file = File.join(destination_root, 'doc/configuration.rb')
       expect(File.exist?(file)).to be true
@@ -192,10 +193,12 @@ describe Thor::Actions do
     end
 
     it 'logs status' do
+      runner.instance_variable_set('@klass', 'Config')
       expect(capture(:stdout) { runner.template('doc/config.rb') }).to eq("      create  doc/config.rb\n")
     end
 
     it 'accepts a block to change output' do
+      runner.instance_variable_set('@klass', 'Config')
       action :template, 'doc/config.rb' do |content|
         'OMG' + content
       end

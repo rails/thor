@@ -3,6 +3,7 @@ require 'thor/actions'
 
 describe Thor::Actions::CreateFile do
   before do
+    @silence = false
     ::FileUtils.rm_rf(destination_root)
   end
 
