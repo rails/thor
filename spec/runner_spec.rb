@@ -229,12 +229,16 @@ describe Thor::Runner do
         else
           expect(File).to receive(:delete).with(path)
         end
-        silence(:stdout) { Thor::Runner.start(%w[update random]) }
+        silence_warnings do
+          silence(:stdout) { Thor::Runner.start(%w[update random]) }
+        end
       end
 
       it 'installs thor files' do
         ARGV.replace %W[install #{@location}]
-        silence(:stdout) { Thor::Runner.start }
+        silence_warnings do
+          silence(:stdout) { Thor::Runner.start }
+        end
       end
     end
   end
