@@ -146,14 +146,14 @@ describe Thor::Actions do
 
     it 'creates the directory if it does not exist' do
       runner.inside('foo') do
-        expect(File.exists?(file)).to be true
+        expect(File.exist?(file)).to be true
       end
     end
 
     describe 'when pretending' do
       it 'no directories should be created' do
         runner.inside('bar', :pretend => true) {}
-        expect(File.exists?('bar')).to be false
+        expect(File.exist?('bar')).to be false
       end
     end
 

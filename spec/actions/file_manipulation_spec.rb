@@ -13,7 +13,7 @@ describe Thor::Actions do
 
   def exists_and_identical?(source, destination)
     destination = File.join(destination_root, destination)
-    expect(File.exists?(destination)).to be true
+    expect(File.exist?(destination)).to be true
 
     source = File.join(source_root, source)
     expect(FileUtils).to be_identical(source, destination)
@@ -174,21 +174,21 @@ describe Thor::Actions do
     it 'copies the template to the specified destination' do
       action :template, 'doc/config.rb', 'doc/configuration.rb'
       file = File.join(destination_root, 'doc/configuration.rb')
-      expect(File.exists?(file)).to be true
+      expect(File.exist?(file)).to be true
     end
 
     it 'converts encoded instructions' do
       expect(runner).to receive(:file_name).and_return('rdoc')
       action :template, 'doc/%file_name%.rb.tt'
       file = File.join(destination_root, 'doc/rdoc.rb')
-      expect(File.exists?(file)).to be true
+      expect(File.exist?(file)).to be true
     end
 
     it 'accepts filename without .tt for template method' do
       expect(runner).to receive(:file_name).and_return('rdoc')
       action :template, 'doc/%file_name%.rb'
       file = File.join(destination_root, 'doc/rdoc.rb')
-      expect(File.exists?(file)).to be true
+      expect(File.exist?(file)).to be true
     end
 
     it 'logs status' do
@@ -206,7 +206,7 @@ describe Thor::Actions do
       action :template, 'doc/config.yaml.tt'
 
       file = File.join(destination_root, 'doc/config.yaml')
-      expect(File.exists?(file)).to be true
+      expect(File.exist?(file)).to be true
     end
   end
 
@@ -222,18 +222,18 @@ describe Thor::Actions do
     describe '#remove_file' do
       it 'removes the file given' do
         action :remove_file, 'doc/README'
-        expect(File.exists?(file)).to be false
+        expect(File.exist?(file)).to be false
       end
 
       it 'removes directories too' do
         action :remove_dir, 'doc'
-        expect(File.exists?(File.join(destination_root, 'doc'))).to be false
+        expect(File.exist?(File.join(destination_root, 'doc'))).to be false
       end
 
       it 'does not remove if pretending' do
         runner(:pretend => true)
         action :remove_file, 'doc/README'
-        expect(File.exists?(file)).to be true
+        expect(File.exist?(file)).to be true
       end
 
       it 'logs status' do
