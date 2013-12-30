@@ -246,11 +246,12 @@ describe Thor::Base do
   describe '#start' do
     it 'raises an error instead of rescuing if THOR_DEBUG=1 is given' do
       begin
-        ENV['THOR_DEBUG'] = 1
+        ENV['THOR_DEBUG'] = '1'
+
         expect do
           MyScript.start %w[what --debug]
-        end.to raise_error(Thor::UndefinedcommandError, 'Could not find command "what" in "my_script" namespace.')
-      rescue
+        end.to raise_error(Thor::UndefinedCommandError, 'Could not find command "what" in "my_script" namespace.')
+      ensure
         ENV['THOR_DEBUG'] = nil
       end
     end
