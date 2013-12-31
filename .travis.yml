@@ -15,15 +15,15 @@ rvm:
   - ruby-head
 matrix:
   include:
-    - rvm: jruby-19mode
+    - rvm: jruby-18mode
       env: JRUBY_OPTS="$JRUBY_OPTS --debug"
-    - rvm: jruby-20mode
+    - rvm: jruby-19mode
       env: JRUBY_OPTS="$JRUBY_OPTS --debug"
     - rvm: jruby-head
       env: JRUBY_OPTS="$JRUBY_OPTS --debug"
   allow_failures:
+    - rvm: jruby-18mode
     - rvm: jruby-19mode
-    - rvm: jruby-20mode
     - rvm: jruby-head
     - rvm: rbx
     - rvm: ruby-head
