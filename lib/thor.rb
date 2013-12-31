@@ -19,14 +19,11 @@ class Thor # rubocop:disable ClassLength
     # meth<Symbol>:: name of the default command
     #
     def default_command(meth = nil)
-      @default_command = case meth
-                         when :none
-                           'help'
-                         when nil
-                           @default_command || from_superclass(:default_command, 'help')
-                         else
-                           meth.to_s
-                         end
+      if meth
+        @default_command = meth == :none ? 'help' : meth.to_s
+      else
+        @default_command ||= from_superclass(:default_command, 'help')
+      end
     end
     alias_method :default_task, :default_command
 
@@ -195,7 +192,7 @@ class Thor # rubocop:disable ClassLength
       end
       list.sort! { |a, b| a[0] <=> b[0] }
 
-      if @package_name
+      if defined?(@package_name) && @package_name
         shell.say "#{@package_name} commands:"
       else
         shell.say 'Commands:'
@@ -310,15 +307,17 @@ class Thor # rubocop:disable ClassLength
     # ==== Parameters
     # Symbol ...:: A list of commands that should be affected.
     def stop_on_unknown_option!(*command_names)
-      @stop_on_unknown_option ||= Set.new
-      @stop_on_unknown_option.merge(command_names)
+      stop_on_unknown_option.merge(command_names)
     end
 
     def stop_on_unknown_option?(command) #:nodoc:
-      command && !@stop_on_unknown_option.nil? && @stop_on_unknown_option.include?(command.name.to_sym)
+      command && stop_on_unknown_option.include?(command.name.to_sym)
     end
 
   protected
+    def stop_on_unknown_option #:nodoc:
+      @stop_on_unknown_option ||= Set.new
+    end
 
     # The method responsible for dispatching given the args.
     def dispatch(meth, given_args, given_opts, config) #:nodoc: # rubocop:disable MethodLength
@@ -382,6 +381,10 @@ class Thor # rubocop:disable ClassLength
     end
 
     def create_command(meth) #:nodoc:
+      @usage ||= nil
+      @desc ||= nil
+      @long_desc ||= nil
+      
       if @usage && @desc
         base_class = @hide ? Thor::HiddenCommand : Thor::Command
         commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)

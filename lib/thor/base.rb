@@ -317,12 +317,11 @@ class Thor
       # name<String|Symbol>
       #
       def group(name = nil)
-        @group = case name
-                 when nil
-                   @group || from_superclass(:group, 'standard')
-                 else
-                   name.to_s
-                 end
+        if name
+          @group = name.to_s
+        else
+          @group ||= from_superclass(:group, 'standard')
+        end
       end
 
       # Returns the commands for this Thor class.
@@ -592,6 +591,7 @@ class Thor
         # Return if it's not a public instance method
         return unless public_method_defined?(meth.to_sym)
 
+        @no_commands ||= false
         return if @no_commands || !create_command(meth)
 
         is_thor_reserved_word?(meth, :command)

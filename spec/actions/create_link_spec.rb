@@ -4,6 +4,7 @@ require 'tempfile'
 
 describe Thor::Actions::CreateLink do
   before do
+    @silence = false
     @hardlink_to = File.join(Dir.tmpdir, 'linkdest.rb')
     ::FileUtils.rm_rf(destination_root)
     ::FileUtils.rm_rf(@hardlink_to)
@@ -36,7 +37,7 @@ describe Thor::Actions::CreateLink do
       create_link('doc/config.rb', :symbolic => true)
       invoke!
       destination_path = File.join(destination_root, 'doc/config.rb')
-      expect(File.exists?(destination_path)).to be true
+      expect(File.exist?(destination_path)).to be true
       expect(File.symlink?(destination_path)).to be true
     end
 
@@ -44,7 +45,7 @@ describe Thor::Actions::CreateLink do
       create_link(@hardlink_to, :symbolic => false)
       invoke!
       destination_path = @hardlink_to
-      expect(File.exists?(destination_path)).to be true
+      expect(File.exist?(destination_path)).to be true
       expect(File.symlink?(destination_path)).to be false
     end
 
@@ -52,14 +53,14 @@ describe Thor::Actions::CreateLink do
       create_link('doc/config.rb')
       invoke!
       destination_path = File.join(destination_root, 'doc/config.rb')
-      expect(File.exists?(destination_path)).to be true
+      expect(File.exist?(destination_path)).to be true
       expect(File.symlink?(destination_path)).to be true
     end
 
     it 'does not create a link if pretending' do
       create_link('doc/config.rb', {}, :pretend => true)
       invoke!
-      expect(File.exists?(File.join(destination_root, 'doc/config.rb'))).to be false
+      expect(File.exist?(File.join(destination_root, 'doc/config.rb'))).to be false
     end
 
     it 'shows created status to the user' do

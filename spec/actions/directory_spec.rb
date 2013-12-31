@@ -28,7 +28,7 @@ describe Thor::Actions::Directory do
       source      = File.join(source_root, source_path, file)
       destination = File.join(destination_root, destination_path, file)
 
-      expect(File.exists?(destination)).to be true
+      expect(File.exist?(destination)).to be true
       expect(FileUtils.identical?(source, destination)).to be true
     end
   end
@@ -42,7 +42,7 @@ describe Thor::Actions::Directory do
 
     it 'does not create a directory in pretend mode' do
       invoke! 'doc', 'ghost', :pretend => true
-      expect(File.exists?('ghost')).to be false
+      expect(File.exist?('ghost')).to be false
     end
 
     it 'copies the whole directory recursively to the default destination' do
@@ -59,25 +59,25 @@ describe Thor::Actions::Directory do
       invoke! '.', 'commands', :recursive => false
 
       file = File.join(destination_root, 'commands', 'group.thor')
-      expect(File.exists?(file)).to be true
+      expect(File.exist?(file)).to be true
 
       file = File.join(destination_root, 'commands', 'doc')
-      expect(File.exists?(file)).to be false
+      expect(File.exist?(file)).to be false
 
       file = File.join(destination_root, 'commands', 'doc', 'README')
-      expect(File.exists?(file)).to be false
+      expect(File.exist?(file)).to be false
     end
 
     it 'ignores files within excluding/ directories when exclude_pattern is provided' do
       invoke! 'doc', 'docs', :exclude_pattern => /excluding\//
       file = File.join(destination_root, 'docs', 'excluding', 'rdoc.rb')
-      expect(File.exists?(file)).to be false
+      expect(File.exist?(file)).to be false
     end
 
     it 'copies and evaluates files within excluding/ directory when no exclude_pattern is present' do
       invoke! 'doc', 'docs'
       file = File.join(destination_root, 'docs', 'excluding', 'rdoc.rb')
-      expect(File.exists?(file)).to be true
+      expect(File.exist?(file)).to be true
       expect(File.read(file)).to eq("BAR = BAR\n")
     end
 
@@ -91,7 +91,7 @@ describe Thor::Actions::Directory do
     it 'copies and evaluates templates' do
       invoke! 'doc', 'docs'
       file = File.join(destination_root, 'docs', 'rdoc.rb')
-      expect(File.exists?(file)).to be true
+      expect(File.exist?(file)).to be true
       expect(File.read(file)).to eq("FOO = FOO\n")
     end
 
@@ -105,20 +105,20 @@ describe Thor::Actions::Directory do
     it 'copies directories' do
       invoke! 'doc', 'docs'
       file = File.join(destination_root, 'docs', 'components')
-      expect(File.exists?(file)).to be true
+      expect(File.exist?(file)).to be true
       expect(File.directory?(file)).to be true
     end
 
     it 'does not copy .empty_directory files' do
       invoke! 'doc', 'docs'
       file = File.join(destination_root, 'docs', 'components', '.empty_directory')
-      expect(File.exists?(file)).to be false
+      expect(File.exist?(file)).to be false
     end
 
     it 'copies directories even if they are empty' do
       invoke! 'doc/components', 'docs/components'
       file = File.join(destination_root, 'docs', 'components')
-      expect(File.exists?(file)).to be true
+      expect(File.exist?(file)).to be true
     end
 
     it 'does not copy empty directories twice' do
@@ -153,17 +153,17 @@ describe Thor::Actions::Directory do
       invoke! 'doc'
       revoke! 'doc'
 
-      expect(File.exists?(File.join(destination_root, 'doc', 'README'))).to be false
-      expect(File.exists?(File.join(destination_root, 'doc', 'config.rb'))).to be false
-      expect(File.exists?(File.join(destination_root, 'doc', 'components'))).to be false
+      expect(File.exist?(File.join(destination_root, 'doc', 'README'))).to be false
+      expect(File.exist?(File.join(destination_root, 'doc', 'config.rb'))).to be false
+      expect(File.exist?(File.join(destination_root, 'doc', 'components'))).to be false
     end
 
     it 'works with glob characters in the path' do
       invoke! 'app{1}'
-      expect(File.exists?(File.join(destination_root, 'app{1}', 'README'))).to be true
+      expect(File.exist?(File.join(destination_root, 'app{1}', 'README'))).to be true
 
       revoke! 'app{1}'
-      expect(File.exists?(File.join(destination_root, 'app{1}', 'README'))).to be false
+      expect(File.exist?(File.join(destination_root, 'app{1}', 'README'))).to be false
     end
   end
 end

@@ -3,6 +3,7 @@ require 'thor/actions'
 
 describe Thor::Actions::CreateFile do
   before do
+    @silence = false
     ::FileUtils.rm_rf(destination_root)
   end
 
@@ -29,13 +30,13 @@ describe Thor::Actions::CreateFile do
     it 'creates a file' do
       create_file('doc/config.rb')
       invoke!
-      expect(File.exists?(File.join(destination_root, 'doc/config.rb'))).to be true
+      expect(File.exist?(File.join(destination_root, 'doc/config.rb'))).to be true
     end
 
     it 'does not create a file if pretending' do
       create_file('doc/config.rb', {}, :pretend => true)
       invoke!
-      expect(File.exists?(File.join(destination_root, 'doc/config.rb'))).to be false
+      expect(File.exist?(File.join(destination_root, 'doc/config.rb'))).to be false
     end
 
     it 'shows created status to the user' do
@@ -58,7 +59,7 @@ describe Thor::Actions::CreateFile do
     it 'converts encoded instructions' do
       create_file('doc/%file_name%.rb.tt')
       invoke!
-      expect(File.exists?(File.join(destination_root, 'doc/rdoc.rb.tt'))).to be true
+      expect(File.exist?(File.join(destination_root, 'doc/rdoc.rb.tt'))).to be true
     end
 
     describe 'when file exists' do
@@ -137,13 +138,13 @@ describe Thor::Actions::CreateFile do
       create_file('doc/config.rb')
       invoke!
       revoke!
-      expect(File.exists?(@action.destination)).to be false
+      expect(File.exist?(@action.destination)).to be false
     end
 
     it 'does not raise an error if the file does not exist' do
       create_file('doc/config.rb')
       revoke!
-      expect(File.exists?(@action.destination)).to be false
+      expect(File.exist?(@action.destination)).to be false
     end
   end
 

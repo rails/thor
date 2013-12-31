@@ -28,7 +28,7 @@ class Thor
       # Stores and return the source root for this class
       def source_root(path = nil)
         @_source_root = path if path
-        @_source_root
+        @_source_root ||= nil
       end
 
       # Returns the source paths in the following order:

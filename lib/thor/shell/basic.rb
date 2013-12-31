@@ -9,7 +9,7 @@ class Thor
       # Initialize base, mute and padding to nil.
       #
       def initialize #:nodoc:
-        @base, @mute, @padding = nil, false, 0
+        @base, @mute, @padding, @always_force = nil, false, 0, false
       end
 
       # Mute everything that's inside given block

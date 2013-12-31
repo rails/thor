@@ -48,6 +48,9 @@ class Thor
       end
 
       class PathCompletion
+        attr_reader :text
+        private :text
+        
         def initialize(text)
           @text = text
         end
@@ -57,8 +60,6 @@ class Thor
         end
 
         private
-
-        attr_reader :text
 
         def relative_matches
           absolute_matches.map { |path| path.sub(base_path, '') }
