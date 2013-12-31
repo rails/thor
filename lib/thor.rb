@@ -384,7 +384,7 @@ class Thor # rubocop:disable ClassLength
       @usage ||= nil
       @desc ||= nil
       @long_desc ||= nil
-      
+
       if @usage && @desc
         base_class = @hide ? Thor::HiddenCommand : Thor::Command
         commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
