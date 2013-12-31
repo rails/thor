@@ -50,7 +50,7 @@ class Thor
       class PathCompletion
         attr_reader :text
         private :text
-        
+
         def initialize(text)
           @text = text
         end

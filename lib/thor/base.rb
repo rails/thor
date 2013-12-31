@@ -439,7 +439,7 @@ class Thor
         config[:shell] ||= Thor::Base.shell.new
         dispatch(nil, given_args.dup, nil, config)
       rescue Thor::Error => e
-        ENV['THOR_DEBUG'] == '1' ? (raise e) : config[:shell].error(e.message)
+        config[:debug] || ENV['THOR_DEBUG'] == '1' ? (raise e) : config[:shell].error(e.message)
         exit(1) if exit_on_failure?
       rescue Errno::EPIPE
         # This happens if a thor command is piped to something like `head`,
