@@ -76,10 +76,10 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
     end
 
     location = if options[:relative] || name =~ %r{^https?://}
-                 name
-               else
-                 File.expand_path(name)
-               end
+      name
+    else
+      File.expand_path(name)
+    end
 
     thor_yaml[as] = {
       :filename   => Digest::MD5.hexdigest(name + as),

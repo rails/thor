@@ -147,10 +147,10 @@ class Thor # rubocop:disable ClassLength
     #
     def method_option(name, options = {})
       scope = if options[:for]
-                find_and_refresh_command(options[:for]).options
-              else
-                method_options
-              end
+        find_and_refresh_command(options[:for]).options
+      else
+        method_options
+      end
 
       build_option(name, options, scope)
     end

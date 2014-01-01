@@ -82,10 +82,10 @@ class Thor
       render = open(source) { |input| input.binmode.read }
 
       destination ||= if block_given?
-                        block.arity == 1 ? block.call(render) : block.call
-                      else
-                        File.basename(source)
-                      end
+        block.arity == 1 ? block.call(render) : block.call
+      else
+        File.basename(source)
+      end
 
       create_file destination, render, config
     end

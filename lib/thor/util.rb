@@ -165,24 +165,24 @@ class Thor
 
       def user_home # rubocop:disable MethodLength
         @@user_home ||= if ENV['HOME']
-                          ENV['HOME']
-                        elsif ENV['USERPROFILE']
-                          ENV['USERPROFILE']
-                        elsif ENV['HOMEDRIVE'] && ENV['HOMEPATH']
-                          File.join(ENV['HOMEDRIVE'], ENV['HOMEPATH'])
-                        elsif ENV['APPDATA']
-                          ENV['APPDATA']
-                        else
-                          begin
-                            File.expand_path('~')
-                          rescue
-                            if File::ALT_SEPARATOR
-                              'C:/'
-                            else
-                              '/'
-                            end
-                          end
-                        end
+          ENV['HOME']
+        elsif ENV['USERPROFILE']
+          ENV['USERPROFILE']
+        elsif ENV['HOMEDRIVE'] && ENV['HOMEPATH']
+          File.join(ENV['HOMEDRIVE'], ENV['HOMEPATH'])
+        elsif ENV['APPDATA']
+          ENV['APPDATA']
+        else
+          begin
+            File.expand_path('~')
+          rescue
+            if File::ALT_SEPARATOR
+              'C:/'
+            else
+              '/'
+            end
+          end
+        end
       end
 
       # Returns the root where thor files are located, depending on the OS.

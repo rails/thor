@@ -210,12 +210,12 @@ class Thor
         no_commands { attr_accessor name }
 
         required = if options.key?(:optional)
-                     !options[:optional]
-                   elsif options.key?(:required)
-                     options[:required]
-                   else
-                     options[:default].nil?
-                   end
+          !options[:optional]
+        elsif options.key?(:required)
+          options[:required]
+        else
+          options[:default].nil?
+        end
 
         remove_argument name
 

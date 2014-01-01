@@ -51,10 +51,10 @@ class Thor
         say_status :invoke
 
         content = if @behavior == :after
-                    '\0' + replacement
-                  else
-                    replacement + '\0'
-                  end
+          '\0' + replacement
+        else
+          replacement + '\0'
+        end
 
         replace!(/#{flag}/, content, config[:force])
       end
@@ -63,12 +63,12 @@ class Thor
         say_status :revoke
 
         regexp = if @behavior == :after
-                   content = '\1\2'
-                   /(#{flag})(.*)(#{Regexp.escape(replacement)})/m
-                 else
-                   content = '\2\3'
-                   /(#{Regexp.escape(replacement)})(.*)(#{flag})/m
-                 end
+          content = '\1\2'
+          /(#{flag})(.*)(#{Regexp.escape(replacement)})/m
+        else
+          content = '\2\3'
+          /(#{Regexp.escape(replacement)})(.*)(#{flag})/m
+        end
 
         replace!(regexp, content, true)
       end
@@ -77,16 +77,16 @@ class Thor
 
       def say_status(behavior)
         status = if behavior == :invoke
-                   if flag == /\A/
-                     :prepend
-                   elsif flag == /\z/
-                     :append
-                   else
-                     :insert
-                   end
-                 else
-                   :subtract
-                 end
+          if flag == /\A/
+            :prepend
+          elsif flag == /\z/
+            :append
+          else
+            :insert
+          end
+        else
+          :subtract
+        end
 
         super(status, config[:verbose])
       end

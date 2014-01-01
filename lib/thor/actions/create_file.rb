@@ -50,10 +50,10 @@ class Thor
       #
       def render
         @render ||= if data.is_a?(Proc)
-                      data.call
-                    else
-                      data
-                    end
+          data.call
+        else
+          data
+        end
       end
 
       def invoke!

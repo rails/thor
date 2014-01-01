@@ -172,11 +172,11 @@ class Thor::Group # rubocop:disable ClassLength
     def get_options_from_invocations(group_options, base_options) #:nodoc: # rubocop:disable MethodLength
       invocations.each do |name, from_option|
         value = if from_option
-                  option = class_options[name]
-                  option.type == :boolean ? name : option.default
-                else
-                  name
-                end
+          option = class_options[name]
+          option.type == :boolean ? name : option.default
+        else
+          name
+        end
         next unless value
 
         klass, _ = prepare_for_invocation(name, value)
