@@ -26,9 +26,4 @@ group :test do
   gem 'simplecov', :require => false
 end
 
-platform :rbx do
-  gem 'rubinius-coverage'
-  gem 'rubysl'
-end
-
 gemspec

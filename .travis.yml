@@ -1,8 +1,3 @@
-before_install:
-  - gem update bundler
-  - bundle --version
-  - gem update --system 2.1.11
-  - gem --version
 bundler_args: --without development
 language: ruby
 rvm:
@@ -11,7 +6,7 @@ rvm:
   - 1.9.3
   - 2.0.0
   - 2.1.0
-  - rbx
+  - rbx-2
   - ruby-head
 matrix:
   include:
@@ -25,7 +20,7 @@ matrix:
     - rvm: jruby-18mode
     - rvm: jruby-19mode
     - rvm: jruby-head
-    - rvm: rbx
+    - rvm: rbx-2
     - rvm: ruby-head
   fast_finish: true
 script: bundle exec thor spec
