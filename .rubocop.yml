@@ -73,3 +73,18 @@ EndAlignment:
 CaseIndentation:
   IndentWhenRelativeTo: end
   IndentOneStep: false
+
+DoubleNegation:
+  Enabled: false
+
+PercentLiteralDelimiters:
+  PreferredDelimiters:
+    '%':  ()
+    '%i': ()
+    '%q': ()
+    '%Q': ()
+    '%r': '{}'
+    '%s': ()
+    '%w': '[]'
+    '%W': '[]'
+    '%x': ()

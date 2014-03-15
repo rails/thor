@@ -112,7 +112,8 @@ describe Thor::Runner do
     it 'does not swallow Thor InvocationError' do
       ARGV.replace %w[my_script:animal]
       content = capture(:stderr) { Thor::Runner.start }
-      expect(content.strip).to eq(%Q'ERROR: "thor animal" was called with no arguments\nUsage: "thor my_script:animal TYPE"')
+      expect(content.strip).to eq(%Q(ERROR: "thor animal" was called with no arguments
+Usage: "thor my_script:animal TYPE"))
     end
   end
 

@@ -308,7 +308,7 @@ class Thor
     def _cleanup_options_and_set(options, key) #:nodoc:
       case options
       when Array
-        %w(--force -f --skip -s).each { |i| options.delete(i) }
+        %w[--force -f --skip -s].each { |i| options.delete(i) }
         options << "--#{key}"
       when Hash
         [:force, :skip, 'force', 'skip'].each { |i| options.delete(i) }

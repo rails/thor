@@ -24,7 +24,7 @@ describe Thor::Actions::Directory do
   end
 
   def exists_and_identical?(source_path, destination_path)
-    %w(config.rb README).each do |file|
+    %w[config.rb README].each do |file|
       source      = File.join(source_root, source_path, file)
       destination = File.join(destination_root, destination_path, file)
 
