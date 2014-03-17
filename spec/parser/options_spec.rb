@@ -292,8 +292,8 @@ describe Thor::Options do
       it "raises error when value isn't in enum" do
         enum = %w[apple banana]
         create :fruit => Thor::Option.new('fruit', :type => :string, :enum => enum)
-        expect{ parse('--fruit', 'orange') }.to raise_error(Thor::MalformattedArgumentError,
-          "Expected '--fruit' to be one of #{enum.join(', ')}; got orange")
+        expect { parse('--fruit', 'orange') }.to raise_error(Thor::MalformattedArgumentError,
+                                                             "Expected '--fruit' to be one of #{enum.join(', ')}; got orange")
       end
     end
 
@@ -405,8 +405,8 @@ describe Thor::Options do
       it "raises error when value isn't in enum" do
         enum = [1, 2]
         create :limit => Thor::Option.new('limit', :type => :numeric, :enum => enum)
-        expect{ parse('--limit', '3') }.to raise_error(Thor::MalformattedArgumentError,
-          "Expected '--limit' to be one of #{enum.join(', ')}; got 3")
+        expect { parse('--limit', '3') }.to raise_error(Thor::MalformattedArgumentError,
+                                                        "Expected '--limit' to be one of #{enum.join(', ')}; got 3")
       end
     end
 

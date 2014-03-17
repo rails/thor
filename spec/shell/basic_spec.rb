@@ -318,7 +318,7 @@ TABLE
     describe 'when a block is given' do
       it 'displays diff options to the user' do
         expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqdh] ', :add_to_history => false).and_return('s')
-        shell.file_collision('foo'){ }
+        shell.file_collision('foo') {}
       end
 
       it 'invokes the diff command' do

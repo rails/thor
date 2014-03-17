@@ -38,7 +38,7 @@ class Thor
         super(base, destination, {:verbose => true}.merge(config))
 
         @behavior, @flag = if @config.key?(:after)
-                             [:after, @config.delete(:after)]
+          [:after, @config.delete(:after)]
                            else
                              [:before, @config.delete(:before)]
                            end

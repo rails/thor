@@ -23,7 +23,7 @@ class Thor
         end
       end
 
-      private
+    private
 
       def add_to_history?
         options.fetch(:add_to_history, true)
@@ -31,9 +31,9 @@ class Thor
 
       def completion_proc
         if use_path_completion?
-          Proc.new { |text| PathCompletion.new(text).matches }
+          proc { |text| PathCompletion.new(text).matches }
         elsif completion_options.any?
-          Proc.new do |text|
+          proc do |text|
             completion_options.select { |option| option.start_with?(text) }
           end
         end
@@ -59,7 +59,7 @@ class Thor
           relative_matches
         end
 
-        private
+      private
 
         def relative_matches
           absolute_matches.map { |path| path.sub(base_path, '') }

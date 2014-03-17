@@ -132,11 +132,11 @@ class Thor
       end
 
       value = $&.index('.') ? shift.to_f : shift.to_i
-        if @switches.is_a?(Hash) && switch = @switches[name]
-          if switch.enum && !switch.enum.include?(value)
-            raise MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
-          end
+      if @switches.is_a?(Hash) && switch = @switches[name]
+        if switch.enum && !switch.enum.include?(value)
+          fail MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
         end
+      end
       value
     end
 

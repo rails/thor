@@ -16,7 +16,7 @@ describe Thor::Shell::Color do
       shell.ask 'Is this green?', :green
 
       expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? [Yes, No, Maybe] \e[0m", anything).and_return('Yes')
-      shell.ask 'Is this green?', :green, :limited_to => ['Yes', 'No', 'Maybe']
+      shell.ask 'Is this green?', :green, :limited_to => %w[Yes No Maybe]
     end
   end
 
@@ -87,18 +87,18 @@ describe Thor::Shell::Color do
       expect(bold).to eq("\e[37m\e[41m\e[1mhi!\e[0m")
     end
 
-    it "does nothing when there are no colors" do
-      colorless = shell.set_color "hi!", nil
-      expect(colorless).to eq("hi!")
+    it 'does nothing when there are no colors' do
+      colorless = shell.set_color 'hi!', nil
+      expect(colorless).to eq('hi!')
 
-      colorless = shell.set_color "hi!"
-      expect(colorless).to eq("hi!")
+      colorless = shell.set_color 'hi!'
+      expect(colorless).to eq('hi!')
     end
 
-    it "does nothing when the terminal does not support color" do
+    it 'does nothing when the terminal does not support color' do
       allow($stdout).to receive(:tty?).and_return(false)
-      colorless = shell.set_color "hi!", :white
-      expect(colorless).to eq("hi!")
+      colorless = shell.set_color 'hi!', :white
+      expect(colorless).to eq('hi!')
     end
   end
 

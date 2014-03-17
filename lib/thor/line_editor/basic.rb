@@ -17,7 +17,7 @@ class Thor
         get_input
       end
 
-      private
+    private
 
       def get_input
         if echo?

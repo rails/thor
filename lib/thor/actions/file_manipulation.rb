@@ -292,8 +292,8 @@ class Thor
     end
     alias_method :remove_dir, :remove_file
 
-  attr_accessor :output_buffer
-  private :output_buffer, :output_buffer=
+    attr_accessor :output_buffer
+    private :output_buffer, :output_buffer=
 
   private
 

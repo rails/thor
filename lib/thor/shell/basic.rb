@@ -291,7 +291,7 @@ class Thor
     protected
 
       def prepare_message(message, *color)
-        spaces = "  " * padding
+        spaces = '  ' * padding
         spaces + set_color(message.to_s, *color)
       end
 
