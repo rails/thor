@@ -6,7 +6,6 @@ gem 'rdoc', '>= 3.9'
 group :development do
   gem 'guard-rspec'
   gem 'pry'
-  gem 'pry-rescue'
   platforms :ruby_19, :ruby_20 do
     gem 'pry-debugger'
     gem 'pry-stack_explorer'
@@ -15,7 +14,7 @@ end
 
 group :test do
   gem 'childlabor'
-  gem 'coveralls', '>=0.5.7', :require => false
+  gem 'coveralls', '>= 0.5.7', :require => false
   # mime-types is required indirectly by coveralls
   # needs to be < 2.0 to work with Ruby 1.8.7
   gem 'mime-types', '~> 1.25', :platforms => [:jruby, :ruby_18]
