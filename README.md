@@ -1,11 +1,17 @@
-[![Gem Version](https://badge.fury.io/rb/thor.png)](https://rubygems.org/gems/thor)
-[![Build Status](https://secure.travis-ci.org/erikhuda/thor.png?branch=master)](http://travis-ci.org/erikhuda/thor)
-[![Dependency Status](https://gemnasium.com/erikhuda/thor.png?travis)](https://gemnasium.com/erikhuda/thor)
-[![Code Climate](https://codeclimate.com/github/erikhuda/thor.png)](https://codeclimate.com/github/erikhuda/thor)
-[![Coverage Status](https://coveralls.io/repos/erikhuda/thor/badge.png?branch=master)](https://coveralls.io/r/erikhuda/thor)
-
 Thor
 ====
+
+[![Gem Version](http://img.shields.io/gem/v/thor.svg)][gem]
+[![Build Status](http://img.shields.io/travis/erikhuda/thor.svg)][travis]
+[![Dependency Status](http://img.shields.io/gemnasium/erikhuda/thor.svg)][gemnasium]
+[![Code Climate](http://img.shields.io/codeclimate/github/erikhuda/thor.svg)][codeclimate]
+[![Coverage Status](http://img.shields.io/coveralls/erikhuda/thor.svg)][coveralls]
+
+[gem]: https://rubygems.org/gems/thor
+[travis]: http://travis-ci.org/erikhuda/thor
+[gemnasium]: https://gemnasium.com/erikhuda/thor
+[codeclimate]: https://codeclimate.com/github/erikhuda/thor
+[coveralls]: https://coveralls.io/r/erikhuda/thor
 
 Description
 -----------
