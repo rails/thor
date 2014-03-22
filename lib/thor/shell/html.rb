@@ -1,4 +1,4 @@
-require 'thor/shell/basic'
+require "thor/shell/basic"
 
 class Thor
   module Shell
@@ -7,41 +7,41 @@ class Thor
     #
     class HTML < Basic
       # The start of an HTML bold sequence.
-      BOLD       = 'font-weight: bold'
+      BOLD       = "font-weight: bold"
 
       # Set the terminal's foreground HTML color to black.
-      BLACK      = 'color: black'
+      BLACK      = "color: black"
       # Set the terminal's foreground HTML color to red.
-      RED        = 'color: red'
+      RED        = "color: red"
       # Set the terminal's foreground HTML color to green.
-      GREEN      = 'color: green'
+      GREEN      = "color: green"
       # Set the terminal's foreground HTML color to yellow.
-      YELLOW     = 'color: yellow'
+      YELLOW     = "color: yellow"
       # Set the terminal's foreground HTML color to blue.
-      BLUE       = 'color: blue'
+      BLUE       = "color: blue"
       # Set the terminal's foreground HTML color to magenta.
-      MAGENTA    = 'color: magenta'
+      MAGENTA    = "color: magenta"
       # Set the terminal's foreground HTML color to cyan.
-      CYAN       = 'color: cyan'
+      CYAN       = "color: cyan"
       # Set the terminal's foreground HTML color to white.
-      WHITE      = 'color: white'
+      WHITE      = "color: white"
 
       # Set the terminal's background HTML color to black.
-      ON_BLACK   = 'background-color: black'
+      ON_BLACK   = "background-color: black"
       # Set the terminal's background HTML color to red.
-      ON_RED     = 'background-color: red'
+      ON_RED     = "background-color: red"
       # Set the terminal's background HTML color to green.
-      ON_GREEN   = 'background-color: green'
+      ON_GREEN   = "background-color: green"
       # Set the terminal's background HTML color to yellow.
-      ON_YELLOW  = 'background-color: yellow'
+      ON_YELLOW  = "background-color: yellow"
       # Set the terminal's background HTML color to blue.
-      ON_BLUE    = 'background-color: blue'
+      ON_BLUE    = "background-color: blue"
       # Set the terminal's background HTML color to magenta.
-      ON_MAGENTA = 'background-color: magenta'
+      ON_MAGENTA = "background-color: magenta"
       # Set the terminal's background HTML color to cyan.
-      ON_CYAN    = 'background-color: cyan'
+      ON_CYAN    = "background-color: cyan"
       # Set the terminal's background HTML color to white.
-      ON_WHITE   = 'background-color: white'
+      ON_WHITE   = "background-color: white"
 
       # Set color by using a string or one of the defined constants. If a third
       # option is set to true, it also adds bold to the string. This is based
@@ -68,7 +68,7 @@ class Thor
       #
       # TODO: Implement #ask for Thor::Shell::HTML
       def ask(statement, color = nil)
-        fail NotImplementedError, 'Implement #ask for Thor::Shell::HTML'
+        fail NotImplementedError, "Implement #ask for Thor::Shell::HTML"
       end
 
     protected
@@ -81,7 +81,7 @@ class Thor
       # available.
       #
       def show_diff(destination, content) #:nodoc:
-        if diff_lcs_loaded? && ENV['THOR_DIFF'].nil? && ENV['RAILS_DIFF'].nil?
+        if diff_lcs_loaded? && ENV["THOR_DIFF"].nil? && ENV["RAILS_DIFF"].nil?
           actual  = File.binread(destination).to_s.split("\n")
           content = content.to_s.split("\n")
 
@@ -95,11 +95,11 @@ class Thor
 
       def output_diff_line(diff) #:nodoc:
         case diff.action
-        when '-'
+        when "-"
           say "- #{diff.old_element.chomp}", :red, true
-        when '+'
+        when "+"
           say "+ #{diff.new_element.chomp}", :green, true
-        when '!'
+        when "!"
           say "- #{diff.old_element.chomp}", :red, true
           say "+ #{diff.new_element.chomp}", :green, true
         else
@@ -115,7 +115,7 @@ class Thor
         return @diff_lcs_loaded unless @diff_lcs_loaded.nil?
 
         @diff_lcs_loaded = begin
-          require 'diff/lcs'
+          require "diff/lcs"
           true
         rescue LoadError
           false

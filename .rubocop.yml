@@ -88,3 +88,6 @@ PercentLiteralDelimiters:
     '%w': '[]'
     '%W': '[]'
     '%x': ()
+
+StringLiterals:
+  EnforcedStyle: double_quotes

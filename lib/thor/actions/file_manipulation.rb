@@ -1,5 +1,5 @@
-require 'erb'
-require 'open-uri'
+require "erb"
+require "open-uri"
 
 class Thor
   module Actions
@@ -107,13 +107,13 @@ class Thor
     #
     def template(source, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
-      destination = args.first || source.sub(/#{TEMPLATE_EXTNAME}$/, '')
+      destination = args.first || source.sub(/#{TEMPLATE_EXTNAME}$/, "")
 
       source  = File.expand_path(find_in_source_paths(source.to_s))
-      context = instance_eval('binding')
+      context = instance_eval("binding")
 
       create_file destination, nil, config do
-        content = ERB.new(::File.binread(source), nil, '-', '@output_buffer').result(context)
+        content = ERB.new(::File.binread(source), nil, "-", "@output_buffer").result(context)
         content = block.call(content) if block
         content
       end
@@ -230,7 +230,7 @@ class Thor
       unless options[:pretend]
         content = File.binread(path)
         content.gsub!(flag, *args, &block)
-        File.open(path, 'wb') { |file| file.write(content) }
+        File.open(path, "wb") { |file| file.write(content) }
       end
     end
 
@@ -305,7 +305,7 @@ class Thor
       with_output_buffer { block.call(*args) }
     end
 
-    def with_output_buffer(buf = '') #:nodoc:
+    def with_output_buffer(buf = "") #:nodoc:
       self.output_buffer, old_buffer = buf, output_buffer
       yield
       output_buffer

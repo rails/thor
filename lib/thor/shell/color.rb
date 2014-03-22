@@ -1,4 +1,4 @@
-require 'thor/shell/basic'
+require "thor/shell/basic"
 
 class Thor
   module Shell
@@ -89,7 +89,7 @@ class Thor
           foreground, bold = colors
           foreground = self.class.const_get(foreground.to_s.upcase) if foreground.is_a?(Symbol)
 
-          bold       = bold ? BOLD : ''
+          bold       = bold ? BOLD : ""
           "#{bold}#{foreground}#{string}#{CLEAR}"
         end
       end
@@ -104,7 +104,7 @@ class Thor
       # available.
       #
       def show_diff(destination, content) #:nodoc:
-        if diff_lcs_loaded? && ENV['THOR_DIFF'].nil? && ENV['RAILS_DIFF'].nil?
+        if diff_lcs_loaded? && ENV["THOR_DIFF"].nil? && ENV["RAILS_DIFF"].nil?
           actual  = File.binread(destination).to_s.split("\n")
           content = content.to_s.split("\n")
 
@@ -118,11 +118,11 @@ class Thor
 
       def output_diff_line(diff) #:nodoc:
         case diff.action
-        when '-'
+        when "-"
           say "- #{diff.old_element.chomp}", :red, true
-        when '+'
+        when "+"
           say "+ #{diff.new_element.chomp}", :green, true
-        when '!'
+        when "!"
           say "- #{diff.old_element.chomp}", :red, true
           say "+ #{diff.new_element.chomp}", :green, true
         else
@@ -138,7 +138,7 @@ class Thor
         return @diff_lcs_loaded unless @diff_lcs_loaded.nil?
 
         @diff_lcs_loaded = begin
-          require 'diff/lcs'
+          require "diff/lcs"
           true
         rescue LoadError
           false

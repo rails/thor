@@ -90,7 +90,7 @@ class Thor
       end
 
       if aliases.empty?
-        (' ' * padding) << sample
+        (" " * padding) << sample
       else
         "#{aliases.join(', ')}, #{sample}"
       end
@@ -107,19 +107,19 @@ class Thor
   protected
 
     def validate!
-      fail ArgumentError, 'An option cannot be boolean and required.' if boolean? && required?
+      fail ArgumentError, "An option cannot be boolean and required." if boolean? && required?
     end
 
     def dasherized?
-      name.index('-') == 0
+      name.index("-") == 0
     end
 
     def undasherize(str)
-      str.sub(/^-{1,2}/, '')
+      str.sub(/^-{1,2}/, "")
     end
 
     def dasherize(str)
-      (str.length > 1 ? '--' : '-') + str.gsub('_', '-')
+      (str.length > 1 ? "--" : "-") + str.gsub("_", "-")
     end
   end
 end

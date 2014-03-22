@@ -97,8 +97,8 @@ class Thor
       return shift if peek.is_a?(Hash)
       hash = {}
 
-      while current_is_value? && peek.include?(':')
-        key, value = shift.split(':', 2)
+      while current_is_value? && peek.include?(":")
+        key, value = shift.split(":", 2)
         hash[key] = value
       end
       hash
@@ -131,7 +131,7 @@ class Thor
         fail MalformattedArgumentError, "Expected numeric value for '#{name}'; got #{peek.inspect}"
       end
 
-      value = $&.index('.') ? shift.to_f : shift.to_i
+      value = $&.index(".") ? shift.to_f : shift.to_i
       if @switches.is_a?(Hash) && switch = @switches[name]
         if switch.enum && !switch.enum.include?(value)
           fail MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
@@ -167,7 +167,7 @@ class Thor
           o.respond_to?(:switch_name) ? o.switch_name : o.human_name
         end.join("', '")
 
-        class_name = self.class.name.split('::').last.downcase
+        class_name = self.class.name.split("::").last.downcase
         fail RequiredArgumentMissingError, "No value provided for required #{class_name} '#{names}'"
       end
     end

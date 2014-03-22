@@ -1,12 +1,12 @@
-require 'fileutils'
-require 'uri'
-require 'thor/core_ext/io_binary_read'
-require 'thor/actions/create_file'
-require 'thor/actions/create_link'
-require 'thor/actions/directory'
-require 'thor/actions/empty_directory'
-require 'thor/actions/file_manipulation'
-require 'thor/actions/inject_into_file'
+require "fileutils"
+require "uri"
+require "thor/core_ext/io_binary_read"
+require "thor/actions/create_file"
+require "thor/actions/create_link"
+require "thor/actions/directory"
+require "thor/actions/empty_directory"
+require "thor/actions/file_manipulation"
+require "thor/actions/inject_into_file"
 
 class Thor
   module Actions
@@ -48,17 +48,17 @@ class Thor
       # Add runtime options that help actions execution.
       #
       def add_runtime_options!
-        class_option :force, :type => :boolean, :aliases => '-f', :group => :runtime,
-                             :desc => 'Overwrite files that already exist'
+        class_option :force, :type => :boolean, :aliases => "-f", :group => :runtime,
+                             :desc => "Overwrite files that already exist"
 
-        class_option :pretend, :type => :boolean, :aliases => '-p', :group => :runtime,
-                               :desc => 'Run but do not make any changes'
+        class_option :pretend, :type => :boolean, :aliases => "-p", :group => :runtime,
+                               :desc => "Run but do not make any changes"
 
-        class_option :quiet, :type => :boolean, :aliases => '-q', :group => :runtime,
-                             :desc => 'Suppress status output'
+        class_option :quiet, :type => :boolean, :aliases => "-q", :group => :runtime,
+                             :desc => "Suppress status output"
 
-        class_option :skip, :type => :boolean, :aliases => '-s', :group => :runtime,
-                            :desc => 'Skip files that already exist'
+        class_option :skip, :type => :boolean, :aliases => "-s", :group => :runtime,
+                            :desc => "Skip files that already exist"
       end
     end
 
@@ -73,10 +73,10 @@ class Thor
     #
     def initialize(args = [], options = {}, config = {})
       self.behavior = case config[:behavior].to_s
-                      when 'force', 'skip'
+                      when "force", "skip"
                         _cleanup_options_and_set(options, config[:behavior])
                         :invoke
-                      when 'revoke'
+                      when "revoke"
                         :revoke
                       else
                         :invoke
@@ -106,7 +106,7 @@ class Thor
     #
     def destination_root=(root)
       @destination_stack ||= []
-      @destination_stack[0] = File.expand_path(root || '')
+      @destination_stack[0] = File.expand_path(root || "")
     end
 
     # Returns the given path relative to the absolute root (ie, root where
@@ -114,8 +114,8 @@ class Thor
     #
     def relative_to_original_destination_root(path, remove_dot = true)
       path = path.dup
-      if path.gsub!(@destination_stack[0], '.')
-        remove_dot ? (path[2..-1] || '') : path
+      if path.gsub!(@destination_stack[0], ".")
+        remove_dot ? (path[2..-1] || "") : path
       else
         path
       end
@@ -147,7 +147,7 @@ class Thor
       end
 
       if source_paths.empty?
-        message << 'Currently you have no source paths.'
+        message << "Currently you have no source paths."
       else
         message << "Your current source paths are: \n#{source_paths.join("\n")}"
       end
@@ -164,7 +164,7 @@ class Thor
     # dir<String>:: the directory to move to.
     # config<Hash>:: give :verbose => true to log and use padding.
     #
-    def inside(dir = '', config = {}, &block)
+    def inside(dir = "", config = {}, &block)
       verbose = config.fetch(:verbose, false)
       pretend = options[:pretend]
 
@@ -215,7 +215,7 @@ class Thor
       shell.padding += 1 if verbose
 
       if is_uri
-        contents = open(path, 'Accept' => 'application/x-thor-template') { |io| io.read }
+        contents = open(path, "Accept" => "application/x-thor-template") { |io| io.read }
       else
         contents = open(path) { |io| io.read }
       end
@@ -292,7 +292,7 @@ class Thor
 
       args.unshift(command)
       args.push Thor::Options.to_switches(config)
-      command = args.join(' ').strip
+      command = args.join(" ").strip
 
       run command, :with => :thor, :verbose => verbose, :pretend => pretend, :capture => capture
     end
@@ -311,7 +311,7 @@ class Thor
         %w[--force -f --skip -s].each { |i| options.delete(i) }
         options << "--#{key}"
       when Hash
-        [:force, :skip, 'force', 'skip'].each { |i| options.delete(i) }
+        [:force, :skip, "force", "skip"].each { |i| options.delete(i) }
         options.merge!(key => true)
       end
     end

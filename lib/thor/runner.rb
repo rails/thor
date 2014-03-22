@@ -1,15 +1,15 @@
-require 'thor'
-require 'thor/group'
-require 'thor/core_ext/io_binary_read'
+require "thor"
+require "thor/group"
+require "thor/core_ext/io_binary_read"
 
-require 'fileutils'
-require 'open-uri'
-require 'yaml'
-require 'digest/md5'
-require 'pathname'
+require "fileutils"
+require "open-uri"
+require "yaml"
+require "digest/md5"
+require "pathname"
 
 class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
-  map '-T' => :list, '-i' => :install, '-u' => :update, '-v' => :version
+  map "-T" => :list, "-i" => :install, "-u" => :update, "-v" => :version
 
   # Override Thor#help so it can give information about any class and any method.
   #
@@ -18,7 +18,7 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
       initialize_thorfiles(meth)
       klass, command = Thor::Util.find_class_and_command_by_namespace(meth)
       self.class.handle_no_command_error(command, false) if klass.nil?
-      klass.start(['-h', command].compact, :shell => shell)
+      klass.start(["-h", command].compact, :shell => shell)
     else
       super
     end
@@ -36,7 +36,7 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
     klass.start(args, :shell => shell)
   end
 
-  desc 'install NAME', 'Install an optionally named Thor file into your system commands'
+  desc "install NAME", "Install an optionally named Thor file into your system commands"
   method_options :as => :string, :relative => :boolean, :force => :boolean
   def install(name) # rubocop:disable MethodLength
     initialize_thorfiles
@@ -45,7 +45,7 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
     # command in said directory.
     begin
       if File.directory?(File.expand_path(name))
-        base, package = File.join(name, 'main.thor'), :directory
+        base, package = File.join(name, "main.thor"), :directory
         contents      = open(base) { |input| input.read }
       else
         base, package = name, :file
@@ -57,14 +57,14 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
       fail Error, "Error opening file '#{name}'"
     end
 
-    say 'Your Thorfile contains:'
+    say "Your Thorfile contains:"
     say contents
 
-    unless options['force']
-      return false if no?('Do you wish to continue [y/N]?')
+    unless options["force"]
+      return false if no?("Do you wish to continue [y/N]?")
     end
 
-    as = options['as'] || begin
+    as = options["as"] || begin
       first_line = contents.split("\n")[0]
       (match = first_line.match(/\s*#\s*module:\s*([^\n]*)/)) ? match[1].strip : nil
     end
@@ -88,11 +88,11 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
     }
 
     save_yaml(thor_yaml)
-    say 'Storing thor file in your system repository'
+    say "Storing thor file in your system repository"
     destination = File.join(thor_root, thor_yaml[as][:filename])
 
     if package == :file
-      File.open(destination, 'w') { |f| f.puts contents }
+      File.open(destination, "w") { |f| f.puts contents }
     else
       FileUtils.cp_r(name, destination)
     end
@@ -100,13 +100,13 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
     thor_yaml[as][:filename] # Indicate success
   end
 
-  desc 'version', 'Show Thor version'
+  desc "version", "Show Thor version"
   def version
-    require 'thor/version'
+    require "thor/version"
     say "Thor #{Thor::VERSION}"
   end
 
-  desc 'uninstall NAME', 'Uninstall a named Thor module'
+  desc "uninstall NAME", "Uninstall a named Thor module"
   def uninstall(name)
     fail Error, "Can't find module '#{name}'" unless thor_yaml[name]
     say "Uninstalling #{name}."
@@ -115,17 +115,17 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
     thor_yaml.delete(name)
     save_yaml(thor_yaml)
 
-    puts 'Done.'
+    puts "Done."
   end
 
-  desc 'update NAME', 'Update a Thor file from its original location'
+  desc "update NAME", "Update a Thor file from its original location"
   def update(name)
     fail Error, "Can't find module '#{name}'" if !thor_yaml[name] || !thor_yaml[name][:location]
 
     say "Updating '#{name}' from #{thor_yaml[name][:location]}"
 
     old_filename = thor_yaml[name][:filename]
-    self.options = options.merge('as' => name)
+    self.options = options.merge("as" => name)
 
     if File.directory? File.expand_path(name)
       FileUtils.rm_rf(File.join(thor_root, old_filename))
@@ -143,21 +143,21 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
     end
   end
 
-  desc 'installed', 'List the installed Thor modules and commands'
+  desc "installed", "List the installed Thor modules and commands"
   method_options :internal => :boolean
   def installed
     initialize_thorfiles(nil, true)
-    display_klasses(true, options['internal'])
+    display_klasses(true, options["internal"])
   end
 
-  desc 'list [SEARCH]', 'List the available thor commands (--substring means .*SEARCH)'
+  desc "list [SEARCH]", "List the available thor commands (--substring means .*SEARCH)"
   method_options :substring => :boolean, :group => :string, :all => :boolean, :debug => :boolean
-  def list(search = '')
+  def list(search = "")
     initialize_thorfiles
 
-    search = ".*#{search}" if options['substring']
+    search = ".*#{search}" if options["substring"]
     search = /^#{search}.*/i
-    group  = options[:group] || 'standard'
+    group  = options[:group] || "standard"
 
     klasses = Thor::Base.subclasses.select do |k|
       (options[:all] || k.group == group) && k.namespace =~ search
@@ -169,7 +169,7 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
 private
 
   def self.banner(command, all = false, subcommand = false)
-    'thor ' + command.formatted_usage(self, all, subcommand)
+    "thor " + command.formatted_usage(self, all, subcommand)
   end
 
   def thor_root
@@ -178,7 +178,7 @@ private
 
   def thor_yaml
     @thor_yaml ||= begin
-      yaml_file = File.join(thor_root, 'thor.yml')
+      yaml_file = File.join(thor_root, "thor.yml")
       yaml = YAML.load_file(yaml_file) if File.exist?(yaml_file)
       yaml || {}
     end
@@ -187,15 +187,15 @@ private
   # Save the yaml file. If none exists in thor root, creates one.
   #
   def save_yaml(yaml)
-    yaml_file = File.join(thor_root, 'thor.yml')
+    yaml_file = File.join(thor_root, "thor.yml")
 
     unless File.exist?(yaml_file)
       FileUtils.mkdir_p(thor_root)
-      yaml_file = File.join(thor_root, 'thor.yml')
+      yaml_file = File.join(thor_root, "thor.yml")
       FileUtils.touch(yaml_file)
     end
 
-    File.open(yaml_file, 'w') { |f| f.puts yaml.to_yaml }
+    File.open(yaml_file, "w") { |f| f.puts yaml.to_yaml }
   end
 
   def self.exit_on_failure?
@@ -252,7 +252,7 @@ private
     files -= ["#{thor_root}/thor.yml"]
 
     files.map! do |file|
-      File.directory?(file) ? File.join(file, 'main.thor') : file
+      File.directory?(file) ? File.join(file, "main.thor") : file
     end
   end
 
@@ -261,7 +261,7 @@ private
   # namespaces registered.
   #
   def thorfiles_relevant_to(meth)
-    lookup = [meth, meth.split(':')[0...-1].join(':')]
+    lookup = [meth, meth.split(":")[0...-1].join(":")]
 
     files = thor_yaml.select do |k, v|
       v[:namespaces] && !(v[:namespaces] & lookup).empty?
@@ -276,21 +276,21 @@ private
   def display_klasses(with_modules = false, show_internal = false, klasses = Thor::Base.subclasses)
     klasses -= [Thor, Thor::Runner, Thor::Group] unless show_internal
 
-    fail Error, 'No Thor commands available' if klasses.empty?
+    fail Error, "No Thor commands available" if klasses.empty?
     show_modules if with_modules && !thor_yaml.empty?
 
     list = Hash.new { |h, k| h[k] = [] }
     groups = klasses.select { |k| k.ancestors.include?(Thor::Group) }
 
     # Get classes which inherit from Thor
-    (klasses - groups).each { |k| list[k.namespace.split(':').first] += k.printable_commands(false) }
+    (klasses - groups).each { |k| list[k.namespace.split(":").first] += k.printable_commands(false) }
 
     # Get classes which inherit from Thor::Base
     groups.map! { |k| k.printable_commands(false).first }
-    list['root'] = groups
+    list["root"] = groups
 
     # Order namespaces with default coming first
-    list = list.sort { |a, b| a[0].sub(/^default/, '') <=> b[0].sub(/^default/, '') }
+    list = list.sort { |a, b| a[0].sub(/^default/, "") <=> b[0].sub(/^default/, "") }
     list.each { |n, commands| display_commands(n, commands) unless commands.empty? }
   end
 
@@ -298,7 +298,7 @@ private
     list.sort! { |a, b| a[0] <=> b[0] }
 
     say shell.set_color(namespace, :blue, true)
-    say '-' * namespace.size
+    say "-" * namespace.size
 
     print_table(list, :truncate => true)
     say
@@ -310,13 +310,13 @@ private
     labels = %w[Modules Namespaces]
 
     info << labels
-    info << ['-' * labels[0].size, '-' * labels[1].size]
+    info << ["-" * labels[0].size, "-" * labels[1].size]
 
     thor_yaml.each do |name, hash|
-      info << [name, hash[:namespaces].join(', ')]
+      info << [name, hash[:namespaces].join(", ")]
     end
 
     print_table info
-    say ''
+    say ""
   end
 end

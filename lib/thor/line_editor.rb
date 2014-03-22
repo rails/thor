@@ -1,5 +1,5 @@
-require 'thor/line_editor/basic'
-require 'thor/line_editor/readline'
+require "thor/line_editor/basic"
+require "thor/line_editor/readline"
 
 class Thor
   module LineEditor

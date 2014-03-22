@@ -6,7 +6,7 @@ class Thor
     alias_method :human_name, :name
 
     def initialize(name, options = {})
-      class_name = self.class.name.split('::').last
+      class_name = self.class.name.split("::").last
 
       type = options[:type]
 
@@ -45,9 +45,9 @@ class Thor
 
     def validate!
       if required? && !default.nil?
-        fail ArgumentError, 'An argument cannot be required and have default value.'
+        fail ArgumentError, "An argument cannot be required and have default value."
       elsif @enum && !@enum.is_a?(Array)
-        fail ArgumentError, 'An argument cannot have an enum other than an array.'
+        fail ArgumentError, "An argument cannot have an enum other than an array."
       end
     end
 
@@ -62,11 +62,11 @@ class Thor
       when :string, :default
         human_name.upcase
       when :numeric
-        'N'
+        "N"
       when :hash
-        'key:value'
+        "key:value"
       when :array
-        'one two three'
+        "one two three"
       end
     end
   end

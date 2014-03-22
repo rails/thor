@@ -1,5 +1,5 @@
-require 'set'
-require 'thor/base'
+require "set"
+require "thor/base"
 
 class Thor # rubocop:disable ClassLength
   class << self
@@ -10,7 +10,7 @@ class Thor # rubocop:disable ClassLength
     # options<Hash>
     #
     def package_name(name, options = {})
-      @package_name = name.nil? || name == '' ? nil : name
+      @package_name = name.nil? || name == "" ? nil : name
     end
 
     # Sets the default command when thor is executed without an explicit command to be called.
@@ -20,9 +20,9 @@ class Thor # rubocop:disable ClassLength
     #
     def default_command(meth = nil)
       if meth
-        @default_command = meth == :none ? 'help' : meth.to_s
+        @default_command = meth == :none ? "help" : meth.to_s
       else
-        @default_command ||= from_superclass(:default_command, 'help')
+        @default_command ||= from_superclass(:default_command, "help")
       end
     end
     alias_method :default_task, :default_command
@@ -167,12 +167,12 @@ class Thor # rubocop:disable ClassLength
       command = all_commands[meth]
       handle_no_command_error(meth) unless command
 
-      shell.say 'Usage:'
+      shell.say "Usage:"
       shell.say "  #{banner(command)}"
       shell.say
       class_options_help(shell, nil => command.options.map { |_, o| o })
       if command.long_description
-        shell.say 'Description:'
+        shell.say "Description:"
         shell.print_wrapped(command.long_description, :indent => 2)
       else
         shell.say command.description
@@ -195,7 +195,7 @@ class Thor # rubocop:disable ClassLength
       if defined?(@package_name) && @package_name
         shell.say "#{@package_name} commands:"
       else
-        shell.say 'Commands:'
+        shell.say "Commands:"
       end
 
       shell.print_table(list, :indent => 2, :truncate => true)
@@ -209,7 +209,7 @@ class Thor # rubocop:disable ClassLength
         next if command.hidden?
         item = []
         item << banner(command, false, subcommand)
-        item << (command.description ? "# #{command.description.gsub(/\s+/m, ' ')}" : '')
+        item << (command.description ? "# #{command.description.gsub(/\s+/m, ' ')}" : "")
         item
       end.compact
     end
@@ -231,7 +231,7 @@ class Thor # rubocop:disable ClassLength
 
       define_method(subcommand) do |*args|
         args, opts = Thor::Arguments.split(args)
-        args.unshift('help') if opts.include? '--help' or opts.include? '-h'
+        args.unshift("help") if opts.include? "--help" or opts.include? "-h"
         invoke subcommand_class, args, opts, :invoked_via_subcommand => true, :class_options => options
       end
     end
@@ -386,11 +386,11 @@ class Thor # rubocop:disable ClassLength
         commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
         @usage, @desc, @long_desc, @method_options, @hide = nil
         true
-      elsif all_commands[meth] || meth == 'method_missing'
+      elsif all_commands[meth] || meth == "method_missing"
         true
       else
         puts "[WARNING] Attempted to create command #{meth.inspect} without usage or description. " <<
-             'Call desc if you want this method to be available as command or declare it inside a ' <<
+             "Call desc if you want this method to be available as command or declare it inside a " <<
              "no_commands{} block. Invoked from #{caller[1].inspect}."
         false
       end
@@ -421,7 +421,7 @@ class Thor # rubocop:disable ClassLength
     # +normalize_command_name+ also converts names like +animal-prison+
     # into +animal_prison+.
     def normalize_command_name(meth) #:nodoc:
-      return default_command.to_s.gsub('-', '_') unless meth
+      return default_command.to_s.gsub("-", "_") unless meth
 
       possibilities = find_command_possibilities(meth)
       if possibilities.size > 1
@@ -434,7 +434,7 @@ class Thor # rubocop:disable ClassLength
         meth = possibilities.first
       end
 
-      meth.to_s.gsub('-', '_') # treat foo-bar as foo_bar
+      meth.to_s.gsub("-", "_") # treat foo-bar as foo_bar
     end
     alias_method :normalize_task_name, :normalize_command_name
 
@@ -457,7 +457,7 @@ class Thor # rubocop:disable ClassLength
     alias_method :find_task_possibilities, :find_command_possibilities
 
     def subcommand_help(cmd)
-      desc 'help [COMMAND]', 'Describe subcommands or one specific subcommand'
+      desc "help [COMMAND]", "Describe subcommands or one specific subcommand"
       class_eval "
         def help(command = nil, subcommand = true); super; end
 "
@@ -469,7 +469,7 @@ class Thor # rubocop:disable ClassLength
 
   map HELP_MAPPINGS => :help
 
-  desc 'help [COMMAND]', 'Describe available commands or one specific command'
+  desc "help [COMMAND]", "Describe available commands or one specific command"
   def help(command = nil, subcommand = false)
     if command
       if self.class.subcommands.include? command

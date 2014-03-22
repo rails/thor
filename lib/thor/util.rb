@@ -1,4 +1,4 @@
-require 'rbconfig'
+require "rbconfig"
 
 class Thor
   module Sandbox #:nodoc:
@@ -41,8 +41,8 @@ class Thor
       # String:: If we receive Foo::Bar::Baz it returns "foo:bar:baz"
       #
       def namespace_from_thor_class(constant)
-        constant = constant.to_s.gsub(/^Thor::Sandbox::/, '')
-        constant = snake_case(constant).squeeze(':')
+        constant = constant.to_s.gsub(/^Thor::Sandbox::/, "")
+        constant = snake_case(constant).squeeze(":")
         constant
       end
 
@@ -75,7 +75,7 @@ class Thor
         stringfied_constants = klass.constants.map { |c| c.to_s }
         Thor::Base.subclasses.select do |subclass|
           next unless subclass.name
-          stringfied_constants.include?(subclass.name.gsub("#{klass.name}::", ''))
+          stringfied_constants.include?(subclass.name.gsub("#{klass.name}::", ""))
         end
       end
 
@@ -89,7 +89,7 @@ class Thor
       #
       def snake_case(str)
         return str.downcase if str =~ /^[A-Z_]+$/
-        str.gsub(/\B[A-Z]/, '_\&').squeeze('_') =~ /_*(.*)/
+        str.gsub(/\B[A-Z]/, '_\&').squeeze("_") =~ /_*(.*)/
         $+.downcase
       end
 
@@ -103,7 +103,7 @@ class Thor
       #
       def camel_case(str)
         return str if str !~ /_/ && str =~ /[A-Z]+.*/
-        str.split('_').map { |i| i.capitalize }.join
+        str.split("_").map { |i| i.capitalize }.join
       end
 
       # Receives a namespace and tries to retrieve a Thor or Thor::Group class
@@ -129,17 +129,17 @@ class Thor
       # namespace<String>
       #
       def find_class_and_command_by_namespace(namespace, fallback = true)
-        if namespace.include?(':') # look for a namespaced command
-          pieces  = namespace.split(':')
+        if namespace.include?(":") # look for a namespaced command
+          pieces  = namespace.split(":")
           command = pieces.pop
-          klass   = Thor::Util.find_by_namespace(pieces.join(':'))
+          klass   = Thor::Util.find_by_namespace(pieces.join(":"))
         end
         unless klass # look for a Thor::Group with the right name
           klass, command = Thor::Util.find_by_namespace(namespace), nil
         end
         if !klass && fallback # try a command in the default namespace
           command = namespace
-          klass   = Thor::Util.find_by_namespace('')
+          klass   = Thor::Util.find_by_namespace("")
         end
         [klass, command]
       end
@@ -164,22 +164,22 @@ class Thor
       end
 
       def user_home # rubocop:disable MethodLength
-        @@user_home ||= if ENV['HOME']
-          ENV['HOME']
-        elsif ENV['USERPROFILE']
-          ENV['USERPROFILE']
-        elsif ENV['HOMEDRIVE'] && ENV['HOMEPATH']
-          File.join(ENV['HOMEDRIVE'], ENV['HOMEPATH'])
-        elsif ENV['APPDATA']
-          ENV['APPDATA']
+        @@user_home ||= if ENV["HOME"]
+          ENV["HOME"]
+        elsif ENV["USERPROFILE"]
+          ENV["USERPROFILE"]
+        elsif ENV["HOMEDRIVE"] && ENV["HOMEPATH"]
+          File.join(ENV["HOMEDRIVE"], ENV["HOMEPATH"])
+        elsif ENV["APPDATA"]
+          ENV["APPDATA"]
         else
           begin
-            File.expand_path('~')
+            File.expand_path("~")
           rescue
             if File::ALT_SEPARATOR
-              'C:/'
+              "C:/"
             else
-              '/'
+              "/"
             end
           end
         end
@@ -188,7 +188,7 @@ class Thor
       # Returns the root where thor files are located, depending on the OS.
       #
       def thor_root
-        File.join(user_home, '.thor').gsub(/\\/, '/')
+        File.join(user_home, ".thor").gsub(/\\/, "/")
       end
 
       # Returns the files in the thor root. On Windows thor_root will be something
@@ -202,7 +202,7 @@ class Thor
         files = Dir["#{escape_globs(thor_root)}/*"]
 
         files.map! do |file|
-          File.directory?(file) ? File.join(file, 'main.thor') : file
+          File.directory?(file) ? File.join(file, "main.thor") : file
         end
       end
 
@@ -218,15 +218,15 @@ class Thor
       #
       def ruby_command # rubocop:disable MethodLength
         @ruby_command ||= begin
-          ruby_name = RbConfig::CONFIG['ruby_install_name']
-          ruby = File.join(RbConfig::CONFIG['bindir'], ruby_name)
-          ruby << RbConfig::CONFIG['EXEEXT']
+          ruby_name = RbConfig::CONFIG["ruby_install_name"]
+          ruby = File.join(RbConfig::CONFIG["bindir"], ruby_name)
+          ruby << RbConfig::CONFIG["EXEEXT"]
 
           # avoid using different name than ruby (on platforms supporting links)
-          if ruby_name != 'ruby' && File.respond_to?(:readlink)
+          if ruby_name != "ruby" && File.respond_to?(:readlink)
             begin
-              alternate_ruby = File.join(RbConfig::CONFIG['bindir'], 'ruby')
-              alternate_ruby << RbConfig::CONFIG['EXEEXT']
+              alternate_ruby = File.join(RbConfig::CONFIG["bindir"], "ruby")
+              alternate_ruby << RbConfig::CONFIG["EXEEXT"]
 
               # ruby is a symlink
               if File.symlink? alternate_ruby

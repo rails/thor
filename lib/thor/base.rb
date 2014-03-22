@@ -1,17 +1,17 @@
-require 'thor/command'
-require 'thor/core_ext/hash_with_indifferent_access'
-require 'thor/core_ext/ordered_hash'
-require 'thor/error'
-require 'thor/invocation'
-require 'thor/parser'
-require 'thor/shell'
-require 'thor/line_editor'
-require 'thor/util'
+require "thor/command"
+require "thor/core_ext/hash_with_indifferent_access"
+require "thor/core_ext/ordered_hash"
+require "thor/error"
+require "thor/invocation"
+require "thor/parser"
+require "thor/shell"
+require "thor/line_editor"
+require "thor/util"
 
 class Thor
-  autoload :Actions,    'thor/actions'
-  autoload :RakeCompat, 'thor/rake_compat'
-  autoload :Group,      'thor/group'
+  autoload :Actions,    "thor/actions"
+  autoload :RakeCompat, "thor/rake_compat"
+  autoload :Group,      "thor/group"
 
   # Shortcuts for help.
   HELP_MAPPINGS       = %w[-h -? --help -D]
@@ -20,7 +20,7 @@ class Thor
   THOR_RESERVED_WORDS = %w[invoke shell options behavior root destination_root relative_root
                            action add_file create_file in_root inside run run_ruby_script]
 
-  TEMPLATE_EXTNAME = '.tt'
+  TEMPLATE_EXTNAME = ".tt"
 
   module Base
     attr_accessor :options, :parent_options, :args
@@ -320,7 +320,7 @@ class Thor
         if name
           @group = name.to_s
         else
-          @group ||= from_superclass(:group, 'standard')
+          @group ||= from_superclass(:group, "standard")
         end
       end
 
@@ -439,7 +439,7 @@ class Thor
         config[:shell] ||= Thor::Base.shell.new
         dispatch(nil, given_args.dup, nil, config)
       rescue Thor::Error => e
-        config[:debug] || ENV['THOR_DEBUG'] == '1' ? (raise e) : config[:shell].error(e.message)
+        config[:debug] || ENV["THOR_DEBUG"] == "1" ? (raise e) : config[:shell].error(e.message)
         exit(1) if exit_on_failure?
       rescue Errno::EPIPE
         # This happens if a thor command is piped to something like `head`,
@@ -477,8 +477,8 @@ class Thor
 
       def handle_argument_error(command, error, args, arity) #:nodoc:
         msg = "ERROR: \"#{basename} #{command.name}\" was called with "
-        msg << 'no arguments'               if     args.empty?
-        msg << 'arguments ' << args.inspect unless args.empty?
+        msg << "no arguments"               if     args.empty?
+        msg << "arguments " << args.inspect unless args.empty?
         msg << "\nUsage: #{banner(command).inspect}"
         fail InvocationError, msg
       end
@@ -515,17 +515,17 @@ class Thor
         options.each do |option|
           unless option.hide
             item = [option.usage(padding)]
-            item.push(option.description ? "# #{option.description}" : '')
+            item.push(option.description ? "# #{option.description}" : "")
 
             list << item
-            list << ['', "# Default: #{option.default}"] if option.show_default?
-            list << ['', "# Possible values: #{option.enum.join(', ')}"] if option.enum
+            list << ["", "# Default: #{option.default}"] if option.show_default?
+            list << ["", "# Possible values: #{option.enum.join(', ')}"] if option.enum
           end
         end
 
-        shell.say(group_name ? "#{group_name} options:" : 'Options:')
+        shell.say(group_name ? "#{group_name} options:" : "Options:")
         shell.print_table(list, :indent => 2)
-        shell.say ''
+        shell.say ""
       end
 
       # Raises an error if the word given is a Thor reserved word.
@@ -583,7 +583,7 @@ class Thor
       def method_added(meth)
         meth = meth.to_s
 
-        if meth == 'initialize'
+        if meth == "initialize"
           initialize_added
           return
         end
@@ -628,7 +628,7 @@ class Thor
       # The basename of the program invoking the thor class.
       #
       def basename
-        File.basename($PROGRAM_NAME).split(' ').first
+        File.basename($PROGRAM_NAME).split(" ").first
       end
 
       # SIGNATURE: Sets the baseclass. This is where the superclass lookup

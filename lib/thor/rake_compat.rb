@@ -1,5 +1,5 @@
-require 'rake'
-require 'rake/dsl_definition'
+require "rake"
+require "rake/dsl_definition"
 
 class Thor
   # Adds a compatibility layer to your Thor classes which allows you to use
@@ -41,10 +41,10 @@ instance_eval do
     task = super
 
     if klass = Thor::RakeCompat.rake_classes.last # rubocop:disable AssignmentInCondition
-      non_namespaced_name = task.name.split(':').last
+      non_namespaced_name = task.name.split(":").last
 
       description = non_namespaced_name
-      description << task.arg_names.map { |n| n.to_s.upcase }.join(' ')
+      description << task.arg_names.map { |n| n.to_s.upcase }.join(" ")
       description.strip!
 
       klass.desc description, Rake.application.last_description || non_namespaced_name

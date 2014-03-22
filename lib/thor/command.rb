@@ -45,12 +45,12 @@ class Thor
       end
       formatted = "#{klass.namespace.split(':').last} " if subcommand
 
-      formatted ||= ''
+      formatted ||= ""
 
       # Add usage with required arguments
       formatted << if klass && !klass.arguments.empty?
                      usage.to_s.gsub(/^#{name}/) do |match|
-                       match << ' ' << klass.arguments.map { |a| a.usage }.compact.join(' ')
+                       match << " " << klass.arguments.map { |a| a.usage }.compact.join(" ")
                      end
                    else
                      usage.to_s
@@ -70,7 +70,7 @@ class Thor
     end
 
     def required_options
-      @required_options ||= options.map { |_, o| o.usage if o.required? }.compact.sort.join(' ')
+      @required_options ||= options.map { |_, o| o.usage if o.required? }.compact.sort.join(" ")
     end
 
     # Given a target, checks if this class name is a public method.
@@ -96,7 +96,7 @@ class Thor
       not_debugging?(instance) && (error.message =~ /wrong number of arguments/ || error.message =~ /given \d*, expected \d*/) && begin
         saned = sans_backtrace(error.backtrace, caller)
         # Ruby 1.9 always include the called method in the backtrace
-        saned.empty? || (saned.size == 1 && RUBY_VERSION >= '1.9')
+        saned.empty? || (saned.size == 1 && RUBY_VERSION >= "1.9")
       end
     end
 
@@ -118,7 +118,7 @@ class Thor
   # A dynamic command that handles method missing scenarios.
   class DynamicCommand < Command
     def initialize(name, options = nil)
-      super(name.to_s, 'A dynamically-generated command', name.to_s, name.to_s, options)
+      super(name.to_s, "A dynamically-generated command", name.to_s, name.to_s, options)
     end
 
     def run(instance, args = [])

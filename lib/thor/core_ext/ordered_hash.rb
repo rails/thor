@@ -1,6 +1,6 @@
 class Thor
   module CoreExt #:nodoc:
-    if RUBY_VERSION >= '1.9'
+    if RUBY_VERSION >= "1.9"
       class OrderedHash < ::Hash
       end
     else

@@ -1,5 +1,5 @@
 begin
-  require 'readline'
+  require "readline"
 rescue LoadError
 end
 
@@ -62,7 +62,7 @@ class Thor
       private
 
         def relative_matches
-          absolute_matches.map { |path| path.sub(base_path, '') }
+          absolute_matches.map { |path| path.sub(base_path, "") }
         end
 
         def absolute_matches

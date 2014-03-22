@@ -1,4 +1,4 @@
-require 'thor/actions/empty_directory'
+require "thor/actions/empty_directory"
 
 class Thor
   module Actions
@@ -74,18 +74,18 @@ class Thor
 
       def execute! # rubocop:disable MethodLength
         lookup = Util.escape_globs(source)
-        lookup = config[:recursive] ? File.join(lookup, '**') : lookup
+        lookup = config[:recursive] ? File.join(lookup, "**") : lookup
         lookup = file_level_lookup(lookup)
 
         files(lookup).sort.each do |file_source|
           next if File.directory?(file_source)
           next if config[:exclude_pattern] && file_source.match(config[:exclude_pattern])
-          file_destination = File.join(given_destination, file_source.gsub(source, '.'))
-          file_destination.gsub!('/./', '/')
+          file_destination = File.join(given_destination, file_source.gsub(source, "."))
+          file_destination.gsub!("/./", "/")
 
           case file_source
           when /\.empty_directory$/
-            dirname = File.dirname(file_destination).gsub(/\/\.$/, '')
+            dirname = File.dirname(file_destination).gsub(/\/\.$/, "")
             next if dirname == given_destination
             base.empty_directory(dirname, config)
           when /#{TEMPLATE_EXTNAME}$/
@@ -96,9 +96,9 @@ class Thor
         end
       end
 
-      if RUBY_VERSION < '2.0'
+      if RUBY_VERSION < "2.0"
         def file_level_lookup(previous_lookup)
-          File.join(previous_lookup, '{*,.[a-z]*}')
+          File.join(previous_lookup, "{*,.[a-z]*}")
         end
 
         def files(lookup)
@@ -106,7 +106,7 @@ class Thor
         end
       else
         def file_level_lookup(previous_lookup)
-          File.join(previous_lookup, '*')
+          File.join(previous_lookup, "*")
         end
 
         def files(lookup)

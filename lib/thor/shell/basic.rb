@@ -1,5 +1,5 @@
-require 'tempfile'
-require 'io/console' if RUBY_VERSION > '1.9.2'
+require "tempfile"
+require "io/console" if RUBY_VERSION > "1.9.2"
 
 class Thor
   module Shell
@@ -76,7 +76,7 @@ class Thor
       # ==== Example
       # say("I know you knew that.")
       #
-      def say(message = '', color = nil, force_new_line = (message.to_s !~ /( |\t)\Z/))
+      def say(message = "", color = nil, force_new_line = (message.to_s !~ /( |\t)\Z/))
         buffer = prepare_message(message, *color)
         buffer << "\n" if force_new_line && !message.end_with?("\n")
 
@@ -91,7 +91,7 @@ class Thor
       #
       def say_status(status, message, log_status = true)
         return if quiet? || log_status == false
-        spaces = '  ' * (padding + 1)
+        spaces = "  " * (padding + 1)
         color  = log_status.is_a?(Symbol) ? log_status : :green
 
         status = status.to_s.rjust(12)
@@ -163,17 +163,17 @@ class Thor
           maximas << maxima
           if index == colcount - 1
             # Don't output 2 trailing spaces when printing the last column
-            formats << '%-s'
+            formats << "%-s"
           else
             formats << "%-#{maxima + 2}s"
           end
         end
 
-        formats[0] = formats[0].insert(0, ' ' * indent)
-        formats << '%s'
+        formats[0] = formats[0].insert(0, " " * indent)
+        formats << "%s"
 
         array.each do |row|
-          sentence = ''
+          sentence = ""
 
           row.each_with_index do |column, index|
             maxima = maximas[index]
@@ -211,12 +211,12 @@ class Thor
         paras = message.split("\n\n")
 
         paras.map! do |unwrapped|
-          unwrapped.strip.gsub(/\n/, ' ').squeeze(' ').gsub(/.{1,#{width}}(?:\s|\Z)/) { ($& + 5.chr).gsub(/\n\005/, "\n").gsub(/\005/, "\n") }
+          unwrapped.strip.gsub(/\n/, " ").squeeze(" ").gsub(/.{1,#{width}}(?:\s|\Z)/) { ($& + 5.chr).gsub(/\n\005/, "\n").gsub(/\005/, "\n") }
         end
 
         paras.each do |para|
           para.split("\n").each do |line|
-            stdout.puts line.insert(0, ' ' * indent)
+            stdout.puts line.insert(0, " " * indent)
           end
           stdout.puts unless para == paras.last
         end
@@ -232,7 +232,7 @@ class Thor
       #
       def file_collision(destination) # rubocop:disable MethodLength
         return true if @always_force
-        options = block_given? ? '[Ynaqdh]' : '[Ynaqh]'
+        options = block_given? ? "[Ynaqdh]" : "[Ynaqh]"
 
         loop do
           answer = ask(
@@ -241,18 +241,18 @@ class Thor
           )
 
           case answer
-          when is?(:yes), is?(:force), ''
+          when is?(:yes), is?(:force), ""
             return true
           when is?(:no), is?(:skip)
             return false
           when is?(:always)
             return @always_force = true
           when is?(:quit)
-            say 'Aborting...'
+            say "Aborting..."
             fail SystemExit
           when is?(:diff)
             show_diff(destination, yield) if block_given?
-            say 'Retrying...'
+            say "Retrying..."
           else
             say file_collision_help
           end
@@ -262,8 +262,8 @@ class Thor
       # This code was copied from Rake, available under MIT-LICENSE
       # Copyright (c) 2003, 2004 Jim Weirich
       def terminal_width
-        if ENV['THOR_COLUMNS']
-          result = ENV['THOR_COLUMNS'].to_i
+        if ENV["THOR_COLUMNS"]
+          result = ENV["THOR_COLUMNS"].to_i
         else
           result = unix? ? dynamic_width : 80
         end
@@ -291,7 +291,7 @@ class Thor
     protected
 
       def prepare_message(message, *color)
-        spaces = '  ' * padding
+        spaces = "  " * padding
         spaces + set_color(message.to_s, *color)
       end
 
@@ -334,7 +334,7 @@ class Thor
       end
 
       def show_diff(destination, content) #:nodoc:
-        diff_cmd = ENV['THOR_DIFF'] || ENV['RAILS_DIFF'] || 'diff -u'
+        diff_cmd = ENV["THOR_DIFF"] || ENV["RAILS_DIFF"] || "diff -u"
 
         Tempfile.open(File.basename(destination), File.dirname(destination)) do |temp|
           temp.write content
@@ -370,18 +370,18 @@ class Thor
           if chars.length <= width
             chars.join
           else
-            ( chars[0, width - 3].join) + '...'
+            ( chars[0, width - 3].join) + "..."
           end
         end
       end
 
-      if ''.respond_to?(:encode)
+      if "".respond_to?(:encode)
         def as_unicode
           yield
         end
       else
         def as_unicode
-          old, $KCODE = $KCODE, 'U'
+          old, $KCODE = $KCODE, "U"
           yield
         ensure
           $KCODE = old
@@ -390,7 +390,7 @@ class Thor
 
       def ask_simply(statement, color, options)
         default = options[:default]
-        message = [statement, ("(#{default})" if default), nil].uniq.join(' ')
+        message = [statement, ("(#{default})" if default), nil].uniq.join(" ")
         message = prepare_message(message, color)
         result = Thor::LineEditor.readline(message, options)
 
@@ -398,7 +398,7 @@ class Thor
 
         result.strip!
 
-        if default && result == ''
+        if default && result == ""
           default
         else
           result
@@ -409,7 +409,7 @@ class Thor
         answer_set = options[:limited_to]
         correct_answer = nil
         until correct_answer
-          answers = answer_set.join(', ')
+          answers = answer_set.join(", ")
           answer = ask_simply("#{statement} [#{answers}]", color, options)
           correct_answer = answer_set.include?(answer) ? answer : nil
           say("Your response must be one of: [#{answers}]. Please try again.") unless correct_answer

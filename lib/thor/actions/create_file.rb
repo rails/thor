@@ -1,4 +1,4 @@
-require 'thor/actions/empty_directory'
+require "thor/actions/empty_directory"
 
 class Thor
   module Actions
@@ -59,7 +59,7 @@ class Thor
       def invoke!
         invoke_with_conflict_check do
           FileUtils.mkdir_p(File.dirname(destination))
-          File.open(destination, 'wb') { |f| f.write render }
+          File.open(destination, "wb") { |f| f.write render }
         end
         given_destination
       end

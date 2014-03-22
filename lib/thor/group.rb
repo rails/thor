@@ -1,4 +1,4 @@
-require 'thor/base'
+require "thor/base"
 
 # Thor has a special class called Thor::Group. The main difference to Thor class
 # is that it invokes all commands at once. It also include some methods that allows
@@ -27,7 +27,7 @@ class Thor::Group # rubocop:disable ClassLength
     # short:: When true, shows only usage.
     #
     def help(shell)
-      shell.say 'Usage:'
+      shell.say "Usage:"
       shell.say "  #{banner}\n"
       shell.say
       class_options_help(shell)
@@ -62,7 +62,7 @@ class Thor::Group # rubocop:disable ClassLength
         invocation_blocks[name] = block if block_given?
 
         class_eval <<-METHOD, __FILE__, __LINE__
-          def _invoke_#{name.to_s.gsub(/\W/, '_')}
+          def _invoke_#{name.to_s.gsub(/\W/, "_")}
             klass, command = self.class.prepare_for_invocation(nil, #{name.inspect})
 
             if klass
@@ -114,14 +114,14 @@ class Thor::Group # rubocop:disable ClassLength
       names.each do |name|
         unless class_options.key?(name)
           fail ArgumentError, "You have to define the option #{name.inspect} " <<
-                               'before setting invoke_from_option.'
+                               "before setting invoke_from_option."
         end
 
         invocations[name] = true
         invocation_blocks[name] = block if block_given?
 
         class_eval <<-METHOD, __FILE__, __LINE__
-          def _invoke_from_option_#{name.to_s.gsub(/\W/, '_')}
+          def _invoke_from_option_#{name.to_s.gsub(/\W/, "_")}
             return unless options[#{name.inspect}]
 
             value = options[#{name.inspect}]
@@ -199,15 +199,15 @@ class Thor::Group # rubocop:disable ClassLength
     def printable_commands(*)
       item = []
       item << banner
-      item << (desc ? "# #{desc.gsub(/\s+/m, ' ')}" : '')
+      item << (desc ? "# #{desc.gsub(/\s+/m, ' ')}" : "")
       [item]
     end
     alias_method :printable_tasks, :printable_commands
 
     def handle_argument_error(command, error, args, arity) #:nodoc:
       msg = "#{basename} #{command.name} takes #{arity} argument"
-      msg << 's' if arity > 1
-      msg << ', but it should not.'
+      msg << "s" if arity > 1
+      msg << ", but it should not."
       fail error, msg
     end
 

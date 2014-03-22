@@ -1,4 +1,4 @@
-require 'thor/actions/empty_directory'
+require "thor/actions/empty_directory"
 
 class Thor
   module Actions
@@ -98,7 +98,7 @@ class Thor
           content = File.binread(destination)
           if force || !content.include?(replacement)
             content.gsub!(regexp, string)
-            File.open(destination, 'wb') { |file| file.write(content) }
+            File.open(destination, "wb") { |file| file.write(content) }
           end
         end
       end
