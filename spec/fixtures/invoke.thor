@@ -116,3 +116,16 @@ class H < Thor::Group
   class_option :defined, :type => :boolean, :default => true
   invoke_from_option :defined
 end
+
+class I < Thor
+  desc "two", "Two"
+  def two
+    current_command_chain
+  end
+end
+
+class J < Thor
+  desc "i", "I"
+  subcommand :one, I
+end
+

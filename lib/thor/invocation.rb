@@ -25,6 +25,11 @@ class Thor
       super
     end
 
+    # Make the current command chain accessible with in a Thor-(sub)command
+    def current_command_chain
+      @_invocations.values.flatten.map(&:to_sym)
+    end
+
     # Receives a name and invokes it. The name can be a string (either "command" or
     # "namespace:command"), a Thor::Command, a Class or a Thor instance. If the
     # command cannot be guessed by name, it can also be supplied as second argument.
