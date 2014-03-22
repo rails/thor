@@ -85,6 +85,10 @@ class Thor
 
       sample = "[#{sample}]" unless required?
 
+      if boolean?
+        sample << ", [#{dasherize("no-" + human_name)}]" unless name == "force"
+      end
+
       if aliases.empty?
         (' ' * padding) << sample
       else
