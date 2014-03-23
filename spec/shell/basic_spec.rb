@@ -119,6 +119,11 @@ describe Thor::Shell::Basic do
       expect($stdout).to receive(:print).with("Running...")
       shell.say("Running...", nil, false)
     end
+
+    it "coerces everything to a string before printing" do
+      expect($stdout).to receive(:print).with("this_is_not_a_string\n")
+      shell.say(:this_is_not_a_string, nil, true)
+    end
   end
 
   describe "#say_status" do
