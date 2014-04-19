@@ -565,7 +565,7 @@ class Thor
           item.push(option.description ? "# #{option.description}" : "")
 
           list << item
-          list << ["", "# Default: #{option.default}"] if option.show_default?
+          list << ["", "# Default: #{option.print_default}"] if option.show_default?
           list << ["", "# Possible values: #{option.enum.join(', ')}"] if option.enum
         end
 
