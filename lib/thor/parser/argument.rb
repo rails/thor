@@ -24,6 +24,17 @@ class Thor
       validate! # Trigger specific validations
     end
 
+    def print_default
+      if @type == :array and @default.is_a?(Array)
+        @default.map { |x|
+          p = x.gsub('"','\\"')
+          "\"#{p}\""
+        }.join(" ")
+      else
+        @default
+      end
+    end
+
     def usage
       required? ? banner : "[#{banner}]"
     end
