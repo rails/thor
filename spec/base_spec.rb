@@ -131,6 +131,10 @@ describe Thor::Base do
       expect(@content).to match(/# Default: 3/)
     end
 
+    it "prints arrays as copy pasteables" do
+      expect(@content).to match(/Default: "foo" "bar"/)
+    end
+
     it "shows options in different groups" do
       expect(@content).to match(/Options\:/)
       expect(@content).to match(/Runtime options\:/)
