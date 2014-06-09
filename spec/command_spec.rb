@@ -58,7 +58,7 @@ describe Thor::Command do
   describe "#run" do
     it "runs a command by calling a method in the given instance" do
       dub = double
-      expect(dub).to receive(:can_has).and_return { |*args| args }
+      expect(dub).to receive(:can_has) { |*args| args }
       expect(command.run(dub, [1, 2, 3])).to eq([1, 2, 3])
     end
 
