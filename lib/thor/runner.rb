@@ -242,11 +242,13 @@ private
 
     unless skip_lookup
       Pathname.pwd.ascend do |path|
-        thorfiles = Thor::Util.globs_for(path).map { |g| Dir[g] }.flatten
-        break unless thorfiles.empty?
+        thorfiles.push Thor::Util.globs_for(path).map { |g| Dir[g] }.flatten
       end
+      Pathname.new("./engines").children.each do |path|
+        thorfiles.push Thor::Util.globs_for(path).map { |g| Dir[g] }.flatten
+      end
+      thorfiles.flatten!
     end
-
     files  = (relevant_to ? thorfiles_relevant_to(relevant_to) : Thor::Util.thor_root_glob)
     files += thorfiles
     files -= ["#{thor_root}/thor.yml"]
