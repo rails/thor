@@ -17,6 +17,7 @@ matrix:
     - rvm: jruby-head
       env: JRUBY_OPTS="$JRUBY_OPTS --debug"
   allow_failures:
+    - rvm: 1.9.2
     - rvm: jruby-18mode
     - rvm: jruby-19mode
     - rvm: jruby-head
