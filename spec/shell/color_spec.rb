@@ -18,6 +18,16 @@ describe Thor::Shell::Color do
       expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? [Yes, No, Maybe] \e[0m", anything).and_return("Yes")
       shell.ask "Is this green?", :green, :limited_to => %w[Yes No Maybe]
     end
+
+    it "handles an Array of colors" do
+      expect(Thor::LineEditor).to receive(:readline).with("\e[32m\e[47m\e[1mIs this green on white? \e[0m", anything).and_return("yes")
+      shell.ask "Is this green on white?", [:green, :on_white, :bold]
+    end
+
+    it "supports the legacy color syntax" do
+      expect(Thor::LineEditor).to receive(:readline).with("\e[1m\e[34mIs this legacy blue? \e[0m", anything).and_return("yes")
+      shell.ask "Is this legacy blue?", [:blue, true]
+    end
   end
 
   describe "#say" do
@@ -53,6 +63,15 @@ describe Thor::Shell::Color do
 
       expect(out.chomp).to eq("\e[32m\e[41m\e[1mWow! Now we have colors *and* background colors\e[0m")
     end
+
+    it "supports the legacy color syntax" do
+      out = capture(:stdout) do
+        shell.say "Wow! This still works?", [:blue, true]
+      end
+
+      expect(out.chomp).to eq("\e[1m\e[34mWow! This still works?\e[0m")
+    end
+
   end
 
   describe "#say_status" do

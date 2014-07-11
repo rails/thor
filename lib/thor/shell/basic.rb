@@ -391,7 +391,7 @@ class Thor
       def ask_simply(statement, color, options)
         default = options[:default]
         message = [statement, ("(#{default})" if default), nil].uniq.join(" ")
-        message = prepare_message(message, color)
+        message = prepare_message(message, *color)
         result = Thor::LineEditor.readline(message, options)
 
         return unless result
