@@ -21,6 +21,10 @@ describe Thor::Arguments do
       create :string => nil, :numeric => nil
       expect(parse("name", "13")["string"]).to eq("name")
       expect(parse("name", "13")["numeric"]).to eq(13)
+      expect(parse("name", "+13")["numeric"]).to eq(13)
+      expect(parse("name", "+13.3")["numeric"]).to eq(13.3)
+      expect(parse("name", "-13")["numeric"]).to eq(-13)
+      expect(parse("name", "-13.3")["numeric"]).to eq(-13.3)
     end
 
     it "accepts hashes" do
