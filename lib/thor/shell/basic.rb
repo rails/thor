@@ -209,8 +209,10 @@ class Thor
         indent = options[:indent] || 0
         width = terminal_width - indent
         paras = message.split("\n\n")
+        min_space_length = paras.map{|para| para[/(^\s+)/, 1].length }.min
 
         paras.map! do |unwrapped|
+          ' ' * (unwrapped[/^(\s+)/, 1].length - min_space_length) +
           unwrapped.strip.gsub(/\n/, " ").squeeze(" ").gsub(/.{1,#{width}}(?:\s|\Z)/) { ($& + 5.chr).gsub(/\n\005/, "\n").gsub(/\005/, "\n") }
         end
 
