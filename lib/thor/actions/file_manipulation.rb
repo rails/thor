@@ -113,7 +113,9 @@ class Thor
       context = instance_eval("binding")
 
       create_file destination, nil, config do
-        content = ERB.new(::File.binread(source), nil, "-", "@output_buffer").result(context)
+        content = ERB.new(::File.binread(source), nil, "-", "@output_buffer").tap do | erb |
+          erb.filename = source
+        end.result(context)
         content = block.call(content) if block
         content
       end
