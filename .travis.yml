@@ -24,3 +24,4 @@ matrix:
     - rvm: ruby-head
   fast_finish: true
 script: bundle exec thor spec
+sudo: false
