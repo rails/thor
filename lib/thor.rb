@@ -194,7 +194,7 @@ class Thor # rubocop:disable ClassLength
       list.sort! { |a, b| a[0] <=> b[0] }
 
       if defined?(@package_name) && @package_name
-        shell.say Thor::Localize.t('thor.help.command_list.with_package_name', package_name: @package_name)
+        shell.say Thor::Localize.t('thor.help.command_list.with_package_name', :package_name => @package_name)
       else
         shell.say Thor::Localize.t('thor.help.command_list.simple')
       end
@@ -390,7 +390,7 @@ class Thor # rubocop:disable ClassLength
       elsif all_commands[meth] || meth == "method_missing"
         true
       else
-        puts Thor::Localize.t('thor.errors.missing_description', command: meth.inspect, invoker: caller[1].inspect)
+        puts Thor::Localize.t('thor.errors.missing_description', :command => meth.inspect, :invoker => caller[1].inspect)
 
         false
       end
@@ -425,7 +425,7 @@ class Thor # rubocop:disable ClassLength
 
       possibilities = find_command_possibilities(meth)
       if possibilities.size > 1
-        fail AmbiguousTaskError, Thor::Localize.t('thor.errors.ambiguous_command', command: meth, matching_commands: possibilities.join(', '))
+        fail AmbiguousTaskError, Thor::Localize.t('thor.errors.ambiguous_command', :command => meth, :matching_commands => possibilities.join(', '))
       elsif possibilities.size < 1
         meth = meth || default_command
       elsif map[meth]
