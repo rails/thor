@@ -1,5 +1,6 @@
 require "set"
 require "thor/base"
+require "thor/localize"
 
 class Thor # rubocop:disable ClassLength
   class << self
@@ -167,12 +168,12 @@ class Thor # rubocop:disable ClassLength
       command = all_commands[meth]
       handle_no_command_error(meth) unless command
 
-      shell.say "Usage:"
+      shell.say Thor::Localize.t('thor.help.usage')
       shell.say "  #{banner(command)}"
       shell.say
       class_options_help(shell, nil => command.options.map { |_, o| o })
       if command.long_description
-        shell.say "Description:"
+        shell.say Thor::Localize.t('thor.help.description')
         shell.print_wrapped(command.long_description, :indent => 2)
       else
         shell.say command.description
@@ -193,9 +194,9 @@ class Thor # rubocop:disable ClassLength
       list.sort! { |a, b| a[0] <=> b[0] }
 
       if defined?(@package_name) && @package_name
-        shell.say "#{@package_name} commands:"
+        shell.say Thor::Localize.t('thor.help.command_list.with_package_name', package_name: @package_name)
       else
-        shell.say "Commands:"
+        shell.say Thor::Localize.t('thor.help.command_list.simple')
       end
 
       shell.print_table(list, :indent => 2, :truncate => true)
@@ -389,9 +390,8 @@ class Thor # rubocop:disable ClassLength
       elsif all_commands[meth] || meth == "method_missing"
         true
       else
-        puts "[WARNING] Attempted to create command #{meth.inspect} without usage or description. " <<
-             "Call desc if you want this method to be available as command or declare it inside a " <<
-             "no_commands{} block. Invoked from #{caller[1].inspect}."
+        puts Thor::Localize.t('thor.errors.missing_description', command: meth.inspect, invoker: caller[1].inspect)
+
         false
       end
     end
@@ -425,7 +425,7 @@ class Thor # rubocop:disable ClassLength
 
       possibilities = find_command_possibilities(meth)
       if possibilities.size > 1
-        fail AmbiguousTaskError, "Ambiguous command #{meth} matches [#{possibilities.join(', ')}]"
+        fail AmbiguousTaskError, Thor::Localize.t('thor.errors.ambiguous_command', command: meth, matching_commands: possibilities.join(', '))
       elsif possibilities.size < 1
         meth = meth || default_command
       elsif map[meth]
@@ -457,7 +457,7 @@ class Thor # rubocop:disable ClassLength
     alias_method :find_task_possibilities, :find_command_possibilities
 
     def subcommand_help(cmd)
-      desc "help [COMMAND]", "Describe subcommands or one specific subcommand"
+      desc Thor::Localize.t('thor.help.subcommand.short'), Thor::Localize.t('thor.help.subcommand.long')
       class_eval "
         def help(command = nil, subcommand = true); super; end
 "
@@ -469,7 +469,7 @@ class Thor # rubocop:disable ClassLength
 
   map HELP_MAPPINGS => :help
 
-  desc "help [COMMAND]", "Describe available commands or one specific command"
+  desc Thor::Localize.t('thor.help.short'), Thor::Localize.t('thor.help.long')
   def help(command = nil, subcommand = false)
     if command
       if self.class.subcommands.include? command

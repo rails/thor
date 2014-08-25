@@ -1,0 +1,81 @@
+---
+thor:
+  errors:
+    missing_description: "[WARNING] Attempted to create command %{command} without usage or description. Call desc if you want this method to be available as command or declare it inside a no_commands{} block. Invoked from %{invoker}."
+    ambiguous_command: "Ambiguous command %{command} matches [%{matching_commands}]"
+  runner:
+    show:
+      thorfile:
+        contents: "Your Thorfile contains:"
+    install:
+      thorfile:
+        message:
+          filename: "Storing thor file in your system repository"
+        short: "install NAME"
+        long: "Install an optionally named Thor file into your system commands"
+        error:
+          uri: "Error opening URI '%{name}'"
+          file: "Error opening file '%{name}'"
+          missing_commands: "No Thor commands available"
+        question:
+          continue: "Do you wish to continue [y/N]?"
+          filename: "Please specify a name for %{name} in the system repository [%{basename}]:"
+      uninstall:
+        thorfile:
+          short: "uninstall NAME"
+          long: "Uninstall a named Thor module"
+        message:
+          uninstall: "Uninstalling %{name}."
+        error:
+          missing_module: "Can't find module '%{name}'"
+        success: "Done."
+    update:
+      thorfile:
+        short: "update NAME"
+        long: "Update a Thor file from its original location"
+        message: "Updating '%{name}' from %{location}"
+        error:
+          missing_module: "Can't find module '%{name}'"
+        success: "Done."
+    list_installed:
+      thorfile:
+        short: "installed"
+        long: "List the installed Thor modules and commands"
+    list_commands:
+      thorfile:
+        short: "list [SEARCH]"
+        long: "List the available thor commands (--substring means .*SEARCH)"
+    version:
+      long: "Show Thor version"
+      short: "version"
+  help:
+    usage: "Usage:"
+    description: "Description:"
+    command_list:
+        with_package_name: "%{package_name} commands:"
+        simple: "Commands:"
+    options:
+      with_group_name: "%{group_name} options:"
+      simple: "Options:"
+    short: "help [COMMAND]"
+    long: "Describe available commands or one specific command"
+    subcommand:
+      short: "help [COMMAND]"
+      long: "Describe subcommands or one specific subcommand"
+  status:
+    apply: "apply"
+    chmod: "chmod"
+    create: "create"
+    error: "error"
+    exist: "exist"
+    force: "force"
+    gsub: "gsub"
+    identical: "identical"
+    inside: "inside"
+    invoke: "invoke"
+    remove: "remove"
+    revoke: "revoke"
+    run: "run"
+    skip: "skip"
+    error:
+      not_found: "not found"

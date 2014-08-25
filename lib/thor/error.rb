@@ -29,4 +29,8 @@ class Thor
 
   class MalformattedArgumentError < InvocationError
   end
+
+  # Raised if an invalid localization key was found
+  class InvalidLocalizationKeyError < Error
+  end
 end
