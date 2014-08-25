@@ -1,3 +1,4 @@
+require 'psych'
 require "thor/localize/internal"
 require "thor/localize/interpolate"
 
