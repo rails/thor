@@ -108,6 +108,21 @@ class Thor
 
     def validate!
       fail ArgumentError, "An option cannot be boolean and required." if boolean? && required?
+      validate_default_type!
+    end
+
+    def validate_default_type!
+      default_type = case @default
+                     when nil
+                       return
+                     when TrueClass, FalseClass
+                       :boolean
+                     when Numeric
+                       :numeric
+                     when Hash, Array, String
+                       @default.class.name.downcase.to_sym
+                     end
+      fail ArgumentError, "An option's default must match its type." unless default_type == @type
     end
 
     def dasherized?
