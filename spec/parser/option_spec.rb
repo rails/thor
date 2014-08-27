@@ -135,6 +135,12 @@ describe Thor::Option do
     expect(option).to be_required
   end
 
+  it "raises an error if default is inconsistent with type" do
+    expect do
+      option = option("foo", :type => :numeric, :default => "bar")
+    end.to raise_error(ArgumentError, "An option's default must match its type.")
+  end
+
   it "boolean options cannot be required" do
     expect do
       option("foo", :required => true, :type => :boolean)
