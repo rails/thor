@@ -27,6 +27,12 @@ describe Thor::Shell::Basic do
       shell.indent { expect(shell.padding).to eq(7) }
     end
 
+    it "accepts custom indentation amounts" do
+      shell.indent(6) {
+        expect(shell.padding).to eq(6)
+      }
+    end
+
     it "increases the padding when nested" do
       shell.indent {
         expect(shell.padding).to eq(1)
