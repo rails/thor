@@ -16,6 +16,29 @@ describe Thor::Shell::Basic do
     end
   end
 
+  describe "#indent" do
+    it "sets the padding temporarily" do
+      shell.indent { expect(shell.padding).to eq(1) }
+      expect(shell.padding).to eq(0)
+    end
+
+    it "derives padding from original value" do
+      shell.padding = 6
+      shell.indent { expect(shell.padding).to eq(7) }
+    end
+
+    it "increases the padding when nested" do
+      shell.indent {
+        expect(shell.padding).to eq(1)
+
+        shell.indent {
+          expect(shell.padding).to eq(2)
+        }
+      }
+      expect(shell.padding).to eq(0)
+    end
+  end
+
   describe "#ask" do
     it "prints a message to the user and gets the response" do
       expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", {}).and_return("Sure")
