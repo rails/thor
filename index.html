@@ -19,7 +19,8 @@
   <body>
     <div id="main">
       <header>
-Thor is a toolkit for building powerful command-line interfaces. It is used in Bundler, Vagrant, Rails and others.
+Thor is a toolkit for building powerful command-line interfaces. It is
+used in Bundler, Vagrant, Rails, and 197 other gems.
 </header>
 
 <h1 id="getting-started">Getting Started</h1>
@@ -292,7 +293,7 @@ end
 <pre class="brush: plain; gutter: false; toolbar: false">
 
 $ ./cli hello Yehuda
-No value provided for required options '--from'
+No value provided for required options &#39;--from&#39;
 </pre></div>
 
 <p>The full list of metadata you can provide for an option:</p>
@@ -309,7 +310,8 @@ usage description. By default, this is the upcase version of the flag
 option cannot be both <code>:required</code> and have a <code>:default</code>.</li>
   <li><code>:type</code>: <code>:string</code>, <code>:hash</code>, <code>:array</code>, <code>:numeric</code>, or <code>:boolean</code></li>
   <li><code>:aliases</code>: A list of aliases for this option. Typically, you would
-use aliases to provide short versions of the option.</li>
+use aliases to provide short versions of the option. Each alias is a string
+and it has a prepended dash (for example: <code>"-f"</code>).</li>
 </ul>
 
 <p>You can use a shorthand to specify a number of options at once if you
@@ -403,7 +405,7 @@ module GitCLI
       refspec to track only &lt;branch&gt; is created. You can give more than one -t &lt;branch&gt; to track multiple branches without grabbing all
       branches.
 
-      With -m &lt;master&gt; option, $GIT_DIR/remotes/&lt;name&gt;/HEAD is set up to point at remote's &lt;master&gt; branch. See also the set-head
+      With -m &lt;master&gt; option, $GIT_DIR/remotes/&lt;name&gt;/HEAD is set up to point at remote&#39;s &lt;master&gt; branch. See also the set-head
       command.
 
       When a fetch mirror is created with --mirror=fetch, the refs will not be stored in the refs/remotes/ namespace, but rather
@@ -427,7 +429,7 @@ module GitCLI
   class Git &lt; Thor
     desc &quot;fetch &lt;repository&gt; [&lt;refspec&gt;...]&quot;, &quot;Download objects and refs from another repository&quot;
     options :all =&gt; :boolean, :multiple =&gt; :boolean
-    option :append, :type =&gt; :boolean, :aliases =&gt; :a
+    option :append, :type =&gt; :boolean, :aliases =&gt; &quot;-a&quot;
     def fetch(respository, *refspec)
       # implement git fetch here
     end
