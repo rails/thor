@@ -1,3 +1,24 @@
+## 0.19.0, release 2014-03-22
+* Add support for a default to #ask
+* Avoid @namespace not initialized warning
+* Avoid private attribute? warning
+* Fix initializing with unknown options
+* Loosen required_rubygems_version for compatibility with Ubuntu 10.04
+* Shell#ask: support a noecho option for stdin
+* Shell#ask: change API to be :echo => false
+* Display a message without a stack trace for ambiguous commands
+* Make say and say_status thread safe
+* Dependency for console io version check
+* Alias --help to help on subcommands
+* Use mime-types 1.x for Ruby 1.8.7 compatibility for Ruby 1.8 only
+* Accept .tt files as templates
+* Check if numeric value is in enum
+* Use Readline for user input
+* Fix dispatching of subcommands (concerning :help and *args)
+* Fix warnings when running specs with `$VERBOSE = true`
+* Make subcommand help more consistent
+* Make the current command chain accessible in command
+
 ## 0.18.1, release 2013-03-30
 * Revert regressions found in 0.18.0
 
