@@ -1,3 +1,6 @@
+## 0.19.1, release 2014-03-24
+* Fix `say` non-String break regression
+
 ## 0.19.0, release 2014-03-22
 * Add support for a default to #ask
 * Avoid @namespace not initialized warning
