@@ -326,7 +326,7 @@ end
 As your CLI becomes more complex, you might want to be able to specify a
 command that points at its own set of subcommands. One example of this
 is the `git remote` command, which exposes `add`, `rename`, `rm`,
-`prune`, `set-head`, and so in.
+`prune`, `set-head`, and so on.
 
 In Thor, you can achieve this easily by creating a new Thor class to
 represent the subcommand, and point to it from the parent class. Let's
