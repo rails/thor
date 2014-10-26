@@ -4,8 +4,7 @@ title: Home
 
 <header>
 Thor is a toolkit for building powerful command-line interfaces. It is
-used in Bundler, Vagrant, Rails, and
-<a href="http://gemfamily.info/gems/thor">197 other gems</a>.
+used in Bundler, Vagrant, Rails, and 197 other gems.
 </header>
 
 # Getting Started
