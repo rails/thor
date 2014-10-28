@@ -228,7 +228,7 @@ describe Thor::Base do
 
   describe "#remove_command" do
     it "removes the command from its commands hash" do
-      expect(MyChildScript.commands.keys).not_to include("bar")
+      expect(MyChildScript.all_commands.keys).not_to include("name_with_dashes")
       expect(MyChildScript.commands.keys).not_to include("boom")
     end
 

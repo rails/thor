@@ -118,7 +118,7 @@ END
 end
 
 class MyChildScript < MyScript
-  remove_command :bar
+  remove_command :name_with_dashes
 
   method_options :force => :boolean, :param => :numeric
   def initialize(*args)
