@@ -1,7 +1,3 @@
-if defined?(Encoding) && Encoding.default_external != "UTF-8"
-  Encoding.default_external = "UTF-8"
-end
-
 describe "The library itself" do
   def check_for_spec_defs_with_single_quotes(filename)
     failing_lines = []
