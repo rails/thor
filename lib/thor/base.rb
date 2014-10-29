@@ -343,7 +343,7 @@ class Thor
       #
       def all_commands
         @all_commands ||= from_superclass(:all_commands, Thor::CoreExt::OrderedHash.new)
-        @all_commands.merge(commands)
+        @all_commands.merge!(commands)
       end
       alias_method :all_tasks, :all_commands
 
