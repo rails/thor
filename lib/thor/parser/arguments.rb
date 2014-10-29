@@ -1,6 +1,6 @@
 class Thor
   class Arguments #:nodoc: # rubocop:disable ClassLength
-    NUMERIC = /[-+]{0,1}(\d*\.\d+|\d+)/
+    NUMERIC = /[-+]?(\d*\.\d+|\d+)/
 
     # Receives an array of args and returns two arrays, one with arguments
     # and one with switches.
