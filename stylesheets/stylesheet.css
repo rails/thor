@@ -48,6 +48,7 @@ header {
   font-weight: 400;
   line-height: 28px;
   color: #925700;
+  overflow: hidden;
 }
 
 header a:link, header a:visited {
@@ -92,4 +93,29 @@ header a:hover {
 code {
   color: #723700;
   font-family: Menlo, Monaco, Courier, monospace;
+}
+
+.footer {
+
+}
+
+#main .footer p {
+  font-size: 15px;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+  text-align: center;
+}
+
+#main .footer .person {
+  float: left;
+  width: 50%;
+}
+
+#main iframe {
+  margin: 0 auto;
+}
+
+.gratipay {
+  margin: 0 auto;
+  text-align: center;
 }

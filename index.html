@@ -292,7 +292,7 @@ end
 <pre class="brush: plain; gutter: false; toolbar: false">
 
 $ ./cli hello Yehuda
-No value provided for required options '--from'
+No value provided for required options &#39;--from&#39;
 </pre></div>
 
 <p>The full list of metadata you can provide for an option:</p>
@@ -376,7 +376,7 @@ end
 <p>As your CLI becomes more complex, you might want to be able to specify a
 command that points at its own set of subcommands. One example of this
 is the <code>git remote</code> command, which exposes <code>add</code>, <code>rename</code>, <code>rm</code>,
-<code>prune</code>, <code>set-head</code>, and so in.</p>
+<code>prune</code>, <code>set-head</code>, and so on.</p>
 
 <p>In Thor, you can achieve this easily by creating a new Thor class to
 represent the subcommand, and point to it from the parent class. Let’s
@@ -403,7 +403,7 @@ module GitCLI
       refspec to track only &lt;branch&gt; is created. You can give more than one -t &lt;branch&gt; to track multiple branches without grabbing all
       branches.
 
-      With -m &lt;master&gt; option, $GIT_DIR/remotes/&lt;name&gt;/HEAD is set up to point at remote's &lt;master&gt; branch. See also the set-head
+      With -m &lt;master&gt; option, $GIT_DIR/remotes/&lt;name&gt;/HEAD is set up to point at remote&#39;s &lt;master&gt; branch. See also the set-head
       command.
 
       When a fetch mirror is created with --mirror=fetch, the refs will not be stored in the refs/remotes/ namespace, but rather
@@ -440,6 +440,26 @@ end
 
 <p>You can access the options from the parent command in a subcommand using
 the <code>parent_options</code> accessor.</p>
+
+<header>
+  Do you use Thor? Help support the people who made and maintain it!
+
+<div class="footer">
+  <div class="person">
+    <p><a href="http://www.twitter.com/wycats">Yehuda Katz</a></p>
+      <div class="gratipay">
+      <script data-gratipay-username="wycats" src="//grtp.co/v1.js"></script>
+      </div>
+  </div>
+
+  <div class="person">
+    <p><a href="http://www.twitter.com/sferik">Erik Michaels-Ober</a></p>
+      <div class="gratipay">
+        <script data-gratipay-username="sferik" src="//grtp.co/v1.js"></script>
+      </div>
+  </div>
+</div>
+</header>
 
     </div>
     <script>SyntaxHighlighter.all();</script>

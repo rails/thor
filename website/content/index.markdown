@@ -3,9 +3,7 @@ title: Home
 ---
 
 <header>
-Thor is a toolkit for building powerful command-line interfaces. It is
-used in Bundler, Vagrant, Rails, and
-<a href="http://gemfamily.info/gems/thor">197 other gems</a>.
+Thor is a toolkit for building powerful command-line interfaces. It is used in Bundler, Vagrant, Rails and others.
 </header>
 
 # Getting Started
@@ -262,8 +260,7 @@ The full list of metadata you can provide for an option:
   option cannot be both `:required` and have a `:default`.
 * `:type`: `:string`, `:hash`, `:array`, `:numeric`, or `:boolean`
 * `:aliases`: A list of aliases for this option. Typically, you would
-  use aliases to provide short versions of the option. Each alias is a string
-  and it has a prepended dash (for example: `"-f"`).
+  use aliases to provide short versions of the option.
 
 You can use a shorthand to specify a number of options at once if you
 just want to specify the type of the options. You could rewrite the
@@ -375,7 +372,7 @@ module GitCLI
   class Git < Thor
     desc "fetch <repository> [<refspec>...]", "Download objects and refs from another repository"
     options :all => :boolean, :multiple => :boolean
-    option :append, :type => :boolean, :aliases => "-a"
+    option :append, :type => :boolean, :aliases => :a
     def fetch(respository, *refspec)
       # implement git fetch here
     end
@@ -388,3 +385,25 @@ end
 
 You can access the options from the parent command in a subcommand using
 the `parent_options` accessor.
+
+<header>
+  Do you use Thor? Help support the people who made and maintain it!
+
+<div class="footer">
+  <div class="person">
+    <p><a href="http://www.twitter.com/wycats">Yehuda Katz</a></p>
+      <div class="gratipay">
+      <script data-gratipay-username="wycats"
+          src="//grtp.co/v1.js"></script>
+      </div>
+  </div>
+
+  <div class="person">
+    <p><a href="http://www.twitter.com/sferik">Erik Michaels-Ober</a></p>
+      <div class="gratipay">
+        <script data-gratipay-username="sferik"
+          src="//grtp.co/v1.js"></script>
+      </div>
+  </div>
+</div>
+</header>
