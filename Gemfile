@@ -15,7 +15,7 @@ end
 group :test do
   gem 'childlabor'
   gem 'coveralls', '>= 0.5.7'
-  gem 'fakeweb', '>= 1.3'
+  gem 'webmock', '>= 1.20'
   gem 'mime-types', '~> 1.25', :platforms => [:jruby, :ruby_18]
   gem 'rspec', '>= 3'
   gem 'rspec-mocks', '>= 3'

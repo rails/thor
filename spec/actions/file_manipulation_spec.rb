@@ -138,20 +138,20 @@ describe Thor::Actions do
 
     it "accepts http remote sources" do
       body = "__start__\nHTTPFILE\n__end__\n"
-      FakeWeb.register_uri(:get, "http://example.com/file.txt", :body => body)
+      stub_request(:get, "http://example.com/file.txt").to_return(:body => body)
       action :get, "http://example.com/file.txt" do |content|
+        expect(a_request(:get, "http://example.com/file.txt")).to have_been_made
         expect(content).to eq(body)
       end
-      FakeWeb.clean_registry
     end
 
     it "accepts https remote sources" do
       body = "__start__\nHTTPSFILE\n__end__\n"
-      FakeWeb.register_uri(:get, "https://example.com/file.txt", :body => body)
+      stub_request(:get, "https://example.com/file.txt").to_return(:body => body)
       action :get, "https://example.com/file.txt" do |content|
+        expect(a_request(:get, "https://example.com/file.txt")).to have_been_made
         expect(content).to eq(body)
       end
-      FakeWeb.clean_registry
     end
   end
 

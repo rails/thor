@@ -20,7 +20,10 @@ require "stringio"
 require "rdoc"
 require "rspec"
 require "diff/lcs" # You need diff/lcs installed to run specs (but not to run Thor).
-require "fakeweb"  # You need fakeweb installed to run specs (but not to run Thor).
+require "webmock/rspec"
+
+WebMock.disable_net_connect!(:allow => "coveralls.io")
+
 
 # Set shell to basic
 $0 = "thor"
