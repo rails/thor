@@ -292,8 +292,7 @@ describe Thor::Options do
       it "raises error when value isn't in enum" do
         enum = %w[apple banana]
         create :fruit => Thor::Option.new("fruit", :type => :string, :enum => enum)
-        expect { parse("--fruit", "orange") }.to raise_error(Thor::MalformattedArgumentError,
-                                                             "Expected '--fruit' to be one of #{enum.join(', ')}; got orange")
+        expect { parse("--fruit", "orange") }.to raise_error(Thor::MalformattedArgumentError)
       end
     end
 
@@ -363,6 +362,10 @@ describe Thor::Options do
 
       it "must not mix values with other switches" do
         expect(parse("--attributes", "name:string", "age:integer", "--baz", "cool")["attributes"]).to eq("name" => "string", "age" => "integer")
+      end
+
+      it "must not allow the same hash key to be specified multiple times" do
+        expect {parse("--attributes", "name:string", "name:integer")}.to raise_error(Thor::MalformattedArgumentError, "You can't specify 'name' more than once in option '--attributes'; got name:string and name:integer")
       end
     end
 
