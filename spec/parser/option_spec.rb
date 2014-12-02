@@ -189,6 +189,14 @@ describe Thor::Option do
       expect(parse(:foo, :boolean).usage).to include("[--no-foo]")
     end
 
+    it "does not document a negative option for a negative boolean" do
+      expect(parse(:'no-foo', :boolean).usage).not_to include("[--no-no-foo]")
+    end
+
+    it "documents a negative option for a positive boolean starting with 'no'" do
+      expect(parse(:'nougat', :boolean).usage).to include("[--no-nougat]")
+    end
+
     it "uses banner when supplied" do
       expect(option(:foo, :required => false, :type => :string, :banner => "BAR").usage).to eq("[--foo=BAR]")
     end
