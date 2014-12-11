@@ -422,6 +422,23 @@ HELP
         expect(capture(:stdout) { MyScript.start(%w[help foo]) }).to match(/Usage:/)
       end
     end
+
+    context "with required class_options" do
+      let(:klass) do
+        Class.new(Thor) do
+          class_option :foo, :required => true
+
+          desc "bar", "do something"
+          def bar
+          end
+        end
+      end
+
+      it "shows the command help" do
+        content = capture(:stdout) { klass.start(%w{help}) }
+        expect(content).to match(/Commands:/)
+      end
+    end
   end
 
   describe "when creating commands" do
