@@ -234,6 +234,9 @@ class Thor # rubocop:disable ClassLength
         args.unshift("help") if opts.include? "--help" or opts.include? "-h"
         invoke subcommand_class, args, opts, :invoked_via_subcommand => true, :class_options => options
       end
+      subcommand_class.commands.each do |meth, command|
+        command.ancestor_name = subcommand
+      end
     end
     alias_method :subtask, :subcommand
 
