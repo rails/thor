@@ -92,7 +92,13 @@ class Thor
 
             switch = normalize_switch(switch)
             option = switch_option(switch)
-            @assigns[option.human_name] = parse_peek(switch, option)
+            result = parse_peek(switch, option)
+
+            if option.repeatable
+              (@assigns[option.human_name] ||= []) << result
+            else
+              @assigns[option.human_name] = result
+            end
           elsif @stop_on_unknown
             @parsing_options = false
             @extra << shifted
