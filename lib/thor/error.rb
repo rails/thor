@@ -3,7 +3,7 @@ class Thor
   # errors have their backtrace suppressed and are nicely shown to the user.
   #
   # Errors that are caused by the developer, like declaring a method which
-  # overwrites a thor keyword, it SHOULD NOT raise a Thor::Error. This way, we
+  # overwrites a thor keyword, SHOULD NOT raise a Thor::Error. This way, we
   # ensure that developer errors are shown with full backtrace.
   class Error < StandardError
   end
