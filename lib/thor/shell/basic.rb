@@ -34,6 +34,15 @@ class Thor
         @padding = [0, value].max
       end
 
+      # Sets the output padding while executing a block and resets it.
+      #
+      def indent(count = 1, &block)
+        orig_padding = padding
+        self.padding = padding + count
+        yield
+        self.padding = orig_padding
+      end
+
       # Asks something to the user and receives a response.
       #
       # If asked to limit the correct responses, you can pass in an
