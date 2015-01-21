@@ -28,6 +28,10 @@ class Thor
         super(convert_key(key))
       end
 
+      def fetch(key, *args)
+        super(convert_key(key), *args)
+      end
+
       def key?(key)
         super(convert_key(key))
       end

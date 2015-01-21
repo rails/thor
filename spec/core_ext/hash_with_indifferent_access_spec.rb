@@ -14,10 +14,16 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
     expect(@hash.delete(:foo)).to eq("bar")
   end
 
+  it "supports fetch" do
+    expect(@hash.fetch("foo")).to eq("bar")
+    expect(@hash.fetch("foo", nil)).to eq("bar")
+    expect(@hash.fetch(:foo)).to eq("bar")
+    expect(@hash.fetch(:foo, nil)).to eq("bar")
+  end
+
   it "has key checkable by either strings or symbols" do
     expect(@hash.key?("foo")).to be true
     expect(@hash.key?(:foo)).to be true
-
     expect(@hash.key?("nothing")).to be false
     expect(@hash.key?(:nothing)).to be false
   end
