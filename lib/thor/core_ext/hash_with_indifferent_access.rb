@@ -28,6 +28,10 @@ class Thor
         super(convert_key(key))
       end
 
+      def fetch(key, *args)
+        super(convert_key(key), *args)
+      end
+
       def values_at(*indices)
         indices.map { |key| self[convert_key(key)] }
       end
