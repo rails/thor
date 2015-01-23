@@ -38,6 +38,8 @@ Contributing
 ------------
 If you would like to help, please read the [CONTRIBUTING][] file for suggestions.
 
+[contributing]: CONTRIBUTING.md
+
 License
 -------
 Released under the MIT License.  See the [LICENSE][] file for further details.
