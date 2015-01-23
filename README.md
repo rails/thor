@@ -34,6 +34,10 @@ Please see the [wiki][] for basic usage and other documentation on using Thor. Y
 [wiki]: https://github.com/erikhuda/thor/wiki
 [homepage]: http://whatisthor.com/
 
+Contributing
+------------
+If you would like to help, please read the [CONTRIBUTING][] file for suggestions.
+
 License
 -------
 Released under the MIT License.  See the [LICENSE][] file for further details.
