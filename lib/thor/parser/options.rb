@@ -157,11 +157,7 @@ class Thor
     end
 
     def switch_option(arg)
-      if match = no_or_skip?(arg) # rubocop:disable AssignmentInCondition
-        @switches[arg] || @switches["--#{match}"]
-      else
-        @switches[arg]
-      end
+      @switches[arg]
     end
 
     # Check if the given argument is actually a shortcut.
@@ -175,7 +171,7 @@ class Thor
       @parsing_options
     end
 
-    # Parse boolean values which can be given as --foo=true, --foo or --no-foo.
+    # Parse boolean values which can be given as --foo=true or --foo.
     #
     def parse_boolean(switch)
       if current_is_value?
@@ -189,7 +185,7 @@ class Thor
           true
         end
       else
-        @switches.key?(switch) || !no_or_skip?(switch)
+        @switches.key?(switch)
       end
     end
 
@@ -199,8 +195,6 @@ class Thor
       if parsing_options? && (current_is_switch_formatted? || last?)
         if option.boolean?
           # No problem for boolean types
-        elsif no_or_skip?(switch)
-          return nil # User set value to nil
         elsif option.string? && !option.required?
           # Return the default if there is one, else the human name
           return option.lazy_default || option.default || option.human_name

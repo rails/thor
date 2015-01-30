@@ -128,7 +128,6 @@ describe Thor::Options do
     it "accepts underscores in commandline args hash for boolean" do
       create :foo_bar => :boolean
       expect(parse("--foo_bar")["foo_bar"]).to eq(true)
-      expect(parse("--no_foo_bar")["foo_bar"]).to eq(false)
     end
 
     it "accepts underscores in commandline args hash for strings" do
@@ -264,11 +263,6 @@ describe Thor::Options do
         expect(parse("--foo_bar=http://example.com/under_score/")["foo_bar"]).to eq("http://example.com/under_score/")
       end
 
-      it "accepts a --no-switch format" do
-        create "--foo" => "bar"
-        expect(parse("--no-foo")["foo"]).to be nil
-      end
-
       it "does not consume an argument for --no-switch format" do
         create "--cheese" => :string
         expect(parse("burger", "--no-cheese", "fries")["cheese"]).to be nil
@@ -337,8 +331,6 @@ describe Thor::Options do
       it "accepts inputs in the human name format" do
         create :foo_bar => :boolean
         expect(parse("--foo-bar")["foo_bar"]).to eq(true)
-        expect(parse("--no-foo-bar")["foo_bar"]).to eq(false)
-        expect(parse("--skip-foo-bar")["foo_bar"]).to eq(false)
       end
 
       it "doesn't eat the next part of the param" do

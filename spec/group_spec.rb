@@ -116,10 +116,6 @@ describe Thor::Group do
         expect(@content).to match(/1\n2\n3\n4\n5\n/)
       end
 
-      it "does not invoke if the option is nil" do
-        expect(capture(:stdout) { G.start(%w[--skip-invoked]) }).not_to match(/invoke/)
-      end
-
       it "prints a message if invocation cannot be found" do
         content = capture(:stdout) { G.start(%w[--invoked unknown]) }
         expect(content).to match(/error  unknown \[not found\]/)
@@ -159,10 +155,6 @@ describe Thor::Group do
 
       it "allows to invoke a class from the class binding by a default option" do
         expect(@content).to match(/1\n2\n3\n4\n5\n/)
-      end
-
-      it "does not invoke if the option is false" do
-        expect(capture(:stdout) { H.start(%w[--no-defined]) }).not_to match(/invoke/)
       end
 
       it "shows invocation information to the user" do
