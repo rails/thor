@@ -178,23 +178,7 @@ describe Thor::Option do
     end
 
     it "returns usage for boolean types" do
-      expect(parse(:foo, :boolean).usage).to eq("[--foo], [--no-foo]")
-    end
-
-    it "does not use padding when no aliases are given" do
-      expect(parse(:foo, :boolean).usage).to eq("[--foo], [--no-foo]")
-    end
-
-    it "documents a negative option when boolean" do
-      expect(parse(:foo, :boolean).usage).to include("[--no-foo]")
-    end
-
-    it "does not document a negative option for a negative boolean" do
-      expect(parse(:'no-foo', :boolean).usage).not_to include("[--no-no-foo]")
-    end
-
-    it "documents a negative option for a positive boolean starting with 'no'" do
-      expect(parse(:'nougat', :boolean).usage).to include("[--no-nougat]")
+      expect(parse(:foo, :boolean).usage).to eq("[--foo]")
     end
 
     it "uses banner when supplied" do
@@ -214,10 +198,6 @@ describe Thor::Option do
     describe "with aliases" do
       it "does not show the usage between brackets" do
         expect(parse([:foo, "-f", "-b"], :required).usage).to eq("-f, -b, --foo=FOO")
-      end
-
-      it "does not negate the aliases" do
-        expect(parse([:foo, "-f", "-b"], :boolean).usage).to eq("-f, -b, [--foo], [--no-foo]")
       end
     end
   end
