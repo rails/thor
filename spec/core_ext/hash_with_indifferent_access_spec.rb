@@ -14,6 +14,14 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
     expect(@hash.delete(:foo)).to eq("bar")
   end
 
+  it "has key checkable by either strings or symbols" do
+    expect(@hash.key?("foo")).to be true
+    expect(@hash.key?(:foo)).to be true
+
+    expect(@hash.key?("nothing")).to be false
+    expect(@hash.key?(:nothing)).to be false
+  end
+
   it "handles magic boolean predicates" do
     expect(@hash.force?).to be true
     expect(@hash.foo?).to be true
