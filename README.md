@@ -21,7 +21,7 @@ utilities.  It removes the pain of parsing command line options, writing
 build tool.  The syntax is Rake-like, so it should be familiar to most Rake
 users.
 
-[rake]: https://github.com/jimweirich/rake
+[rake]: https://github.com/ruby/rake
 
 Installation
 ------------
