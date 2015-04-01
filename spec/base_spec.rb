@@ -85,12 +85,15 @@ describe Thor::Base do
     it "raise error when exclusive options are given" do
       begin
         ENV["THOR_DEBUG"] = "1"
+        err_msg = RUBY_VERSION < '1.9.2' ? nil : "Found exclusive options '--one', '--two'"
+
         expect do
           MyClassOptionScript.start %w[mix --one --two --three --five]
-        end.to raise_error(Thor::ExclusiveArgumentError, "Found exclusive options '--one', '--two'")
+        end.to raise_error(Thor::ExclusiveArgumentError, err_msg)
+        err_msg = RUBY_VERSION < '1.9.2' ? nil : "Found exclusive options '--five', '--six'"
         expect do
           MyClassOptionScript.start %w[mix --one --three --five --six]
-        end.to raise_error(Thor::ExclusiveArgumentError, "Found exclusive options '--five', '--six'")
+        end.to raise_error(Thor::ExclusiveArgumentError, err_msg)
       ensure
         ENV["THOR_DEBUG"] = nil
       end
@@ -100,12 +103,14 @@ describe Thor::Base do
     it "raise error when at least one of required options are not given" do
       begin
         ENV["THOR_DEBUG"] = "1"
+        err_msg = RUBY_VERSION < '1.9.2' ? nil : "Not found at least one of required options '--three', '--four'"
         expect do
           MyClassOptionScript.start %w[mix --five]
-        end.to raise_error(Thor::AtLeastOneRequiredArgumentError, "Not found at least one of required options '--three', '--four'")
+        end.to raise_error(Thor::AtLeastOneRequiredArgumentError, err_msg)
+        err_msg = RUBY_VERSION < '1.9.2' ? nil : "Not found at least one of required options '--five', '--six', '--seven'"
         expect do
           MyClassOptionScript.start %w[mix --one --three]
-        end.to raise_error(Thor::AtLeastOneRequiredArgumentError, "Not found at least one of required options '--five', '--six', '--seven'")
+        end.to raise_error(Thor::AtLeastOneRequiredArgumentError, err_msg)
       ensure
         ENV["THOR_DEBUG"] = nil
       end

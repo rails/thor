@@ -253,7 +253,8 @@ describe Thor::Options do
       end
 
       it "raises an error if exclusive argumets are given" do
-        expect{parse(%w[--foo --bar])}.to raise_error(Thor::ExclusiveArgumentError, "Found exclusive options '--foo', '--bar'")
+        err_msg = RUBY_VERSION < '1.9.2' ? nil : "Found exclusive options '--foo', '--bar'"
+        expect{parse(%w[--foo --bar])}.to raise_error(Thor::ExclusiveArgumentError, err_msg)
       end
 
       it "does not raise an error if exclusive argumets are not given" do
@@ -268,7 +269,8 @@ describe Thor::Options do
       end
 
       it "raises an error if at least one of required argumet is not given" do
-        expect{parse(%w[--baz])}.to raise_error(Thor::AtLeastOneRequiredArgumentError, "Not found at least one of required options '--foo', '--bar'")
+        err_msg = RUBY_VERSION < '1.9.2' ? nil : "Not found at least one of required options '--foo', '--bar'"
+        expect{parse(%w[--baz])}.to raise_error(Thor::AtLeastOneRequiredArgumentError, err_msg)
       end
 
       it "does not raise an error if at least one of required argument is given" do

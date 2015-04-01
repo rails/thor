@@ -389,7 +389,7 @@ Usage: "thor scripts:arities:optional_arg [ARG]")
 
       it "prints class exclusive options" do
         content = capture(:stdout) { MyClassOptionScript.help(shell) }
-        expect(content).to match(/Exclusive Options:\n\s+--one\s+--two\n/)
+        expect(content).to match(/Exclusive Options:\n\s+--(one|two)\s+--(one|two)\n/)
       end
 
       it "does not print class exclusive options" do
@@ -399,7 +399,7 @@ Usage: "thor scripts:arities:optional_arg [ARG]")
 
       it "prints class at least one of requred options" do
         content = capture(:stdout) { MyClassOptionScript.help(shell) }
-        expect(content).to match(/Required At Least One:\n\s+--three\s+--four\n/)
+        expect(content).to match(/Required At Least One:\n\s+--(three|four)\s+--(three|four)\n/)
       end
 
       it "does not print class at least one of required options" do
@@ -455,8 +455,8 @@ HELP
         message = expect(capture(:stdout) do
                            MyClassOptionScript.command_help(shell, "mix")
                          end)
-        message.to match(/Exclusive Options:\n\s+--five\s+--six\s+--seven\n\s+--one\s+--two/)
-        message.to match(/Required At Least One:\n\s+--five\s+--six\s+--seven\n\s+--three\s+--four/)
+        message.to match(/Exclusive Options:\n\s+--(five|six|seven)\s+--(five|six|seven)\s+--(five|six|seven)\n\s+--(one|two)\s+--(one|two)/)
+        message.to match(/Required At Least One:\n\s+--(five|six|seven)\s+--(five|six|seven)\s+--(five|six|seven)\n\s+--(three|four)\s+--(three|four)/)
       end
       it "does not print exclusive and at least one options" do
         message = expect(capture(:stdout) do
