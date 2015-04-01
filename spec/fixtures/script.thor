@@ -258,3 +258,69 @@ class Pear < Thor
   namespace :fruits
   desc 'pear', 'pear'; def pear; end
 end
+class MyClassOptionScript < Thor
+  class_option :free
+
+  class_exclusive do
+    class_option :one
+    class_option :two
+  end
+
+  class_at_least_one do
+    class_option :three
+    class_option :four
+  end
+  desc "mix", ""
+  exclusive do
+    at_least_one do
+      option :five
+      option :six
+      option :seven
+    end
+  end
+  def mix
+  end
+end
+class MyOptionScript < Thor
+  desc "exclusive", ""
+  exclusive do
+    method_option :one
+    method_option :two
+    method_option :three
+  end
+  method_option :after1
+  method_option :after2
+  def exclusive
+  end
+  exclusive :after1, :after2, {:for => :exclusive}
+
+  desc "at_least_one", ""
+  at_least_one do
+    method_option :one
+    method_option :two
+    method_option :three
+  end
+  method_option :after1
+  method_option :after2
+  def at_least_one
+  end
+  at_least_one :after1, :after2, :for => :at_least_one
+
+  desc "only_one", ""
+  exclusive do
+    at_least_one do
+      option :one
+      option :two
+      option :three
+    end
+  end
+  def only_one
+  end
+
+  desc "no_relastions", ""
+  option :no_rel1
+  option :no_rel2
+  def no_relations
+
+  end
+end
