@@ -160,6 +160,97 @@ class Thor # rubocop:disable ClassLength
       @disable_class_options = true
     end
 
+    # Returns this class exclusive options array set.
+    #
+    # ==== Rturns
+    # Array[Array[Thor::Option.name]]
+    #
+    def method_exclusive_option_names
+      @method_exclusive_option_names ||=[]
+    end
+
+    # Adds and declareds option group for exclusive options in the
+    # block and arguments. You can declare options as the outside of the block.
+    # If :for is given as option,
+    # it allows you to change the options from a prvious defined command.
+    #
+    # ==== Parameters
+    # Array[Thor::Option.name]
+    # options<Hash>:: :for is applied for previous defined command.
+    #
+    # ==== Examples
+    #
+    #   exclusive do
+    #     option :one
+    #     option :two
+    #    end
+    #
+    # Or
+    #
+    #   option :one
+    #   option :two
+    #   exclusive :one, :two
+    #
+    # If you give "--one" and "--two" at the same time.
+    # ExclusiveArgumentsError will be raised.
+    #
+    def method_exclusive(*args, &block)
+      register_options_relation_for(:method_options,
+                                    :method_exclusive_option_names, *args, &block)
+    end
+    alias_method :exclusive, :method_exclusive
+
+    # Returns this class at least one of required options array set.
+    #
+    # ==== Rturns
+    # Array[Array[Thor::Option.name]]
+    #
+    def method_at_least_one_option_names
+      @method_at_least_one_option_names ||=[]
+    end
+
+    # Adds and declareds option group for required at least one of options in the
+    # block of arguments. You can declare options as the outside of the block.
+    # If :for is given as option,
+    # it allows you to change the options from a prvious defined command.
+    #
+    # ==== Parameters
+    # Array[Thor::Option.name]
+    # options<Hash>:: :for is applied for previous defined command.
+    #
+    # ==== Examples
+    #
+    #   at_least_one do
+    #     option :one
+    #     option :two
+    #    end
+    #
+    # Or
+    #
+    #   option :one
+    #   option :two
+    #   at_least_one :one, :two
+    #
+    # If you do not give "--one" and "--two".
+    # AtLeastOneRequiredArgumentError will be raised.
+    #
+    # You can use at_least_one and exclusive at the same time.
+    #
+    #    exclusive do
+    #      at_least_one do
+    #        option :one
+    #        option :two
+    #      end
+    #    end
+    #
+    # Then it is required either only one of "--one" or "--two".
+    #
+    def method_at_least_one(*args, &block)
+      register_options_relation_for(:method_options,
+                                    :method_at_least_one_option_names, *args, &block)
+    end
+    alias_method :at_least_one, :method_at_least_one
+
     # Prints help information for the given command.
     #
     # ==== Parameters
@@ -175,6 +266,9 @@ class Thor # rubocop:disable ClassLength
       shell.say "  #{banner(command)}"
       shell.say
       class_options_help(shell, nil => command.options.map { |_, o| o })
+      print_exclusive_options(shell, command)
+      print_at_least_one_required_options(shell, command)
+
       if command.long_description
         shell.say "Description:"
         shell.print_wrapped(command.long_description, :indent => 2)
@@ -205,6 +299,8 @@ class Thor # rubocop:disable ClassLength
       shell.print_table(list, :indent => 2, :truncate => true)
       shell.say
       class_options_help(shell)
+      print_exclusive_options(shell)
+      print_at_least_one_required_options(shell)
     end
 
     # Returns commands ready to be printed.
@@ -219,6 +315,26 @@ class Thor # rubocop:disable ClassLength
     end
     alias_method :printable_tasks, :printable_commands
 
+    def print_exclusive_options(shell, command = nil)
+      opts = []
+      opts  = command.method_exclusive_option_names unless command.nil?
+      opts += class_exclusive_option_names
+      unless opts.empty?
+        shell.say "Exclusive Options:"
+        shell.print_table(opts.map{ |ex| ex.map{ |e| "--#{e}"}}, :indent => 2 )
+        shell.say
+      end
+    end
+    def print_at_least_one_required_options(shell, command = nil)
+      opts = []
+      opts = command.method_at_least_one_option_names unless command.nil?
+      opts += class_at_least_one_option_names
+      unless opts.empty?
+        shell.say "Required At Least One:"
+        shell.print_table(opts.map{ |ex| ex.map{ |e| "--#{e}"}}, :indent => 2 )
+        shell.say
+      end
+    end
     def subcommands
       @subcommands ||= from_superclass(:subcommands, [])
     end
@@ -388,8 +504,11 @@ class Thor # rubocop:disable ClassLength
 
       if @usage && @desc
         base_class = @hide ? Thor::HiddenCommand : Thor::Command
-        commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options, @disable_class_options)
+        relations = {:exclusive_option_names => method_exclusive_option_names,
+          :at_least_one_option_names => method_at_least_one_option_names}
+        commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options, @disable_class_options, relations)
         @usage, @desc, @long_desc, @method_options, @hide, @disable_class_options = nil
+        @method_exclusive_option_names, @method_at_least_one_option_names = nil
         true
       elsif all_commands[meth] || meth == "method_missing"
         true

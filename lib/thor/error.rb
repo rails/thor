@@ -29,4 +29,10 @@ class Thor
 
   class MalformattedArgumentError < InvocationError
   end
+
+  class ExclusiveArgumentError < InvocationError
+  end
+
+  class AtLeastOneRequiredArgumentError < InvocationError
+  end
 end

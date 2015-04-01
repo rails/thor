@@ -241,6 +241,25 @@ describe Thor do
     end
   end
 
+  describe "#method_exclusive" do
+    it "returns the exclusive option names for the class" do
+      cmd =  MyOptionScript.commands["exclusive"]
+      exclusives = cmd.options_relation[:exclusive_option_names]
+      expect(exclusives.size).to be(2)
+      expect(exclusives.first).to eq(%w[one two three])
+      expect(exclusives.last).to eq(%w[after1 after2])
+    end
+  end
+  describe "#method_at_least_one" do
+    it "returns the at least one of option names for the class" do
+      cmd =  MyOptionScript.commands["at_least_one"]
+      at_least_ones = cmd.options_relation[:at_least_one_option_names]
+      expect(at_least_ones.size).to be(2)
+      expect(at_least_ones.first).to eq(%w[one two three])
+      expect(at_least_ones.last).to eq(%w[after1 after2])
+    end
+  end
+
   describe "#start" do
     it "calls a no-param method when no params are passed" do
       expect(MyScript.start(%w[zoo])).to eq(true)
@@ -367,6 +386,26 @@ Usage: "thor scripts:arities:optional_arg [ARG]")
         content = capture(:stdout) { Scripts::MyScript.help(shell) }
         expect(content).to match(/zoo ACCESSOR \-\-param\=PARAM/)
       end
+
+      it "prints class exclusive options" do
+        content = capture(:stdout) { MyClassOptionScript.help(shell) }
+        expect(content).to match(/Exclusive Options:\n\s+--one\s+--two\n/)
+      end
+
+      it "does not print class exclusive options" do
+        content = capture(:stdout) { Scripts::MyScript.help(shell) }
+        expect(content).not_to match(/Exclusive Options:/)
+      end
+
+      it "prints class at least one of requred options" do
+        content = capture(:stdout) { MyClassOptionScript.help(shell) }
+        expect(content).to match(/Required At Least One:\n\s+--three\s+--four\n/)
+      end
+
+      it "does not print class at least one of required options" do
+        content = capture(:stdout) { Scripts::MyScript.help(shell) }
+        expect(content).not_to match(/Required At Least One:/)
+      end
     end
 
     describe "for a specific command" do
@@ -410,6 +449,21 @@ HELP
         expect(capture(:stdout) do
           MyScript.command_help(shell, "name_with_dashes")
         end).not_to match(/so very long/i)
+      end
+
+      it "prints exclusive and at least one options" do
+        message = expect(capture(:stdout) do
+                           MyClassOptionScript.command_help(shell, "mix")
+                         end)
+        message.to match(/Exclusive Options:\n\s+--five\s+--six\s+--seven\n\s+--one\s+--two/)
+        message.to match(/Required At Least One:\n\s+--five\s+--six\s+--seven\n\s+--three\s+--four/)
+      end
+      it "does not print exclusive and at least one options" do
+        message = expect(capture(:stdout) do
+                           MyOptionScript.command_help(shell, "no_relations")
+                         end)
+        message.not_to match(/Exclusive Options:/)
+        message.not_to match(/Rquired At Least One:/)
       end
     end
 

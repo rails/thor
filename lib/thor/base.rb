@@ -62,8 +62,20 @@ class Thor
       # Let Thor::Options parse the options first, so it can remove
       # declared options from the array. This will leave us with
       # a list of arguments that weren't declared.
-      stop_on_unknown = self.class.stop_on_unknown_option? config[:current_command]
-      opts = Thor::Options.new(parse_options, hash_options, stop_on_unknown)
+      current_command = config[:current_command]
+      stop_on_unknown = self.class.stop_on_unknown_option? current_command
+
+      # Give a relation of options.
+      # After parsing, Thor::Options check whether right relations are kept
+      relations = {:exclusive_option_names => [], :at_least_one_option_names => []}
+      unless current_command.nil?
+        relations = current_command.options_relation
+      end
+      self.class.class_exclusive_option_names.map{ |n| relations[:exclusive_option_names] << n}
+      self.class.class_at_least_one_option_names.map{ |n| relations[:at_least_one_option_names] << n}
+
+      opts = Thor::Options.new(parse_options, hash_options, stop_on_unknown, relations)
+
       self.options = opts.parse(array_options)
       self.options = config[:class_options].merge(options) if config[:class_options]
 
@@ -239,6 +251,24 @@ class Thor
         @arguments ||= from_superclass(:arguments, [])
       end
 
+      # Returns this class exclusive options array set, looking up in the ancestors chain.
+      #
+      # ==== Rturns
+      # Array[Array[Thor::Option.name]]
+      #
+      def class_exclusive_option_names
+        @class_exclusive_option_names ||= from_superclass(:class_exclusive_option_names, [])
+      end
+
+      # Returns this class at least one of required options array set, looking up in the ancestors chain.
+      #
+      # ==== Rturns
+      # Array[Array[Thor::Option.name]]
+      #
+      def class_at_least_one_option_names
+        @class_at_least_one_option_names ||= from_superclass(:class_at_least_one_option_names, [])
+      end
+
       # Adds a bunch of options to the set of class options.
       #
       #   class_options :foo => false, :bar => :required, :baz => :string
@@ -272,6 +302,67 @@ class Thor
       #
       def class_option(name, options = {})
         build_option(name, options, class_options)
+      end
+
+      # Adds and declareds option group for exclusive options in the
+      # block and arguments. You can declare options as the outside of the block.
+      #
+      # ==== Parameters
+      # Array[Thor::Option.name]
+      #
+      # ==== Examples
+      #
+      #   class_exclusive do
+      #     class_option :one
+      #     class_option :two
+      #    end
+      #
+      # Or
+      #
+      #   class_option :one
+      #   class_option :two
+      #   class_exclusive :one, :two
+      #
+      # If you give "--one" and "--two" at the same time.
+      # ExclusiveArgumentsError will be raised.
+      #
+      def class_exclusive(*args, &block)
+        register_options_relation_for(:class_options,
+                                      :class_exclusive_option_names, *args, &block)
+      end
+
+      # Adds and declareds option group for required at least one of options in the
+      # block and arguments. You can declare options as the outside of the block.
+      #
+      # ==== Examples
+      #
+      #   class_at_least_one do
+      #     class_option :one
+      #     class_option :two
+      #    end
+      #
+      # Or
+      #
+      #   class_option :one
+      #   class_option :two
+      #   class_at_least_one :one, :two
+      #
+      # If you do not give "--one" and "--two".
+      # AtLeastOneRequiredArgumentError will be raised.
+      # You can use class_at_least_one and class_exclusive at the same time.
+      #
+      #    class_exclusive do
+      #      class_at_least_one do
+      #        class_option :one
+      #        class_option :two
+      #      end
+      #    end
+      #
+      # Then it is required either only one of "--one" or "--two".
+      #
+      def class_at_least_one(*args, &block)
+        register_options_relation_for(:class_options,
+                                      :class_at_least_one_option_names, *args, &block)
       end
 
       # Removes a previous defined argument. If :undefine is given, undefine
@@ -650,6 +741,34 @@ class Thor
       # SIGNATURE: The hook invoked by start.
       def dispatch(command, given_args, given_opts, config) #:nodoc:
         fail NotImplementedError
+      end
+
+      # Register a relation of options for target(method_option/class_option)
+      # by args and block.
+      def register_options_relation_for( target, relation, *args, &block)
+        opt = args.pop if args.last.is_a? Hash
+        opt ||= {}
+        names = args.map{ |arg| arg.to_s }
+        names += built_option_names(target, opt, &block) if block_given?
+        command_scope_member(relation, opt) << names
+      end
+
+      # Get target(method_options or class_options) options
+      # of before and after by block evaluation.
+      def built_option_names(target, opt = {}, &block)
+        before = command_scope_member(target, opt).map{ |k,v| v.name }
+        instance_eval(&block)
+        after  = command_scope_member(target, opt).map{ |k,v| v.name }
+        after - before
+      end
+
+      # Get command scope member by name.
+      def command_scope_member( name, options = {} ) #:nodoc:
+        if options[:for]
+          find_and_refresh_command(options[:for]).send(name)
+        else
+          send( name )
+        end
       end
     end
   end

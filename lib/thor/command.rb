@@ -1,14 +1,15 @@
 class Thor
-  class Command < Struct.new(:name, :description, :long_description, :usage, :options, :disable_class_options)
+  class Command < Struct.new(:name, :description, :long_description, :usage, :options, :disable_class_options, :options_relation)
     FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
 
-    def initialize(name, description, long_description, usage, options = nil, disable_class_options = false)
-      super(name.to_s, description, long_description, usage, options || {}, disable_class_options)
+    def initialize(name, description, long_description, usage, options = nil, disable_class_options = false, options_relation = nil)
+      super(name.to_s, description, long_description, usage, options || {}, disable_class_options, options_relation || {})
     end
 
     def initialize_copy(other) #:nodoc:
       super(other)
       self.options = other.options.dup if other.options
+      self.options_relation = other.options_relation.dup if other.options_relation
     end
 
     def hidden?
@@ -62,6 +63,12 @@ class Thor
       # Strip and go!
       formatted.strip
     end
+    def method_exclusive_option_names
+      self.options_relation[:exclusive_option_names] || []
+    end
+    def method_at_least_one_option_names
+      self.options_relation[:at_least_one_option_names] || []
+    end
 
   protected
 
@@ -72,7 +79,6 @@ class Thor
     def required_options
       @required_options ||= options.map { |_, o| o.usage if o.required? }.compact.sort.join(" ")
     end
-
     # Given a target, checks if this class name is a public method.
     def public_method?(instance) #:nodoc:
       !(instance.public_methods & [name.to_s, name.to_sym]).empty?
