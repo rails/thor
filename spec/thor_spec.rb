@@ -384,6 +384,10 @@ do some fooing
 END
       end
 
+      it "outputs information about validations as well" do
+        expect(capture(:stdout) { MyScript.command_help(shell, "with_validator") }).to include 'Validation'
+      end
+
       it "raises an error if the command can't be found" do
         expect do
           MyScript.command_help(shell, "unknown")

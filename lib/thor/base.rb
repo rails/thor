@@ -524,6 +524,7 @@ class Thor
             list << item
             list << ["", "# Default: #{option.default}"] if option.show_default?
             list << ["", "# Possible values: #{option.enum.join(', ')}"] if option.enum
+            list << ["", "# Validation: #{option.validator_description}"] if option.validator_description
           end
         end
 

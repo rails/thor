@@ -91,6 +91,12 @@ END
     [name, options, args]
   end
 
+  method_option :my_option, :type => :string, :validator => proc { |v| v == 'hello world' }, :validator_desc => 'Needs to be "hello world"'
+  desc 'with_validator', 'Check option with validator'
+  def with_validator
+    [options]
+  end
+
   class AnotherScript < Thor
     desc "baz", "do some bazing"
     def baz
