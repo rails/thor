@@ -195,12 +195,14 @@ class Thor
       # options<Hash>:: Described below.
       #
       # ==== Options
-      # :desc     - Description for the argument.
-      # :required - If the argument is required or not.
-      # :optional - If the argument is optional or not.
-      # :type     - The type of the argument, can be :string, :hash, :array, :numeric.
-      # :default  - Default value for this argument. It cannot be required and have default values.
-      # :banner   - String to show on usage notes.
+      # :desc           - Description for the argument.
+      # :required       - If the argument is required or not.
+      # :optional       - If the argument is optional or not.
+      # :type           - The type of the argument, can be :string, :hash, :array, :numeric.
+      # :default        - Default value for this argument. It cannot be required and have default values.
+      # :banner         - String to show on usage notes.
+      # :validator      - Check value of argument (:string, :array, :numeric), Check key/value of argument (hash). Needs to respond to #call.
+      # :validator_desc - Document which keys/values the validator accepts
       #
       # ==== Errors
       # ArgumentError:: Raised if you supply a required argument after a non required one.
@@ -261,14 +263,16 @@ class Thor
       # options<Hash>:: Described below.
       #
       # ==== Options
-      # :desc::     -- Description for the argument.
-      # :required:: -- If the argument is required or not.
-      # :default::  -- Default value for this argument.
-      # :group::    -- The group for this options. Use by class options to output options in different levels.
-      # :aliases::  -- Aliases for this option. <b>Note:</b> Thor follows a convention of one-dash-one-letter options. Thus aliases like "-something" wouldn't be parsed; use either "\--something" or "-s" instead.
-      # :type::     -- The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
-      # :banner::   -- String to show on usage notes.
-      # :hide::     -- If you want to hide this option from the help.
+      # :desc::           -- Description for the argument.
+      # :required::       -- If the argument is required or not.
+      # :default::        -- Default value for this argument.
+      # :group::          -- The group for this options. Use by class options to output options in different levels.
+      # :aliases::        -- Aliases for this option. <b>Note:</b> Thor follows a convention of one-dash-one-letter options. Thus aliases like "-something" wouldn't be parsed; use either "\--something" or "-s" instead.
+      # :type::           -- The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
+      # :banner::         -- String to show on usage notes.
+      # :hide::           -- If you want to hide this option from the help.
+      # :validator::      -- Check value of argument (:string, :array, :numeric), Check key/value of argument (hash). Needs to respond to #call.
+      # :validator_desc:: -- Document which keys/values the validator accepts
       #
       def class_option(name, options = {})
         build_option(name, options, class_options)
