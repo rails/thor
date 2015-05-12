@@ -109,6 +109,13 @@ class Thor
     def validate!
       fail ArgumentError, "An option cannot be boolean and required." if boolean? && required?
       validate_default_type!
+      validate_validator!
+    end
+
+    def validate_validator!
+      fail ArgumentError, "A validator is only supported for type = :string, :numeric, :array or :hash" if type_cannot_have_validator?
+
+      super
     end
 
     def validate_default_type!
@@ -123,6 +130,10 @@ class Thor
                        @default.class.name.downcase.to_sym
                      end
       fail ArgumentError, "An option's default must match its type." unless default_type == @type
+    end
+
+    def type_cannot_have_validator?
+      validator && ![:string, :numeric, :array, :hash].include?(type)
     end
 
     def dasherized?

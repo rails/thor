@@ -141,6 +141,30 @@ describe Thor::Option do
     end.to raise_error(ArgumentError, "An option's default must match its type.")
   end
 
+  it "raises an error if validator is used with boolean option" do
+    expect do
+      option = option("foo", :type => :boolean, :validator => proc {}, :validator_desc => 'Validator Description')
+    end.to raise_error(ArgumentError, "A validator is only supported for type = :string, :numeric, :array or :hash")
+  end
+
+  it "raises an error if validator does not have call-method" do
+    expect do
+      option = option("foo", :type => :string, :validator => Class.new.new, :validator_desc => 'Validator Description')
+    end.to raise_error(ArgumentError, "A validator needs to respond to #call")
+  end
+
+  it "raises an error if validator does not have a description" do
+    expect do
+      option = option("foo", :type => :string, :validator => proc {})
+    end.to raise_error(ArgumentError, "A validator needs a description. Please define :validator_desc")
+  end
+
+  it "raises an error if validator and enum-option are used together" do
+    expect do
+      option = option(:foo, :type => :string, :validator => proc {}, :validator_desc => 'A validator description', :enum => ['a', 'b'])
+    end.to raise_error(ArgumentError, "It does not make sense to use both :validator and :enum. Please use either :validator or :enum")
+  end
+
   it "boolean options cannot be required" do
     expect do
       option("foo", :required => true, :type => :boolean)
