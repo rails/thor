@@ -84,6 +84,12 @@ class Thor
       peek && peek.to_s !~ /^-/
     end
 
+    def for_switch(name)
+      if @switches.is_a?(Hash) && switch = @switches[name]
+        yield(switch)
+      end
+    end
+
     # Runs through the argument array getting strings that contains ":" and
     # mark it as a hash:
     #
@@ -100,7 +106,7 @@ class Thor
       while current_is_value? && peek.include?(":")
         key, value = shift.split(":", 2)
 
-        if @switches.is_a?(Hash) && switch = @switches[name]
+        for_switch name do |switch|
           if switch.validator && !switch.validator.call(key, value)
             fail MalformattedArgumentError, "Expected '#{name}=#{key}:#{value}' to return true for `:validator`, but it returns false"
           end
@@ -127,7 +133,7 @@ class Thor
       while current_is_value?
         value = shift
 
-        if @switches.is_a?(Hash) && switch = @switches[name]
+        for_switch name do |switch|
           if switch.validator && !switch.validator.call(value)
             fail MalformattedArgumentError, "Expected '#{name}=[#{value}, ...]' to return true for `:validator`, but it returns false"
           end
@@ -151,7 +157,7 @@ class Thor
 
       value = $&.index(".") ? shift.to_f : shift.to_i
 
-      if @switches.is_a?(Hash) && switch = @switches[name]
+      for_switch name do |switch|
         if switch.validator && !switch.validator.call(value)
           fail MalformattedArgumentError, "Expected '#{name}=#{value}' to return true for `:validator`, but it returns false"
         elsif switch.enum && !switch.enum.include?(value)
@@ -172,7 +178,7 @@ class Thor
         nil
       else
         value = shift
-        if @switches.is_a?(Hash) && switch = @switches[name] # rubocop:disable AssignmentInCondition
+        for_switch name do |switch|
           if switch.validator && !switch.validator.call(value)
             fail MalformattedArgumentError, "Expected '#{name}=#{value}' to return true for `:validator`, but it returns false"
           elsif switch.enum && !switch.enum.include?(value)
