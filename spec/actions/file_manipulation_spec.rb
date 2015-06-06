@@ -205,6 +205,16 @@ describe Thor::Actions do
       expect(File.read(File.join(destination_root, "doc/config.rb"))).to match(/^OMG/)
     end
 
+    it "accepts a context to use as the binding" do
+      begin
+        @klass = 'FooBar'
+        action :template, "doc/config.rb", :context => eval("binding")
+        expect(File.read(File.join(destination_root, "doc/config.rb"))).to eq("class FooBar; end\n")
+      ensure
+        remove_instance_variable(:@klass)
+      end
+    end
+
     it "guesses the destination name when given only a source" do
       action :template, "doc/config.yaml.tt"
 
