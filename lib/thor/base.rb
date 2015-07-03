@@ -42,7 +42,7 @@ class Thor
     # config<Hash>:: Configuration for this Thor class.
     #
     def initialize(args = [], local_options = {}, config = {}) # rubocop:disable MethodLength
-      parse_options = self.class.class_options
+      parse_options = config[:current_command] && config[:current_command].disable_class_options ? {} : self.class.class_options
 
       # The start method splits inbound arguments at the first argument
       # that looks like an option (starts with - or --). It then calls

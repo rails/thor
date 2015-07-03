@@ -156,6 +156,10 @@ class Thor # rubocop:disable ClassLength
     end
     alias_method :option, :method_option
 
+    def disable_class_options
+      @disable_class_options = true
+    end
+
     # Prints help information for the given command.
     #
     # ==== Parameters
@@ -380,11 +384,12 @@ class Thor # rubocop:disable ClassLength
       @usage ||= nil
       @desc ||= nil
       @long_desc ||= nil
+      @disable_class_options ||= nil
 
       if @usage && @desc
         base_class = @hide ? Thor::HiddenCommand : Thor::Command
-        commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
-        @usage, @desc, @long_desc, @method_options, @hide = nil
+        commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options, @disable_class_options)
+        @usage, @desc, @long_desc, @method_options, @hide, @disable_class_options = nil
         true
       elsif all_commands[meth] || meth == "method_missing"
         true
@@ -470,6 +475,7 @@ class Thor # rubocop:disable ClassLength
   map HELP_MAPPINGS => :help
 
   desc "help [COMMAND]", "Describe available commands or one specific command"
+  disable_class_options
   def help(command = nil, subcommand = false)
     if command
       if self.class.subcommands.include? command
