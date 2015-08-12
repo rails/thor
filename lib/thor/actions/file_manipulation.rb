@@ -110,7 +110,7 @@ class Thor
       destination = args.first || source.sub(/#{TEMPLATE_EXTNAME}$/, "")
 
       source  = File.expand_path(find_in_source_paths(source.to_s))
-      context = instance_eval("binding")
+      context = config.delete(:context) || instance_eval("binding")
 
       create_file destination, nil, config do
         content = ERB.new(::File.binread(source), nil, "-", "@output_buffer").result(context)

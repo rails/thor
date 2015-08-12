@@ -99,6 +99,7 @@ class Thor
 
       while current_is_value? && peek.include?(":")
         key, value = shift.split(":", 2)
+        fail MalformattedArgumentError, "You can't specify '#{key}' more than once in option '#{name}'; got #{key}:#{hash[key]} and #{key}:#{value}" if hash.include? key
         hash[key] = value
       end
       hash

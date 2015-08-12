@@ -21,7 +21,7 @@ utilities.  It removes the pain of parsing command line options, writing
 build tool.  The syntax is Rake-like, so it should be familiar to most Rake
 users.
 
-[rake]: https://github.com/jimweirich/rake
+[rake]: https://github.com/ruby/rake
 
 Installation
 ------------
@@ -33,6 +33,12 @@ Please see the [wiki][] for basic usage and other documentation on using Thor. Y
 
 [wiki]: https://github.com/erikhuda/thor/wiki
 [homepage]: http://whatisthor.com/
+
+Contributing
+------------
+If you would like to help, please read the [CONTRIBUTING][] file for suggestions.
+
+[contributing]: CONTRIBUTING.md
 
 License
 -------
