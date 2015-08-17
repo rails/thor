@@ -246,8 +246,8 @@ describe Thor do
       cmd =  MyOptionScript.commands["exclusive"]
       exclusives = cmd.options_relation[:exclusive_option_names]
       expect(exclusives.size).to be(2)
-      expect(exclusives.first).to eq(%w[one two three])
-      expect(exclusives.last).to eq(%w[after1 after2])
+      expect(exclusives.first.sort).to eq(%w[one two three].sort)
+      expect(exclusives.last.sort).to eq(%w[after1 after2].sort)
     end
   end
   describe "#method_at_least_one" do
@@ -255,8 +255,8 @@ describe Thor do
       cmd =  MyOptionScript.commands["at_least_one"]
       at_least_ones = cmd.options_relation[:at_least_one_option_names]
       expect(at_least_ones.size).to be(2)
-      expect(at_least_ones.first).to eq(%w[one two three])
-      expect(at_least_ones.last).to eq(%w[after1 after2])
+      expect(at_least_ones.first.sort).to eq(%w[one two three].sort)
+      expect(at_least_ones.last.sort).to eq(%w[after1 after2].sort)
     end
   end
 
