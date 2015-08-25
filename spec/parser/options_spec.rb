@@ -257,6 +257,7 @@ describe Thor::Options do
         expect(parse("-f=12")["foo"]).to eq("12")
         expect(parse("--foo=12")["foo"]).to eq("12")
         expect(parse("--foo=bar=baz")["foo"]).to eq("bar=baz")
+        expect(parse("--foo=-bar")["foo"]).to eq("-bar")
       end
 
       it "must accept underscores switch=value assignment" do
