@@ -235,8 +235,11 @@ class Thor # rubocop:disable ClassLength
 
       define_method(subcommand) do |*args|
         args, opts = Thor::Arguments.split(args)
-        args.unshift("help") if opts.include? "--help" or opts.include? "-h"
-        invoke subcommand_class, args, opts, :invoked_via_subcommand => true, :class_options => options
+        invoke_args = [args, opts, Hash[:invoked_via_subcommand => true, :class_options => options]]
+        if opts.delete('--help') or opts.delete("-h")
+            invoke_args.unshift 'help'
+        end
+        invoke subcommand_class, *invoke_args
       end
     end
     alias_method :subtask, :subcommand
