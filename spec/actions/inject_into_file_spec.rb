@@ -70,6 +70,21 @@ describe Thor::Actions::InjectIntoFile do
       expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
     end
 
+    it "does not attempt to change the file if it doesn't exist" do
+      expect_any_instance_of(Thor::Actions::InjectIntoFile).not_to receive(:replace!)
+      invoker.inject_into_file "idontexist", :before => "something" do
+        "any content"
+      end rescue nil
+    end
+
+    it "raises a malformatted argument error including filename if file doesn't exist" do
+      expect do
+        invoker.inject_into_file "idontexist", :before => "something" do
+          "any content"
+        end
+      end.to raise_error(Thor::MalformattedArgumentError, /does not appear to exist/)
+    end
+
     it "does change the file if already includes content and :force is true" do
       invoke! "doc/README", :before => "__end__" do
         "more content\n"

@@ -1,4 +1,5 @@
 require "thor/actions/empty_directory"
+require "pry"
 
 class Thor
   module Actions
@@ -56,7 +57,11 @@ class Thor
           replacement + '\0'
         end
 
-        replace!(/#{flag}/, content, config[:force])
+        if File.exist?(destination)
+          replace!(/#{flag}/, content, config[:force])
+        else
+          raise MalformattedArgumentError, "The file #{ destination } does not appear to exist"
+        end
       end
 
       def revoke!
