@@ -1,5 +1,4 @@
 require "thor/actions/empty_directory"
-require "pry"
 
 class Thor
   module Actions
