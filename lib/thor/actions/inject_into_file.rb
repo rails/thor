@@ -57,7 +57,7 @@ class Thor
           replacement + '\0'
         end
 
-        if File.exist?(destination)
+        if exists?
           replace!(/#{flag}/, content, config[:force])
         else
           raise MalformattedArgumentError, "The file #{ destination } does not appear to exist"
