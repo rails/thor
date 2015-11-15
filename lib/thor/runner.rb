@@ -45,16 +45,18 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
     # command in said directory.
     begin
       if File.directory?(File.expand_path(name))
-        base, package = File.join(name, "main.thor"), :directory
-        contents      = open(base) { |input| input.read }
+        base = File.join(name, "main.thor")
+        package = :directory
+        contents = open(base, &:read)
       else
-        base, package = name, :file
-        contents      = open(name) { |input| input.read }
+        base = name
+        package = :file
+        contents = open(name, &:read)
       end
     rescue OpenURI::HTTPError
       raise Error, "Error opening URI '#{name}'"
     rescue Errno::ENOENT
-      fail Error, "Error opening file '#{name}'"
+      raise Error, "Error opening file '#{name}'"
     end
 
     say "Your Thorfile contains:"
@@ -263,11 +265,11 @@ private
   def thorfiles_relevant_to(meth)
     lookup = [meth, meth.split(":")[0...-1].join(":")]
 
-    files = thor_yaml.select do |k, v|
+    files = thor_yaml.select do |_k, v|
       v[:namespaces] && !(v[:namespaces] & lookup).empty?
     end
 
-    files.map { |k, v| File.join(thor_root, "#{v[:filename]}") }
+    files.map { |_k, v| File.join(thor_root, "#{v[:filename]}") }
   end
 
   # Display information about the given klasses. If with_module is given,
@@ -306,7 +308,7 @@ private
   alias_method :display_tasks, :display_commands
 
   def show_modules #:nodoc:
-    info  = []
+    info = []
     labels = %w[Modules Namespaces]
 
     info << labels

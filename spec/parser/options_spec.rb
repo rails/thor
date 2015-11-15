@@ -55,7 +55,6 @@ describe Thor::Options do
     it "accepts underscored options" do
       expect(Thor::Options.to_switches(:under_score_option => "foo bar")).to eq('--under_score_option "foo bar"')
     end
-
   end
 
   describe "#parse" do
@@ -293,7 +292,7 @@ describe Thor::Options do
         enum = %w[apple banana]
         create :fruit => Thor::Option.new("fruit", :type => :string, :enum => enum)
         expect { parse("--fruit", "orange") }.to raise_error(Thor::MalformattedArgumentError,
-            "Expected '--fruit' to be one of #{enum.join(', ')}; got orange")
+                                                             "Expected '--fruit' to be one of #{enum.join(', ')}; got orange")
       end
     end
 
@@ -366,7 +365,7 @@ describe Thor::Options do
       end
 
       it "must not allow the same hash key to be specified multiple times" do
-        expect {parse("--attributes", "name:string", "name:integer")}.to raise_error(Thor::MalformattedArgumentError, "You can't specify 'name' more than once in option '--attributes'; got name:string and name:integer")
+        expect { parse("--attributes", "name:string", "name:integer") }.to raise_error(Thor::MalformattedArgumentError, "You can't specify 'name' more than once in option '--attributes'; got name:string and name:integer")
       end
     end
 
@@ -413,6 +412,5 @@ describe Thor::Options do
                                                         "Expected '--limit' to be one of #{enum.join(', ')}; got 3")
       end
     end
-
   end
 end

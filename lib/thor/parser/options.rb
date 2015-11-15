@@ -14,7 +14,7 @@ class Thor
         when true
           "--#{key}"
         when Array
-          "--#{key} #{value.map { |v| v.inspect }.join(' ')}"
+          "--#{key} #{value.map(&:inspect).join(' ')}"
         when Hash
           "--#{key} #{value.map { |k, v| "#{k}:#{v}" }.join(' ')}"
         when nil, false
@@ -40,7 +40,9 @@ class Thor
         @non_assigned_required.delete(hash_options[key])
       end
 
-      @shorts, @switches, @extra = {}, {}, []
+      @shorts = {}
+      @switches = {}
+      @extra = []
 
       options.each do |option|
         @switches[option.switch_name] = option
@@ -81,13 +83,13 @@ class Thor
           if is_switch
             case shifted
             when SHORT_SQ_RE
-              unshift($1.split("").map { |f| "-#{f}" })
+              unshift(Regexp.last_match(1).split("").map { |f| "-#{f}" })
               next
             when EQ_RE, SHORT_NUM
-              unshift($2)
-              switch = $1
+              unshift(Regexp.last_match(2))
+              switch = Regexp.last_match(1)
             when LONG_RE, SHORT_RE
-              switch = $1
+              switch = Regexp.last_match(1)
             end
 
             switch = normalize_switch(switch)
@@ -131,9 +133,9 @@ class Thor
     def current_is_switch?
       case peek
       when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
-        [true, switch?($1)]
+        [true, switch?(Regexp.last_match(1))]
       when SHORT_SQ_RE
-        [true, $1.split("").any? { |f| switch?("-#{f}") }]
+        [true, Regexp.last_match(1).split("").any? { |f| switch?("-#{f}") }]
       else
         [false, false]
       end

@@ -2,7 +2,7 @@ describe "The library itself" do
   def check_for_spec_defs_with_single_quotes(filename)
     failing_lines = []
 
-    File.readlines(filename).each_with_index do |line,number|
+    File.readlines(filename).each_with_index do |line, number|
       failing_lines << number + 1 if line =~ /^ *(describe|it|context) {1}'{1}/
     end
 
@@ -13,7 +13,7 @@ describe "The library itself" do
 
   def check_for_tab_characters(filename)
     failing_lines = []
-    File.readlines(filename).each_with_index do |line,number|
+    File.readlines(filename).each_with_index do |line, number|
       failing_lines << number + 1 if line =~ /\t/
     end
 
@@ -24,7 +24,7 @@ describe "The library itself" do
 
   def check_for_extra_spaces(filename)
     failing_lines = []
-    File.readlines(filename).each_with_index do |line,number|
+    File.readlines(filename).each_with_index do |line, number|
       next if line =~ /^\s+#.*\s+\n$/
       failing_lines << number + 1 if line =~ /\s+\n$/
     end
@@ -39,9 +39,7 @@ describe "The library itself" do
       actual.join("\n")
     end
 
-    match do |actual|
-      actual.empty?
-    end
+    match(&:empty?)
   end
 
   it "has no malformed whitespace" do

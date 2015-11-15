@@ -6,7 +6,7 @@ describe Thor::Actions::EmptyDirectory do
     ::FileUtils.rm_rf(destination_root)
   end
 
-  def empty_directory(destination, options = {})
+  def empty_directory(destination, _options = {})
     @action = Thor::Actions::EmptyDirectory.new(base, destination)
   end
 

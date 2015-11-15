@@ -140,7 +140,7 @@ BoringVendorProvidedCLI.register(
   "subcommands ftw")
 
 BoringVendorProvidedCLI.register(SubcommandWithDefault,
-  "subcommand", "subcommand", "Run subcommands")
+                                 "subcommand", "subcommand", "Run subcommands")
 
 describe ".register-ing a Thor subclass" do
   it "registers the plugin as a subcommand" do

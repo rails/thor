@@ -5,12 +5,15 @@ class Thor
   module Shell
     class Basic # rubocop:disable ClassLength
       attr_accessor :base
-      attr_reader   :padding
+      attr_reader :padding
 
       # Initialize base, mute and padding to nil.
       #
       def initialize #:nodoc:
-        @base, @mute, @padding, @always_force = nil, false, 0, false
+        @base = nil
+        @mute = false
+        @padding = 0
+        @always_force = false
       end
 
       # Mute everything that's inside given block
@@ -36,7 +39,7 @@ class Thor
 
       # Sets the output padding while executing a block and resets it.
       #
-      def indent(count = 1, &block)
+      def indent(count = 1, &_block)
         orig_padding = padding
         self.padding = padding + count
         yield
@@ -157,7 +160,9 @@ class Thor
       def print_table(array, options = {}) # rubocop:disable MethodLength
         return if array.empty?
 
-        formats, indent, colwidth = [], options[:indent].to_i, options[:colwidth]
+        formats = []
+        indent = options[:indent].to_i
+        colwidth = options[:colwidth]
         options[:truncate] = terminal_width if options[:truncate] == true
 
         formats << "%-#{colwidth + 2}s" if colwidth
@@ -293,7 +298,7 @@ class Thor
       # Apply color to the given string with optional bold. Disabled in the
       # Thor::Shell::Basic class.
       #
-      def set_color(string, *args) #:nodoc:
+      def set_color(string, *_args) #:nodoc:
         string
       end
 
@@ -362,11 +367,11 @@ class Thor
       end
 
       def dynamic_width_stty
-        %x(stty size 2>/dev/null).split[1].to_i
+        `stty size 2>/dev/null`.split[1].to_i
       end
 
       def dynamic_width_tput
-        %x(tput cols 2>/dev/null).to_i
+        `tput cols 2>/dev/null`.to_i
       end
 
       def unix?
@@ -379,7 +384,7 @@ class Thor
           if chars.length <= width
             chars.join
           else
-            ( chars[0, width - 3].join) + "..."
+            (chars[0, width - 3].join) + "..."
           end
         end
       end
@@ -390,7 +395,8 @@ class Thor
         end
       else
         def as_unicode
-          old, $KCODE = $KCODE, "U"
+          old = $KCODE
+          $KCODE = "U"
           yield
         ensure
           $KCODE = old

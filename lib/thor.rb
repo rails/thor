@@ -9,7 +9,7 @@ class Thor # rubocop:disable ClassLength
     # name<String>
     # options<Hash>
     #
-    def package_name(name, options = {})
+    def package_name(name, _options = {})
       @package_name = name.nil? || name == "" ? nil : name
     end
 
@@ -57,7 +57,9 @@ class Thor # rubocop:disable ClassLength
         command.usage = usage             if usage
         command.description = description if description
       else
-        @usage, @desc, @hide = usage, description, options[:hide] || false
+        @usage = usage
+        @desc = description
+        @hide = options[:hide] || false
       end
     end
 
@@ -235,7 +237,7 @@ class Thor # rubocop:disable ClassLength
 
       define_method(subcommand) do |*args|
         args, opts = Thor::Arguments.split(args)
-        args.unshift("help") if opts.include? "--help" or opts.include? "-h"
+        args.unshift("help") if opts.include?("--help") || opts.include?("-h")
         invoke subcommand_class, args, opts, :invoked_via_subcommand => true, :class_options => options
       end
     end
@@ -324,6 +326,7 @@ class Thor # rubocop:disable ClassLength
     end
 
   protected
+
     def stop_on_unknown_option #:nodoc:
       @stop_on_unknown_option ||= Set.new
     end
@@ -349,7 +352,8 @@ class Thor # rubocop:disable ClassLength
           opts.clear
         end
       else
-        args, opts = given_args, nil
+        args = given_args
+        opts = nil
         command = dynamic_command_class.new(meth)
       end
 
@@ -368,7 +372,7 @@ class Thor # rubocop:disable ClassLength
     # the command that is going to be invoked and a boolean which indicates if
     # the namespace should be displayed as arguments.
     #
-    def banner(command, namespace = nil, subcommand = false)
+    def banner(command, _namespace = nil, subcommand = false)
       "#{basename} #{command.formatted_usage(self, $thor_runner, subcommand)}"
     end
 
@@ -394,8 +398,8 @@ class Thor # rubocop:disable ClassLength
       elsif all_commands[meth] || meth == "method_missing"
         true
       else
-        puts "[WARNING] Attempted to create command #{meth.inspect} without usage or description. " <<
-             "Call desc if you want this method to be available as command or declare it inside a " <<
+        puts "[WARNING] Attempted to create command #{meth.inspect} without usage or description. " \
+             "Call desc if you want this method to be available as command or declare it inside a " \
              "no_commands{} block. Invoked from #{caller[1].inspect}."
         false
       end
@@ -410,11 +414,7 @@ class Thor # rubocop:disable ClassLength
     # Retrieve the command name from given args.
     def retrieve_command_name(args) #:nodoc:
       meth = args.first.to_s unless args.empty?
-      if meth && (map[meth] || meth !~ /^\-/)
-        args.shift
-      else
-        nil
-      end
+      args.shift if meth && (map[meth] || meth !~ /^\-/)
     end
     alias_method :retrieve_task_name, :retrieve_command_name
 
@@ -426,20 +426,20 @@ class Thor # rubocop:disable ClassLength
     # +normalize_command_name+ also converts names like +animal-prison+
     # into +animal_prison+.
     def normalize_command_name(meth) #:nodoc:
-      return default_command.to_s.gsub("-", "_") unless meth
+      return default_command.to_s.tr("-", "_") unless meth
 
       possibilities = find_command_possibilities(meth)
       if possibilities.size > 1
         fail AmbiguousTaskError, "Ambiguous command #{meth} matches [#{possibilities.join(', ')}]"
       elsif possibilities.size < 1
-        meth = meth || default_command
+        meth ||= default_command
       elsif map[meth]
         meth = map[meth]
       else
         meth = possibilities.first
       end
 
-      meth.to_s.gsub("-", "_") # treat foo-bar as foo_bar
+      meth.to_s.tr("-", "_") # treat foo-bar as foo_bar
     end
     alias_method :normalize_task_name, :normalize_command_name
 
@@ -461,7 +461,7 @@ class Thor # rubocop:disable ClassLength
     end
     alias_method :find_task_possibilities, :find_command_possibilities
 
-    def subcommand_help(cmd)
+    def subcommand_help(_cmd)
       desc "help [COMMAND]", "Describe subcommands or one specific subcommand"
       class_eval "
         def help(command = nil, subcommand = true); super; end

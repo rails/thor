@@ -215,9 +215,9 @@ class Thor
       shell.padding += 1 if verbose
 
       if is_uri
-        contents = open(path, "Accept" => "application/x-thor-template") { |io| io.read }
+        contents = open(path, "Accept" => "application/x-thor-template", &:read)
       else
-        contents = open(path) { |io| io.read }
+        contents = open(path, &:read)
       end
 
       instance_eval(contents, path)

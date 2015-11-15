@@ -62,11 +62,11 @@ describe Thor::Invocation do
       expect(I.new.invoke("two")).to eq([:two])
 
       if RUBY_VERSION < "1.9.3"
-        result = J.start(["one", "two" ])
+        result = J.start(%w[one two])
         expect(result).to include(:one)
         expect(result).to include(:two)
       else
-        expect(J.start(["one", "two" ])).to eq([:one, :two])
+        expect(J.start(%w[one two])).to eq([:one, :two])
       end
     end
 
@@ -76,7 +76,8 @@ describe Thor::Invocation do
     end
 
     it "allow extra configuration values to be given" do
-      base, shell = A.new, Thor::Base.shell.new
+      base = A.new
+      shell = Thor::Base.shell.new
       expect(base.invoke("b:three", [], {}, :shell => shell).shell).to eq(shell)
     end
 

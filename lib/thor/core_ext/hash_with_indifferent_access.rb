@@ -68,13 +68,13 @@ class Thor
       #   options.shebang                 # => "/usr/lib/local/ruby"
       #   options.test_framework?(:rspec) # => options[:test_framework] == :rspec
       #
-      def method_missing(method, *args, &block)
+      def method_missing(method, *args, &_block)
         method = method.to_s
         if method =~ /^(\w+)\?$/
           if args.empty?
-            !!self[$1]
+            !!self[Regexp.last_match(1)]
           else
-            self[$1] == args.first
+            self[Regexp.last_match(1)] == args.first
           end
         else
           self[method]

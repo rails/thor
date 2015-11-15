@@ -33,7 +33,7 @@ class Thor
     rescue ArgumentError => e
       handle_argument_error?(instance, e, caller) ? instance.class.handle_argument_error(self, e, args, arity) : (raise e)
     rescue NoMethodError => e
-      handle_no_method_error?(instance, e, caller) ? instance.class.handle_no_command_error(name) : (fail e)
+      handle_no_method_error?(instance, e, caller) ? instance.class.handle_no_command_error(name) : (raise e)
     end
 
     # Returns the formatted usage by injecting given required arguments
@@ -50,7 +50,7 @@ class Thor
       # Add usage with required arguments
       formatted << if klass && !klass.arguments.empty?
                      usage.to_s.gsub(/^#{name}/) do |match|
-                       match << " " << klass.arguments.map { |a| a.usage }.compact.join(" ")
+                       match << " " << klass.arguments.map(&:usage).compact.join(" ")
                      end
                    else
                      usage.to_s
@@ -100,7 +100,7 @@ class Thor
       end
     end
 
-    def handle_no_method_error?(instance, error, caller)
+    def handle_no_method_error?(instance, error, _caller)
       not_debugging?(instance) &&
         error.message =~ /^undefined method `#{name}' for #{Regexp.escape(instance.to_s)}$/
     end

@@ -64,7 +64,7 @@ class Thor
         new_constants = Thor::Base.subclasses.dup
         Thor::Base.subclasses.replace(old_constants)
 
-        new_constants.map! { |c| c.namespace }
+        new_constants.map!(&:namespace)
         new_constants.compact!
         new_constants
       end
@@ -72,7 +72,7 @@ class Thor
       # Returns the thor classes declared inside the given class.
       #
       def thor_classes_in(klass)
-        stringfied_constants = klass.constants.map { |c| c.to_s }
+        stringfied_constants = klass.constants.map(&:to_s)
         Thor::Base.subclasses.select do |subclass|
           next unless subclass.name
           stringfied_constants.include?(subclass.name.gsub("#{klass.name}::", ""))
@@ -103,7 +103,7 @@ class Thor
       #
       def camel_case(str)
         return str if str !~ /_/ && str =~ /[A-Z]+.*/
-        str.split("_").map { |i| i.capitalize }.join
+        str.split("_").map(&:capitalize).join
       end
 
       # Receives a namespace and tries to retrieve a Thor or Thor::Group class
@@ -135,7 +135,8 @@ class Thor
           klass   = Thor::Util.find_by_namespace(pieces.join(":"))
         end
         unless klass # look for a Thor::Group with the right name
-          klass, command = Thor::Util.find_by_namespace(namespace), nil
+          klass = Thor::Util.find_by_namespace(namespace)
+          command = nil
         end
         if !klass && fallback # try a command in the default namespace
           command = namespace

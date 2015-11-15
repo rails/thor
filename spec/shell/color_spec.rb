@@ -71,7 +71,6 @@ describe Thor::Shell::Color do
 
       expect(out.chomp).to eq("\e[1m\e[34mWow! This still works?\e[0m")
     end
-
   end
 
   describe "#say_status" do

@@ -11,7 +11,6 @@ describe Thor::Option do
   end
 
   describe "#parse" do
-
     describe "with value as a symbol" do
       describe "and symbol is a valid type" do
         it "has type equals to the symbol" do
@@ -160,7 +159,6 @@ describe Thor::Option do
   end
 
   describe "#usage" do
-
     it "returns usage for string types" do
       expect(parse(:foo, :string).usage).to eq("[--foo=FOO]")
     end
@@ -194,7 +192,7 @@ describe Thor::Option do
     end
 
     it "documents a negative option for a positive boolean starting with 'no'" do
-      expect(parse(:'nougat', :boolean).usage).to include("[--no-nougat]")
+      expect(parse(:nougat, :boolean).usage).to include("[--no-nougat]")
     end
 
     it "uses banner when supplied" do

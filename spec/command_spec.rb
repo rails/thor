@@ -67,6 +67,7 @@ describe Thor::Command do
         def self.handle_no_command_error(name)
           name
         end
+
         def can_has
           "fail"
         end

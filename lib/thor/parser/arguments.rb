@@ -24,7 +24,8 @@ class Thor
     # Takes an array of Thor::Argument objects.
     #
     def initialize(arguments = [])
-      @assigns, @non_assigned_required = {}, []
+      @assigns = {}
+      @non_assigned_required = []
       @switches = arguments
 
       arguments.each do |argument|
@@ -57,7 +58,7 @@ class Thor
 
     def no_or_skip?(arg)
       arg =~ /^--(no|skip)-([-\w]+)$/
-      $2
+      Regexp.last_match(2)
     end
 
     def last?
@@ -73,7 +74,7 @@ class Thor
     end
 
     def unshift(arg)
-      if arg.kind_of?(Array)
+      if arg.is_a?(Array)
         @pile = arg + @pile
       else
         @pile.unshift(arg)
@@ -114,7 +115,7 @@ class Thor
     #
     #   ["a", "b", "c"]
     #
-    def parse_array(name)
+    def parse_array(_name)
       return shift if peek.is_a?(Array)
       array = []
       array << shift while current_is_value?

@@ -23,9 +23,11 @@ class Thor
     #
     def insert_into_file(destination, *args, &block)
       if block_given?
-        data, config = block, args.shift
+        data = block
+        config = args.shift
       else
-        data, config = args.shift, args.shift
+        data = args.shift
+        config = args.shift
       end
       action InjectIntoFile.new(self, destination, data, config)
     end
@@ -39,8 +41,8 @@ class Thor
 
         @behavior, @flag = if @config.key?(:after)
           [:after, @config.delete(:after)]
-                           else
-                             [:before, @config.delete(:before)]
+        else
+          [:before, @config.delete(:before)]
                            end
 
         @replacement = data.is_a?(Proc) ? data.call : data

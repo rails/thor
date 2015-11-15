@@ -49,7 +49,7 @@ class Thor
     #
     #   link_file "doc/README"
     #
-    def link_file(source, *args, &block)
+    def link_file(source, *args, &_block)
       config = args.last.is_a?(Hash) ? args.pop : {}
       destination = args.first || source
       source = File.expand_path(find_in_source_paths(source.to_s))
@@ -285,7 +285,7 @@ class Thor
     #
     def remove_file(path, config = {})
       return unless behavior == :invoke
-      path  = File.expand_path(path, destination_root)
+      path = File.expand_path(path, destination_root)
 
       say_status :remove, relative_to_original_destination_root(path), config.fetch(:verbose, true)
       ::FileUtils.rm_rf(path) if !options[:pretend] && File.exist?(path)
@@ -306,7 +306,8 @@ class Thor
     end
 
     def with_output_buffer(buf = "") #:nodoc:
-      self.output_buffer, old_buffer = buf, output_buffer
+      self.output_buffer = buf
+      old_buffer = output_buffer
       yield
       output_buffer
     ensure
