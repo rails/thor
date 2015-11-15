@@ -52,11 +52,13 @@ class Thor
       command_options = config.delete(:command_options) # hook for start
       parse_options = parse_options.merge(command_options) if command_options
       if local_options.is_a?(Array)
-        array_options, hash_options = local_options, {}
+        array_options = local_options
+        hash_options = {}
       else
         # Handle the case where the class was explicitly instantiated
         # with pre-parsed options.
-        array_options, hash_options = [], local_options
+        array_options = []
+        hash_options = local_options
       end
 
       # Let Thor::Options parse the options first, so it can remove
@@ -144,14 +146,14 @@ class Thor
         @check_unknown_options ||= from_superclass(:check_unknown_options, false)
       end
 
-      def check_unknown_options?(config) #:nodoc:
+      def check_unknown_options?(_config) #:nodoc:
         !!check_unknown_options
       end
 
       # If true, option parsing is suspended as soon as an unknown option or a
       # regular argument is encountered.  All remaining arguments are passed to
       # the command as regular arguments.
-      def stop_on_unknown_option?(command_name) #:nodoc:
+      def stop_on_unknown_option?(_command_name) #:nodoc:
         false
       end
 
@@ -166,7 +168,7 @@ class Thor
         @strict_args_position ||= from_superclass(:strict_args_position, false)
       end
 
-      def strict_args_position?(config) #:nodoc:
+      def strict_args_position?(_config) #:nodoc:
         !!strict_args_position
       end
 
@@ -221,7 +223,7 @@ class Thor
 
         arguments.each do |argument|
           next if argument.required?
-          fail ArgumentError, "You cannot have #{name.to_s.inspect} as required argument after " <<
+          fail ArgumentError, "You cannot have #{name.to_s.inspect} as required argument after " \
                                "the non-required argument #{argument.human_name.inspect}."
         end if required
 
@@ -475,7 +477,7 @@ class Thor
       end
       alias_method :handle_no_task_error, :handle_no_command_error
 
-      def handle_argument_error(command, error, args, arity) #:nodoc:
+      def handle_argument_error(command, _error, args, _arity) #:nodoc:
         msg = "ERROR: \"#{basename} #{command.name}\" was called with "
         msg << "no arguments"               if     args.empty?
         msg << "arguments " << args.inspect unless args.empty?
@@ -513,14 +515,13 @@ class Thor
         padding = options.map { |o| o.aliases.size }.max.to_i * 4
 
         options.each do |option|
-          unless option.hide
-            item = [option.usage(padding)]
-            item.push(option.description ? "# #{option.description}" : "")
+          next if option.hide
+          item = [option.usage(padding)]
+          item.push(option.description ? "# #{option.description}" : "")
 
-            list << item
-            list << ["", "# Default: #{option.default}"] if option.show_default?
-            list << ["", "# Possible values: #{option.enum.join(', ')}"] if option.enum
-          end
+          list << item
+          list << ["", "# Default: #{option.default}"] if option.show_default?
+          list << ["", "# Possible values: #{option.enum.join(', ')}"] if option.enum
         end
 
         shell.say(group_name ? "#{group_name} options:" : "Options:")
@@ -648,7 +649,7 @@ class Thor
       end
 
       # SIGNATURE: The hook invoked by start.
-      def dispatch(command, given_args, given_opts, config) #:nodoc:
+      def dispatch(_command, _given_args, _given_opts, _config) #:nodoc:
         fail NotImplementedError
       end
     end

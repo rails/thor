@@ -1,6 +1,6 @@
 $TESTING = true
 
-if RUBY_VERSION >= '1.9'
+if RUBY_VERSION >= "1.9"
   require "simplecov"
   require "coveralls"
 
@@ -23,7 +23,6 @@ require "diff/lcs" # You need diff/lcs installed to run specs (but not to run Th
 require "webmock/rspec"
 
 WebMock.disable_net_connect!(:allow => "coveralls.io")
-
 
 # Set shell to basic
 $0 = "thor"
@@ -72,11 +71,12 @@ RSpec.configure do |config|
   # This code was adapted from Ruby on Rails, available under MIT-LICENSE
   # Copyright (c) 2004-2013 David Heinemeier Hansson
   def silence_warnings
-    old_verbose, $VERBOSE = $VERBOSE, nil
+    old_verbose = $VERBOSE
+    $VERBOSE = nil
     yield
   ensure
     $VERBOSE = old_verbose
   end
 
-  alias silence capture
+  alias_method :silence, :capture
 end

@@ -127,7 +127,7 @@ describe Thor do
       expect(my_script.start(%w[exec -- --verbose])).to eq [{}, %w[--verbose]]
     end
 
-    it "does not affect ordinary commands"  do
+    it "does not affect ordinary commands" do
       expect(my_script.start(%w[boring command --verbose])).to eq [{"verbose" => true}, %w[command]]
     end
 
@@ -259,17 +259,17 @@ describe Thor do
         stderr = capture(:stderr) { Scripts::Arities.start(args) }
         expect(stderr.strip).to eq(msg)
       end
-      arity_asserter.call %w[zero_args one], %Q(ERROR: "thor zero_args" was called with arguments ["one"]
+      arity_asserter.call %w[zero_args one], %(ERROR: "thor zero_args" was called with arguments ["one"]
 Usage: "thor scripts:arities:zero_args")
-      arity_asserter.call %w[one_arg], %Q(ERROR: "thor one_arg" was called with no arguments
+      arity_asserter.call %w[one_arg], %(ERROR: "thor one_arg" was called with no arguments
 Usage: "thor scripts:arities:one_arg ARG")
-      arity_asserter.call %w[one_arg one two], %Q(ERROR: "thor one_arg" was called with arguments ["one", "two"]
+      arity_asserter.call %w[one_arg one two], %(ERROR: "thor one_arg" was called with arguments ["one", "two"]
 Usage: "thor scripts:arities:one_arg ARG")
-      arity_asserter.call %w[one_arg one two], %Q(ERROR: "thor one_arg" was called with arguments ["one", "two"]
+      arity_asserter.call %w[one_arg one two], %(ERROR: "thor one_arg" was called with arguments ["one", "two"]
 Usage: "thor scripts:arities:one_arg ARG")
-      arity_asserter.call %w[two_args one], %Q(ERROR: "thor two_args" was called with arguments ["one"]
+      arity_asserter.call %w[two_args one], %(ERROR: "thor two_args" was called with arguments ["one"]
 Usage: "thor scripts:arities:two_args ARG1 ARG2")
-      arity_asserter.call %w[optional_arg one two], %Q(ERROR: "thor optional_arg" was called with arguments ["one", "two"]
+      arity_asserter.call %w[optional_arg one two], %(ERROR: "thor optional_arg" was called with arguments ["one", "two"]
 Usage: "thor scripts:arities:optional_arg [ARG]")
     end
 
@@ -321,7 +321,6 @@ Usage: "thor scripts:arities:optional_arg [ARG]")
         MyScript.start(%w[f], :shell => shell)
       end
     end
-
   end
 
   describe "#help" do
@@ -435,7 +434,7 @@ HELP
       end
 
       it "shows the command help" do
-        content = capture(:stdout) { klass.start(%w{help}) }
+        content = capture(:stdout) { klass.start(%w[help]) }
         expect(content).to match(/Commands:/)
       end
     end

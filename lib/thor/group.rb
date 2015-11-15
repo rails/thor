@@ -62,7 +62,7 @@ class Thor::Group # rubocop:disable ClassLength
         invocation_blocks[name] = block if block_given?
 
         class_eval <<-METHOD, __FILE__, __LINE__
-          def _invoke_#{name.to_s.gsub(/\W/, "_")}
+          def _invoke_#{name.to_s.gsub(/\W/, '_')}
             klass, command = self.class.prepare_for_invocation(nil, #{name.inspect})
 
             if klass
@@ -113,7 +113,7 @@ class Thor::Group # rubocop:disable ClassLength
 
       names.each do |name|
         unless class_options.key?(name)
-          fail ArgumentError, "You have to define the option #{name.inspect} " <<
+          fail ArgumentError, "You have to define the option #{name.inspect} " \
                                "before setting invoke_from_option."
         end
 
@@ -121,7 +121,7 @@ class Thor::Group # rubocop:disable ClassLength
         invocation_blocks[name] = block if block_given?
 
         class_eval <<-METHOD, __FILE__, __LINE__
-          def _invoke_from_option_#{name.to_s.gsub(/\W/, "_")}
+          def _invoke_from_option_#{name.to_s.gsub(/\W/, '_')}
             return unless options[#{name.inspect}]
 
             value = options[#{name.inspect}]
@@ -179,7 +179,7 @@ class Thor::Group # rubocop:disable ClassLength
         end
         next unless value
 
-        klass, _ = prepare_for_invocation(name, value)
+        klass, = prepare_for_invocation(name, value)
         next unless klass && klass.respond_to?(:class_options)
 
         value = value.to_s
@@ -204,7 +204,7 @@ class Thor::Group # rubocop:disable ClassLength
     end
     alias_method :printable_tasks, :printable_commands
 
-    def handle_argument_error(command, error, args, arity) #:nodoc:
+    def handle_argument_error(command, error, _args, arity) #:nodoc:
       msg = "#{basename} #{command.name} takes #{arity} argument"
       msg << "s" if arity > 1
       msg << ", but it should not."

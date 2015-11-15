@@ -35,7 +35,7 @@ end
 
 # override task on (main), for compatibility with Rake 0.9
 instance_eval do
-  alias rake_namespace namespace
+  alias_method :rake_namespace, :namespace
 
   def task(*)
     task = super

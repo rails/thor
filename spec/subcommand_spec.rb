@@ -1,9 +1,7 @@
 require "helper"
 
 describe Thor do
-
   describe "#subcommand" do
-
     it "maps a given subcommand to another Thor subclass" do
       barn_help = capture(:stdout) { Scripts::MyDefaults.start(%w[barn]) }
       expect(barn_help).to include("barn help [COMMAND]  # Describe subcommands or one specific subcommand")
@@ -39,10 +37,9 @@ describe Thor do
     end
 
     it "the help command on the subcommand and after it should result in the same output" do
-      output = capture(:stdout) { TestSubcommands::Parent.start(%w[sub help])}
-      sub_help = capture(:stdout) { TestSubcommands::Parent.start(%w[help sub])}
+      output = capture(:stdout) { TestSubcommands::Parent.start(%w[sub help]) }
+      sub_help = capture(:stdout) { TestSubcommands::Parent.start(%w[help sub]) }
       expect(output).to eq(sub_help)
     end
   end
-
 end

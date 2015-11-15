@@ -9,12 +9,12 @@ Gem::Specification.new do |spec|
   spec.description = "Thor is a toolkit for building powerful command-line interfaces."
   spec.email = "ruby-thor@googlegroups.com"
   spec.executables = %w[thor]
-  spec.files = %w[.document thor.gemspec] + Dir['*.md', 'bin/*', 'lib/**/*.rb']
+  spec.files = %w[.document thor.gemspec] + Dir["*.md", "bin/*", "lib/**/*.rb"]
   spec.homepage = "http://whatisthor.com/"
   spec.licenses = %w[MIT]
   spec.name = "thor"
   spec.require_paths = %w[lib]
-  spec.required_ruby_version = '>= 1.8.7'
+  spec.required_ruby_version = ">= 1.8.7"
   spec.required_rubygems_version = ">= 1.3.5"
   spec.summary = spec.description
   spec.version = Thor::VERSION

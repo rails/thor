@@ -28,19 +28,19 @@ describe Thor::Shell::Basic do
     end
 
     it "accepts custom indentation amounts" do
-      shell.indent(6) {
+      shell.indent(6) do
         expect(shell.padding).to eq(6)
-      }
+      end
     end
 
     it "increases the padding when nested" do
-      shell.indent {
+      shell.indent do
         expect(shell.padding).to eq(1)
 
-        shell.indent {
+        shell.indent do
           expect(shell.padding).to eq(2)
-        }
-      }
+        end
+      end
       expect(shell.padding).to eq(0)
     end
   end
@@ -261,7 +261,7 @@ TABLE
       2.times { @table.first.pop }
       content = capture(:stdout) { shell.print_table(@table) }
       expect(content).to eq(<<-TABLE)
-abc  
+abc
      #0    empty
 xyz  #786  last three
 TABLE

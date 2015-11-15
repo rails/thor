@@ -44,7 +44,8 @@ class Thor
       if key.is_a?(Array)
         name, *aliases = key
       else
-        name, aliases = key, []
+        name = key
+        aliases = []
       end
 
       name    = name.to_s
@@ -86,7 +87,7 @@ class Thor
       sample = "[#{sample}]" unless required?
 
       if boolean?
-        sample << ", [#{dasherize("no-" + human_name)}]" unless name == "force" or name.start_with?("no-")
+        sample << ", [#{dasherize('no-' + human_name)}]" unless name == "force" or name.start_with?("no-")
       end
 
       if aliases.empty?
@@ -134,7 +135,7 @@ class Thor
     end
 
     def dasherize(str)
-      (str.length > 1 ? "--" : "-") + str.gsub("_", "-")
+      (str.length > 1 ? "--" : "-") + str.tr("_", "-")
     end
   end
 end

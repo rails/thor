@@ -32,7 +32,8 @@ class Thor
       # config<Hash>:: give :verbose => false to not log the status.
       #
       def initialize(base, destination, config = {})
-        @base, @config   = base, {:verbose => true}.merge(config)
+        @base = base
+        @config = {:verbose => true}.merge(config)
         self.destination = destination
       end
 
@@ -100,7 +101,7 @@ class Thor
       #
       def convert_encoded_instructions(filename)
         filename.gsub(/%(.*?)%/) do |initial_string|
-          method = $1.strip
+          method = Regexp.last_match(1).strip
           base.respond_to?(method, true) ? base.send(method) : initial_string
         end
       end
@@ -121,7 +122,7 @@ class Thor
 
       # What to do when the destination file already exists.
       #
-      def on_conflict_behavior(&block)
+      def on_conflict_behavior(&_block)
         say_status :exist, :blue
       end
 
