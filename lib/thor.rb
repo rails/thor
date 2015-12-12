@@ -174,7 +174,7 @@ class Thor # rubocop:disable ClassLength
       shell.say "Usage:"
       shell.say "  #{banner(command)}"
       shell.say
-      class_options_help(shell, nil => command.options.map { |_, o| o })
+      class_options_help(shell, nil => command.options.values)
       if command.long_description
         shell.say "Description:"
         shell.print_wrapped(command.long_description, :indent => 2)
