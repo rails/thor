@@ -113,7 +113,7 @@ class Thor
       context = config.delete(:context) || instance_eval("binding")
 
       create_file destination, nil, config do
-        content = ERB.new(::File.binread(source), nil, "-", "@output_buffer").result(context)
+        content = CapturableERB.new(::File.binread(source), nil, "-", "@output_buffer").result(context)
         content = block.call(content) if block
         content
       end
@@ -311,6 +311,17 @@ class Thor
       output_buffer
     ensure
       self.output_buffer = old_buffer
+    end
+
+    # Thor::Actions#capture depends on what kind of buffer is used in ERB.
+    # Thus CapturableERB fixes ERB to use String buffer.
+    class CapturableERB < ERB
+      def set_eoutvar(compiler, eoutvar = '_erbout')
+        compiler.put_cmd = "#{eoutvar}.concat"
+        compiler.insert_cmd = "#{eoutvar}.concat"
+        compiler.pre_cmd = ["#{eoutvar} = ''"]
+        compiler.post_cmd = [eoutvar]
+      end
     end
   end
 end
