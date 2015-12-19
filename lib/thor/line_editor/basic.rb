@@ -23,7 +23,9 @@ class Thor
         if echo?
           $stdin.gets
         else
-          $stdin.noecho(&:gets)
+          $stdin.noecho do |stdin|
+            stdin.gets
+          end
         end
       end
 
