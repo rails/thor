@@ -31,6 +31,24 @@ describe Thor::Argument do
         argument(:command, :type => :string, :enum => "bar")
       end.to raise_error(ArgumentError, "An argument cannot have an enum other than an array.")
     end
+
+    it "raises an error if validator does not have call-method" do
+      expect do
+        argument(:command, :type => :string, :validator => Class.new.new, :validator_desc => 'Validator Description')
+      end.to raise_error(ArgumentError, "A validator needs to respond to #call")
+    end
+
+    it "raises an error if validator does not have a description" do
+      expect do
+        argument(:command, :type => :string, :validator => proc {})
+      end.to raise_error(ArgumentError, "A validator needs a description. Please define :validator_desc")
+    end
+
+    it "raises an error if validator and enum-option are used together" do
+      expect do
+        argument(:command, :type => :string, :validator => proc {}, :validator_desc => 'A validator description', :enum => ['a', 'b'])
+      end.to raise_error(ArgumentError, "It does not make sense to use both :validator and :enum. Please use either :validator or :enum")
+    end
   end
 
   describe "#usage" do

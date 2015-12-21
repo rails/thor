@@ -295,6 +295,18 @@ describe Thor::Options do
         expect { parse("--fruit", "orange") }.to raise_error(Thor::MalformattedArgumentError,
             "Expected '--fruit' to be one of #{enum.join(', ')}; got orange")
       end
+
+      it "accepts value when value 't match validator" do
+        create :fruit => Thor::Option.new("fruit", :type => :string, :validator => proc { |v| /orange/ === v }, :validator_desc => 'description')
+        expect { parse("--fruit", "orange") }.not_to raise_error
+      end
+
+      it "raises error when value doesn't match validator" do
+        create :fruit => Thor::Option.new("fruit", :type => :string, :validator => proc { |v| /banana/ === v }, :validator_desc => 'description')
+        expect { parse("--fruit", "orange") }.to raise_error(Thor::MalformattedArgumentError, 
+                                                             "Expected '--fruit=orange' to return true for `:validator`, but it returns false"
+                                                            )
+      end
     end
 
     describe "with :boolean type" do
@@ -368,6 +380,18 @@ describe Thor::Options do
       it "must not allow the same hash key to be specified multiple times" do
         expect {parse("--attributes", "name:string", "name:integer")}.to raise_error(Thor::MalformattedArgumentError, "You can't specify 'name' more than once in option '--attributes'; got name:string and name:integer")
       end
+
+      it "accepts value when value 't match validator" do
+        create :attributes => Thor::Option.new("attributes", :type => :hash, :validator => proc { |k,v| /name/ === k && /string/ === v}, :validator_desc => 'description')
+        expect { parse("--attributes", "name:string") }.not_to raise_error
+      end
+
+      it "raises error when value doesn't match validator" do
+        create :attributes => Thor::Option.new("attributes", :type => :hash, :validator => proc { |k,v| /name/ === k && /longstring/ === v}, :validator_desc => 'description')
+        expect { parse("--attributes", "name:string") }.to raise_error(Thor::MalformattedArgumentError, 
+                                                             "Expected '--attributes=name:string' to return true for `:validator`, but it returns false"
+                                                            )
+      end
     end
 
     describe "with :array type" do
@@ -385,6 +409,18 @@ describe Thor::Options do
 
       it "must not mix values with other switches" do
         expect(parse("--attributes", "a", "b", "c", "--baz", "cool")["attributes"]).to eq(%w[a b c])
+      end
+
+      it "accepts value when value 't match validator" do
+        create :attributes => Thor::Option.new("attributes", :type => :array, :validator => proc { |v| v.to_i < 4 }, :validator_desc => 'description')
+        expect { parse("--attributes", "1", "2", "3") }.not_to raise_error
+      end
+
+      it "raises error when value doesn't match validator" do
+        create :attributes => Thor::Option.new("attributes", :type => :array, :validator => proc { |v| v.to_i > 3 }, :validator_desc => 'description')
+        expect { parse("--attributes", "1", "4") }.to raise_error(Thor::MalformattedArgumentError, 
+                                                             "Expected '--attributes=[1, ...]' to return true for `:validator`, but it returns false"
+                                                            )
       end
     end
 
@@ -412,7 +448,18 @@ describe Thor::Options do
         expect { parse("--limit", "3") }.to raise_error(Thor::MalformattedArgumentError,
                                                         "Expected '--limit' to be one of #{enum.join(', ')}; got 3")
       end
-    end
 
+      it "accepts value when value 't match validator" do
+        create :limit => Thor::Option.new("limit", :type => :numeric, :validator => proc { |v| v == 3 }, :validator_desc => 'description')
+        expect { parse("--limit", "3") }.not_to raise_error
+      end
+
+      it "raises error when value doesn't match validator" do
+        create :limit => Thor::Option.new("limit", :type => :numeric, :validator => proc { |v| v < 3 }, :validator_desc => 'description')
+        expect { parse("--limit", "3") }.to raise_error(Thor::MalformattedArgumentError, 
+                                                             "Expected '--limit=3' to return true for `:validator`, but it returns false"
+                                                            )
+      end
+    end
   end
 end

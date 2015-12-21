@@ -137,14 +137,15 @@ class Thor # rubocop:disable ClassLength
     # options<Hash>:: Described below.
     #
     # ==== Options
-    # :desc     - Description for the argument.
-    # :required - If the argument is required or not.
-    # :default  - Default value for this argument. It cannot be required and have default values.
-    # :aliases  - Aliases for this option.
-    # :type     - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
-    # :banner   - String to show on usage notes.
-    # :hide     - If you want to hide this option from the help.
-    #
+    # :desc           - Description for the argument.
+    # :required       - If the argument is required or not.
+    # :default        - Default value for this argument. It cannot be required and have default values.
+    # :aliases        - Aliases for this option.
+    # :type           - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
+    # :banner         - String to show on usage notes.
+    # :hide           - If you want to hide this option from the help.
+    # :validator      - Check value of argument (:string, :array, :numeric), Check key/value of argument (hash). Needs to respond to #call.
+    # :validator_desc - Document which keys/values the validator accepts
     def method_option(name, options = {})
       scope = if options[:for]
         find_and_refresh_command(options[:for]).options
