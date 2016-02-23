@@ -1,6 +1,7 @@
 require "helper"
 
 class Application; end
+module ApplicationHelper; end
 
 describe Thor::Actions do
   def runner(options = {})
@@ -339,6 +340,33 @@ describe Thor::Actions do
         action :inject_into_class, "application.rb", "App", "  filter_parameters :password\n"
         expect(File.binread(file)).to eq("class Application < Base\nend\n")
       end
+    end
+
+
+
+    describe "#inject_into_module" do
+      def file
+        File.join(destination_root, "application_helper.rb")
+      end
+
+      it "appends content to a module" do
+        action :inject_into_module, "application_helper.rb", ApplicationHelper, "  def help; 'help'; end\n"
+        expect(File.binread(file)).to eq("module ApplicationHelper\n  def help; 'help'; end\nend\n")
+      end
+
+      # it "accepts a block" do
+      #   action(:inject_into_module, "application.rb", Application) { "  filter_parameters :password\n" }
+      #   expect(File.binread(file)).to eq("class Application < Base\n  filter_parameters :password\nend\n")
+      # end
+      #
+      # it "logs status" do
+      #   expect(action(:inject_into_module, "application.rb", Application, "  filter_parameters :password\n")).to eq("      insert  application.rb\n")
+      # end
+      #
+      # it "does not append if class name does not match" do
+      #   action :inject_into_module, "application.rb", "App", "  filter_parameters :password\n"
+      #   expect(File.binread(file)).to eq("class Application < Base\nend\n")
+      # end
     end
   end
 
