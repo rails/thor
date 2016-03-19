@@ -121,7 +121,7 @@ describe Thor::Actions do
 
       it "finds a template inside the source path" do
         expect(runner.find_in_source_paths("doc")).to eq(File.expand_path("doc", source_root))
-        expect { runner.find_in_source_paths("README") }.to raise_error
+        expect { runner.find_in_source_paths("README") }.to raise_error(Thor::Error)
 
         new_path = File.join(source_root, "doc")
         runner.instance_variable_set(:@source_paths, nil)

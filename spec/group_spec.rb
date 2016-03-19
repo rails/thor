@@ -28,7 +28,7 @@ describe Thor::Group do
     end
 
     it "raises when an exception happens within the command call" do
-      expect { BrokenCounter.start(%w[1 2 --fail]) }.to raise_error
+      expect { BrokenCounter.start(%w[1 2 --fail]) }.to raise_error(NameError)
     end
 
     it "raises an error when a Thor group command expects arguments" do
