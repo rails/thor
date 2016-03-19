@@ -25,3 +25,4 @@ matrix:
   fast_finish: true
 script: bundle exec thor spec
 sudo: false
+cache: bundler
