@@ -331,7 +331,9 @@ class Thor # rubocop:disable ClassLength
     # The method responsible for dispatching given the args.
     def dispatch(meth, given_args, given_opts, config) #:nodoc: # rubocop:disable MethodLength
       meth ||= retrieve_command_name(given_args)
-      command = all_commands[normalize_command_name(meth)]
+      # Initially search for a direct command match. If that's not found,
+      # search for the normalized name.
+      command = all_commands[meth] || all_commands[normalize_command_name(meth)]
 
       if !command && config[:invoked_via_subcommand]
         # We're a subcommand and our first argument didn't match any of our
