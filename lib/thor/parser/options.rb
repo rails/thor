@@ -5,6 +5,7 @@ class Thor
     EQ_RE       = /^(--\w+(?:-\w+)*|-[a-z])=(.*)$/i
     SHORT_SQ_RE = /^-([a-z]{2,})$/i # Allow either -x -v or -xv style for single char args
     SHORT_NUM   = /^(-[a-z])#{NUMERIC}$/i
+    SHORT_INC   = /^-((.)\2{1,})$/i # Allow the same character repeated for an incremental arg.
     OPTS_END    = "--".freeze
 
     # Receives a hash and makes it switches.
@@ -80,6 +81,10 @@ class Thor
 
           if is_switch
             case shifted
+            when SHORT_INC
+              # The numeric value of this switch is the length of the repeated short switches.
+              unshift($1.length)
+              switch = "-#{$2}"
             when SHORT_SQ_RE
               unshift($1.split("").map { |f| "-#{f}" })
               next
@@ -132,6 +137,8 @@ class Thor
       case peek
       when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
         [true, switch?($1)]
+      when SHORT_INC
+        [false, switch?("-#{$2}")]
       when SHORT_SQ_RE
         [true, $1.split("").any? { |f| switch?("-#{f}") }]
       else
@@ -199,6 +206,9 @@ class Thor
       if parsing_options? && (current_is_switch_formatted? || last?)
         if option.boolean?
           # No problem for boolean types
+        elsif option.numeric? && option.incremental?
+          # If this is an incremental numeric option and no value is provided, default to 1.
+          return 1
         elsif no_or_skip?(switch)
           return nil # User set value to nil
         elsif option.string? && !option.required?
