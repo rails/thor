@@ -1,6 +1,8 @@
 class Thor
   module Shell
     class Basic
+      DEFAULT_TERMINAL_WIDTH = 80
+
       attr_accessor :base
       attr_reader   :padding
 
@@ -279,11 +281,11 @@ class Thor
         result = if ENV["THOR_COLUMNS"]
           ENV["THOR_COLUMNS"].to_i
         else
-          unix? ? dynamic_width : 80
+          unix? ? dynamic_width : DEFAULT_TERMINAL_WIDTH
         end
-        result < 10 ? 80 : result
+        result < 10 ? DEFAULT_TERMINAL_WIDTH : result
       rescue
-        80
+        DEFAULT_TERMINAL_WIDTH
       end
 
       # Called if something goes wrong during the execution. This is used by Thor
