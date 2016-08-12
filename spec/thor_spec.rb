@@ -441,6 +441,18 @@ HELP
     end
   end
 
+  describe "subcommands" do
+    it "triggers a subcommand help when passed --help" do
+      parent = Class.new(Thor)
+      child  = Class.new(Thor)
+      parent.desc 'child', 'child subcommand'
+      parent.subcommand 'child', child
+      parent.desc 'dummy', 'dummy'
+      expect(child).to receive(:help).with(anything, anything)
+      parent.start ['child', '--help']
+    end
+  end
+
   describe "when creating commands" do
     it "prints a warning if a public method is created without description or usage" do
       expect(capture(:stdout) do
