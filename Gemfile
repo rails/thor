@@ -21,7 +21,7 @@ group :test do
   gem 'json', '< 2' # This is to support Ruby 1.8 and 1.9
   gem 'tins', '< 1.7' # This is to support Ruby 1.8 and 1.9
   gem 'addressable', '~> 2.3.6', :platforms => [:ruby_18]
-  gem 'webmock', '>= 1.20'
+  gem 'webmock', '>= 1.20', '< 2' # This is to support Ruby 1.8 and 1.9.2
   gem 'mime-types', '~> 1.25', :platforms => [:jruby, :ruby_18]
   gem 'rspec', '>= 3'
   gem 'rspec-mocks', '>= 3'
