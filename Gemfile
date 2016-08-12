@@ -3,8 +3,6 @@ source 'https://rubygems.org'
 gem 'rake', '< 11'
 gem 'rdoc', '>= 3.9'
 
-gem 'json', '< 2' # This is to support Ruby 1.8 and 1.9
-
 group :development do
   gem 'guard-rspec'
   gem 'pry'
@@ -20,6 +18,8 @@ end
 group :test do
   gem 'childlabor'
   gem 'coveralls', '>= 0.5.7'
+  gem 'json', '< 2' # This is to support Ruby 1.8 and 1.9
+  gem 'tins', '< 1.7' # This is to support Ruby 1.8 and 1.9
   gem 'addressable', '~> 2.3.6', :platforms => [:ruby_18]
   gem 'webmock', '>= 1.20'
   gem 'mime-types', '~> 1.25', :platforms => [:jruby, :ruby_18]
