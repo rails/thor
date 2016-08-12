@@ -6,6 +6,9 @@ gem 'rdoc', '>= 3.9'
 group :development do
   gem 'guard-rspec'
   gem 'pry'
+  platforms :ruby_21 do
+    gem 'pry-byebug'
+  end
   platforms :ruby_19, :ruby_20 do
     gem 'pry-debugger'
     gem 'pry-stack_explorer'
