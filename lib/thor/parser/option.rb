@@ -116,7 +116,7 @@ class Thor
                      when nil
                        return
                      when TrueClass, FalseClass
-                       :boolean
+                       required? ? :string : :boolean
                      when Numeric
                        :numeric
                      when Symbol

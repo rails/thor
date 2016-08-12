@@ -153,6 +153,12 @@ describe Thor::Option do
     end.to raise_error(ArgumentError, "An option cannot be boolean and required.")
   end
 
+  it "does not raises an error if default is a boolean and it is required" do
+    expect do
+      option("foo", :required => true, :default => true)
+    end.not_to raise_error
+  end
+
   it "allows type predicates" do
     expect(parse(:foo, :string)).to be_string
     expect(parse(:foo, :boolean)).to be_boolean
