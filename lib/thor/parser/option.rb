@@ -119,6 +119,8 @@ class Thor
                        :boolean
                      when Numeric
                        :numeric
+                     when Symbol
+                       :string
                      when Hash, Array, String
                        @default.class.name.downcase.to_sym
                      end

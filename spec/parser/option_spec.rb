@@ -141,6 +141,12 @@ describe Thor::Option do
     end.to raise_error(ArgumentError, "An option's default must match its type.")
   end
 
+  it "does not raises an error if default is an symbol and type string" do
+    expect do
+      option = option("foo", :type => :string, :default => :bar)
+    end.not_to raise_error
+  end
+
   it "boolean options cannot be required" do
     expect do
       option("foo", :required => true, :type => :boolean)
