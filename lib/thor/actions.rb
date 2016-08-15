@@ -229,7 +229,8 @@ class Thor
     # ==== Parameters
     # command<String>:: the command to be executed.
     # config<Hash>:: give :verbose => false to not log the status, :capture => true to hide to output. Specify :with
-    #                to append an executable to command execution.
+    #                to append an executable to command execution, :raise_error => true to raise CommandFailedError if
+    #                the command exits with a non-zero status code.
     #
     # ==== Example
     #
@@ -251,8 +252,14 @@ class Thor
       say_status :run, desc, config.fetch(:verbose, true)
 
       unless options[:pretend]
-        config[:capture] ? `#{command}` : system("#{command}")
+        result = config[:capture] ? `#{command}` : system("#{command}")
+        if config.fetch(:raise_error, false) && 0 != $?.exitstatus
+          error =  $?.exitstatus.nil? ? "no exit status (likely force killed)" : "exit status #{$?.exitstatus}"
+          raise CommandFailedError.new("#{command} failed with #{error}")
+        end
+        result
       end
+
     end
 
     # Executes a ruby script (taking into account WIN32 platform quirks).

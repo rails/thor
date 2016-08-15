@@ -17,6 +17,10 @@ class Thor
   end
   AmbiguousTaskError = AmbiguousCommandError # rubocop:disable ConstantName
 
+  # Optionally raised when a run action fails
+  class CommandFailedError < Error
+  end
+
   # Raised when a command was found, but not invoked properly.
   class InvocationError < Error
   end
