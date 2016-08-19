@@ -55,11 +55,6 @@ class Thor
 
   private
 
-    def no_or_skip?(arg)
-      arg =~ /^--(no|skip)-([-\w]+)$/
-      $2
-    end
-
     def last?
       @pile.empty?
     end
@@ -143,21 +138,16 @@ class Thor
 
     # Parse string:
     # for --string-arg, just return the current value in the pile
-    # for --no-string-arg, nil
     # Check if the peek is included in enum if enum is provided. Otherwise raises an error.
     #
     def parse_string(name)
-      if no_or_skip?(name)
-        nil
-      else
-        value = shift
-        if @switches.is_a?(Hash) && switch = @switches[name] # rubocop:disable AssignmentInCondition
-          if switch.enum && !switch.enum.include?(value)
-            fail MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
-          end
+      value = shift
+      if @switches.is_a?(Hash) && switch = @switches[name] # rubocop:disable AssignmentInCondition
+        if switch.enum && !switch.enum.include?(value)
+          fail MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
         end
-        value
       end
+      value
     end
 
     # Raises an error if @non_assigned_required array is not empty.
