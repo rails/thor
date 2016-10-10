@@ -84,6 +84,10 @@ describe Thor::Actions::InjectIntoFile do
       expect(File.read(file)).to eq("__start__\nREADME\nmore content\nmore content\n__end__\n")
     end
 
+    it "can insert chinese" do
+      invoke! "doc/README.zh", "\n中文", :after => "__start__"
+      expect(File.read(File.join(destination_root, "doc/README.zh"))).to eq("__start__\n中文\n说明\n__end__\n")
+    end
   end
 
   describe "#revoke!" do

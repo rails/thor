@@ -29,6 +29,7 @@ _yardoc
 auto-save-list
 coverage
 doc/
+!spec/fixtures/doc/
 lib/bundler/man
 pkg
 pkg/*
