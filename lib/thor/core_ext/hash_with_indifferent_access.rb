@@ -77,7 +77,11 @@ class Thor
             self[$1] == args.first
           end
         else
-          self[method]
+          if self.key?(method)
+            self[method]
+          else
+            raise NoMethodError, "undefined method `#{method}' for #{self}"
+          end
         end
       end
     end
