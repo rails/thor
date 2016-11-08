@@ -305,14 +305,18 @@ class Thor
       super.merge!(:destination_root => destination_root)
     end
 
+    FORCE_SKIP_OPPOSITES ||= { force: "skip", skip: "force" }.freeze
+
     def _cleanup_options_and_set(options, key) #:nodoc:
       case options
       when Array
         %w[--force -f --skip -s].each { |i| options.delete(i) }
         options << "--#{key}"
+        options << "--no-#{FORCE_SKIP_OPPOSITES[key.to_sym]}"
       when Hash
         [:force, :skip, "force", "skip"].each { |i| options.delete(i) }
         options.merge!(key => true)
+        options.merge!(FORCE_SKIP_OPPOSITES[key.to_sym] => false)
       end
     end
   end
