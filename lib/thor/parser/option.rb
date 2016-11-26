@@ -124,7 +124,7 @@ class Thor
                      when Hash, Array, String
                        @default.class.name.downcase.to_sym
                      end
-      fail ArgumentError, "An option's default must match its type." unless default_type == @type
+      fail ArgumentError, "Option #{human_name}'s default must match its type." unless default_type == @type
     end
 
     def dasherized?
