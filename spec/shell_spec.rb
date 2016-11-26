@@ -43,5 +43,4 @@ describe Thor::Shell do
       end
     end
   end
-
 end

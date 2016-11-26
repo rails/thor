@@ -28,19 +28,19 @@ describe Thor::Shell::Basic do
     end
 
     it "accepts custom indentation amounts" do
-      shell.indent(6) {
+      shell.indent(6) do
         expect(shell.padding).to eq(6)
-      }
+      end
     end
 
     it "increases the padding when nested" do
-      shell.indent {
+      shell.indent do
         expect(shell.padding).to eq(1)
 
-        shell.indent {
+        shell.indent do
           expect(shell.padding).to eq(2)
-        }
-      }
+        end
+      end
       expect(shell.padding).to eq(0)
     end
   end
@@ -69,13 +69,13 @@ describe Thor::Shell::Basic do
     end
 
     it "prints a message to the user with the available options and determines the correctness of the answer" do
-      flavors = %w[strawberry chocolate vanilla]
+      flavors = %w(strawberry chocolate vanilla)
       expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', :limited_to => flavors).and_return("chocolate")
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq("chocolate")
     end
 
     it "prints a message to the user with the available options and reasks the question after an incorrect repsonse" do
-      flavors = %w[strawberry chocolate vanilla]
+      flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
       expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', :limited_to => flavors).and_return("moose tracks", "chocolate")
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq("chocolate")
@@ -87,7 +87,7 @@ describe Thor::Shell::Basic do
     end
 
     it "prints a message to the user with the available options and reasks the question after an incorrect repsonse and then returns the default" do
-      flavors = %w[strawberry chocolate vanilla]
+      flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
       expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ', :default => "vanilla", :limited_to => flavors).and_return("moose tracks", "")
       expect(shell.ask("What's your favorite Neopolitan flavor?", :default => "vanilla", :limited_to => flavors)).to eq("vanilla")

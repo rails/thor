@@ -29,23 +29,23 @@ describe Thor::Actions do
 
   describe "#chmod" do
     it "executes the command given" do
-      expect(FileUtils).to receive(:chmod_R).with(0755, file) # rubocop:disable SymbolName
+      expect(FileUtils).to receive(:chmod_R).with(0755, file)
       action :chmod, "foo", 0755
     end
 
     it "does not execute the command if pretending" do
-      expect(FileUtils).not_to receive(:chmod_R) # rubocop:disable SymbolName
+      expect(FileUtils).not_to receive(:chmod_R)
       runner(:pretend => true)
       action :chmod, "foo", 0755
     end
 
     it "logs status" do
-      expect(FileUtils).to receive(:chmod_R).with(0755, file) # rubocop:disable SymbolName
+      expect(FileUtils).to receive(:chmod_R).with(0755, file)
       expect(action(:chmod, "foo", 0755)).to eq("       chmod  foo\n")
     end
 
     it "does not log status if required" do
-      expect(FileUtils).to receive(:chmod_R).with(0755, file) # rubocop:disable SymbolName
+      expect(FileUtils).to receive(:chmod_R).with(0755, file)
       expect(action(:chmod, "foo", 0755, :verbose => false)).to be_empty
     end
   end
@@ -122,7 +122,7 @@ describe Thor::Actions do
     end
 
     it "allows the destination to be set as a block result" do
-      action(:get, "doc/README") { |c| "docs/README" }
+      action(:get, "doc/README") { "docs/README" }
       exists_and_identical?("doc/README", "docs/README")
     end
 
@@ -207,7 +207,7 @@ describe Thor::Actions do
 
     it "accepts a context to use as the binding" do
       begin
-        @klass = 'FooBar'
+        @klass = "FooBar"
         action :template, "doc/config.rb", :context => eval("binding")
         expect(File.read(File.join(destination_root, "doc/config.rb"))).to eq("class FooBar; end\n")
       ensure
@@ -271,7 +271,7 @@ describe Thor::Actions do
       end
 
       it "accepts a block" do
-        action(:gsub_file, "doc/README", "__start__") { |match| match.gsub("__", "").upcase  }
+        action(:gsub_file, "doc/README", "__start__") { |match| match.gsub("__", "").upcase }
         expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
       end
 

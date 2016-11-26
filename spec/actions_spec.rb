@@ -39,7 +39,7 @@ describe Thor::Actions do
     end
 
     it "when behavior is set to skip, overwrite options" do
-      runner = MyCounter.new([1], %w[--force], :behavior => :skip)
+      runner = MyCounter.new([1], %w(--force), :behavior => :skip)
       expect(runner.behavior).to eq(:invoke)
       expect(runner.options.force).not_to be true
       expect(runner.options.skip).to be true

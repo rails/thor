@@ -68,7 +68,7 @@ class Thor
       #   options.shebang                 # => "/usr/lib/local/ruby"
       #   options.test_framework?(:rspec) # => options[:test_framework] == :rspec
       #
-      def method_missing(method, *args, &block)
+      def method_missing(method, *args)
         method = method.to_s
         if method =~ /^(\w+)\?$/
           if args.empty?

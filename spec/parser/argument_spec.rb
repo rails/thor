@@ -2,7 +2,6 @@ require "helper"
 require "thor/parser"
 
 describe Thor::Argument do
-
   def argument(name, options = {})
     @argument ||= Thor::Argument.new(name, options)
   end

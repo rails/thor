@@ -12,7 +12,7 @@ describe Thor::CoreExt::OrderedHash do
     end
 
     it "doesn't iterate through any items" do
-      @hash.each { fail }
+      @hash.each { raise }
     end
 
     it "has an empty key and values list" do

@@ -24,7 +24,8 @@ class Thor
     # Takes an array of Thor::Argument objects.
     #
     def initialize(arguments = [])
-      @assigns, @non_assigned_required = {}, []
+      @assigns = {}
+      @non_assigned_required = []
       @switches = arguments
 
       arguments.each do |argument|
@@ -49,7 +50,7 @@ class Thor
       @assigns
     end
 
-    def remaining # rubocop:disable TrivialAccessors
+    def remaining
       @pile
     end
 
@@ -73,7 +74,7 @@ class Thor
     end
 
     def unshift(arg)
-      if arg.kind_of?(Array)
+      if arg.is_a?(Array)
         @pile = arg + @pile
       else
         @pile.unshift(arg)
@@ -99,7 +100,7 @@ class Thor
 
       while current_is_value? && peek.include?(":")
         key, value = shift.split(":", 2)
-        fail MalformattedArgumentError, "You can't specify '#{key}' more than once in option '#{name}'; got #{key}:#{hash[key]} and #{key}:#{value}" if hash.include? key
+        raise MalformattedArgumentError, "You can't specify '#{key}' more than once in option '#{name}'; got #{key}:#{hash[key]} and #{key}:#{value}" if hash.include? key
         hash[key] = value
       end
       hash
@@ -129,13 +130,13 @@ class Thor
       return shift if peek.is_a?(Numeric)
 
       unless peek =~ NUMERIC && $& == peek
-        fail MalformattedArgumentError, "Expected numeric value for '#{name}'; got #{peek.inspect}"
+        raise MalformattedArgumentError, "Expected numeric value for '#{name}'; got #{peek.inspect}"
       end
 
       value = $&.index(".") ? shift.to_f : shift.to_i
       if @switches.is_a?(Hash) && switch = @switches[name]
         if switch.enum && !switch.enum.include?(value)
-          fail MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
+          raise MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
         end
       end
       value
@@ -151,9 +152,9 @@ class Thor
         nil
       else
         value = shift
-        if @switches.is_a?(Hash) && switch = @switches[name] # rubocop:disable AssignmentInCondition
+        if @switches.is_a?(Hash) && switch = @switches[name]
           if switch.enum && !switch.enum.include?(value)
-            fail MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
+            raise MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
           end
         end
         value
@@ -163,14 +164,12 @@ class Thor
     # Raises an error if @non_assigned_required array is not empty.
     #
     def check_requirement!
-      unless @non_assigned_required.empty?
-        names = @non_assigned_required.map do |o|
-          o.respond_to?(:switch_name) ? o.switch_name : o.human_name
-        end.join("', '")
-
-        class_name = self.class.name.split("::").last.downcase
-        fail RequiredArgumentMissingError, "No value provided for required #{class_name} '#{names}'"
-      end
+      return if @non_assigned_required.empty?
+      names = @non_assigned_required.map do |o|
+        o.respond_to?(:switch_name) ? o.switch_name : o.human_name
+      end.join("', '")
+      class_name = self.class.name.split("::").last.downcase
+      raise RequiredArgumentMissingError, "No value provided for required #{class_name} '#{names}'"
     end
   end
 end
