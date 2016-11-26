@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rake', '< 11'
-gem 'rdoc', '>= 3.9'
+gem 'rdoc', '~> 4.2.2' # This is to support Ruby 1.8 and 1.9
 
 group :development do
   gem 'guard-rspec'
