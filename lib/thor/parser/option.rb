@@ -127,7 +127,8 @@ class Thor
         @default.class.name.downcase.to_sym
       end
 
-      raise ArgumentError, "An option's default must match its type." unless default_type == @type
+      # TODO: This should raise an ArgumentError in a future version of Thor
+      warn "Expected #{@type} default value for '#{switch_name}'; got #{@default.inspect} (#{default_type})" unless default_type == @type
     end
 
     def dasherized?
