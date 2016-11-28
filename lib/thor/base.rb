@@ -208,7 +208,7 @@ class Thor
       # ArgumentError:: Raised if you supply a required argument after a non required one.
       #
       def argument(name, options = {})
-        thor_reserved_word?(name, :argument)
+        is_thor_reserved_word?(name, :argument)
         no_commands { attr_accessor name }
 
         required = if options.key?(:optional)
@@ -529,7 +529,7 @@ class Thor
       end
 
       # Raises an error if the word given is a Thor reserved word.
-      def thor_reserved_word?(word, type) #:nodoc:
+      def is_thor_reserved_word?(word, type) #:nodoc:
         return false unless THOR_RESERVED_WORDS.include?(word.to_s)
         raise "#{word.inspect} is a Thor reserved word and cannot be defined as #{type}"
       end
@@ -594,7 +594,7 @@ class Thor
         @no_commands ||= false
         return if @no_commands || !create_command(meth)
 
-        thor_reserved_word?(meth, :command)
+        is_thor_reserved_word?(meth, :command)
         Thor::Base.register_klass_file(self)
       end
 
