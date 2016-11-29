@@ -477,7 +477,8 @@ class Thor
       alias_method :handle_no_task_error, :handle_no_command_error
 
       def handle_argument_error(command, error, args, arity) #:nodoc:
-        msg = "ERROR: \"#{basename} #{command.name}\" was called with "
+        name = [command.ancestor_name, command.name].compact.join(" ")
+        msg = "ERROR: \"#{basename} #{name}\" was called with "
         msg << "no arguments"               if     args.empty?
         msg << "arguments " << args.inspect unless args.empty?
         msg << "\nUsage: #{banner(command).inspect}"

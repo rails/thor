@@ -1,5 +1,5 @@
 class Thor
-  class Command < Struct.new(:name, :description, :long_description, :usage, :options, :disable_class_options)
+  class Command < Struct.new(:name, :description, :long_description, :usage, :options, :disable_class_options, :ancestor_name)
     FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
 
     def initialize(name, description, long_description, usage, options = nil, disable_class_options = false)
@@ -39,11 +39,13 @@ class Thor
     # Returns the formatted usage by injecting given required arguments
     # and required options into the given usage.
     def formatted_usage(klass, namespace = true, subcommand = false)
-      if namespace
+      if ancestor_name
+        formatted = "#{ancestor_name} " # add space
+      elsif namespace
         namespace = klass.namespace
         formatted = "#{namespace.gsub(/^(default)/, '')}:"
       end
-      formatted = "#{klass.namespace.split(':').last} " if subcommand
+      formatted ||= "#{klass.namespace.split(':').last} " if subcommand
 
       formatted ||= ""
 

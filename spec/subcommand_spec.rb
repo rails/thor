@@ -42,4 +42,26 @@ describe Thor do
       expect(output).to eq(sub_help)
     end
   end
+
+  context "subcommand with an arg" do
+    module SubcommandTest1
+      class Child1 < Thor
+        desc "foo NAME", "Fooo"
+        def foo(name)
+          puts "#{name} was given"
+        end
+      end
+
+      class Parent < Thor
+        desc "child1", "child1 description"
+        subcommand "child1", Child1
+      end
+    end
+
+    it "shows subcommand name and method name" do
+      sub_help = capture(:stderr) { SubcommandTest1::Parent.start(%w[child1 foo]) }
+      expect(sub_help).to eq ['ERROR: "thor child1 foo" was called with no arguments', 'Usage: "thor child1 foo NAME"', ''].join("\n")
+    end
+  end
+
 end
