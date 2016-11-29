@@ -107,20 +107,20 @@ describe Thor::Actions::CreateFile do
           expect(Thor::LineEditor).to receive(:readline).with("Overwrite #{file}? (enter \"h\" for help) [Ynaqdh] ", anything).and_return("s")
 
           content = invoke!
-          expect(content).to match(/conflict  doc\/config\.rb/)
-          expect(content).to match(/skip  doc\/config\.rb/)
+          expect(content).to match(%r{conflict  doc/config\.rb})
+          expect(content).to match(%r{skip  doc/config\.rb})
         end
 
         it "creates the file if the file collision menu returns true" do
           create_file("doc/config.rb")
           expect(Thor::LineEditor).to receive(:readline).and_return("y")
-          expect(invoke!).to match(/force  doc\/config\.rb/)
+          expect(invoke!).to match(%r{force  doc/config\.rb})
         end
 
         it "skips the file if the file collision menu returns false" do
           create_file("doc/config.rb")
           expect(Thor::LineEditor).to receive(:readline).and_return("n")
-          expect(invoke!).to match(/skip  doc\/config\.rb/)
+          expect(invoke!).to match(%r{skip  doc/config\.rb})
         end
 
         it "executes the block given to show file content" do

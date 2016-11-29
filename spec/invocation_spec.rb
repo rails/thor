@@ -34,16 +34,16 @@ describe Thor::Invocation do
 
     it "accepts a class as argument with a command to invoke" do
       base = A.new([], :last_name => "Valim")
-      expect(base.invoke(B, :one, %w[Jose])).to eq("Valim, Jose")
+      expect(base.invoke(B, :one, %w(Jose))).to eq("Valim, Jose")
     end
 
     it "allows customized options to be given" do
       base = A.new([], :last_name => "Wrong")
-      expect(base.invoke(B, :one, %w[Jose], :last_name => "Valim")).to eq("Valim, Jose")
+      expect(base.invoke(B, :one, %w(Jose), :last_name => "Valim")).to eq("Valim, Jose")
     end
 
     it "reparses options in the new class" do
-      expect(A.start(%w[invoker --last-name Valim])).to eq("Valim, Jose")
+      expect(A.start(%w(invoker --last-name Valim))).to eq("Valim, Jose")
     end
 
     it "shares initialize options with invoked class" do
@@ -62,11 +62,11 @@ describe Thor::Invocation do
       expect(I.new.invoke("two")).to eq([:two])
 
       if RUBY_VERSION < "1.9.3"
-        result = J.start(["one", "two" ])
+        result = J.start(%w(one two))
         expect(result).to include(:one)
         expect(result).to include(:two)
       else
-        expect(J.start(["one", "two" ])).to eq([:one, :two])
+        expect(J.start(%w(one two))).to eq([:one, :two])
       end
     end
 
@@ -76,7 +76,8 @@ describe Thor::Invocation do
     end
 
     it "allow extra configuration values to be given" do
-      base, shell = A.new, Thor::Base.shell.new
+      base = A.new
+      shell = Thor::Base.shell.new
       expect(base.invoke("b:three", [], {}, :shell => shell).shell).to eq(shell)
     end
 

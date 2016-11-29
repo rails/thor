@@ -83,7 +83,6 @@ describe Thor::Actions::InjectIntoFile do
 
       expect(File.read(file)).to eq("__start__\nREADME\nmore content\nmore content\n__end__\n")
     end
-
   end
 
   describe "#revoke!" do

@@ -33,7 +33,7 @@ class Thor
     rescue ArgumentError => e
       handle_argument_error?(instance, e, caller) ? instance.class.handle_argument_error(self, e, args, arity) : (raise e)
     rescue NoMethodError => e
-      handle_no_method_error?(instance, e, caller) ? instance.class.handle_no_command_error(name) : (fail e)
+      handle_no_method_error?(instance, e, caller) ? instance.class.handle_no_command_error(name) : (raise e)
     end
 
     # Returns the formatted usage by injecting given required arguments
@@ -52,7 +52,7 @@ class Thor
       # Add usage with required arguments
       formatted << if klass && !klass.arguments.empty?
                      usage.to_s.gsub(/^#{name}/) do |match|
-                       match << " " << klass.arguments.map { |a| a.usage }.compact.join(" ")
+                       match << " " << klass.arguments.map(&:usage).compact.join(" ")
                      end
                    else
                      usage.to_s
@@ -90,7 +90,7 @@ class Thor
     end
 
     def sans_backtrace(backtrace, caller) #:nodoc:
-      saned = backtrace.reject { |frame| frame =~ FILE_REGEXP || (frame =~ /\.java:/ && RUBY_PLATFORM =~ /java/) || (frame =~ /^kernel\// && RUBY_ENGINE =~ /rbx/) }
+      saned = backtrace.reject { |frame| frame =~ FILE_REGEXP || (frame =~ /\.java:/ && RUBY_PLATFORM =~ /java/) || (frame =~ %r{^kernel/} && RUBY_ENGINE =~ /rbx/) }
       saned - caller
     end
 
@@ -107,7 +107,7 @@ class Thor
         error.message =~ /^undefined method `#{name}' for #{Regexp.escape(instance.to_s)}$/
     end
   end
-  Task = Command # rubocop:disable ConstantName
+  Task = Command
 
   # A command that is hidden in help messages but still invocable.
   class HiddenCommand < Command
@@ -115,7 +115,7 @@ class Thor
       true
     end
   end
-  HiddenTask = HiddenCommand # rubocop:disable ConstantName
+  HiddenTask = HiddenCommand
 
   # A dynamic command that handles method missing scenarios.
   class DynamicCommand < Command
@@ -131,5 +131,5 @@ class Thor
       end
     end
   end
-  DynamicTask = DynamicCommand # rubocop:disable ConstantName
+  DynamicTask = DynamicCommand
 end

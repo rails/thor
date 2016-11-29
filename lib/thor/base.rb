@@ -14,11 +14,11 @@ class Thor
   autoload :Group,      "thor/group"
 
   # Shortcuts for help.
-  HELP_MAPPINGS       = %w[-h -? --help -D]
+  HELP_MAPPINGS       = %w(-h -? --help -D)
 
   # Thor methods that should not be overwritten by the user.
-  THOR_RESERVED_WORDS = %w[invoke shell options behavior root destination_root relative_root
-                           action add_file create_file in_root inside run run_ruby_script]
+  THOR_RESERVED_WORDS = %w(invoke shell options behavior root destination_root relative_root
+                           action add_file create_file in_root inside run run_ruby_script)
 
   TEMPLATE_EXTNAME = ".tt"
 
@@ -41,7 +41,7 @@ class Thor
     #
     # config<Hash>:: Configuration for this Thor class.
     #
-    def initialize(args = [], local_options = {}, config = {}) # rubocop:disable MethodLength
+    def initialize(args = [], local_options = {}, config = {})
       parse_options = config[:current_command] && config[:current_command].disable_class_options ? {} : self.class.class_options
 
       # The start method splits inbound arguments at the first argument
@@ -52,11 +52,13 @@ class Thor
       command_options = config.delete(:command_options) # hook for start
       parse_options = parse_options.merge(command_options) if command_options
       if local_options.is_a?(Array)
-        array_options, hash_options = local_options, {}
+        array_options = local_options
+        hash_options = {}
       else
         # Handle the case where the class was explicitly instantiated
         # with pre-parsed options.
-        array_options, hash_options = [], local_options
+        array_options = []
+        hash_options = local_options
       end
 
       # Let Thor::Options parse the options first, so it can remove
@@ -205,7 +207,7 @@ class Thor
       # ==== Errors
       # ArgumentError:: Raised if you supply a required argument after a non required one.
       #
-      def argument(name, options = {}) # rubocop:disable MethodLength
+      def argument(name, options = {})
         is_thor_reserved_word?(name, :argument)
         no_commands { attr_accessor name }
 
@@ -219,11 +221,13 @@ class Thor
 
         remove_argument name
 
-        arguments.each do |argument|
-          next if argument.required?
-          fail ArgumentError, "You cannot have #{name.to_s.inspect} as required argument after " <<
-                               "the non-required argument #{argument.human_name.inspect}."
-        end if required
+        if required
+          arguments.each do |argument|
+            next if argument.required?
+            raise ArgumentError, "You cannot have #{name.to_s.inspect} as required argument after " \
+                                "the non-required argument #{argument.human_name.inspect}."
+          end
+        end
 
         options[:required] = required
 
@@ -467,11 +471,8 @@ class Thor
       alias_method :public_task, :public_command
 
       def handle_no_command_error(command, has_namespace = $thor_runner) #:nodoc:
-        if has_namespace
-          fail UndefinedCommandError, "Could not find command #{command.inspect} in #{namespace.inspect} namespace."
-        else
-          fail UndefinedCommandError, "Could not find command #{command.inspect}."
-        end
+        raise UndefinedCommandError, "Could not find command #{command.inspect} in #{namespace.inspect} namespace." if has_namespace
+        raise UndefinedCommandError, "Could not find command #{command.inspect}."
       end
       alias_method :handle_no_task_error, :handle_no_command_error
 
@@ -481,7 +482,7 @@ class Thor
         msg << "no arguments"               if     args.empty?
         msg << "arguments " << args.inspect unless args.empty?
         msg << "\nUsage: #{banner(command).inspect}"
-        fail InvocationError, msg
+        raise InvocationError, msg
       end
 
     protected
@@ -514,14 +515,13 @@ class Thor
         padding = options.map { |o| o.aliases.size }.max.to_i * 4
 
         options.each do |option|
-          unless option.hide
-            item = [option.usage(padding)]
-            item.push(option.description ? "# #{option.description}" : "")
+          next if option.hide
+          item = [option.usage(padding)]
+          item.push(option.description ? "# #{option.description}" : "")
 
-            list << item
-            list << ["", "# Default: #{option.default}"] if option.show_default?
-            list << ["", "# Possible values: #{option.enum.join(', ')}"] if option.enum
-          end
+          list << item
+          list << ["", "# Default: #{option.default}"] if option.show_default?
+          list << ["", "# Possible values: #{option.enum.join(', ')}"] if option.enum
         end
 
         shell.say(group_name ? "#{group_name} options:" : "Options:")
@@ -532,7 +532,7 @@ class Thor
       # Raises an error if the word given is a Thor reserved word.
       def is_thor_reserved_word?(word, type) #:nodoc:
         return false unless THOR_RESERVED_WORDS.include?(word.to_s)
-        fail "#{word.inspect} is a Thor reserved word and cannot be defined as #{type}"
+        raise "#{word.inspect} is a Thor reserved word and cannot be defined as #{type}"
       end
 
       # Build an option and adds it to the given scope.
@@ -567,7 +567,7 @@ class Thor
         elsif command = all_commands[name.to_s] # rubocop:disable AssignmentInCondition
           commands[name.to_s] = command.clone
         else
-          fail ArgumentError, "You supplied :for => #{name.inspect}, but the command #{name.inspect} could not be found."
+          raise ArgumentError, "You supplied :for => #{name.inspect}, but the command #{name.inspect} could not be found."
         end
       end
       alias_method :find_and_refresh_task, :find_and_refresh_command
@@ -650,7 +650,7 @@ class Thor
 
       # SIGNATURE: The hook invoked by start.
       def dispatch(command, given_args, given_opts, config) #:nodoc:
-        fail NotImplementedError
+        raise NotImplementedError
       end
     end
   end

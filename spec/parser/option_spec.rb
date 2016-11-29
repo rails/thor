@@ -11,7 +11,6 @@ describe Thor::Option do
   end
 
   describe "#parse" do
-
     describe "with value as a symbol" do
       describe "and symbol is a valid type" do
         it "has type equals to the symbol" do
@@ -136,15 +135,27 @@ describe Thor::Option do
   end
 
   it "raises an error if default is inconsistent with type" do
+    expect(capture(:stderr) do
+      option("foo_bar", :type => :numeric, :default => "baz")
+    end.chomp).to eq('Expected numeric default value for \'--foo-bar\'; got "baz" (string)')
+  end
+
+  it "does not raises an error if default is an symbol and type string" do
     expect do
-      option = option("foo", :type => :numeric, :default => "bar")
-    end.to raise_error(ArgumentError, "An option's default must match its type.")
+      option("foo", :type => :string, :default => :bar)
+    end.not_to raise_error
   end
 
   it "boolean options cannot be required" do
     expect do
       option("foo", :required => true, :type => :boolean)
     end.to raise_error(ArgumentError, "An option cannot be boolean and required.")
+  end
+
+  it "does not raises an error if default is a boolean and it is required" do
+    expect do
+      option("foo", :required => true, :default => true)
+    end.not_to raise_error
   end
 
   it "allows type predicates" do
@@ -160,7 +171,6 @@ describe Thor::Option do
   end
 
   describe "#usage" do
-
     it "returns usage for string types" do
       expect(parse(:foo, :string).usage).to eq("[--foo=FOO]")
     end

@@ -10,8 +10,22 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
     expect(@hash["foo"]).to eq("bar")
     expect(@hash[:foo]).to eq("bar")
 
-    expect(@hash.values_at(:foo, :baz)).to eq(%w[bar bee])
+    expect(@hash.values_at(:foo, :baz)).to eq(%w(bar bee))
     expect(@hash.delete(:foo)).to eq("bar")
+  end
+
+  it "supports fetch" do
+    expect(@hash.fetch("foo")).to eq("bar")
+    expect(@hash.fetch("foo", nil)).to eq("bar")
+    expect(@hash.fetch(:foo)).to eq("bar")
+    expect(@hash.fetch(:foo, nil)).to eq("bar")
+  end
+
+  it "has key checkable by either strings or symbols" do
+    expect(@hash.key?("foo")).to be true
+    expect(@hash.key?(:foo)).to be true
+    expect(@hash.key?("nothing")).to be false
+    expect(@hash.key?(:nothing)).to be false
   end
 
   it "handles magic boolean predicates" do
@@ -30,7 +44,8 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
   end
 
   it "merges keys independent if they are symbols or strings" do
-    @hash.merge!("force" => false, :baz => "boom")
+    @hash["force"] = false
+    @hash[:baz] = "boom"
     expect(@hash[:force]).to eq(false)
     expect(@hash["baz"]).to eq("boom")
   end

@@ -1,27 +1,19 @@
+before_install:
+  - gem install bundler
 bundler_args: --without development
 language: ruby
-env:
-  global:
-    - JRUBY_OPTS="$JRUBY_OPTS --debug"
 rvm:
   - 1.8.7
-  - 1.9.2
   - 1.9.3
   - 2.0.0
-  - 2.1
-  - jruby-18mode
-  - jruby-19mode
-  - jruby-head
-  - rbx-2
+  - 2.1.10
+  - 2.2.6
+  - 2.3.3
   - ruby-head
 matrix:
   allow_failures:
-    - rvm: 1.9.2
-    - rvm: jruby-18mode
-    - rvm: jruby-19mode
-    - rvm: jruby-head
-    - rvm: rbx-2
     - rvm: ruby-head
   fast_finish: true
 script: bundle exec thor spec
 sudo: false
+cache: bundler

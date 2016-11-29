@@ -11,10 +11,18 @@ require "pathname"
 class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
   map "-T" => :list, "-i" => :install, "-u" => :update, "-v" => :version
 
+  def self.banner(command, all = false, subcommand = false)
+    "thor " + command.formatted_usage(self, all, subcommand)
+  end
+
+  def self.exit_on_failure?
+    true
+  end
+
   # Override Thor#help so it can give information about any class and any method.
   #
   def help(meth = nil)
-    if meth && !self.respond_to?(meth)
+    if meth && !respond_to?(meth)
       initialize_thorfiles(meth)
       klass, command = Thor::Util.find_class_and_command_by_namespace(meth)
       self.class.handle_no_command_error(command, false) if klass.nil?
@@ -45,16 +53,18 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
     # command in said directory.
     begin
       if File.directory?(File.expand_path(name))
-        base, package = File.join(name, "main.thor"), :directory
-        contents      = open(base) { |input| input.read }
+        base = File.join(name, "main.thor")
+        package = :directory
+        contents = open(base, &:read)
       else
-        base, package = name, :file
-        contents      = open(name) { |input| input.read }
+        base = name
+        package = :file
+        contents = open(name, &:read)
       end
     rescue OpenURI::HTTPError
       raise Error, "Error opening URI '#{name}'"
     rescue Errno::ENOENT
-      fail Error, "Error opening file '#{name}'"
+      raise Error, "Error opening file '#{name}'"
     end
 
     say "Your Thorfile contains:"
@@ -108,9 +118,9 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
 
   desc "uninstall NAME", "Uninstall a named Thor module"
   def uninstall(name)
-    fail Error, "Can't find module '#{name}'" unless thor_yaml[name]
+    raise Error, "Can't find module '#{name}'" unless thor_yaml[name]
     say "Uninstalling #{name}."
-    FileUtils.rm_rf(File.join(thor_root, "#{thor_yaml[name][:filename]}"))
+    FileUtils.rm_rf(File.join(thor_root, (thor_yaml[name][:filename]).to_s))
 
     thor_yaml.delete(name)
     save_yaml(thor_yaml)
@@ -120,7 +130,7 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
 
   desc "update NAME", "Update a Thor file from its original location"
   def update(name)
-    fail Error, "Can't find module '#{name}'" if !thor_yaml[name] || !thor_yaml[name][:location]
+    raise Error, "Can't find module '#{name}'" if !thor_yaml[name] || !thor_yaml[name][:location]
 
     say "Updating '#{name}' from #{thor_yaml[name][:location]}"
 
@@ -138,9 +148,7 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
       filename = install(thor_yaml[name][:location])
     end
 
-    unless filename == old_filename
-      File.delete(File.join(thor_root, old_filename))
-    end
+    File.delete(File.join(thor_root, old_filename)) unless filename == old_filename
   end
 
   desc "installed", "List the installed Thor modules and commands"
@@ -168,10 +176,6 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
 
 private
 
-  def self.banner(command, all = false, subcommand = false)
-    "thor " + command.formatted_usage(self, all, subcommand)
-  end
-
   def thor_root
     Thor::Util.thor_root
   end
@@ -196,10 +200,6 @@ private
     end
 
     File.open(yaml_file, "w") { |f| f.puts yaml.to_yaml }
-  end
-
-  def self.exit_on_failure?
-    true
   end
 
   # Load the Thorfiles. If relevant_to is supplied, looks for specific files
@@ -263,11 +263,11 @@ private
   def thorfiles_relevant_to(meth)
     lookup = [meth, meth.split(":")[0...-1].join(":")]
 
-    files = thor_yaml.select do |k, v|
+    files = thor_yaml.select do |_, v|
       v[:namespaces] && !(v[:namespaces] & lookup).empty?
     end
 
-    files.map { |k, v| File.join(thor_root, "#{v[:filename]}") }
+    files.map { |_, v| File.join(thor_root, (v[:filename]).to_s) }
   end
 
   # Display information about the given klasses. If with_module is given,
@@ -276,7 +276,7 @@ private
   def display_klasses(with_modules = false, show_internal = false, klasses = Thor::Base.subclasses)
     klasses -= [Thor, Thor::Runner, Thor::Group] unless show_internal
 
-    fail Error, "No Thor commands available" if klasses.empty?
+    raise Error, "No Thor commands available" if klasses.empty?
     show_modules if with_modules && !thor_yaml.empty?
 
     list = Hash.new { |h, k| h[k] = [] }
@@ -306,8 +306,8 @@ private
   alias_method :display_tasks, :display_commands
 
   def show_modules #:nodoc:
-    info  = []
-    labels = %w[Modules Namespaces]
+    info = []
+    labels = %w(Modules Namespaces)
 
     info << labels
     info << ["-" * labels[0].size, "-" * labels[1].size]

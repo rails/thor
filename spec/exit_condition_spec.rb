@@ -9,7 +9,7 @@ describe "Exit conditions" do
       desc "my_action", "testing EPIPE"
       define_method :my_action do
         epiped = true
-        fail Errno::EPIPE
+        raise Errno::EPIPE
       end
     end
 
