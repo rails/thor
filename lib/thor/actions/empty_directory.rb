@@ -112,11 +112,17 @@ class Thor
         if exists?
           on_conflict_behavior(&block)
         else
-          say_status :create, :green
           yield unless pretend?
+          say_status :create, :green
         end
 
         destination
+      rescue Errno::EISDIR, Errno::EEXIST
+        on_file_clash_behavior
+      end
+
+      def on_file_clash_behavior
+        say_status :file_clash, :red
       end
 
       # What to do when the destination file already exists.
