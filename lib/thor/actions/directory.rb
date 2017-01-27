@@ -83,7 +83,7 @@ class Thor
 
           # Fix for Windows, turns /USER~1/ into /User Name/ for temp directory so that
           # gsub will find a match
-          source.gsub!(/\/\w*~1\//, "/"+ENV['USERNAME']+"/")
+          source.gsub!(/\/\w*[~]1\//, "/"+ENV['USERNAME']+"/") if ENV['USERNAME'] #Fix for Windows
 
           file_destination = File.join(given_destination, file_source.gsub(source, "."))
           file_destination.gsub!("/./", "/")
