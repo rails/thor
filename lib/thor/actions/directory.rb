@@ -80,6 +80,11 @@ class Thor
         files(lookup).sort.each do |file_source|
           next if File.directory?(file_source)
           next if config[:exclude_pattern] && file_source.match(config[:exclude_pattern])
+
+          # Fix for Windows, turns /USER~1/ into /User Name/ for temp directory so that
+          # gsub will find a match
+          source.gsub!(/\/\w*~1\//, "/"+ENV['USERNAME']+"/")
+
           file_destination = File.join(given_destination, file_source.gsub(source, "."))
           file_destination.gsub!("/./", "/")
 
