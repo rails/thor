@@ -222,6 +222,18 @@ describe Thor::Actions do
       file = File.join(destination_root, "doc/config.yaml")
       expect(File.exist?(file)).to be true
     end
+
+    it "has proper ERB stacktraces" do
+      error = nil
+      begin
+        action :template, "template/bad_config.yaml.tt"
+      rescue => e
+        error = e
+      end
+
+      expect(error).to be_a NameError
+      expect(error.backtrace.to_s).to include("bad_config.yaml.tt:2")
+    end
   end
 
   describe "when changing existent files" do

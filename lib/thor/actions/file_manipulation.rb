@@ -113,7 +113,9 @@ class Thor
       context = config.delete(:context) || instance_eval("binding")
 
       create_file destination, nil, config do
-        content = CapturableERB.new(::File.binread(source), nil, "-", "@output_buffer").result(context)
+        content = CapturableERB.new(::File.binread(source), nil, "-", "@output_buffer").tap do |erb|
+          erb.filename = source
+        end.result(context)
         content = yield(content) if block
         content
       end
