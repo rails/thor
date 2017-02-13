@@ -71,18 +71,19 @@ describe Thor::Actions::InjectIntoFile do
     end
 
     it "does not attempt to change the file if it doesn't exist" do
-      expect_any_instance_of(Thor::Actions::InjectIntoFile).not_to receive(:replace!)
       invoker.inject_into_file "idontexist", :before => "something" do
         "any content"
       end rescue nil
+
+      expect(File.exist?("idontexist")).to be_falsey
     end
 
-    it "raises a malformatted argument error including filename if file doesn't exist" do
+    it "raises a Thor error including filename if file doesn't exist" do
       expect do
-        invoker.inject_into_file "idontexist", :before => "something" do
+        invoke! "idontexist", :before => "something" do
           "any content"
         end
-      end.to raise_error(Thor::MalformattedArgumentError, /does not appear to exist/)
+      end.to raise_error(Thor::Error, /does not appear to exist/)
     end
 
     it "does change the file if already includes content and :force is true" do

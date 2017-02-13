@@ -59,7 +59,7 @@ class Thor
         if File.exist?(destination)
           replace!(/#{flag}/, content, config[:force])
         else
-          raise MalformattedArgumentError, "The file #{ destination } does not appear to exist"
+          raise Thor::Error, "The file #{ destination } does not appear to exist"
         end
       end
 
