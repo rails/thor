@@ -204,6 +204,29 @@ class Thor
       insert_into_file(path, *(args << config), &block)
     end
 
+    # Injects text right after the module definition. Since it depends on
+    # insert_into_file, it's reversible.
+    #
+    # ==== Parameters
+    # path<String>:: path of the file to be changed
+    # module_name<String|Class>:: the module to be manipulated
+    # data<String>:: the data to append to the class, can be also given as a block.
+    # config<Hash>:: give :verbose => false to not log the status.
+    #
+    # ==== Examples
+    #
+    #   inject_into_module "app/helpers/application_helper.rb", ApplicationHelper, "  def help; 'help'; end\n"
+    #
+    #   inject_into_module "app/helpers/application_helper.rb", ApplicationHelper do
+    #     "  def help; 'help'; end\n"
+    #   end
+    #
+    def inject_into_module(path, module_name, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
+      config.merge!(:after => /module #{module_name}\n|module #{module_name} .*\n/)
+      insert_into_file(path, *(args << config), &block)
+    end
+
     # Run a regular expression replacement on a file.
     #
     # ==== Parameters
