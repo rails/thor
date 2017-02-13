@@ -1,9 +1,9 @@
 class Thor
-  class Command < Struct.new(:name, :description, :long_description, :usage, :options, :disable_class_options, :ancestor_name)
+  class Command < Struct.new(:name, :description, :long_description, :usage, :options, :ancestor_name)
     FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
 
-    def initialize(name, description, long_description, usage, options = nil, disable_class_options = false)
-      super(name.to_s, description, long_description, usage, options || {}, disable_class_options)
+    def initialize(name, description, long_description, usage, options = nil)
+      super(name.to_s, description, long_description, usage, options || {})
     end
 
     def initialize_copy(other) #:nodoc:

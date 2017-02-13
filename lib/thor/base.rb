@@ -42,7 +42,7 @@ class Thor
     # config<Hash>:: Configuration for this Thor class.
     #
     def initialize(args = [], local_options = {}, config = {})
-      parse_options = config[:current_command] && config[:current_command].disable_class_options ? {} : self.class.class_options
+      parse_options = self.class.class_options
 
       # The start method splits inbound arguments at the first argument
       # that looks like an option (starts with - or --). It then calls
@@ -65,7 +65,8 @@ class Thor
       # declared options from the array. This will leave us with
       # a list of arguments that weren't declared.
       stop_on_unknown = self.class.stop_on_unknown_option? config[:current_command]
-      opts = Thor::Options.new(parse_options, hash_options, stop_on_unknown)
+      disable_required_check = self.class.disable_required_check? config[:current_command]
+      opts = Thor::Options.new(parse_options, hash_options, stop_on_unknown, disable_required_check)
       self.options = opts.parse(array_options)
       self.options = config[:class_options].merge(options) if config[:class_options]
 
@@ -154,6 +155,12 @@ class Thor
       # regular argument is encountered.  All remaining arguments are passed to
       # the command as regular arguments.
       def stop_on_unknown_option?(command_name) #:nodoc:
+        false
+      end
+
+      # If true, option set will not suspend the execution of the command when
+      # a required option is not provided.
+      def disable_required_check?(command_name) #:nodoc:
         false
       end
 

@@ -29,8 +29,9 @@ class Thor
     #
     # If +stop_on_unknown+ is true, #parse will stop as soon as it encounters
     # an unknown option or a regular argument.
-    def initialize(hash_options = {}, defaults = {}, stop_on_unknown = false)
+    def initialize(hash_options = {}, defaults = {}, stop_on_unknown = false, disable_required_check = false)
       @stop_on_unknown = stop_on_unknown
+      @disable_required_check = disable_required_check
       options = hash_options.values
       super(options)
 
@@ -111,7 +112,7 @@ class Thor
         end
       end
 
-      check_requirement!
+      check_requirement! unless @disable_required_check
 
       assigns = Thor::CoreExt::HashWithIndifferentAccess.new(@assigns)
       assigns.freeze
