@@ -4,7 +4,6 @@ gem "rake", "< 11"
 gem "rdoc", "~> 4.2.2" # This is to support Ruby 1.8 and 1.9
 
 group :development do
-  gem "guard-rspec"
   gem "pry"
   platforms :ruby_21 do
     gem "pry-byebug"
