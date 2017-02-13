@@ -137,7 +137,7 @@ describe Thor::Option do
   it "raises an error if default is inconsistent with type" do
     expect(capture(:stderr) do
       option("foo_bar", :type => :numeric, :default => "baz")
-    end.chomp).to eq('Expected numeric default value for \'--foo-bar\'; got "baz" (string)')
+    end.chomp).to eq('WARNING: Expected numeric default value for \'--foo-bar\'; got "baz" (string)')
   end
 
   it "does not raises an error if default is an symbol and type string" do

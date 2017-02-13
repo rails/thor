@@ -128,7 +128,7 @@ class Thor
       end
 
       # TODO: This should raise an ArgumentError in a future version of Thor
-      warn "Expected #{@type} default value for '#{switch_name}'; got #{@default.inspect} (#{default_type})" unless default_type == @type
+      warn "WARNING: Expected #{@type} default value for '#{switch_name}'; got #{@default.inspect} (#{default_type})" unless default_type == @type
     end
 
     def dasherized?
