@@ -92,7 +92,7 @@ class Thor
       #
       def replace!(regexp, string, force)
         return if base.options[:pretend]
-        content = File.binread(destination)
+        content = File.read(destination)
         if force || !content.include?(replacement)
           content.gsub!(regexp, string)
           File.open(destination, "wb") { |file| file.write(content) }
