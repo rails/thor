@@ -241,7 +241,7 @@ class Thor
         invoke_args.unshift "help" if opts.delete("--help") || opts.delete("-h")
         invoke subcommand_class, *invoke_args
       end
-      subcommand_class.commands.each do |meth, command|
+      subcommand_class.commands.each do |_meth, command|
         command.ancestor_name = subcommand
       end
     end

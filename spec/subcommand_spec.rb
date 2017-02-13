@@ -59,9 +59,8 @@ describe Thor do
     end
 
     it "shows subcommand name and method name" do
-      sub_help = capture(:stderr) { SubcommandTest1::Parent.start(%w[child1 foo]) }
-      expect(sub_help).to eq ['ERROR: "thor child1 foo" was called with no arguments', 'Usage: "thor child1 foo NAME"', ''].join("\n")
+      sub_help = capture(:stderr) { SubcommandTest1::Parent.start(%w(child1 foo)) }
+      expect(sub_help).to eq ['ERROR: "thor child1 foo" was called with no arguments', 'Usage: "thor child1 foo NAME"', ""].join("\n")
     end
   end
-
 end

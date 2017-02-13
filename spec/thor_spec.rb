@@ -428,8 +428,7 @@ HELP
           class_option :foo, :required => true
 
           desc "bar", "do something"
-          def bar
-          end
+          def bar; end
         end
       end
 

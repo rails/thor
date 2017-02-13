@@ -90,7 +90,7 @@ Lint/EndAlignment:
     - 'lib/thor/actions.rb'
     - 'lib/thor/parser/option.rb'
 
-Lint/Eval:
+Security/Eval:
   Exclude:
     - 'spec/helper.rb'
 

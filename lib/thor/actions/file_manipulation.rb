@@ -225,7 +225,7 @@ class Thor
     #
     def inject_into_module(path, module_name, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
-      config.merge!(:after => /module #{module_name}\n|module #{module_name} .*\n/)
+      config[:after] = /module #{module_name}\n|module #{module_name} .*\n/
       insert_into_file(path, *(args << config), &block)
     end
 
@@ -331,7 +331,8 @@ class Thor
     end
 
     def with_output_buffer(buf = "") #:nodoc:
-      self.output_buffer, old_buffer = buf, output_buffer
+      old_buffer = output_buffer
+      self.output_buffer = buf
       yield
       output_buffer
     ensure
