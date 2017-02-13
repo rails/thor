@@ -23,7 +23,7 @@ group :test do
   gem "rest-client", "~> 1.6.0", :platforms => [:jruby, :ruby_18]
   gem "rspec", ">= 3"
   gem "rspec-mocks", ">= 3"
-  gem "rubocop", ">= 0.19", :platforms => [:ruby_20, :ruby_21, :ruby_22, :ruby_23]
+  gem "rubocop", ">= 0.47", :platforms => [:ruby_20, :ruby_21, :ruby_22, :ruby_23, :ruby_24]
   gem "simplecov", ">= 0.9"
   gem "term-ansicolor", "~> 1.3.2" # This is to support Ruby 1.8 and 1.9
   gem "tins", "< 1.7" # This is to support Ruby 1.8 and 1.9
