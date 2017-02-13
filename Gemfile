@@ -27,7 +27,11 @@ group :test do
   gem "simplecov", ">= 0.9"
   gem "term-ansicolor", "~> 1.3.2" # This is to support Ruby 1.8 and 1.9
   gem "tins", "< 1.7" # This is to support Ruby 1.8 and 1.9
-  gem "webmock", ">= 1.20", "< 2" # This is to support Ruby 1.8 and 1.9.2
+  if RUBY_VERSION < "1.9.3"
+    gem "webmock", ">= 1.20", "< 2" # This is to support Ruby 1.8 and 1.9.2
+  else
+    gem "webmock"
+  end
 end
 
 gemspec
