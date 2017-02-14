@@ -17,13 +17,22 @@ class Thor
           if complete = completion_proc
             ::Readline.completion_proc = complete
           end
-          ::Readline.readline(prompt, add_to_history?)
+          ::Readline.readline(normalized_prompt, add_to_history?)
         else
           super
         end
       end
 
     private
+
+      def normalized_prompt
+        ansi_colors = @prompt[0..-5].scan(/\e\[[0-9;]*m/)
+                                    .map { |color| "\001" + color + "\002" }
+        return @prompt if ansi_colors.empty?
+
+        @prompt = @prompt.gsub(/\e\[[0-9;]*m/, "")
+        "#{ansi_colors.join}#{prompt}\001\e[0m\002"
+      end
 
       def add_to_history?
         options.fetch(:add_to_history, true)
