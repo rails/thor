@@ -26,7 +26,7 @@ class Thor
     private
 
       def normalized_prompt
-        ansi_colors = @prompt[0..-5].scan(/\e\[[0-9;]*m/)
+        ansi_colors = @prompt[0..-5].scan(/\e\[[0-9;]*m/) \
                                     .map { |color| "\001" + color + "\002" }
         return @prompt if ansi_colors.empty?
 
