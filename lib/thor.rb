@@ -158,10 +158,6 @@ class Thor
     end
     alias_method :option, :method_option
 
-    def disable_class_options
-      @disable_class_options = true
-    end
-
     # Prints help information for the given command.
     #
     # ==== Parameters
@@ -329,10 +325,29 @@ class Thor
       command && stop_on_unknown_option.include?(command.name.to_sym)
     end
 
+    # Disable the check for required options for the given commands.
+    # This is useful if you have a command that does not need the required options
+    # to work, like help.
+    #
+    # ==== Parameters
+    # Symbol ...:: A list of commands that should be affected.
+    def disable_required_check!(*command_names)
+      disable_required_check.merge(command_names)
+    end
+
+    def disable_required_check?(command) #:nodoc:
+      command && disable_required_check.include?(command.name.to_sym)
+    end
+
   protected
 
     def stop_on_unknown_option #:nodoc:
       @stop_on_unknown_option ||= Set.new
+    end
+
+    # help command has the required check disabled by default.
+    def disable_required_check #:nodoc:
+      @disable_required_check ||= Set.new([:help])
     end
 
     # The method responsible for dispatching given the args.
@@ -393,12 +408,11 @@ class Thor
       @usage ||= nil
       @desc ||= nil
       @long_desc ||= nil
-      @disable_class_options ||= nil
 
       if @usage && @desc
         base_class = @hide ? Thor::HiddenCommand : Thor::Command
-        commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options, @disable_class_options)
-        @usage, @desc, @long_desc, @method_options, @hide, @disable_class_options = nil
+        commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
+        @usage, @desc, @long_desc, @method_options, @hide = nil
         true
       elsif all_commands[meth] || meth == "method_missing"
         true
@@ -480,7 +494,6 @@ class Thor
   map HELP_MAPPINGS => :help
 
   desc "help [COMMAND]", "Describe available commands or one specific command"
-  disable_class_options
   def help(command = nil, subcommand = false)
     if command
       if self.class.subcommands.include? command

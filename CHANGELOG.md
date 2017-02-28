@@ -1,4 +1,7 @@
 ## 0.20.0
+* Add `disable_required_check!` to disable check for required options in some commands.
+  It is a substitute of `disable_class_options` that was not working as intended.
+
 * Add `inject_into_module`.
 
 ## 0.19.4, release 2016-11-28

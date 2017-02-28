@@ -159,6 +159,64 @@ describe Thor do
     end
   end
 
+  describe "#disable_required_check!" do
+    my_script = Class.new(Thor) do
+      class_option "foo", :required => true
+
+      disable_required_check! :boring
+
+      desc "exec", "Run a command"
+      def exec(*args)
+        [options, args]
+      end
+
+      desc "boring", "An ordinary command"
+      def boring(*args)
+        [options, args]
+      end
+    end
+
+    it "does not check the required option in the given command" do
+      expect(my_script.start(%w(boring command))).to eq [{}, %w(command)]
+    end
+
+    it "does check the required option of the remaining command" do
+      content = capture(:stderr) { my_script.start(%w(exec command)) }
+      expect(content).to eq "No value provided for required options '--foo'\n"
+    end
+
+    it "does affects help by default" do
+      expect(my_script.disable_required_check?(double(:name => "help"))).to be true
+    end
+
+    context "when provided with multiple command names" do
+      klass = Class.new(Thor) do
+        disable_required_check! :foo, :bar
+      end
+
+      it "affects all specified commands" do
+        expect(klass.disable_required_check?(double(:name => "help"))).to be true
+        expect(klass.disable_required_check?(double(:name => "foo"))).to be true
+        expect(klass.disable_required_check?(double(:name => "bar"))).to be true
+        expect(klass.disable_required_check?(double(:name => "baz"))).to be false
+      end
+    end
+
+    context "when invoked several times" do
+      klass = Class.new(Thor) do
+        disable_required_check! :foo
+        disable_required_check! :bar
+      end
+
+      it "affects all specified commands" do
+        expect(klass.disable_required_check?(double(:name => "help"))).to be true
+        expect(klass.disable_required_check?(double(:name => "foo"))).to be true
+        expect(klass.disable_required_check?(double(:name => "bar"))).to be true
+        expect(klass.disable_required_check?(double(:name => "baz"))).to be false
+      end
+    end
+  end
+
   describe "#map" do
     it "calls the alias of a method if one is provided" do
       expect(MyScript.start(%w(-T fish))).to eq(%w(fish))
