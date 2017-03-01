@@ -60,4 +60,22 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
     expect(@hash.to_hash.class).to eq(Hash)
     expect(@hash).to eq("foo" => "bar", "baz" => "bee", "force" => true)
   end
+
+  it "handles reverse_merge" do
+    other = {:foo => "qux", "boo" => "bae"}
+    new_hash = @hash.reverse_merge(other)
+
+    expect(@hash.object_id).not_to eq(new_hash.object_id)
+    expect(new_hash[:foo]).to eq("bar")
+    expect(new_hash[:boo]).to eq("bae")
+  end
+
+  it "handles reverse_merge!" do
+    other = {:foo => "qux", "boo" => "bae"}
+    new_hash = @hash.reverse_merge!(other)
+
+    expect(@hash.object_id).to eq(new_hash.object_id)
+    expect(new_hash[:foo]).to eq("bar")
+    expect(new_hash[:boo]).to eq("bae")
+  end
 end
