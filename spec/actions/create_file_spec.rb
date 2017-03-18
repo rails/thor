@@ -131,6 +131,30 @@ describe Thor::Actions::CreateFile do
         end
       end
     end
+
+    context "when file exists and it causes a file clash" do
+      before do
+        create_file("doc/config")
+        invoke!
+      end
+
+      it "generates a file clash" do
+        create_file("doc/config/config.rb")
+        expect(invoke!).to eq("  file_clash  doc/config/config.rb\n")
+      end
+    end
+
+    context "when directory exists and it causes a file clash" do
+      before do
+        create_file("doc/config/hello")
+        invoke!
+      end
+
+      it "generates a file clash" do
+        create_file("doc/config")
+        expect(invoke!) .to eq("  file_clash  doc/config\n")
+      end
+    end
   end
 
   describe "#revoke!" do
