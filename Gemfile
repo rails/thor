@@ -24,7 +24,7 @@ group :test do
   gem "rspec", ">= 3"
   gem "rspec-mocks", ">= 3"
   gem "rubocop", ">= 0.19", :platforms => [:ruby_20, :ruby_21, :ruby_22, :ruby_23, :ruby_24]
-  gem "simplecov", ">= 0.9"
+  gem "simplecov", ">= 0.13"
   gem "term-ansicolor", "~> 1.3.2" # This is to support Ruby 1.8 and 1.9
   gem "tins", "< 1.7" # This is to support Ruby 1.8 and 1.9
   if RUBY_VERSION < "1.9.3"
