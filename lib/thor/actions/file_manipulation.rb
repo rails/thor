@@ -140,7 +140,10 @@ class Thor
       return unless behavior == :invoke
       path = File.expand_path(path, destination_root)
       say_status :chmod, relative_to_original_destination_root(path), config.fetch(:verbose, true)
-      FileUtils.chmod_R(mode, path) unless options[:pretend]
+      unless options[:pretend]
+        require "fileutils"
+        FileUtils.chmod_R(mode, path)
+      end
     end
 
     # Prepend text to a file. Since it depends on insert_into_file, it's reversible.
@@ -317,7 +320,10 @@ class Thor
       path = File.expand_path(path, destination_root)
 
       say_status :remove, relative_to_original_destination_root(path), config.fetch(:verbose, true)
-      ::FileUtils.rm_rf(path) if !options[:pretend] && File.exist?(path)
+      if !options[:pretend] && File.exist?(path)
+        require "fileutils"
+        ::FileUtils.rm_rf(path)
+      end
     end
     alias_method :remove_dir, :remove_file
 
