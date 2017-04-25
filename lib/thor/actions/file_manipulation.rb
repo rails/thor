@@ -1,5 +1,4 @@
 require "erb"
-require "open-uri"
 
 class Thor
   module Actions
@@ -78,7 +77,12 @@ class Thor
       config = args.last.is_a?(Hash) ? args.pop : {}
       destination = args.first
 
-      source = File.expand_path(find_in_source_paths(source.to_s)) unless source =~ %r{^https?\://}
+      if source =~ %r{^https?\://}
+        require "open-uri"
+      else
+        source = File.expand_path(find_in_source_paths(source.to_s))
+      end
+
       render = open(source) { |input| input.binmode.read }
 
       destination ||= if block_given?

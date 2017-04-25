@@ -3,7 +3,6 @@ require "thor/group"
 require "thor/core_ext/io_binary_read"
 
 require "fileutils"
-require "open-uri"
 require "yaml"
 require "digest/md5"
 require "pathname"
