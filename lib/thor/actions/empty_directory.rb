@@ -48,12 +48,14 @@ class Thor
 
       def invoke!
         invoke_with_conflict_check do
+          require "fileutils"
           ::FileUtils.mkdir_p(destination)
         end
       end
 
       def revoke!
         say_status :remove, :red
+        require "fileutils"
         ::FileUtils.rm_rf(destination) if !pretend? && exists?
         given_destination
       end

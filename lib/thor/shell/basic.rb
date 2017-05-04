@@ -1,5 +1,3 @@
-require "tempfile"
-
 class Thor
   module Shell
     class Basic
@@ -349,6 +347,7 @@ class Thor
       def show_diff(destination, content) #:nodoc:
         diff_cmd = ENV["THOR_DIFF"] || ENV["RAILS_DIFF"] || "diff -u"
 
+        require "tempfile"
         Tempfile.open(File.basename(destination), File.dirname(destination)) do |temp|
           temp.write content
           temp.rewind

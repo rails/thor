@@ -1,4 +1,3 @@
-require "fileutils"
 require "uri"
 require "thor/core_ext/io_binary_read"
 require "thor/actions/create_file"
@@ -175,6 +174,7 @@ class Thor
 
       # If the directory doesnt exist and we're not pretending
       if !File.exist?(destination_root) && !pretend
+        require "fileutils"
         FileUtils.mkdir_p(destination_root)
       end
 
@@ -182,6 +182,7 @@ class Thor
         # In pretend mode, just yield down to the block
         block.arity == 1 ? yield(destination_root) : yield
       else
+        require "fileutils"
         FileUtils.cd(destination_root) { block.arity == 1 ? yield(destination_root) : yield }
       end
 
