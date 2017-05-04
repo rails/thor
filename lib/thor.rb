@@ -210,7 +210,7 @@ class Thor
       (all ? all_commands : commands).map do |_, command|
         next if command.hidden?
         item = []
-        item << banner(command, false, subcommand)
+        item << banner(command, subcommand)
         item << (command.description ? "# #{command.description.gsub(/\s+/m, ' ')}" : "")
         item
       end.compact
@@ -392,7 +392,7 @@ class Thor
     # the command that is going to be invoked and a boolean which indicates if
     # the namespace should be displayed as arguments.
     #
-    def banner(command, namespace = nil, subcommand = false)
+    def banner(command, subcommand = false)
       "#{basename} #{command.formatted_usage(self, $thor_runner, subcommand)}"
     end
 
