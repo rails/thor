@@ -1,6 +1,6 @@
 class Thor
   class Option < Argument #:nodoc:
-    attr_reader :aliases, :group, :lazy_default, :hide
+    attr_reader :aliases, :group, :lazy_default, :hide, :incremental
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
@@ -11,6 +11,14 @@ class Thor
       @group        = options[:group].to_s.capitalize if options[:group]
       @aliases      = Array(options[:aliases])
       @hide         = options[:hide]
+      @incremental  = options[:incremental]
+    end
+
+    # Is this numeric option incremental?
+    #
+    # e.g. -vvv = 3
+    def incremental?
+      numeric? && incremental
     end
 
     # This parse quick options given as method_options. It makes several
