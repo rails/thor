@@ -1,6 +1,11 @@
 require "helper"
 require "thor/core_ext/hash_with_indifferent_access"
 
+class HasMethod < Thor::CoreExt::HashWithIndifferentAccess
+  def this_method_exists
+  end
+end
+
 describe Thor::CoreExt::HashWithIndifferentAccess do
   before do
     @hash = Thor::CoreExt::HashWithIndifferentAccess.new :foo => "bar", "baz" => "bee", :force => true
@@ -39,8 +44,19 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
     expect(@hash.foo?("bee")).to be false
   end
 
-  it "maps methods to keys" do
-    expect(@hash.foo).to eq(@hash["foo"])
+  context "map methods to keys" do
+    it "succeeds with existing keys" do
+      expect(@hash.foo).to eq(@hash["foo"])
+    end
+
+    it "does not fail silently with missing keys" do
+      expect { @hash.does_not_exist }.to raise_error(NoMethodError)
+    end
+
+    it "prefers methods over keys in derived classes" do
+      @tester = HasMethod.new
+      expect { @tester.this_method_exists }.not_to raise_error
+    end
   end
 
   it "merges keys independent if they are symbols or strings" do
