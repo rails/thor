@@ -114,9 +114,7 @@ class Thor
 
       check_requirement! unless @disable_required_check
 
-      assigns = Thor::CoreExt::HashWithIndifferentAccess.new(@assigns)
-      assigns.freeze
-      assigns
+      Thor::CoreExt::HashWithIndifferentAccess.new(@assigns)
     end
 
     def check_unknown!
