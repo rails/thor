@@ -252,6 +252,9 @@ class Thor
           )
 
           case answer
+          when nil
+            say ""
+            return true
           when is?(:yes), is?(:force), ""
             return true
           when is?(:no), is?(:skip)
