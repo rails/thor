@@ -18,11 +18,11 @@ class Thor
         when Hash
           "--#{key} #{value.map { |k, v| "#{k}:#{v}" }.join(' ')}"
         when nil, false
-          ""
+          nil
         else
           "--#{key} #{value.inspect}"
         end
-      end.join(" ")
+      end.compact.join(" ")
     end
 
     # Takes a hash of Thor::Option and a hash with defaults.

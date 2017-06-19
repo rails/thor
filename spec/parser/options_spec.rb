@@ -35,6 +35,10 @@ describe Thor::Options do
       expect(Thor::Options.to_switches(:color => false)).to eq("")
     end
 
+    it "avoids extra spaces" do
+      expect(Thor::Options.to_switches(:color => false, :foo => nil)).to eq("")
+    end
+
     it "writes --name value for anything else" do
       expect(Thor::Options.to_switches(:format => "specdoc")).to eq('--format "specdoc"')
     end
