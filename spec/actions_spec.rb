@@ -204,7 +204,7 @@ describe Thor::Actions do
 
   describe "#apply" do
     before do
-      @template = <<-TEMPLATE
+      @template = <<-TEMPLATE.dup
         @foo = "FOO"
         say_status :cool, :padding
       TEMPLATE

@@ -140,7 +140,7 @@ class Thor
         end
       end
 
-      message = "Could not find #{file.inspect} in any of your source paths. "
+      message = "Could not find #{file.inspect} in any of your source paths. ".dup
 
       unless self.class.source_root
         message << "Please invoke #{self.class.name}.source_root(PATH) with the PATH containing your templates. "

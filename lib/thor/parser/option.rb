@@ -80,12 +80,12 @@ class Thor
 
     def usage(padding = 0)
       sample = if banner && !banner.to_s.empty?
-        "#{switch_name}=#{banner}"
+        "#{switch_name}=#{banner}".dup
       else
         switch_name
       end
 
-      sample = "[#{sample}]" unless required?
+      sample = "[#{sample}]".dup unless required?
 
       if boolean?
         sample << ", [#{dasherize('no-' + human_name)}]" unless (name == "force") || name.start_with?("no-")

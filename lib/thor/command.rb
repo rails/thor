@@ -40,14 +40,14 @@ class Thor
     # and required options into the given usage.
     def formatted_usage(klass, namespace = true, subcommand = false)
       if ancestor_name
-        formatted = "#{ancestor_name} " # add space
+        formatted = "#{ancestor_name} ".dup # add space
       elsif namespace
         namespace = klass.namespace
-        formatted = "#{namespace.gsub(/^(default)/, '')}:"
+        formatted = "#{namespace.gsub(/^(default)/, '')}:".dup
       end
-      formatted ||= "#{klass.namespace.split(':').last} " if subcommand
+      formatted ||= "#{klass.namespace.split(':').last} ".dup if subcommand
 
-      formatted ||= ""
+      formatted ||= "".dup
 
       # Add usage with required arguments
       formatted << if klass && !klass.arguments.empty?

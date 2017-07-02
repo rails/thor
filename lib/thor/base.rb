@@ -485,7 +485,7 @@ class Thor
 
       def handle_argument_error(command, error, args, arity) #:nodoc:
         name = [command.ancestor_name, command.name].compact.join(" ")
-        msg = "ERROR: \"#{basename} #{name}\" was called with "
+        msg = "ERROR: \"#{basename} #{name}\" was called with ".dup
         msg << "no arguments"               if     args.empty?
         msg << "arguments " << args.inspect unless args.empty?
         msg << "\nUsage: #{banner(command).inspect}"
