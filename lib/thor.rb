@@ -408,6 +408,7 @@ class Thor
       @usage ||= nil
       @desc ||= nil
       @long_desc ||= nil
+      @hide ||= nil
 
       if @usage && @desc
         base_class = @hide ? Thor::HiddenCommand : Thor::Command
