@@ -310,6 +310,12 @@ TABLE
       shell.file_collision("foo")
     end
 
+    it "outputs a new line and returns true if stdin is closed" do
+      expect($stdout).to receive(:print).with("\n")
+      expect(Thor::LineEditor).to receive(:readline).and_return(nil)
+      expect(shell.file_collision("foo")).to be true
+    end
+
     it "returns true if the user chooses default option" do
       expect(Thor::LineEditor).to receive(:readline).and_return("")
       expect(shell.file_collision("foo")).to be true
