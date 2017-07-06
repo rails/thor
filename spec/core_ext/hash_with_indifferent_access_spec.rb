@@ -19,6 +19,14 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
     expect(@hash.fetch("foo", nil)).to eq("bar")
     expect(@hash.fetch(:foo)).to eq("bar")
     expect(@hash.fetch(:foo, nil)).to eq("bar")
+
+    expect(@hash.fetch("baz")).to eq("bee")
+    expect(@hash.fetch("baz", nil)).to eq("bee")
+    expect(@hash.fetch(:baz)).to eq("bee")
+    expect(@hash.fetch(:baz, nil)).to eq("bee")
+
+    expect { @hash.fetch(:missing) }.to raise_error(IndexError)
+    expect(@hash.fetch(:missing, :found)).to eq(:found)
   end
 
   it "has key checkable by either strings or symbols" do
