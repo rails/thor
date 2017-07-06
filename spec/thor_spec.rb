@@ -583,6 +583,24 @@ HELP
       expect(klass.start(%w(unknown foo --bar baz))).to eq(%w(foo))
     end
 
+    it "does not check the default type when check_default_type! is not called" do
+      expect do
+        Class.new(Thor) do
+          option "bar", :type => :numeric, :default => "foo"
+        end
+      end.not_to raise_error
+    end
+
+    it "checks the default type when check_default_type! is called" do
+      expect do
+        Class.new(Thor) do
+          check_default_type!
+
+          option "bar", :type => :numeric, :default => "foo"
+        end
+      end.to raise_error(ArgumentError, "Expected numeric default value for '--bar'; got \"foo\" (string)")
+    end
+
     it "send as a command name" do
       expect(MyScript.start(%w(send))).to eq(true)
     end
