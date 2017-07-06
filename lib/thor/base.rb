@@ -151,6 +151,21 @@ class Thor
         !!check_unknown_options
       end
 
+      # If you want to raise an error when the default value of an option does not match
+      # the type call check_default_type!
+      # This is disabled by default for compatibility.
+      def check_default_type!
+        @check_default_type = true
+      end
+
+      def check_default_type #:nodoc:
+        @check_default_type ||= from_superclass(:check_default_type, false)
+      end
+
+      def check_default_type? #:nodoc:
+        !!check_default_type
+      end
+
       # If true, option parsing is suspended as soon as an unknown option or a
       # regular argument is encountered.  All remaining arguments are passed to
       # the command as regular arguments.
@@ -549,7 +564,7 @@ class Thor
       # options<Hash>:: Described in both class_option and method_option.
       # scope<Hash>:: Options hash that is being built up
       def build_option(name, options, scope) #:nodoc:
-        scope[name] = Thor::Option.new(name, options)
+        scope[name] = Thor::Option.new(name, options.merge(:check_default_type => check_default_type?))
       end
 
       # Receives a hash of options, parse them and add to the scope. This is a

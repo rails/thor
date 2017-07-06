@@ -5,6 +5,7 @@ class Thor
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
     def initialize(name, options = {})
+      @check_default_type = options[:check_default_type]
       options[:required] = false unless options.key?(:required)
       super
       @lazy_default = options[:lazy_default]
@@ -110,7 +111,7 @@ class Thor
 
     def validate!
       raise ArgumentError, "An option cannot be boolean and required." if boolean? && required?
-      validate_default_type!
+      validate_default_type! if @check_default_type
     end
 
     def validate_default_type!
@@ -127,8 +128,7 @@ class Thor
         @default.class.name.downcase.to_sym
       end
 
-      # TODO: This should raise an ArgumentError in a future version of Thor
-      warn "WARNING: Expected #{@type} default value for '#{switch_name}'; got #{@default.inspect} (#{default_type})" unless default_type == @type
+      raise ArgumentError, "Expected #{@type} default value for '#{switch_name}'; got #{@default.inspect} (#{default_type})" unless default_type == @type
     end
 
     def dasherized?

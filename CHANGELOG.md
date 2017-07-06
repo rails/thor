@@ -1,4 +1,7 @@
 ## 0.20.0
+* Add `check_default_type!` to check if the default value of an option matches the defined type.
+  It removes the warning on usage and gives the command authors the possibility to check for programming errors.
+
 * Add `disable_required_check!` to disable check for required options in some commands.
   It is a substitute of `disable_class_options` that was not working as intended.
 
