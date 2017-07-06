@@ -53,7 +53,11 @@ class Thor
           replacement + '\0'
         end
 
-        replace!(/#{flag}/, content, config[:force])
+        if File.exist?(destination)
+          replace!(/#{flag}/, content, config[:force])
+        else
+          raise Thor::Error, "The file #{ destination } does not appear to exist"
+        end
       end
 
       def revoke!

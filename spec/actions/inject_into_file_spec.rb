@@ -71,6 +71,15 @@ describe Thor::Actions::InjectIntoFile do
       expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
     end
 
+    it "does not attempt to change the file if it doesn't exist - instead raises Thor::Error" do
+      expect do
+	invoke! "idontexist", :before => "something" do
+	  "any content"
+	end
+      end.to raise_error(Thor::Error, /does not appear to exist/)
+      expect(File.exist?("idontexist")).to be_falsey
+    end
+
     it "does change the file if already includes content and :force is true" do
       invoke! "doc/README", :before => "__end__" do
         "more content\n"
