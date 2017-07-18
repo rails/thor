@@ -341,7 +341,7 @@ class Thor
     end
 
     def with_output_buffer(buf = "".dup) #:nodoc:
-      raise "No: #{buf}" if buf.frozen?
+      raise ArgumentError, "Buffer can not be a frozen object" if buf.frozen?
       old_buffer = output_buffer
       self.output_buffer = buf
       yield
