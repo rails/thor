@@ -53,10 +53,12 @@ class Thor
           replacement + '\0'
         end
 
-        if File.exist?(destination)
+        if exists?
           replace!(/#{flag}/, content, config[:force])
         else
-          raise Thor::Error, "The file #{ destination } does not appear to exist"
+          unless pretend?
+            raise Thor::Error, "The file #{ destination } does not appear to exist"
+          end
         end
       end
 
@@ -95,7 +97,7 @@ class Thor
       # Adds the content to the file.
       #
       def replace!(regexp, string, force)
-        return if base.options[:pretend]
+        return if pretend?
         content = File.read(destination)
         if force || !content.include?(replacement)
           content.gsub!(regexp, string)

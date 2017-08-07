@@ -73,10 +73,20 @@ describe Thor::Actions::InjectIntoFile do
 
     it "does not attempt to change the file if it doesn't exist - instead raises Thor::Error" do
       expect do
-	invoke! "idontexist", :before => "something" do
-	  "any content"
-	end
+        invoke! "idontexist", :before => "something" do
+          "any content"
+        end
       end.to raise_error(Thor::Error, /does not appear to exist/)
+      expect(File.exist?("idontexist")).to be_falsey
+    end
+
+    it "does not attempt to change the file if it doesn't exist and pretending" do
+      expect do
+        invoker :pretend => true
+        invoke! "idontexist", :before => "something" do
+          "any content"
+        end
+      end.not_to raise_error
       expect(File.exist?("idontexist")).to be_falsey
     end
 
