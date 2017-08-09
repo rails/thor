@@ -349,6 +349,18 @@ describe Thor::Options do
         expect(parse("--foo", "bar")).to eq("foo" => true)
         expect(@opt.remaining).to eq(%w(bar))
       end
+
+      it "doesn't eat the next part of the param with 'no-opt' variant" do
+        create :foo => :boolean
+        expect(parse("--no-foo", "bar")).to eq("foo" => false)
+        expect(@opt.remaining).to eq(%w(bar))
+      end
+
+      it "doesn't eat the next part of the param with 'skip-opt' variant" do
+        create :foo => :boolean
+        expect(parse("--skip-foo", "bar")).to eq("foo" => false)
+        expect(@opt.remaining).to eq(%w(bar))
+      end
     end
 
     describe "with :hash type" do

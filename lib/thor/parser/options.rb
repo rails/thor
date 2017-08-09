@@ -189,7 +189,7 @@ class Thor
           shift
           false
         else
-          true
+          !no_or_skip?(switch)
         end
       else
         @switches.key?(switch) || !no_or_skip?(switch)
