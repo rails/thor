@@ -531,7 +531,7 @@ HELP
         method_option :loud, :type => :boolean
         desc "hi NAME", "say hi to name"
         def hi(name)
-          name.upcase! if options[:loud]
+          name = name.upcase if options[:loud]
           "Hi #{name}"
         end
       end

@@ -340,7 +340,8 @@ class Thor
       with_output_buffer { yield(*args) }
     end
 
-    def with_output_buffer(buf = "") #:nodoc:
+    def with_output_buffer(buf = "".dup) #:nodoc:
+      raise ArgumentError, "Buffer can not be a frozen object" if buf.frozen?
       old_buffer = output_buffer
       self.output_buffer = buf
       yield
@@ -355,7 +356,7 @@ class Thor
       def set_eoutvar(compiler, eoutvar = "_erbout")
         compiler.put_cmd = "#{eoutvar}.concat"
         compiler.insert_cmd = "#{eoutvar}.concat"
-        compiler.pre_cmd = ["#{eoutvar} = ''"]
+        compiler.pre_cmd = ["#{eoutvar} = ''.dup"]
         compiler.post_cmd = [eoutvar]
       end
     end

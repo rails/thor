@@ -190,7 +190,7 @@ describe Thor::Group do
         class_option :loud, :type => :boolean
 
         def hi
-          name.upcase! if options[:loud]
+          self.name = name.upcase if options[:loud]
           "Hi #{name}"
         end
       end
@@ -207,7 +207,7 @@ describe Thor::Group do
         class_option :loud, :type => :boolean
 
         def hi
-          name.upcase! if options[:loud]
+          self.name = name.upcase if options[:loud]
           out = "Hi #{name}"
           out << ": " << args.join(", ") unless args.empty?
           out
