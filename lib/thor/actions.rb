@@ -217,6 +217,7 @@ class Thor
       shell.padding += 1 if verbose
 
       contents = if is_uri
+        require "open-uri"
         open(path, "Accept" => "application/x-thor-template", &:read)
       else
         open(path, &:read)
