@@ -466,13 +466,13 @@ class Thor
         dispatch(nil, given_args.dup, nil, config)
       rescue Thor::Error => e
         config[:debug] || ENV["THOR_DEBUG"] == "1" ? (raise e) : config[:shell].error(e.message)
-        exit(1) if exit_on_failure?
+        exit(false) if exit_on_failure?
       rescue Errno::EPIPE
         # This happens if a thor command is piped to something like `head`,
         # which closes the pipe when it's done reading. This will also
         # mean that if the pipe is closed, further unnecessary
         # computation will not occur.
-        exit(0)
+        exit(true)
       end
 
       # Allows to use private methods from parent in child classes as commands.
