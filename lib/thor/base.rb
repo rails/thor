@@ -42,7 +42,11 @@ class Thor
     # config<Hash>:: Configuration for this Thor class.
     #
     def initialize(args = [], local_options = {}, config = {})
-      parse_options = self.class.class_options
+      parse_options = self.class.class_options.dup
+
+      ignored_options = config[:current_command] ? config[:current_command].ignored_options : []
+
+      parse_options.reject! { |k, _v| ignored_options.include?(k) }
 
       # The start method splits inbound arguments at the first argument
       # that looks like an option (starts with - or --). It then calls
@@ -512,15 +516,16 @@ class Thor
       # Prints the class options per group. If an option does not belong to
       # any group, it's printed as Class option.
       #
-      def class_options_help(shell, groups = {}) #:nodoc:
+      def class_options_help(shell, ignored_options = [], groups = {}) #:nodoc:
         # Group options by group
-        class_options.each do |_, value|
+        class_options.each do |key, value|
           groups[value.group] ||= []
-          groups[value.group] << value
+          groups[value.group] << value unless ignored_options.include? key
         end
 
         # Deal with default group
         global_options = groups.delete(nil) || []
+
         print_options(shell, global_options)
 
         # Print all others

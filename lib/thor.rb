@@ -121,6 +121,16 @@ class Thor
 
     alias_method :options, :method_options
 
+
+    # Declares the class options which can be ignored for given command
+    # 
+    # ==== Parameters
+    # list<Array>:: List of class options to be ignored
+    #
+    def ignore_class_options(list = nil)
+      @class_options_to_ignore ||= list
+    end
+
     # Adds an option to the set of method options. If :for is given as option,
     # it allows you to change the options from a previous defined command.
     #
@@ -172,7 +182,8 @@ class Thor
       shell.say "Usage:"
       shell.say "  #{banner(command)}"
       shell.say
-      class_options_help(shell, nil => command.options.values)
+      class_options_help(shell, command.ignored_options, nil => command.options.values)
+
       if command.long_description
         shell.say "Description:"
         shell.print_wrapped(command.long_description, :indent => 2)
@@ -412,7 +423,7 @@ class Thor
 
       if @usage && @desc
         base_class = @hide ? Thor::HiddenCommand : Thor::Command
-        commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
+        commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options, ignore_class_options)
         @usage, @desc, @long_desc, @method_options, @hide = nil
         true
       elsif all_commands[meth] || meth == "method_missing"
