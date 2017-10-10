@@ -29,6 +29,7 @@ group :test do
   gem "tins", "< 1.7" # This is to support Ruby 1.8 and 1.9
   if RUBY_VERSION < "1.9.3"
     gem "webmock", ">= 1.20", "< 2" # This is to support Ruby 1.8 and 1.9.2
+    gem "hashdiff", "< 0.3.6" # Hashdiff 0.3.6 no longer supports Ruby 1.8
   else
     gem "webmock"
   end
