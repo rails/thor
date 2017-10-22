@@ -113,7 +113,7 @@ class Thor
       end
 
       # Whenever a class inherits from Thor or Thor::Group, we should track the
-      # class and the file on Thor::Base. This is the method responsable for it.
+      # class and the file on Thor::Base. This is the method responsible for it.
       #
       def register_klass_file(klass) #:nodoc:
         file = caller[1].match(/(.*):\d+/)[1]

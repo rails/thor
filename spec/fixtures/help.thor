@@ -2,7 +2,7 @@ Bundler.require :development, :default
 
 class Help < Thor
 
-  desc :bugs, "ALL TEH BUGZ!"
+  desc :bugs, "ALL THE BUGZ!"
   option "--not_help", :type => :boolean
   def bugs
     puts "Invoked!"

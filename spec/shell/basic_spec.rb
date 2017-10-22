@@ -74,7 +74,7 @@ describe Thor::Shell::Basic do
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq("chocolate")
     end
 
-    it "prints a message to the user with the available options and reasks the question after an incorrect repsonse" do
+    it "prints a message to the user with the available options and reasks the question after an incorrect response" do
       flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
       expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', :limited_to => flavors).and_return("moose tracks", "chocolate")
@@ -86,7 +86,7 @@ describe Thor::Shell::Basic do
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :default => "vanilla")).to eq("vanilla")
     end
 
-    it "prints a message to the user with the available options and reasks the question after an incorrect repsonse and then returns the default" do
+    it "prints a message to the user with the available options and reasks the question after an incorrect response and then returns the default" do
       flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
       expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ', :default => "vanilla", :limited_to => flavors).and_return("moose tracks", "")
