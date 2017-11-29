@@ -86,6 +86,11 @@ describe Thor::Actions do
         expect(runner.relative_to_original_destination_root("/test/file")).to eq("/test/file")
       end
 
+      it "removes the root path from the absolute path only once" do
+        runner.destination_root = "/app"
+        expect(runner.relative_to_original_destination_root("/app/project/application")).to eq("project/application")
+      end
+
       it "does not fail with files containing regexp characters" do
         runner = MyCounter.new([1], {}, :destination_root => File.join(destination_root, "fo[o-b]ar"))
         expect(runner.relative_to_original_destination_root("bar")).to eq("bar")
