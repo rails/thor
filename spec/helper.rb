@@ -45,7 +45,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
-    allow(Thor).to receive(:exit_on_failure?).and_return(false)
+    allow_any_instance_of(Thor::Base::ClassMethods).to receive(:exit_on_failure?).and_return(false)
   end
 
   config.expect_with :rspec do |c|
