@@ -39,7 +39,7 @@ describe Thor::Actions do
     end
 
     it "when behavior is set to skip, overwrite options" do
-      runner = MyCounter.new([1], %w[--force], :behavior => :skip)
+      runner = MyCounter.new([1], %w(--force), :behavior => :skip)
       expect(runner.behavior).to eq(:invoke)
       expect(runner.options.force).not_to be true
       expect(runner.options.skip).to be true
@@ -121,7 +121,7 @@ describe Thor::Actions do
 
       it "finds a template inside the source path" do
         expect(runner.find_in_source_paths("doc")).to eq(File.expand_path("doc", source_root))
-        expect { runner.find_in_source_paths("README") }.to raise_error
+        expect { runner.find_in_source_paths("README") }.to raise_error(Thor::Error, /Could not find "README" in any of your source paths./)
 
         new_path = File.join(source_root, "doc")
         runner.instance_variable_set(:@source_paths, nil)
@@ -204,7 +204,7 @@ describe Thor::Actions do
 
   describe "#apply" do
     before do
-      @template = <<-TEMPLATE
+      @template = <<-TEMPLATE.dup
         @foo = "FOO"
         say_status :cool, :padding
       TEMPLATE
@@ -253,25 +253,35 @@ describe Thor::Actions do
   end
 
   describe "#run" do
-    before do
-      expect(runner).to receive(:system).with("ls")
+    describe "when not pretending" do
+      before do
+        expect(runner).to receive(:system).with("ls")
+      end
+
+      it "executes the command given" do
+        action :run, "ls"
+      end
+
+      it "logs status" do
+        expect(action(:run, "ls")).to eq("         run  ls from \".\"\n")
+      end
+
+      it "does not log status if required" do
+        expect(action(:run, "ls", :verbose => false)).to be_empty
+      end
+
+      it "accepts a color as status" do
+        expect(runner.shell).to receive(:say_status).with(:run, 'ls from "."', :yellow)
+        action :run, "ls", :verbose => :yellow
+      end
     end
 
-    it "executes the command given" do
-      action :run, "ls"
-    end
-
-    it "logs status" do
-      expect(action(:run, "ls")).to eq("         run  ls from \".\"\n")
-    end
-
-    it "does not log status if required" do
-      expect(action(:run, "ls", :verbose => false)).to be_empty
-    end
-
-    it "accepts a color as status" do
-      expect(runner.shell).to receive(:say_status).with(:run, 'ls from "."', :yellow)
-      action :run, "ls", :verbose => :yellow
+    describe "when pretending" do
+      it "doesn't execute the command" do
+        runner = MyCounter.new([1], %w(--pretend))
+        expect(runner).not_to receive(:system)
+        runner.run("ls", :verbose => false)
+      end
     end
   end
 

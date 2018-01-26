@@ -1,6 +1,7 @@
 require "helper"
 
 class Application; end
+module ApplicationHelper; end
 
 describe Thor::Actions do
   def runner(options = {})
@@ -29,23 +30,23 @@ describe Thor::Actions do
 
   describe "#chmod" do
     it "executes the command given" do
-      expect(FileUtils).to receive(:chmod_R).with(0755, file) # rubocop:disable SymbolName
+      expect(FileUtils).to receive(:chmod_R).with(0755, file)
       action :chmod, "foo", 0755
     end
 
     it "does not execute the command if pretending" do
-      expect(FileUtils).not_to receive(:chmod_R) # rubocop:disable SymbolName
+      expect(FileUtils).not_to receive(:chmod_R)
       runner(:pretend => true)
       action :chmod, "foo", 0755
     end
 
     it "logs status" do
-      expect(FileUtils).to receive(:chmod_R).with(0755, file) # rubocop:disable SymbolName
+      expect(FileUtils).to receive(:chmod_R).with(0755, file)
       expect(action(:chmod, "foo", 0755)).to eq("       chmod  foo\n")
     end
 
     it "does not log status if required" do
-      expect(FileUtils).to receive(:chmod_R).with(0755, file) # rubocop:disable SymbolName
+      expect(FileUtils).to receive(:chmod_R).with(0755, file)
       expect(action(:chmod, "foo", 0755, :verbose => false)).to be_empty
     end
   end
@@ -122,7 +123,7 @@ describe Thor::Actions do
     end
 
     it "allows the destination to be set as a block result" do
-      action(:get, "doc/README") { |c| "docs/README" }
+      action(:get, "doc/README") { "docs/README" }
       exists_and_identical?("doc/README", "docs/README")
     end
 
@@ -207,7 +208,7 @@ describe Thor::Actions do
 
     it "accepts a context to use as the binding" do
       begin
-        @klass = 'FooBar'
+        @klass = "FooBar"
         action :template, "doc/config.rb", :context => eval("binding")
         expect(File.read(File.join(destination_root, "doc/config.rb"))).to eq("class FooBar; end\n")
       ensure
@@ -220,6 +221,18 @@ describe Thor::Actions do
 
       file = File.join(destination_root, "doc/config.yaml")
       expect(File.exist?(file)).to be true
+    end
+
+    it "has proper ERB stacktraces" do
+      error = nil
+      begin
+        action :template, "template/bad_config.yaml.tt"
+      rescue => e
+        error = e
+      end
+
+      expect(error).to be_a NameError
+      expect(error.backtrace.to_s).to include("bad_config.yaml.tt:2")
     end
   end
 
@@ -271,7 +284,7 @@ describe Thor::Actions do
       end
 
       it "accepts a block" do
-        action(:gsub_file, "doc/README", "__start__") { |match| match.gsub("__", "").upcase  }
+        action(:gsub_file, "doc/README", "__start__") { |match| match.gsub("__", "").upcase }
         expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
       end
 
@@ -338,6 +351,31 @@ describe Thor::Actions do
       it "does not append if class name does not match" do
         action :inject_into_class, "application.rb", "App", "  filter_parameters :password\n"
         expect(File.binread(file)).to eq("class Application < Base\nend\n")
+      end
+    end
+
+    describe "#inject_into_module" do
+      def file
+        File.join(destination_root, "application_helper.rb")
+      end
+
+      it "appends content to a module" do
+        action :inject_into_module, "application_helper.rb", ApplicationHelper, "  def help; 'help'; end\n"
+        expect(File.binread(file)).to eq("module ApplicationHelper\n  def help; 'help'; end\nend\n")
+      end
+
+      it "accepts a block" do
+        action(:inject_into_module, "application_helper.rb", ApplicationHelper) { "  def help; 'help'; end\n" }
+        expect(File.binread(file)).to eq("module ApplicationHelper\n  def help; 'help'; end\nend\n")
+      end
+
+      it "logs status" do
+        expect(action(:inject_into_module, "application_helper.rb", ApplicationHelper, "  def help; 'help'; end\n")).to eq("      insert  application_helper.rb\n")
+      end
+
+      it "does not append if class name does not match" do
+        action :inject_into_module, "application_helper.rb", "App", "  def help; 'help'; end\n"
+        expect(File.binread(file)).to eq("module ApplicationHelper\nend\n")
       end
     end
   end

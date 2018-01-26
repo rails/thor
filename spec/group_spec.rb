@@ -3,22 +3,22 @@ require "helper"
 describe Thor::Group do
   describe "command" do
     it "allows to use private methods from parent class as commands" do
-      expect(ChildGroup.start).to eq(%w[bar foo baz])
+      expect(ChildGroup.start).to eq(%w(bar foo baz))
       expect(ChildGroup.new.baz("bar")).to eq("bar")
     end
   end
 
   describe "#start" do
     it "invokes all the commands under the Thor group" do
-      expect(MyCounter.start(%w[1 2 --third 3])).to eq([1, 2, 3, nil, nil, nil])
+      expect(MyCounter.start(%w(1 2 --third 3))).to eq([1, 2, 3, nil, nil, nil])
     end
 
     it "uses argument's default value" do
-      expect(MyCounter.start(%w[1 --third 3])).to eq([1, 2, 3, nil, nil, nil])
+      expect(MyCounter.start(%w(1 --third 3))).to eq([1, 2, 3, nil, nil, nil])
     end
 
     it "invokes all the commands in the Thor group and its parents" do
-      expect(BrokenCounter.start(%w[1 2 --third 3])).to eq([nil, 2, 3, false, 5, nil])
+      expect(BrokenCounter.start(%w(1 2 --third 3))).to eq([nil, 2, 3, false, 5, nil])
     end
 
     it "raises an error if a required argument is added after a non-required" do
@@ -28,7 +28,7 @@ describe Thor::Group do
     end
 
     it "raises when an exception happens within the command call" do
-      expect { BrokenCounter.start(%w[1 2 --fail]) }.to raise_error
+      expect { BrokenCounter.start(%w(1 2 --fail)) }.to raise_error(NameError, /undefined local variable or method `this_method_does_not_exist'/)
     end
 
     it "raises an error when a Thor group command expects arguments" do
@@ -37,7 +37,7 @@ describe Thor::Group do
 
     it "invokes help message if any of the shortcuts are given" do
       expect(MyCounter).to receive(:help)
-      MyCounter.start(%w[-h])
+      MyCounter.start(%w(-h))
     end
   end
 
@@ -117,11 +117,11 @@ describe Thor::Group do
       end
 
       it "does not invoke if the option is nil" do
-        expect(capture(:stdout) { G.start(%w[--skip-invoked]) }).not_to match(/invoke/)
+        expect(capture(:stdout) { G.start(%w(--skip-invoked)) }).not_to match(/invoke/)
       end
 
       it "prints a message if invocation cannot be found" do
-        content = capture(:stdout) { G.start(%w[--invoked unknown]) }
+        content = capture(:stdout) { G.start(%w(--invoked unknown)) }
         expect(content).to match(/error  unknown \[not found\]/)
       end
 
@@ -129,7 +129,7 @@ describe Thor::Group do
         error = nil
         content = capture(:stdout) do
           error = capture(:stderr) do
-            G.start(%w[--invoked e])
+            G.start(%w(--invoked e))
           end
         end
         expect(content).to match(/invoke  e/)
@@ -162,7 +162,7 @@ describe Thor::Group do
       end
 
       it "does not invoke if the option is false" do
-        expect(capture(:stdout) { H.start(%w[--no-defined]) }).not_to match(/invoke/)
+        expect(capture(:stdout) { H.start(%w(--no-defined)) }).not_to match(/invoke/)
       end
 
       it "shows invocation information to the user" do
@@ -190,14 +190,14 @@ describe Thor::Group do
         class_option :loud, :type => :boolean
 
         def hi
-          name.upcase! if options[:loud]
+          self.name = name.upcase if options[:loud]
           "Hi #{name}"
         end
       end
 
-      expect(klass.start(%w[jose])).to eq(["Hi jose"])
-      expect(klass.start(%w[jose --loud])).to eq(["Hi JOSE"])
-      expect(klass.start(%w[--loud jose])).to eq(["Hi JOSE"])
+      expect(klass.start(%w(jose))).to eq(["Hi jose"])
+      expect(klass.start(%w(jose --loud))).to eq(["Hi JOSE"])
+      expect(klass.start(%w(--loud jose))).to eq(["Hi JOSE"])
     end
 
     it "provides extra args as `args`" do
@@ -207,16 +207,16 @@ describe Thor::Group do
         class_option :loud, :type => :boolean
 
         def hi
-          name.upcase! if options[:loud]
+          self.name = name.upcase if options[:loud]
           out = "Hi #{name}"
           out << ": " << args.join(", ") unless args.empty?
           out
         end
       end
 
-      expect(klass.start(%w[jose])).to eq(["Hi jose"])
-      expect(klass.start(%w[jose --loud])).to eq(["Hi JOSE"])
-      expect(klass.start(%w[--loud jose])).to eq(["Hi JOSE"])
+      expect(klass.start(%w(jose))).to eq(["Hi jose"])
+      expect(klass.start(%w(jose --loud))).to eq(["Hi JOSE"])
+      expect(klass.start(%w(--loud jose))).to eq(["Hi JOSE"])
     end
   end
 end

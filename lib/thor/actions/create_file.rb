@@ -58,6 +58,7 @@ class Thor
 
       def invoke!
         invoke_with_conflict_check do
+          require "fileutils"
           FileUtils.mkdir_p(File.dirname(destination))
           File.open(destination, "wb") { |f| f.write render }
         end
@@ -84,7 +85,7 @@ class Thor
       def force_or_skip_or_conflict(force, skip, &block)
         if force
           say_status :force, :yellow
-          block.call unless pretend?
+          yield unless pretend?
         elsif skip
           say_status :skip, :yellow
         else

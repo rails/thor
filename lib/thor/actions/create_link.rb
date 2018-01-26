@@ -14,7 +14,7 @@ class Thor
     #
     #   create_link "config/apache.conf", "/etc/apache.conf"
     #
-    def create_link(destination, *args, &block)
+    def create_link(destination, *args)
       config = args.last.is_a?(Hash) ? args.pop : {}
       source = args.first
       action CreateLink.new(self, destination, source, config)
@@ -38,6 +38,7 @@ class Thor
 
       def invoke!
         invoke_with_conflict_check do
+          require "fileutils"
           FileUtils.mkdir_p(File.dirname(destination))
           # Create a symlink by default
           config[:symbolic] = true if config[:symbolic].nil?

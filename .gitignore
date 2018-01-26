@@ -28,7 +28,7 @@ Session.vim
 _yardoc
 auto-save-list
 coverage
-doc/
+/doc/
 lib/bundler/man
 pkg
 pkg/*

@@ -24,7 +24,7 @@ describe Thor::Actions::Directory do
   end
 
   def exists_and_identical?(source_path, destination_path)
-    %w[config.rb README].each do |file|
+    %w(config.rb README).each do |file|
       source      = File.join(source_root, source_path, file)
       destination = File.join(destination_root, destination_path, file)
 
@@ -69,7 +69,7 @@ describe Thor::Actions::Directory do
     end
 
     it "ignores files within excluding/ directories when exclude_pattern is provided" do
-      invoke! "doc", "docs", :exclude_pattern => /excluding\//
+      invoke! "doc", "docs", :exclude_pattern => %r{excluding/}
       file = File.join(destination_root, "docs", "excluding", "rdoc.rb")
       expect(File.exist?(file)).to be false
     end
@@ -128,10 +128,10 @@ describe Thor::Actions::Directory do
 
     it "logs status" do
       content = invoke!("doc")
-      expect(content).to match(/create  doc\/README/)
-      expect(content).to match(/create  doc\/config\.rb/)
-      expect(content).to match(/create  doc\/rdoc\.rb/)
-      expect(content).to match(/create  doc\/components/)
+      expect(content).to match(%r{create  doc/README})
+      expect(content).to match(%r{create  doc/config\.rb})
+      expect(content).to match(%r{create  doc/rdoc\.rb})
+      expect(content).to match(%r{create  doc/components})
     end
 
     it "yields a block" do
@@ -144,7 +144,7 @@ describe Thor::Actions::Directory do
 
     it "works with glob characters in the path" do
       content = invoke!("app{1}")
-      expect(content).to match(/create  app\{1\}\/README/)
+      expect(content).to match(%r{create  app\{1\}/README})
     end
   end
 

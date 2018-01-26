@@ -1,3 +1,4 @@
+# encoding: utf-8
 require "helper"
 require "thor/actions"
 
@@ -70,6 +71,25 @@ describe Thor::Actions::InjectIntoFile do
       expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
     end
 
+    it "does not attempt to change the file if it doesn't exist - instead raises Thor::Error" do
+      expect do
+        invoke! "idontexist", :before => "something" do
+          "any content"
+        end
+      end.to raise_error(Thor::Error, /does not appear to exist/)
+      expect(File.exist?("idontexist")).to be_falsey
+    end
+
+    it "does not attempt to change the file if it doesn't exist and pretending" do
+      expect do
+        invoker :pretend => true
+        invoke! "idontexist", :before => "something" do
+          "any content"
+        end
+      end.not_to raise_error
+      expect(File.exist?("idontexist")).to be_falsey
+    end
+
     it "does change the file if already includes content and :force is true" do
       invoke! "doc/README", :before => "__end__" do
         "more content\n"
@@ -84,6 +104,10 @@ describe Thor::Actions::InjectIntoFile do
       expect(File.read(file)).to eq("__start__\nREADME\nmore content\nmore content\n__end__\n")
     end
 
+    it "can insert chinese" do
+      invoke! "doc/README.zh", "\n中文", :after => "__start__"
+      expect(File.read(File.join(destination_root, "doc/README.zh"))).to eq("__start__\n中文\n说明\n__end__\n")
+    end
   end
 
   describe "#revoke!" do

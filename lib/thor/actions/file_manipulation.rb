@@ -1,5 +1,4 @@
 require "erb"
-require "open-uri"
 
 class Thor
   module Actions
@@ -26,7 +25,7 @@ class Thor
 
       create_file destination, nil, config do
         content = File.binread(source)
-        content = block.call(content) if block
+        content = yield(content) if block
         content
       end
       if config[:mode] == :preserve
@@ -49,7 +48,7 @@ class Thor
     #
     #   link_file "doc/README"
     #
-    def link_file(source, *args, &block)
+    def link_file(source, *args)
       config = args.last.is_a?(Hash) ? args.pop : {}
       destination = args.first || source
       source = File.expand_path(find_in_source_paths(source.to_s))
@@ -78,11 +77,16 @@ class Thor
       config = args.last.is_a?(Hash) ? args.pop : {}
       destination = args.first
 
-      source = File.expand_path(find_in_source_paths(source.to_s)) unless source =~ %r{^https?\://}
+      if source =~ %r{^https?\://}
+        require "open-uri"
+      else
+        source = File.expand_path(find_in_source_paths(source.to_s))
+      end
+
       render = open(source) { |input| input.binmode.read }
 
       destination ||= if block_given?
-        block.arity == 1 ? block.call(render) : block.call
+        block.arity == 1 ? yield(render) : yield
       else
         File.basename(source)
       end
@@ -113,8 +117,10 @@ class Thor
       context = config.delete(:context) || instance_eval("binding")
 
       create_file destination, nil, config do
-        content = CapturableERB.new(::File.binread(source), nil, "-", "@output_buffer").result(context)
-        content = block.call(content) if block
+        content = CapturableERB.new(::File.binread(source), nil, "-", "@output_buffer").tap do |erb|
+          erb.filename = source
+        end.result(context)
+        content = yield(content) if block
         content
       end
     end
@@ -134,7 +140,10 @@ class Thor
       return unless behavior == :invoke
       path = File.expand_path(path, destination_root)
       say_status :chmod, relative_to_original_destination_root(path), config.fetch(:verbose, true)
-      FileUtils.chmod_R(mode, path) unless options[:pretend]
+      unless options[:pretend]
+        require "fileutils"
+        FileUtils.chmod_R(mode, path)
+      end
     end
 
     # Prepend text to a file. Since it depends on insert_into_file, it's reversible.
@@ -154,7 +163,7 @@ class Thor
     #
     def prepend_to_file(path, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
-      config.merge!(:after => /\A/)
+      config[:after] = /\A/
       insert_into_file(path, *(args << config), &block)
     end
     alias_method :prepend_file, :prepend_to_file
@@ -176,7 +185,7 @@ class Thor
     #
     def append_to_file(path, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
-      config.merge!(:before => /\z/)
+      config[:before] = /\z/
       insert_into_file(path, *(args << config), &block)
     end
     alias_method :append_file, :append_to_file
@@ -200,7 +209,30 @@ class Thor
     #
     def inject_into_class(path, klass, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
-      config.merge!(:after => /class #{klass}\n|class #{klass} .*\n/)
+      config[:after] = /class #{klass}\n|class #{klass} .*\n/
+      insert_into_file(path, *(args << config), &block)
+    end
+
+    # Injects text right after the module definition. Since it depends on
+    # insert_into_file, it's reversible.
+    #
+    # ==== Parameters
+    # path<String>:: path of the file to be changed
+    # module_name<String|Class>:: the module to be manipulated
+    # data<String>:: the data to append to the class, can be also given as a block.
+    # config<Hash>:: give :verbose => false to not log the status.
+    #
+    # ==== Examples
+    #
+    #   inject_into_module "app/helpers/application_helper.rb", ApplicationHelper, "  def help; 'help'; end\n"
+    #
+    #   inject_into_module "app/helpers/application_helper.rb", ApplicationHelper do
+    #     "  def help; 'help'; end\n"
+    #   end
+    #
+    def inject_into_module(path, module_name, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
+      config[:after] = /module #{module_name}\n|module #{module_name} .*\n/
       insert_into_file(path, *(args << config), &block)
     end
 
@@ -285,10 +317,13 @@ class Thor
     #
     def remove_file(path, config = {})
       return unless behavior == :invoke
-      path  = File.expand_path(path, destination_root)
+      path = File.expand_path(path, destination_root)
 
       say_status :remove, relative_to_original_destination_root(path), config.fetch(:verbose, true)
-      ::FileUtils.rm_rf(path) if !options[:pretend] && File.exist?(path)
+      if !options[:pretend] && File.exist?(path)
+        require "fileutils"
+        ::FileUtils.rm_rf(path)
+      end
     end
     alias_method :remove_dir, :remove_file
 
@@ -301,12 +336,14 @@ class Thor
       @output_buffer.concat(string)
     end
 
-    def capture(*args, &block)
-      with_output_buffer { block.call(*args) }
+    def capture(*args)
+      with_output_buffer { yield(*args) }
     end
 
-    def with_output_buffer(buf = "") #:nodoc:
-      self.output_buffer, old_buffer = buf, output_buffer
+    def with_output_buffer(buf = "".dup) #:nodoc:
+      raise ArgumentError, "Buffer can not be a frozen object" if buf.frozen?
+      old_buffer = output_buffer
+      self.output_buffer = buf
       yield
       output_buffer
     ensure
@@ -316,10 +353,10 @@ class Thor
     # Thor::Actions#capture depends on what kind of buffer is used in ERB.
     # Thus CapturableERB fixes ERB to use String buffer.
     class CapturableERB < ERB
-      def set_eoutvar(compiler, eoutvar = '_erbout')
+      def set_eoutvar(compiler, eoutvar = "_erbout")
         compiler.put_cmd = "#{eoutvar}.concat"
         compiler.insert_cmd = "#{eoutvar}.concat"
-        compiler.pre_cmd = ["#{eoutvar} = ''"]
+        compiler.pre_cmd = ["#{eoutvar} = ''.dup"]
         compiler.post_cmd = [eoutvar]
       end
     end

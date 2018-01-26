@@ -1,44 +1,41 @@
 AllCops:
-  Includes:
-    - 'Gemfile'
-    - 'Thorfile'
-    - 'thor.gemspec'
+  TargetRubyVersion: 2.2
 
-# Avoid long parameter lists
-ParameterLists:
-  Max: 5
+Metrics/ParameterLists:
+  Max: 6
   CountKeywordArgs: true
 
-MethodLength:
+Metrics/MethodLength:
+  Max: 25
   CountComments: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/ClassLength:
+  Max: 300
+
+Metrics/ModuleLength:
+  Max: 300
+
+Metrics/BlockLength:
+  Max: 30
+
+Metrics/CyclomaticComplexity:
+  Max: 12
+
+Metrics/PerceivedComplexity:
   Max: 15
 
-# Avoid more than `Max` levels of nesting.
 BlockNesting:
   Max: 4
 
-# Align with the style guide.
-CollectionMethods:
-  PreferredMethods:
-    collect:  'map'
-    inject:   'reduce'
-    find:     'detect'
-    find_all: 'select'
+Metrics/LineLength:
+  Enabled: false
 
-# Do not force public/protected/private keyword to be indented at the same
-# level as the def keyword. My personal preference is to outdent these keywords
-# because I think when scanning code it makes it easier to identify the
-# sections of code and visually separate them. When the keyword is at the same
-# level I think it sort of blends in with the def keywords and makes it harder
-# to scan the code and see where the sections are.
 AccessModifierIndentation:
   Enabled: false
 
-# Limit line length
-LineLength:
-  Enabled: false
-
-# Disable documentation checking until a class needs to be documented once
 Documentation:
   Enabled: false
 
@@ -67,27 +64,121 @@ EmptyLinesAroundAccessModifier:
 
 # Align ends correctly
 EndAlignment:
-  AlignWith: variable
+  EnforcedStyleAlignWith: variable
 
 # Indentation of when/else
 CaseIndentation:
-  IndentWhenRelativeTo: end
+  EnforcedStyle: end
   IndentOneStep: false
 
 DoubleNegation:
   Enabled: false
 
-PercentLiteralDelimiters:
-  PreferredDelimiters:
-    '%':  ()
-    '%i': ()
-    '%q': ()
-    '%Q': ()
-    '%r': '{}'
-    '%s': ()
-    '%w': '[]'
-    '%W': '[]'
-    '%x': ()
-
 StringLiterals:
   EnforcedStyle: double_quotes
+
+Style/SymbolLiteral:
+  Enabled: false
+
+Lint/AssignmentInCondition:
+  Exclude:
+    - 'lib/thor/line_editor/readline.rb'
+    - 'lib/thor/parser/arguments.rb'
+
+Lint/EndAlignment:
+  Exclude:
+    - 'lib/thor/actions.rb'
+    - 'lib/thor/parser/option.rb'
+
+Security/Eval:
+  Exclude:
+    - 'spec/helper.rb'
+
+Lint/HandleExceptions:
+  Exclude:
+    - 'lib/thor/line_editor/readline.rb'
+
+Lint/PercentStringArray:
+  Exclude:
+    - 'spec/parser/options_spec.rb'
+
+Lint/UnusedMethodArgument:
+  Exclude:
+    - 'lib/thor.rb'
+    - 'lib/thor/base.rb'
+    - 'lib/thor/command.rb'
+    - 'lib/thor/parser/arguments.rb'
+    - 'lib/thor/shell/html.rb'
+    - 'spec/actions/empty_directory_spec.rb'
+
+Style/AccessorMethodName:
+  Exclude:
+    - 'lib/thor/line_editor/basic.rb'
+
+Style/Alias:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Exclude:
+    - 'lib/thor/group.rb'
+    - 'lib/thor/runner.rb'
+    - 'spec/shell_spec.rb'
+    - 'spec/util_spec.rb'
+
+Style/ClassVars:
+  Exclude:
+    - 'lib/thor/util.rb'
+    - 'spec/util_spec.rb'
+
+Style/ConstantName:
+  Exclude:
+    - 'spec/line_editor_spec.rb'
+
+Style/GlobalVars:
+  Exclude:
+    - 'bin/thor'
+    - 'lib/thor.rb'
+    - 'lib/thor/base.rb'
+    - 'lib/thor/shell/basic.rb'
+    - 'spec/helper.rb'
+    - 'spec/rake_compat_spec.rb'
+    - 'spec/register_spec.rb'
+    - 'spec/thor_spec.rb'
+
+Style/IndentArray:
+  EnforcedStyle: consistent
+
+Style/MethodMissing:
+  Exclude:
+    - 'lib/thor/core_ext/hash_with_indifferent_access.rb'
+    - 'lib/thor/runner.rb'
+
+Style/MutableConstant:
+  Enabled: false
+
+Style/NumericLiteralPrefix:
+  Exclude:
+    - 'spec/actions/file_manipulation_spec.rb'
+
+Style/NumericPredicate:
+  Exclude:
+    - 'spec/**/*'
+    - 'lib/thor/parser/option.rb'
+
+Style/PerlBackrefs:
+  Exclude:
+    - 'lib/thor/actions/empty_directory.rb'
+    - 'lib/thor/core_ext/hash_with_indifferent_access.rb'
+    - 'lib/thor/parser/arguments.rb'
+    - 'lib/thor/parser/options.rb'
+
+Style/TrailingUnderscoreVariable:
+  Exclude:
+    - 'lib/thor/group.rb'
+
+Style/TrailingWhitespace:
+  Exclude:
+    - 'spec/shell/basic_spec.rb'
+
+Style/AlignParameters:
+  Enabled: false
