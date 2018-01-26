@@ -16,7 +16,7 @@ describe Thor::Shell::Color do
       shell.ask "Is this green?", :green
 
       expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? [Yes, No, Maybe] \e[0m", anything).and_return("Yes")
-      shell.ask "Is this green?", :green, :limited_to => %w[Yes No Maybe]
+      shell.ask "Is this green?", :green, :limited_to => %w(Yes No Maybe)
     end
 
     it "handles an Array of colors" do
@@ -71,7 +71,6 @@ describe Thor::Shell::Color do
 
       expect(out.chomp).to eq("\e[1m\e[34mWow! This still works?\e[0m")
     end
-
   end
 
   describe "#say_status" do

@@ -37,7 +37,7 @@ describe Thor::Arguments do
     it "accepts arrays" do
       create :string => nil, :array => nil
       expect(parse("product", "title", "age")["string"]).to eq("product")
-      expect(parse("product", "title", "age")["array"]).to eq(%w[title age])
+      expect(parse("product", "title", "age")["array"]).to eq(%w(title age))
     end
 
     describe "with no inputs" do

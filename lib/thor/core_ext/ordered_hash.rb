@@ -118,7 +118,7 @@ class Thor
           "#<#{self.class} #{super}>"
         end
 
-      private
+        private
 
         def sync_keys!
           @keys.delete_if { |k| !key?(k) }

@@ -1,6 +1,6 @@
 $TESTING = true
 
-if RUBY_VERSION >= '1.9'
+if RUBY_VERSION >= "1.9"
   require "simplecov"
   require "coveralls"
 
@@ -8,7 +8,7 @@ if RUBY_VERSION >= '1.9'
 
   SimpleCov.start do
     add_filter "/spec"
-    minimum_coverage(91.69)
+    minimum_coverage(90)
   end
 end
 
@@ -24,11 +24,11 @@ require "webmock/rspec"
 
 WebMock.disable_net_connect!(:allow => "coveralls.io")
 
-
 # Set shell to basic
 $0 = "thor"
 $thor_runner = true
 ARGV.clear
+Encoding.default_external = Encoding::UTF_8 if RUBY_VERSION > '1.8.7'
 Thor::Base.shell = Thor::Shell::Basic
 
 # Load fixtures
@@ -76,7 +76,8 @@ RSpec.configure do |config|
   # This code was adapted from Ruby on Rails, available under MIT-LICENSE
   # Copyright (c) 2004-2013 David Heinemeier Hansson
   def silence_warnings
-    old_verbose, $VERBOSE = $VERBOSE, nil
+    old_verbose = $VERBOSE
+    $VERBOSE = nil
     yield
   ensure
     $VERBOSE = old_verbose

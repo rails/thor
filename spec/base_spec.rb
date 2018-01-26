@@ -54,12 +54,12 @@ describe Thor::Base do
 
   describe "#argument" do
     it "sets a value as required and creates an accessor for it" do
-      expect(MyCounter.start(%w[1 2 --third 3])[0]).to eq(1)
-      expect(Scripts::MyScript.start(%w[zoo my_special_param --param=normal_param])).to eq("my_special_param")
+      expect(MyCounter.start(%w(1 2 --third 3))[0]).to eq(1)
+      expect(Scripts::MyScript.start(%w(zoo my_special_param --param=normal_param))).to eq("my_special_param")
     end
 
     it "does not set a value in the options hash" do
-      expect(BrokenCounter.start(%w[1 2 --third 3])[0]).to be nil
+      expect(BrokenCounter.start(%w(1 2 --third 3))[0]).to be nil
     end
   end
 
@@ -71,22 +71,22 @@ describe Thor::Base do
 
   describe ":aliases" do
     it "supports string aliases without a dash prefix" do
-      expect(MyCounter.start(%w[1 2 -z 3])[4]).to eq(3)
+      expect(MyCounter.start(%w(1 2 -z 3))[4]).to eq(3)
     end
 
     it "supports symbol aliases" do
-      expect(MyCounter.start(%w[1 2 -y 3])[5]).to eq(3)
-      expect(MyCounter.start(%w[1 2 -r 3])[5]).to eq(3)
+      expect(MyCounter.start(%w(1 2 -y 3))[5]).to eq(3)
+      expect(MyCounter.start(%w(1 2 -r 3))[5]).to eq(3)
     end
   end
 
   describe "#class_option" do
     it "sets options class wise" do
-      expect(MyCounter.start(%w[1 2 --third 3])[2]).to eq(3)
+      expect(MyCounter.start(%w(1 2 --third 3))[2]).to eq(3)
     end
 
     it "does not create an accessor for it" do
-      expect(BrokenCounter.start(%w[1 2 --third 3])[3]).to be false
+      expect(BrokenCounter.start(%w(1 2 --third 3))[3]).to be false
     end
   end
 
@@ -249,7 +249,7 @@ describe Thor::Base do
         ENV["THOR_DEBUG"] = "1"
 
         expect do
-          MyScript.start %w[what --debug]
+          MyScript.start %w(what --debug)
         end.to raise_error(Thor::UndefinedCommandError, 'Could not find command "what" in "my_script" namespace.')
       ensure
         ENV["THOR_DEBUG"] = nil
@@ -258,36 +258,36 @@ describe Thor::Base do
 
     it "raises an error instead of rescuing if :debug option is given" do
       expect do
-        MyScript.start %w[what], :debug => true
+        MyScript.start %w(what), :debug => true
       end.to raise_error(Thor::UndefinedCommandError, 'Could not find command "what" in "my_script" namespace.')
     end
 
     it "does not steal args" do
-      args = %w[foo bar --force true]
+      args = %w(foo bar --force true)
       MyScript.start(args)
-      expect(args).to eq(%w[foo bar --force true])
+      expect(args).to eq(%w(foo bar --force true))
     end
 
     it "checks unknown options" do
       expect(capture(:stderr) do
-        MyScript.start(%w[foo bar --force true --unknown baz])
+        MyScript.start(%w(foo bar --force true --unknown baz))
       end.strip).to eq("Unknown switches '--unknown'")
     end
 
     it "checks unknown options except specified" do
       expect(capture(:stderr) do
-        expect(MyScript.start(%w[with_optional NAME --omg --invalid])).to eq(["NAME", {}, %w[--omg --invalid]])
+        expect(MyScript.start(%w(with_optional NAME --omg --invalid))).to eq(["NAME", {}, %w(--omg --invalid)])
       end.strip).to be_empty
     end
   end
 
   describe "attr_*" do
     it "does not add attr_reader as a command" do
-      expect(capture(:stderr) { MyScript.start(%w[another_attribute]) }).to match(/Could not find/)
+      expect(capture(:stderr) { MyScript.start(%w(another_attribute)) }).to match(/Could not find/)
     end
 
     it "does not add attr_writer as a command" do
-      expect(capture(:stderr) { MyScript.start(%w[another_attribute= foo]) }).to match(/Could not find/)
+      expect(capture(:stderr) { MyScript.start(%w(another_attribute= foo)) }).to match(/Could not find/)
     end
 
     it "does not add attr_accessor as a command" do

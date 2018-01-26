@@ -38,12 +38,12 @@ describe Thor::LineEditor::Readline do
     it "provides tab completion when given a limited_to option" do
       expect(::Readline).to receive(:readline)
       expect(::Readline).to receive(:completion_proc=) do |proc|
-        expect(proc.call("")).to eq %w[Apples Chicken Chocolate]
-        expect(proc.call("Ch")).to eq %w[Chicken Chocolate]
+        expect(proc.call("")).to eq %w(Apples Chicken Chocolate)
+        expect(proc.call("Ch")).to eq %w(Chicken Chocolate)
         expect(proc.call("Chi")).to eq ["Chicken"]
       end
 
-      editor = Thor::LineEditor::Readline.new("Best food: ", :limited_to => %w[Apples Chicken Chocolate])
+      editor = Thor::LineEditor::Readline.new("Best food: ", :limited_to => %w(Apples Chicken Chocolate))
       editor.readline
     end
 

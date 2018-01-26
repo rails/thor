@@ -32,7 +32,7 @@ end
 
 describe Thor::RakeCompat do
   it "sets the rakefile application" do
-    expect(%w[rake_compat_spec.rb Thorfile]).to include(Rake.application.rakefile)
+    expect(%w(rake_compat_spec.rb Thorfile)).to include(Rake.application.rakefile)
   end
 
   it "adds rake tasks to thor classes too" do
@@ -62,11 +62,11 @@ describe Thor::RakeCompat do
 
   it "invoking the thor task invokes the rake task" do
     expect(capture(:stdout) do
-      ThorTask.start %w[cool]
+      ThorTask.start %w(cool)
     end).to eq("COOL\n")
 
     expect(capture(:stdout) do
-      ThorTask::HiperMega.start %w[super]
+      ThorTask::HiperMega.start %w(super)
     end).to eq("HIPER MEGA SUPER\n")
   end
 end

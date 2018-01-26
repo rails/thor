@@ -32,7 +32,8 @@ class Thor
       # config<Hash>:: give :verbose => false to not log the status.
       #
       def initialize(base, destination, config = {})
-        @base, @config   = base, {:verbose => true}.merge(config)
+        @base = base
+        @config = {:verbose => true}.merge(config)
         self.destination = destination
       end
 
@@ -47,12 +48,14 @@ class Thor
 
       def invoke!
         invoke_with_conflict_check do
+          require "fileutils"
           ::FileUtils.mkdir_p(destination)
         end
       end
 
       def revoke!
         say_status :remove, :red
+        require "fileutils"
         ::FileUtils.rm_rf(destination) if !pretend? && exists?
         given_destination
       end
@@ -80,11 +83,10 @@ class Thor
       #   given_destination    #=> baz
       #
       def destination=(destination)
-        if destination
-          @given_destination = convert_encoded_instructions(destination.to_s)
-          @destination = ::File.expand_path(@given_destination, base.destination_root)
-          @relative_destination = base.relative_to_original_destination_root(@destination)
-        end
+        return unless destination
+        @given_destination = convert_encoded_instructions(destination.to_s)
+        @destination = ::File.expand_path(@given_destination, base.destination_root)
+        @relative_destination = base.relative_to_original_destination_root(@destination)
       end
 
       # Filenames in the encoded form are converted. If you have a file:
@@ -112,16 +114,22 @@ class Thor
         if exists?
           on_conflict_behavior(&block)
         else
+          yield unless pretend?
           say_status :create, :green
-          block.call unless pretend?
         end
 
         destination
+      rescue Errno::EISDIR, Errno::EEXIST
+        on_file_clash_behavior
+      end
+
+      def on_file_clash_behavior
+        say_status :file_clash, :red
       end
 
       # What to do when the destination file already exists.
       #
-      def on_conflict_behavior(&block)
+      def on_conflict_behavior
         say_status :exist, :blue
       end
 
