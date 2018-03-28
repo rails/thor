@@ -75,6 +75,8 @@ class Thor
     def parse(args) # rubocop:disable MethodLength
       @pile = args.dup
       @parsing_options = true
+      @hashes = Hash.new { |h, k| h[k] = {} }
+      @arrays = Hash.new { |h, k| h[k] = [] }
 
       while peek
         if parsing_options?
