@@ -307,7 +307,7 @@ class Thor
     def comment_lines(path, flag, *args)
       flag = flag.respond_to?(:source) ? flag.source : flag
 
-      gsub_file(path, /^(\s*)([^#|\n]*#{flag})/, '\1# \2', *args)
+      gsub_file(path, /^(\s*)([^#\n]*#{flag})/, '\1# \2', *args)
     end
 
     # Removes a file at the given location.
