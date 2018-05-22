@@ -47,6 +47,10 @@ class Thor
 
       # Asks something to the user and receives a response.
       #
+      # If a default value is specified it will be presented to the user
+      # and allows them to select that value with an empty response. This
+      # option is ignored when limited answers are supplied.
+      #
       # If asked to limit the correct responses, you can pass in an
       # array of acceptable answers.  If one of those is not supplied,
       # they will be shown a message stating that one of those answers
@@ -62,6 +66,8 @@ class Thor
       #
       # ==== Example
       # ask("What is your name?")
+      #
+      # ask("What is the planet furthest from the sun?", :default => "Pluto")
       #
       # ask("What is your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])
       #
