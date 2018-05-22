@@ -1,6 +1,6 @@
 class Thor
   class Option < Argument #:nodoc:
-    attr_reader :aliases, :group, :lazy_default, :hide
+    attr_reader :aliases, :group, :lazy_default, :hide, :repeatable
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
@@ -8,10 +8,11 @@ class Thor
       @check_default_type = options[:check_default_type]
       options[:required] = false unless options.key?(:required)
       super
-      @lazy_default = options[:lazy_default]
-      @group        = options[:group].to_s.capitalize if options[:group]
-      @aliases      = Array(options[:aliases])
-      @hide         = options[:hide]
+      @lazy_default   = options[:lazy_default]
+      @group          = options[:group].to_s.capitalize if options[:group]
+      @aliases        = Array(options[:aliases])
+      @hide           = options[:hide]
+      @repeatable     = options.fetch(:repeatable, false)
     end
 
     # This parse quick options given as method_options. It makes several
