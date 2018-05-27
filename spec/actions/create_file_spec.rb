@@ -104,7 +104,7 @@ describe Thor::Actions::CreateFile do
         it "shows conflict status to the user" do
           file = File.join(destination_root, "doc/config.rb")
           expect(create_file("doc/config.rb")).not_to be_identical
-          expect(Thor::LineEditor).to receive(:readline).with("Overwrite #{file}? (enter \"h\" for help) [Ynaqdh] ", anything).and_return("s")
+          expect(Thor::LineEditor).to receive(:readline).with("Overwrite #{file}? (enter \"h\" for help) [Ynaqdhm] ", anything).and_return("s")
 
           content = invoke!
           expect(content).to match(%r{conflict  doc/config\.rb})
@@ -127,6 +127,14 @@ describe Thor::Actions::CreateFile do
           create_file("doc/config.rb")
           expect(Thor::LineEditor).to receive(:readline).and_return("d", "n")
           expect(@base.shell).to receive(:system).with(/diff -u/)
+          invoke!
+        end
+
+        it "executes the block given to run merge tool" do
+          create_file("doc/config.rb")
+          allow(@base.shell).to receive(:merge_tool).and_return("meld")
+          expect(Thor::LineEditor).to receive(:readline).and_return("m")
+          expect(@base.shell).to receive(:system).with(/meld/)
           invoke!
         end
       end
