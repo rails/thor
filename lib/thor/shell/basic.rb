@@ -247,11 +247,11 @@ class Thor
       #
       # ==== Parameters
       # destination<String>:: the destination file to solve conflicts
-      # block<Proc>:: an optional block that returns the value to be used in diff
+      # block<Proc>:: an optional block that returns the value to be used in diff and merge
       #
       def file_collision(destination)
         return true if @always_force
-        options = block_given? ? "[Ynaqdh]" : "[Ynaqh]"
+        options = block_given? ? "[Ynaqdhm]" : "[Ynaqh]"
 
         loop do
           answer = ask(
@@ -275,6 +275,13 @@ class Thor
           when is?(:diff)
             show_diff(destination, yield) if block_given?
             say "Retrying..."
+          when is?(:merge)
+            if block_given? && !merge_tool.empty?
+              merge(destination, yield)
+              return nil
+            end
+
+            say "Please specify merge tool to `THOR_MERGE` env."
           else
             say file_collision_help
           end
@@ -352,6 +359,7 @@ class Thor
         q - quit, abort
         d - diff, show the differences between the old and the new
         h - help, show this help
+        m - merge, run merge tool
         HELP
       end
 
@@ -439,6 +447,23 @@ class Thor
           say("Your response must be one of: [#{answers}]. Please try again.") unless correct_answer
         end
         correct_answer
+      end
+
+      def merge(destination, content) #:nodoc:
+        require "tempfile"
+        Tempfile.open([File.basename(destination), File.extname(destination)], File.dirname(destination)) do |temp|
+          temp.write content
+          temp.rewind
+          system %(#{merge_tool} "#{temp.path}" "#{destination}")
+        end
+      end
+
+      def merge_tool #:nodoc:
+        @merge_tool ||= ENV["THOR_MERGE"] || git_merge_tool
+      end
+
+      def git_merge_tool #:nodoc:
+        `git config merge.tool`.rstrip rescue ""
       end
     end
   end
