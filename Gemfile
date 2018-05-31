@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "rake", "< 11"
+gem "rake"
 
 group :development do
   gem "pry"
