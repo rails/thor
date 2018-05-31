@@ -97,8 +97,7 @@ class Thor
     def handle_argument_error?(instance, error, caller)
       not_debugging?(instance) && (error.message =~ /wrong number of arguments/ || error.message =~ /given \d*, expected \d*/) && begin
         saned = sans_backtrace(error.backtrace, caller)
-        # Ruby 1.9 always include the called method in the backtrace
-        saned.empty? || (saned.size == 1 && RUBY_VERSION >= "1.9")
+        saned.empty? || saned.size == 1
       end
     end
 

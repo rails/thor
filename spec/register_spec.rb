@@ -221,13 +221,13 @@ describe ".register-ing a Thor::Group subclass" do
   end
 end
 
-describe "1.8 and 1.9 syntax compatibility" do
-  it "is compatible with both 1.8 and 1.9 syntax w/o command options" do
+describe "1.9 syntax compatibility" do
+  it "is compatible with both 1.9 syntax w/o command options" do
     group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w(zoo)) }
     expect(group_output).to match(/zebra/)
   end
 
-  it "is compatible with both 1.8 and 1.9 syntax w/command options" do
+  it "is compatible with both 1.9 syntax w/command options" do
     group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w(zoo -w lion)) }
     expect(group_output).to match(/lion/)
   end
