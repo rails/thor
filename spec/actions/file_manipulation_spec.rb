@@ -373,7 +373,7 @@ describe Thor::Actions do
         expect(action(:inject_into_module, "application_helper.rb", ApplicationHelper, "  def help; 'help'; end\n")).to eq("      insert  application_helper.rb\n")
       end
 
-      it "does not append if class name does not match" do
+      it "does not append if module name does not match" do
         action :inject_into_module, "application_helper.rb", "App", "  def help; 'help'; end\n"
         expect(File.binread(file)).to eq("module ApplicationHelper\nend\n")
       end
