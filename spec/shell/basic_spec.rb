@@ -356,8 +356,8 @@ TABLE
     end
 
     describe "when a block is given" do
-      it "displays diff options to the user" do
-        expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqdh] ', :add_to_history => false).and_return("s")
+      it "displays diff and merge options to the user" do
+        expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqdhm] ', :add_to_history => false).and_return("s")
         shell.file_collision("foo") {}
       end
 
@@ -366,6 +366,28 @@ TABLE
         expect(Thor::LineEditor).to receive(:readline).and_return("n")
         expect(shell).to receive(:system).with(/diff -u/)
         capture(:stdout) { shell.file_collision("foo") {} }
+      end
+
+      it "invokes the merge tool" do
+        allow(shell).to receive(:merge_tool).and_return("meld")
+        expect(Thor::LineEditor).to receive(:readline).and_return("m")
+        expect(shell).to receive(:system).with(/meld/)
+        capture(:stdout) { shell.file_collision("foo") {} }
+      end
+
+      it "invokes the merge tool that specified at ENV['THOR_MERGE']" do
+        allow(ENV).to receive(:[]).with("THOR_MERGE").and_return("meld")
+        expect(Thor::LineEditor).to receive(:readline).and_return("m")
+        expect(shell).to receive(:system).with(/meld/)
+        capture(:stdout) { shell.file_collision("foo") {} }
+      end
+
+      it "show warning if user chooses merge but merge tool is not specified" do
+        allow(shell).to receive(:merge_tool).and_return("")
+        expect(Thor::LineEditor).to receive(:readline).and_return("m")
+        expect(Thor::LineEditor).to receive(:readline).and_return("n")
+        help = capture(:stdout) { shell.file_collision("foo") {} }
+        expect(help).to match(/Please specify merge tool to `THOR_MERGE` env/)
       end
     end
   end

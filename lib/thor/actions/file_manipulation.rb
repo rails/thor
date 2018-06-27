@@ -117,7 +117,13 @@ class Thor
       context = config.delete(:context) || instance_eval("binding")
 
       create_file destination, nil, config do
-        content = CapturableERB.new(::File.binread(source), nil, "-", "@output_buffer").tap do |erb|
+        match = ERB.version.match(/(\d+\.\d+\.\d+)/)
+        capturable_erb = if match && match[1] >= "2.2.0" # Ruby 2.6+
+          CapturableERB.new(::File.binread(source), :trim_mode => "-", :eoutvar => "@output_buffer")
+        else
+          CapturableERB.new(::File.binread(source), nil, "-", "@output_buffer")
+        end
+        content = capturable_erb.tap do |erb|
           erb.filename = source
         end.result(context)
         content = yield(content) if block
@@ -301,7 +307,7 @@ class Thor
     def comment_lines(path, flag, *args)
       flag = flag.respond_to?(:source) ? flag.source : flag
 
-      gsub_file(path, /^(\s*)([^#|\n]*#{flag})/, '\1# \2', *args)
+      gsub_file(path, /^(\s*)([^#\n]*#{flag})/, '\1# \2', *args)
     end
 
     # Removes a file at the given location.

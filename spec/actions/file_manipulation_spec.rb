@@ -139,7 +139,7 @@ describe Thor::Actions do
 
     it "accepts http remote sources" do
       body = "__start__\nHTTPFILE\n__end__\n"
-      stub_request(:get, "http://example.com/file.txt").to_return(:body => body)
+      stub_request(:get, "http://example.com/file.txt").to_return(:body => body.dup)
       action :get, "http://example.com/file.txt" do |content|
         expect(a_request(:get, "http://example.com/file.txt")).to have_been_made
         expect(content).to eq(body)
@@ -148,7 +148,7 @@ describe Thor::Actions do
 
     it "accepts https remote sources" do
       body = "__start__\nHTTPSFILE\n__end__\n"
-      stub_request(:get, "https://example.com/file.txt").to_return(:body => body)
+      stub_request(:get, "https://example.com/file.txt").to_return(:body => body.dup)
       action :get, "https://example.com/file.txt" do |content|
         expect(a_request(:get, "https://example.com/file.txt")).to have_been_made
         expect(content).to eq(body)
@@ -373,7 +373,7 @@ describe Thor::Actions do
         expect(action(:inject_into_module, "application_helper.rb", ApplicationHelper, "  def help; 'help'; end\n")).to eq("      insert  application_helper.rb\n")
       end
 
-      it "does not append if class name does not match" do
+      it "does not append if module name does not match" do
         action :inject_into_module, "application_helper.rb", "App", "  def help; 'help'; end\n"
         expect(File.binread(file)).to eq("module ApplicationHelper\nend\n")
       end
