@@ -60,6 +60,9 @@ class Thor
     # destination. If a block is given instead of destination, the content of
     # the url is yielded and used as location.
     #
+    # +get+ relies on open-uri, so passing application user input would provide
+    # a command injection attack vector.
+    #
     # ==== Parameters
     # source<String>:: the address of the given content.
     # destination<String>:: the relative path to the destination root.
