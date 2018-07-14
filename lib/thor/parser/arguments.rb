@@ -39,6 +39,8 @@ class Thor
 
     def parse(args)
       @pile = args.dup
+      @hashes = Hash.new { |h, k| h[k] = {} }
+      @arrays = Hash.new { |h, k| h[k] = [] }
 
       @switches.each do |argument|
         break unless peek
@@ -96,13 +98,14 @@ class Thor
     #
     def parse_hash(name)
       return shift if peek.is_a?(Hash)
-      hash = {}
+      hash = @hashes[name]
 
       while current_is_value? && peek.include?(":")
         key, value = shift.split(":", 2)
         raise MalformattedArgumentError, "You can't specify '#{key}' more than once in option '#{name}'; got #{key}:#{hash[key]} and #{key}:#{value}" if hash.include? key
         hash[key] = value
       end
+
       hash
     end
 
@@ -117,7 +120,7 @@ class Thor
     #
     def parse_array(name)
       return shift if peek.is_a?(Array)
-      array = []
+      array = @arrays[name]
       array << shift while current_is_value?
       array
     end
