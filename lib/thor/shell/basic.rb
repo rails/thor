@@ -234,7 +234,7 @@ class Thor
           unwrapped.split(" ").inject do |memo, word|
             word = word.gsub(/\n\005/, "\n").gsub(/\005/, "\n")
             counter = 0 if word.include? "\n"
-            if (counter + word.length + indent) < width
+            if (counter + word.length + indent) < (width + word.length)
               memo = "#{memo} #{word}"
               counter += word.length+indent
             else
