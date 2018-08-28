@@ -230,8 +230,20 @@ class Thor
         paras = message.split("\n\n")
 
         paras.map! do |unwrapped|
-          unwrapped.strip.tr("\n", " ").squeeze(" ").gsub(/.{1,#{width}}(?:\s|\Z)/) { ($& + 5.chr).gsub(/\n\005/, "\n").gsub(/\005/, "\n") }
-        end
+          counter = 0
+          unwrapped.split(" ").inject do |memo, word|
+            word = word.gsub(/\n\005/, "\n").gsub(/\005/, "\n")
+            counter = 0 if word.include? "\n"
+            if (counter + word.length + indent) < width
+              memo = "#{memo} #{word}"
+              counter += word.length+indent
+            else
+              memo = "#{memo}\n#{word}"
+              counter = word.length
+            end
+            memo
+          end
+        end.compact!
 
         paras.each do |para|
           para.split("\n").each do |line|
