@@ -1,3 +1,5 @@
+* Fix `check_unknown_options!` to not check the content that was not parsed, i.e. after a `--` or after the first unknown with `stop_on_unknown_option!`
+
 ## 0.20.0
 * Add `check_default_type!` to check if the default value of an option matches the defined type.
   It removes the warning on usage and gives the command authors the possibility to check for programming errors.
