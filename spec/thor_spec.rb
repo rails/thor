@@ -127,6 +127,10 @@ describe Thor do
       expect(my_script.start(%w(exec -- --verbose))).to eq [{}, %w(--verbose)]
     end
 
+    it "still passes everything after -- to command, complex" do
+      expect(my_script.start(%w[exec command --mode z again -- --verbose more])).to eq [{}, %w[command --mode z again -- --verbose more]]
+    end
+
     it "does not affect ordinary commands" do
       expect(my_script.start(%w(boring command --verbose))).to eq [{"verbose" => true}, %w(command)]
     end
@@ -156,6 +160,113 @@ describe Thor do
 
     it "doesn't break new" do
       expect(my_script.new).to be_a(Thor)
+    end
+
+    context "along with check_unknown_options!" do
+      my_script2 = Class.new(Thor) do
+        class_option "verbose",   :type => :boolean
+        class_option "mode",      :type => :string
+        check_unknown_options!
+        stop_on_unknown_option! :exec
+
+        desc "exec", "Run a command"
+        def exec(*args)
+          [options, args]
+        end
+      end
+
+      it "passes remaining args to command when it encounters a non-option" do
+        expect(my_script2.start(%w[exec command --verbose])).to eq [{}, %w[command --verbose]]
+      end
+
+      it "does not accept if first non-option looks like an option, but only refuses that invalid option" do
+        expect(capture(:stderr) do
+          my_script2.start(%w[exec --foo command --bar])
+        end.strip).to eq("Unknown switches '--foo'")
+      end
+
+      it "still accepts options that are given before non-options" do
+        expect(my_script2.start(%w[exec --verbose command])).to eq [{"verbose" => true}, %w[command]]
+      end
+
+      it "still accepts when non-options are given after real options and argument" do
+        expect(my_script2.start(%w[exec --verbose command --foo])).to eq [{"verbose" => true}, %w[command --foo]]
+      end
+
+      it "does not accept when non-option looks like an option and is after real options" do
+        expect(capture(:stderr) do
+          my_script2.start(%w[exec --verbose --foo])
+        end.strip).to eq("Unknown switches '--foo'")
+      end
+
+      it "still accepts options that require a value" do
+        expect(my_script2.start(%w[exec --mode rashly command])).to eq [{"mode" => "rashly"}, %w[command]]
+      end
+
+      it "still passes everything after -- to command" do
+        expect(my_script2.start(%w[exec -- --verbose])).to eq [{}, %w[--verbose]]
+      end
+
+      it "still passes everything after -- to command, complex" do
+        expect(my_script2.start(%w[exec command --mode z again -- --verbose more])).to eq [{}, %w[command --mode z again -- --verbose more]]
+      end
+    end
+  end
+
+  describe "#check_unknown_options!" do
+    my_script = Class.new(Thor) do
+      class_option "verbose",   :type => :boolean
+      class_option "mode",      :type => :string
+      check_unknown_options!
+
+      desc "checked", "a command with checked"
+      def checked(*args)
+        [options, args]
+      end
+    end
+
+    it "still accept options and arguments" do
+      expect(my_script.start(%w[checked command --verbose])).to eq [{"verbose" => true}, %w[command]]
+    end
+
+    it "still accepts options that are given before arguments" do
+      expect(my_script.start(%w[checked --verbose command])).to eq [{"verbose" => true}, %w[command]]
+    end
+
+    it "does not accept if non-option that looks like an option is before the arguments" do
+      expect(capture(:stderr) do
+        my_script.start(%w[checked --foo command --bar])
+      end.strip).to eq("Unknown switches '--foo, --bar'")
+    end
+
+    it "does not accept if non-option that looks like an option is after an argument" do
+      expect(capture(:stderr) do
+        my_script.start(%w[checked command --foo --bar])
+      end.strip).to eq("Unknown switches '--foo, --bar'")
+    end
+
+    it "does not accept when non-option that looks like an option is after real options" do
+      expect(capture(:stderr) do
+        my_script.start(%w[checked --verbose --foo])
+      end.strip).to eq("Unknown switches '--foo'")
+    end
+
+    it "does not accept when non-option that looks like an option is before real options" do
+      expect(capture(:stderr) do
+        my_script.start(%w[checked --foo --verbose])
+      end.strip).to eq("Unknown switches '--foo'")
+    end
+
+    it "still accepts options that require a value" do
+      expect(my_script.start(%w[checked --mode rashly command])).to eq [{"mode" => "rashly"}, %w[command]]
+    end
+
+    it "still passes everything after -- to command" do
+      expect(my_script.start(%w[checked -- --verbose])).to eq [{}, %w[--verbose]]
+    end
+
+    it "still passes everything after -- to command, complex" do
+      expect(my_script.start(%w[checked command --mode z again -- --verbose more])).to eq [{"mode" => "z"}, %w[command again --verbose more]]
     end
   end
 
