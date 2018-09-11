@@ -86,9 +86,19 @@ describe Thor::Actions do
         expect(runner.relative_to_original_destination_root("/test/file")).to eq("/test/file")
       end
 
+      it "doesn't remove the root path from the absolute path if it is not at the begining" do
+        runner.destination_root = "/app"
+        expect(runner.relative_to_original_destination_root("/something/app/project")).to eq("/something/app/project")
+      end
+
+      it "doesn't removes the root path from the absolute path only if it is only the partial name of the directory" do
+        runner.destination_root = "/app"
+        expect(runner.relative_to_original_destination_root("/application/project")).to eq("/application/project")
+      end
+
       it "removes the root path from the absolute path only once" do
         runner.destination_root = "/app"
-        expect(runner.relative_to_original_destination_root("/app/project/application")).to eq("project/application")
+        expect(runner.relative_to_original_destination_root("/app/app/project")).to eq("app/project")
       end
 
       it "does not fail with files containing regexp characters" do
