@@ -507,3 +507,5 @@ class Thor
     end
   end
 end
+
+require "thor/thor2"

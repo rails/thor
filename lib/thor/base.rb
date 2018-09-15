@@ -138,7 +138,8 @@ class Thor
       end
 
       # If you want to raise an error for unknown options, call check_unknown_options!
-      # This is disabled by default to allow dynamic invocations.
+      # This is disabled by default in the Thor class to allow dynamic invocations.
+      # This is enabled by default in the Thor2 class
       def check_unknown_options!
         @check_unknown_options = true
       end
@@ -153,7 +154,8 @@ class Thor
 
       # If you want to raise an error when the default value of an option does not match
       # the type call check_default_type!
-      # This is disabled by default for compatibility.
+      # This is disabled by default in the Thor class for compatibility.
+      # This is enabled by default in the Thor2 class
       def check_default_type!
         @check_default_type = true
       end
