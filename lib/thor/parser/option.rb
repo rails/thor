@@ -111,7 +111,7 @@ class Thor
 
     def validate!
       raise ArgumentError, "An option cannot be boolean and required." if boolean? && required?
-      validate_default_type! if @check_default_type
+      validate_default_type!
     end
 
     def validate_default_type!
@@ -127,8 +127,16 @@ class Thor
       when Hash, Array, String
         @default.class.name.downcase.to_sym
       end
-
-      raise ArgumentError, "Expected #{@type} default value for '#{switch_name}'; got #{@default.inspect} (#{default_type})" unless default_type == @type
+      if default_type != @type
+        err = "Expected #{@type} default value for '#{switch_name}'; got #{@default.inspect} (#{default_type})"
+        if @check_default_type
+          raise ArgumentError, err
+        elsif @check_default_type == nil
+          Thor.deprecation_warning "#{err}.\n" +
+            'This will be rejected in the future unless you explicitly pass the options `check_default_type: false`' +
+            ' or call `allow_incompatible_default_type!` in your code'
+        end
+      end
     end
 
     def dasherized?
