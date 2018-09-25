@@ -173,6 +173,10 @@ describe Thor do
         def exec(*args)
           [options, args]
         end
+
+        def self.exit_on_failure?
+          false
+        end
       end
 
       it "passes remaining args to command when it encounters a non-option" do
@@ -222,6 +226,10 @@ describe Thor do
       desc "checked", "a command with checked"
       def checked(*args)
         [options, args]
+      end
+
+      def self.exit_on_failure?
+        false
       end
     end
 
@@ -284,6 +292,10 @@ describe Thor do
       desc "boring", "An ordinary command"
       def boring(*args)
         [options, args]
+      end
+
+      def self.exit_on_failure?
+        false
       end
     end
 
@@ -716,4 +728,19 @@ HELP
       expect(MyScript.start(%w(send))).to eq(true)
     end
   end
+
+  context "without an exit_on_failure? method" do
+    my_script = Class.new(Thor) do
+      desc "no arg", "do nothing"
+      def no_arg
+      end
+    end
+
+    it "outputs a deprecation warning on error" do
+      expect do
+        my_script.start(%w[no_arg one])
+      end.to output(/^Deprecation.*exit_on_failure/).to_stderr
+    end
+  end
+
 end
