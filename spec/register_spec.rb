@@ -1,6 +1,8 @@
 require "helper"
 
 class BoringVendorProvidedCLI < Thor
+  check_unknown_options!
+
   desc "boring", "do boring stuff"
   def boring
     puts "bored. <yawn>"
