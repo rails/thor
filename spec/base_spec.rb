@@ -263,10 +263,8 @@ describe Thor::Base do
     end
 
     it "suggests commands that are similar if there is a typo" do
-      expected = <<~MSG
-        Could not find command "paintz" in "barn" namespace.
-        Did you mean?  "paint"
-      MSG
+      expected = "Could not find command \"paintz\" in \"barn\" namespace.\n"
+      expected << "Did you mean?  \"paint\"" if Thor::Correctable
 
       expect(capture(:stderr) { Barn.start(%w(paintz)) }).to eq(expected)
     end

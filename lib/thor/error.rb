@@ -1,4 +1,11 @@
 class Thor
+  Correctable =
+    begin
+      require 'did_you_mean'
+      DidYouMean::Correctable
+    rescue LoadError
+    end
+
   # Thor::Error is raised when it's caused by wrong usage of thor classes. Those
   # errors have their backtrace suppressed and are nicely shown to the user.
   #
@@ -38,7 +45,7 @@ class Thor
       super(message)
     end
 
-    prepend DidYouMean::Correctable
+    prepend Correctable if Correctable
   end
   UndefinedTaskError = UndefinedCommandError
 
@@ -78,7 +85,7 @@ class Thor
       super("Unknown switches #{unknown.map(&:inspect).join(', ')}")
     end
 
-    prepend DidYouMean::Correctable
+    prepend Correctable if Correctable
   end
 
   class RequiredArgumentMissingError < InvocationError
@@ -87,8 +94,10 @@ class Thor
   class MalformattedArgumentError < InvocationError
   end
 
-  DidYouMean::SPELL_CHECKERS.merge!(
-    'Thor::UndefinedCommandError' => UndefinedCommandError::SpellChecker,
-    'Thor::UnknownArgumentError' => UnknownArgumentError::SpellChecker
-  )
+  if Correctable
+    DidYouMean::SPELL_CHECKERS.merge!(
+      'Thor::UndefinedCommandError' => UndefinedCommandError::SpellChecker,
+      'Thor::UnknownArgumentError' => UnknownArgumentError::SpellChecker
+    )
+  end
 end

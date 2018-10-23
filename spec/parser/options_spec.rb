@@ -114,10 +114,8 @@ describe Thor::Options do
       create :foo => "baz", :bar => :required
       parse("--bar", "baz", "--baz", "unknown")
 
-      expected = <<~MSG.chomp
-        Unknown switches "--baz"
-        Did you mean?  "--bar"
-      MSG
+      expected = "Unknown switches \"--baz\""
+      expected << "\nDid you mean?  \"--bar\"" if Thor::Correctable
 
       expect { check_unknown! }.to raise_error(Thor::UnknownArgumentError, expected)
     end
