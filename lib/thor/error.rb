@@ -10,6 +10,35 @@ class Thor
 
   # Raised when a command was not found.
   class UndefinedCommandError < Error
+    class SpellChecker
+      attr_reader :error
+
+      def initialize(error)
+        @error = error
+      end
+
+      def corrections
+        @corrections ||= spell_checker.correct(error.command).map(&:inspect)
+      end
+
+      def spell_checker
+        DidYouMean::SpellChecker.new(dictionary: error.all_commands)
+      end
+    end
+
+    attr_reader :command, :all_commands
+
+    def initialize(command, all_commands, namespace)
+      @command = command
+      @all_commands = all_commands
+
+      message = "Could not find command #{command.inspect}"
+      message = namespace ? "#{message} in #{namespace.inspect} namespace." : "#{message}."
+
+      super(message)
+    end
+
+    prepend DidYouMean::Correctable
   end
   UndefinedTaskError = UndefinedCommandError
 
@@ -22,6 +51,34 @@ class Thor
   end
 
   class UnknownArgumentError < Error
+    class SpellChecker
+      attr_reader :error
+
+      def initialize(error)
+        @error = error
+      end
+
+      def corrections
+        @corrections ||=
+          error.unknown.flat_map { |unknown| spell_checker.correct(unknown) }.uniq.map(&:inspect)
+      end
+
+      def spell_checker
+        @spell_checker ||=
+          DidYouMean::SpellChecker.new(dictionary: error.switches)
+      end
+    end
+
+    attr_reader :switches, :unknown
+
+    def initialize(switches, unknown)
+      @switches = switches
+      @unknown = unknown
+
+      super("Unknown switches #{unknown.map(&:inspect).join(', ')}")
+    end
+
+    prepend DidYouMean::Correctable
   end
 
   class RequiredArgumentMissingError < InvocationError
@@ -29,4 +86,9 @@ class Thor
 
   class MalformattedArgumentError < InvocationError
   end
+
+  DidYouMean::SPELL_CHECKERS.merge!(
+    'Thor::UndefinedCommandError' => UndefinedCommandError::SpellChecker,
+    'Thor::UnknownArgumentError' => UnknownArgumentError::SpellChecker
+  )
 end
