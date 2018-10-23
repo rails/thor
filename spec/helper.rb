@@ -28,7 +28,7 @@ WebMock.disable_net_connect!(:allow => "coveralls.io")
 $0 = "thor"
 $thor_runner = true
 ARGV.clear
-Encoding.default_external = Encoding::UTF_8 if RUBY_VERSION > '1.8.7'
+Encoding.default_external = Encoding::UTF_8 if RUBY_VERSION > '1.8.7' && RUBY_VERSION < '2.0.0'
 Thor::Base.shell = Thor::Shell::Basic
 
 # Load fixtures
