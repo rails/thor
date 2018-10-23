@@ -255,9 +255,16 @@ class Thor
 
       say_status :run, desc, config.fetch(:verbose, true)
 
-      unless options[:pretend]
-        config[:capture] ? `#{command}` : system(command.to_s)
+      return if options[:pretend]
+
+      result = config[:capture] ? `#{command}` : system(command.to_s)
+
+      if config[:abort_on_failure]
+        success = config[:capture] ? $?.success? : result
+        abort unless success
       end
+
+      result
     end
 
     # Executes a ruby script (taking into account WIN32 platform quirks).
