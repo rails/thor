@@ -12,8 +12,8 @@ describe "when the Thor class's exit_with_failure? method returns true" do
                {:out => w, :err => [:child, :out]})
     w.close
 
-    junk, exit_status= Process.wait2(pid)
-    junk= r.read
+    _, exit_status= Process.wait2(pid)
+    r.read
     r.close
 
     exit_status.exitstatus
