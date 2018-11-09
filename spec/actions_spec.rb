@@ -291,6 +291,24 @@ describe Thor::Actions do
       end
     end
 
+    describe "aborting on failure" do
+      it "aborts when abort_on_failure is given and command fails" do
+        expect { action :run, "false", :abort_on_failure => true }.to raise_error(SystemExit)
+      end
+
+      it "suceeds when abort_on_failure is given and command succeeds" do
+        expect { action :run, "true", :abort_on_failure => true }.not_to raise_error
+      end
+
+      it "aborts when abort_on_failure is given, capture is given and command fails" do
+        expect { action :run, "false", :abort_on_failure => true, :capture => true }.to raise_error(SystemExit)
+      end
+
+      it "suceeds when abort_on_failure is given and command succeeds" do
+        expect { action :run, "true", :abort_on_failure => true, :capture => true }.not_to raise_error
+      end
+    end
+
     describe "when pretending" do
       it "doesn't execute the command" do
         runner = MyCounter.new([1], %w(--pretend))
