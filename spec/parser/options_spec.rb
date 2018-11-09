@@ -113,7 +113,11 @@ describe Thor::Options do
     it "raises an error for unknown switches" do
       create :foo => "baz", :bar => :required
       parse("--bar", "baz", "--baz", "unknown")
-      expect { check_unknown! }.to raise_error(Thor::UnknownArgumentError, "Unknown switches '--baz'")
+
+      expected = "Unknown switches \"--baz\""
+      expected << "\nDid you mean?  \"--bar\"" if Thor::Correctable
+
+      expect { check_unknown! }.to raise_error(Thor::UnknownArgumentError, expected)
     end
 
     it "skips leading non-switches" do

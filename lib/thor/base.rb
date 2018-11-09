@@ -493,8 +493,7 @@ class Thor
       alias_method :public_task, :public_command
 
       def handle_no_command_error(command, has_namespace = $thor_runner) #:nodoc:
-        raise UndefinedCommandError, "Could not find command #{command.inspect} in #{namespace.inspect} namespace." if has_namespace
-        raise UndefinedCommandError, "Could not find command #{command.inspect}."
+        raise UndefinedCommandError.new(command, all_commands.keys, (namespace if has_namespace))
       end
       alias_method :handle_no_task_error, :handle_no_command_error
 

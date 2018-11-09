@@ -127,7 +127,7 @@ class Thor
 
       # an unknown option starts with - or -- and has no more --'s afterward.
       unknown = to_check.select { |str| str =~ /^--?(?:(?!--).)*$/ }
-      raise UnknownArgumentError, "Unknown switches '#{unknown.join(', ')}'" unless unknown.empty?
+      raise UnknownArgumentError.new(@switches.keys, unknown) unless unknown.empty?
     end
 
   protected

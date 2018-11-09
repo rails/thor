@@ -262,6 +262,13 @@ describe Thor::Base do
       end.to raise_error(Thor::UndefinedCommandError, 'Could not find command "what" in "my_script" namespace.')
     end
 
+    it "suggests commands that are similar if there is a typo" do
+      expected = "Could not find command \"paintz\" in \"barn\" namespace.\n"
+      expected << "Did you mean?  \"paint\"" if Thor::Correctable
+
+      expect(capture(:stderr) { Barn.start(%w(paintz)) }).to eq(expected)
+    end
+
     it "does not steal args" do
       args = %w(foo bar --force true)
       MyScript.start(args)
@@ -271,7 +278,7 @@ describe Thor::Base do
     it "checks unknown options" do
       expect(capture(:stderr) do
         MyScript.start(%w(foo bar --force true --unknown baz))
-      end.strip).to eq("Unknown switches '--unknown'")
+      end.strip).to eq("Unknown switches \"--unknown\"")
     end
 
     it "checks unknown options except specified" do

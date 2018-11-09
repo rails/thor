@@ -182,7 +182,7 @@ describe Thor do
       it "does not accept if first non-option looks like an option, but only refuses that invalid option" do
         expect(capture(:stderr) do
           my_script2.start(%w[exec --foo command --bar])
-        end.strip).to eq("Unknown switches '--foo'")
+        end.strip).to eq("Unknown switches \"--foo\"")
       end
 
       it "still accepts options that are given before non-options" do
@@ -196,7 +196,7 @@ describe Thor do
       it "does not accept when non-option looks like an option and is after real options" do
         expect(capture(:stderr) do
           my_script2.start(%w[exec --verbose --foo])
-        end.strip).to eq("Unknown switches '--foo'")
+        end.strip).to eq("Unknown switches \"--foo\"")
       end
 
       it "still accepts options that require a value" do
@@ -236,25 +236,25 @@ describe Thor do
     it "does not accept if non-option that looks like an option is before the arguments" do
       expect(capture(:stderr) do
         my_script.start(%w[checked --foo command --bar])
-      end.strip).to eq("Unknown switches '--foo, --bar'")
+      end.strip).to eq("Unknown switches \"--foo\", \"--bar\"")
     end
 
     it "does not accept if non-option that looks like an option is after an argument" do
       expect(capture(:stderr) do
         my_script.start(%w[checked command --foo --bar])
-      end.strip).to eq("Unknown switches '--foo, --bar'")
+      end.strip).to eq("Unknown switches \"--foo\", \"--bar\"")
     end
 
     it "does not accept when non-option that looks like an option is after real options" do
       expect(capture(:stderr) do
         my_script.start(%w[checked --verbose --foo])
-      end.strip).to eq("Unknown switches '--foo'")
+      end.strip).to eq("Unknown switches \"--foo\"")
     end
 
     it "does not accept when non-option that looks like an option is before real options" do
       expect(capture(:stderr) do
         my_script.start(%w[checked --foo --verbose])
-      end.strip).to eq("Unknown switches '--foo'")
+      end.strip).to eq("Unknown switches \"--foo\"")
     end
 
     it "still accepts options that require a value" do
