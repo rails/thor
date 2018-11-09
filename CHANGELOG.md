@@ -1,3 +1,5 @@
+# 0.20.1
+* Support new versions fo ERB.
 * Fix `check_unknown_options!` to not check the content that was not parsed, i.e. after a `--` or after the first unknown with `stop_on_unknown_option!`
 
 ## 0.20.0
