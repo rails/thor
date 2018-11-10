@@ -24,6 +24,6 @@ class Default < Thor
 
   desc "spec", "Run RSpec code examples"
   def spec
-    exec "rspec spec"
+    exec "bundle exec rspec spec"
   end
 end
