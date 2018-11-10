@@ -33,6 +33,9 @@ group :test do
   else
     gem "webmock"
   end
+  if RUBY_VERSION >= '2.5.0'
+    gem 'did_you_mean'
+  end
 end
 
 gemspec
