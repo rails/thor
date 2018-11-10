@@ -15,7 +15,7 @@ class Thor
       end
 
       DidYouMean::Correctable
-    rescue LoadError
+    rescue LoadError, NameError
     end
 
   # Thor::Error is raised when it's caused by wrong usage of thor classes. Those
