@@ -33,7 +33,8 @@ group :test do
   else
     gem "webmock"
   end
-  if RUBY_VERSION >= '2.5.0'
+  if RUBY_VERSION >= '1.9'
+    # `did_you_mean` can't build with Ruby 1.8.
     gem 'did_you_mean'
   end
 end
