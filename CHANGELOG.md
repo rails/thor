@@ -1,3 +1,6 @@
+# 0.20.3
+* Support old versions of `did_you_mean`.
+
 # 0.20.2
 * Fix `did_you_mean` support.
 
