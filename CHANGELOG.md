@@ -5,7 +5,7 @@
 * Fix `did_you_mean` support.
 
 # 0.20.1
-* Support new versions fo ERB.
+* Support new versions of ERB.
 * Fix `check_unknown_options!` to not check the content that was not parsed, i.e. after a `--` or after the first unknown with `stop_on_unknown_option!`
 * Add `did_you_mean` support.
 
