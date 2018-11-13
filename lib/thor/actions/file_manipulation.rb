@@ -23,14 +23,14 @@ class Thor
       destination = args.first || source
       source = File.expand_path(find_in_source_paths(source.to_s))
 
-      create_file destination, nil, config do
+      resulting_destination = create_file destination, nil, config do
         content = File.binread(source)
         content = yield(content) if block
         content
       end
       if config[:mode] == :preserve
         mode = File.stat(source).mode
-        chmod(destination, mode, config)
+        chmod(resulting_destination, mode, config)
       end
     end
 

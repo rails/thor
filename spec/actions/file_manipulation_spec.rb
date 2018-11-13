@@ -76,6 +76,14 @@ describe Thor::Actions do
       expect(File.stat(original).mode).to eq(File.stat(copy).mode)
     end
 
+    it "copies file from source to default destination and preserves file mode for templated filenames" do
+      expect(runner).to receive(:filename).and_return("app")
+      action :copy_file, "preserve/%filename%.sh", :mode => :preserve
+      original = File.join(source_root, "preserve/%filename%.sh")
+      copy = File.join(destination_root, "preserve/app.sh")
+      expect(File.stat(original).mode).to eq(File.stat(copy).mode)
+    end
+
     it "logs status" do
       expect(action(:copy_file, "command.thor")).to eq("      create  command.thor\n")
     end
