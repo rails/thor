@@ -49,14 +49,7 @@ class Thor
 
       formatted ||= "".dup
 
-      # Add usage with required arguments
-      formatted << if klass && !klass.arguments.empty?
-                     usage.to_s.gsub(/^#{name}/) do |match|
-                       match << " " << klass.arguments.map(&:usage).compact.join(" ")
-                     end
-                   else
-                     usage.to_s
-                   end
+      formatted << required_arguments_for(klass, specific_usage)
 
       # Add required options
       formatted << " #{required_options}"
@@ -66,6 +59,17 @@ class Thor
     end
 
   protected
+
+    # Add usage with required arguments
+    def required_arguments_for(klass, usage)
+      if klass && !klass.arguments.empty?
+        usage.to_s.gsub(/^#{name}/) do |match|
+          match << " " << klass.arguments.map(&:usage).compact.join(" ")
+        end
+      else
+        usage.to_s
+      end
+    end
 
     def not_debugging?(instance)
       !(instance.class.respond_to?(:debugging) && instance.class.debugging)
