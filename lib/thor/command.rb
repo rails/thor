@@ -49,13 +49,17 @@ class Thor
 
       formatted ||= "".dup
 
-      formatted << required_arguments_for(klass, specific_usage)
+      Array(usage).map do |specific_usage|
+        formatted_specific_usage = formatted
 
-      # Add required options
-      formatted << " #{required_options}"
+        formatted_specific_usage += required_arguments_for(klass, specific_usage)
 
-      # Strip and go!
-      formatted.strip
+        # Add required options
+        formatted_specific_usage += " #{required_options}"
+
+        # Strip and go!
+        formatted_specific_usage.strip
+      end.join("\n")
     end
 
   protected

@@ -1,12 +1,12 @@
 require "helper"
 
 describe Thor::Command do
-  def command(options = {})
+  def command(options = {}, usage = "can_has")
     options.each do |key, value|
       options[key] = Thor::Option.parse(key, value)
     end
 
-    @command ||= Thor::Command.new(:can_has, "I can has cheezburger", "I can has cheezburger\nLots and lots of it", "can_has", options)
+    @command ||= Thor::Command.new(:can_has, "I can has cheezburger", "I can has cheezburger\nLots and lots of it", usage, options)
   end
 
   describe "#formatted_usage" do
@@ -29,6 +29,11 @@ describe Thor::Command do
       options = {:required => true, :type => :string}
       object = Struct.new(:namespace, :arguments).new("foo", [Thor::Argument.new(:bar, options)])
       expect(command(:foo => :required).formatted_usage(object)).to eq("foo:can_has BAR --foo=FOO")
+    end
+
+    it "allows multiple usages" do
+      object = Struct.new(:namespace, :arguments).new("foo", [])
+      expect(command({ :bar => :required }, ["can_has FOO", "can_has BAR"]).formatted_usage(object, false)).to eq("can_has FOO --bar=BAR\ncan_has BAR --bar=BAR")
     end
   end
 

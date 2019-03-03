@@ -51,6 +51,12 @@ END
     [bar, options]
   end
 
+  method_option :all, :desc => "Do bazing for all the things"
+  desc ["baz THING", "baz --all"], "super cool"
+  def baz(thing = nil)
+    raise if thing.nil? && !options.include?(:all)
+  end
+
   desc "example_default_command", "example!"
   method_options :with => :string
   def example_default_command
@@ -214,6 +220,10 @@ module Scripts
 
     desc "optional_arg [ARG]", "takes an optional arg"
     def optional_arg(arg='default')
+    end
+
+    desc ["multiple_usages ARG --foo", "multiple_usages ARG --bar"], "takes mutually exclusive combinations of args and flags"
+    def multiple_usages(arg)
     end
   end
 end

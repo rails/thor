@@ -440,6 +440,9 @@ Usage: "thor scripts:arities:one_arg ARG"'
 Usage: "thor scripts:arities:two_args ARG1 ARG2"'
       arity_asserter.call %w(optional_arg one two), 'ERROR: "thor optional_arg" was called with arguments ["one", "two"]
 Usage: "thor scripts:arities:optional_arg [ARG]"'
+      arity_asserter.call %w(multiple_usages), 'ERROR: "thor multiple_usages" was called with no arguments
+Usage: "thor scripts:arities:multiple_usages ARG --foo"
+       "thor scripts:arities:multiple_usages ARG --bar"'
     end
 
     it "raises an error if the invoked command does not exist" do
@@ -549,6 +552,19 @@ Options:
 do some fooing
   This is more info!
   Everyone likes more info!
+END
+      end
+
+      it "provides full help info when talking about a specific command with multiple usages" do
+        expect(capture(:stdout) { MyScript.command_help(shell, "baz") }).to eq(<<-END)
+Usage:
+  thor my_script:baz THING
+  thor my_script:baz --all
+
+Options:
+  [--all=ALL]  # Do bazing for all the things
+
+super cool
 END
       end
 
