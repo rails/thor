@@ -1,5 +1,5 @@
 before_install:
-  - gem update --system
+  - gem update --system 2.7.9
   - gem install bundler
   - rvm @global do gem uninstall did_you_mean
 bundler_args: --without development
