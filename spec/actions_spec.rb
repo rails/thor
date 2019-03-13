@@ -292,20 +292,40 @@ describe Thor::Actions do
     end
 
     describe "aborting on failure" do
-      it "aborts when abort_on_failure is given and command fails" do
-        expect { action :run, "false", :abort_on_failure => true }.to raise_error(SystemExit)
+      context "exit_on_failure? is false" do
+        before do
+          allow(MyCounter).to receive(:exit_on_failure?).and_return(false)
+        end
+
+        it "aborts when abort_on_failure is given and command fails" do
+          expect { action :run, "false", :abort_on_failure => true }.to raise_error(SystemExit)
+        end
+
+        it "suceeds when abort_on_failure is given and command succeeds" do
+          expect { action :run, "true", :abort_on_failure => true }.not_to raise_error
+        end
+
+        it "aborts when abort_on_failure is given, capture is given and command fails" do
+          expect { action :run, "false", :abort_on_failure => true, :capture => true }.to raise_error(SystemExit)
+        end
+
+        it "suceeds when abort_on_failure is given and command succeeds" do
+          expect { action :run, "true", :abort_on_failure => true, :capture => true }.not_to raise_error
+        end
       end
 
-      it "suceeds when abort_on_failure is given and command succeeds" do
-        expect { action :run, "true", :abort_on_failure => true }.not_to raise_error
-      end
+      context "exit_on_failure? is true" do
+        before do
+          allow(MyCounter).to receive(:exit_on_failure?).and_return(true)
+        end
 
-      it "aborts when abort_on_failure is given, capture is given and command fails" do
-        expect { action :run, "false", :abort_on_failure => true, :capture => true }.to raise_error(SystemExit)
-      end
+        it "aborts when command fails even if abort_on_failure is not given" do
+          expect { action :run, "false" }.to raise_error(SystemExit)
+        end
 
-      it "suceeds when abort_on_failure is given and command succeeds" do
-        expect { action :run, "true", :abort_on_failure => true, :capture => true }.not_to raise_error
+        it "does not abort when abort_on_failure is false even if the command fails" do
+          expect { action :run, "false", :abort_on_failure => false }.not_to raise_error
+        end
       end
     end
 

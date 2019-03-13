@@ -259,7 +259,7 @@ class Thor
 
       result = config[:capture] ? `#{command}` : system(command.to_s)
 
-      if config[:abort_on_failure]
+      if config.fetch(:abort_on_failure, self.class.exit_on_failure?)
         success = config[:capture] ? $?.success? : result
         abort unless success
       end

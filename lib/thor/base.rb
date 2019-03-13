@@ -506,6 +506,11 @@ class Thor
         raise InvocationError, msg
       end
 
+      # A flag that makes the process exit with status 1 if any error happens.
+      def exit_on_failure?
+        false
+      end
+
     protected
 
       # Prints the class options per group. If an option does not belong to
@@ -639,11 +644,6 @@ class Thor
           end
 
         end
-      end
-
-      # A flag that makes the process exit with status 1 if any error happens.
-      def exit_on_failure?
-        false
       end
 
       #
