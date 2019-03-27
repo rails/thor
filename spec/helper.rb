@@ -25,6 +25,7 @@ require "webmock/rspec"
 WebMock.disable_net_connect!(:allow => "coveralls.io")
 
 # Set shell to basic
+ENV["THOR_COLUMNS"] = "10000"
 $0 = "thor"
 $thor_runner = true
 ARGV.clear
