@@ -1,7 +1,9 @@
 before_install:
-  - gem update --system
-  - gem install bundler
+  - gem update --system 2.7.9
+  - gem install bundler:1.17.3
   - rvm @global do gem uninstall did_you_mean
+  - # Travis's rvm 2.5.5 installation comes with bundler 2.0.1 for some reason.
+  - if [ "$TRAVIS_RUBY_VERSION" = "2.5.5" ]; then rvm @global do gem uninstall bundler -v 2.0.1 -x; fi
 bundler_args: --without development
 language: ruby
 rvm:
@@ -10,14 +12,14 @@ rvm:
   - 2.0.0
   - 2.1.10
   - 2.2.10
-  - 2.3.7
-  - 2.4.4
-  - 2.5.1
+  - 2.3.8
+  - 2.4.5
+  - 2.5.5
+  - 2.6.2
   - ruby-head
 matrix:
   allow_failures:
     - rvm: ruby-head
   fast_finish: true
 script: bundle exec thor spec
-sudo: false
 cache: bundler
