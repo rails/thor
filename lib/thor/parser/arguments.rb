@@ -9,7 +9,7 @@ class Thor
       arguments = []
 
       args.each do |item|
-        break if item =~ /^-/
+        break if item.is_a?(String) && item =~ /^-/
         arguments << item
       end
 
