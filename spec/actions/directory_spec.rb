@@ -1,3 +1,4 @@
+require "tmpdir"
 require "helper"
 require "thor/actions"
 
@@ -145,6 +146,28 @@ describe Thor::Actions::Directory do
     it "works with glob characters in the path" do
       content = invoke!("app{1}")
       expect(content).to match(%r{create  app\{1\}/README})
+    end
+
+    context 'windows temp directories', :if => windows? do
+      before(:each) { @temp_dir = Dir.mktmpdir("thor") }
+      it "works with windows temp dir" do
+        puts @temp_dir
+        old_invoker = @invoker
+        @invoker = WhinyGenerator.new([1, 2], {}, :destination_root => @temp_dir)
+        begin
+          invoke! "doc", "docs"
+          file = File.join(@temp_dir, "docs", "components")
+          expect(File.exist?(file)).to be true
+          expect(File.directory?(file)).to be true
+        ensure
+          @invoker = old_invoker
+        end
+        source_root = File.join(@temp_dir, "docs")
+        invoke! source_root, "docs"
+        file = File.join(destination_root, "docs", "components")
+        expect(File.exist?(file)).to be true
+        expect(File.directory?(file)).to be true
+      end
     end
   end
 
