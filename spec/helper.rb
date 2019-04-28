@@ -79,5 +79,12 @@ RSpec.configure do |config|
     $VERBOSE = old_verbose
   end
 
+  # true if running on windows, used for conditional spec skips
+  #
+  # @return [TrueClass/FalseClass]
+  def windows?
+    Gem.win_platform?
+  end
+
   alias silence capture
 end
