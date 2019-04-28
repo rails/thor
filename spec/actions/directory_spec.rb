@@ -148,13 +148,13 @@ describe Thor::Actions::Directory do
       expect(content).to match(%r{create  app\{1\}/README})
     end
 
-    context 'windows temp directories', :if => windows? do
+    context "windows temp directories", :if => windows? do
       let(:spec_dir) { File.join(@temp_dir, "spec") }
 
       before(:each) do
         @temp_dir = Dir.mktmpdir("thor")
         Dir.mkdir(spec_dir)
-        File.new(File.join(spec_dir, 'spec_helper.rb'), 'w')
+        File.new(File.join(spec_dir, "spec_helper.rb"), "w")
       end
 
       after(:each) { FileUtils.rm_rf(@temp_dir) }
