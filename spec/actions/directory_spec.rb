@@ -26,7 +26,7 @@ describe Thor::Actions::Directory do
 
   def exists_and_identical?(source_path, destination_path)
     %w(config.rb README).each do |file|
-      source      = File.join(source_root, source_path, file)
+      source = File.join(source_root, source_path, file)
       destination = File.join(destination_root, destination_path, file)
 
       expect(File.exist?(destination)).to be true
@@ -149,22 +149,18 @@ describe Thor::Actions::Directory do
     end
 
     context 'windows temp directories', :if => windows? do
-      before(:each) { @temp_dir = Dir.mktmpdir("thor") }
+      let(:spec_dir) { File.join(@temp_dir, "spec") }
+
+      before(:each) do
+        @temp_dir = Dir.mktmpdir("thor")
+        Dir.mkdir(spec_dir)
+        File.new(File.join(spec_dir, 'spec_helper.rb'), 'w')
+      end
+
+      after(:each) { FileUtils.rm_rf(@temp_dir) }
       it "works with windows temp dir" do
-        puts @temp_dir
-        old_invoker = @invoker
-        @invoker = WhinyGenerator.new([1, 2], {}, :destination_root => @temp_dir)
-        begin
-          invoke! "doc", "docs"
-          file = File.join(@temp_dir, "docs", "components")
-          expect(File.exist?(file)).to be true
-          expect(File.directory?(file)).to be true
-        ensure
-          @invoker = old_invoker
-        end
-        source_root = File.join(@temp_dir, "docs")
-        invoke! source_root, "docs"
-        file = File.join(destination_root, "docs", "components")
+        invoke! spec_dir, "specs"
+        file = File.join(destination_root, "specs")
         expect(File.exist?(file)).to be true
         expect(File.directory?(file)).to be true
       end
