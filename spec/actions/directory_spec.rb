@@ -154,7 +154,7 @@ describe Thor::Actions::Directory do
       before(:each) do
         @temp_dir = Dir.mktmpdir("thor")
         Dir.mkdir(spec_dir)
-        File.new(File.join(spec_dir, "spec_helper.rb"), "w")
+        File.new(File.join(spec_dir, "spec_helper.rb"), "w").close
       end
 
       after(:each) { FileUtils.rm_rf(@temp_dir) }
