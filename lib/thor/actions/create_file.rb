@@ -43,7 +43,7 @@ class Thor
       # Boolean:: true if it is identical, false otherwise.
       #
       def identical?
-        exists? && File.binread(destination) == render
+        exists? && File.binread(destination) == String.new(render).force_encoding("ASCII-8BIT")
       end
 
       # Holds the content to be added to the file.
