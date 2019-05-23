@@ -11,7 +11,7 @@ describe Thor::Actions::CreateFile do
     @base = MyCounter.new([1, 2], options, :destination_root => destination_root)
     allow(@base).to receive(:file_name).and_return("rdoc")
 
-    @action = Thor::Actions::CreateFile.new(@base, destination, "CONFIGURATION", {:verbose => !@silence}.merge(config))
+    @action = Thor::Actions::CreateFile.new(@base, destination, "CONFIGURATION\n配置", {:verbose => !@silence}.merge(config))
   end
 
   def invoke!
