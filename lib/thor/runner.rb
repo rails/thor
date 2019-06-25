@@ -7,6 +7,8 @@ require "digest/md5"
 require "pathname"
 
 class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
+  autoload :OpenURI, "open-uri"
+
   map "-T" => :list, "-i" => :install, "-u" => :update, "-v" => :version
 
   def self.banner(command, all = false, subcommand = false)
