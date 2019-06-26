@@ -61,13 +61,7 @@ describe Thor::Invocation do
     it "returns the command chain" do
       expect(I.new.invoke("two")).to eq([:two])
 
-      if RUBY_VERSION < "1.9.3"
-        result = J.start(%w(one two))
-        expect(result).to include(:one)
-        expect(result).to include(:two)
-      else
-        expect(J.start(%w(one two))).to eq([:one, :two])
-      end
+      expect(J.start(%w(one two))).to eq([:one, :two])
     end
 
     it "dump configuration values to be used in the invoked class" do

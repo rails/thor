@@ -1,6 +1,5 @@
 require "thor/command"
 require "thor/core_ext/hash_with_indifferent_access"
-require "thor/core_ext/ordered_hash"
 require "thor/error"
 require "thor/invocation"
 require "thor/parser"
@@ -353,22 +352,22 @@ class Thor
       # Returns the commands for this Thor class.
       #
       # ==== Returns
-      # OrderedHash:: An ordered hash with commands names as keys and Thor::Command
-      #               objects as values.
+      # Hash:: An ordered hash with commands names as keys and Thor::Command
+      #        objects as values.
       #
       def commands
-        @commands ||= Thor::CoreExt::OrderedHash.new
+        @commands ||= Hash.new
       end
       alias_method :tasks, :commands
 
       # Returns the commands for this Thor class and all subclasses.
       #
       # ==== Returns
-      # OrderedHash:: An ordered hash with commands names as keys and Thor::Command
-      #               objects as values.
+      # Hash:: An ordered hash with commands names as keys and Thor::Command
+      #        objects as values.
       #
       def all_commands
-        @all_commands ||= from_superclass(:all_commands, Thor::CoreExt::OrderedHash.new)
+        @all_commands ||= from_superclass(:all_commands, Hash.new)
         @all_commands.merge!(commands)
       end
       alias_method :all_tasks, :all_commands
