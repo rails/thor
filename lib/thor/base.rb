@@ -89,6 +89,7 @@ class Thor
 
     class << self
       def included(base) #:nodoc:
+        super(base)
         base.extend ClassMethods
         base.send :include, Invocation
         base.send :include, Shell
@@ -596,6 +597,7 @@ class Thor
       # Everytime someone inherits from a Thor class, register the klass
       # and file into baseclass.
       def inherited(klass)
+        super(klass)
         Thor::Base.register_klass_file(klass)
         klass.instance_variable_set(:@no_commands, false)
       end
@@ -603,6 +605,7 @@ class Thor
       # Fire this callback whenever a method is added. Added methods are
       # tracked as commands by invoking the create_command method.
       def method_added(meth)
+        super(meth)
         meth = meth.to_s
 
         if meth == "initialize"
