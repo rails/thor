@@ -8,9 +8,9 @@ require_relative "line_editor"
 require_relative "util"
 
 class Thor
-  autoload :Actions,    "thor/actions"
-  autoload :RakeCompat, "thor/rake_compat"
-  autoload :Group,      "thor/group"
+  autoload :Actions,    File.expand_path("actions", __dir__)
+  autoload :RakeCompat, File.expand_path("rake_compat", __dir__)
+  autoload :Group,      File.expand_path("group", __dir__)
 
   # Shortcuts for help.
   HELP_MAPPINGS       = %w(-h -? --help -D)
