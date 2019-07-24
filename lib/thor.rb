@@ -1,5 +1,5 @@
 require "set"
-require "thor/base"
+require_relative "thor/base"
 
 class Thor
   class << self
