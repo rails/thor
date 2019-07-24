@@ -1,11 +1,11 @@
 require "uri"
-require "thor/core_ext/io_binary_read"
-require "thor/actions/create_file"
-require "thor/actions/create_link"
-require "thor/actions/directory"
-require "thor/actions/empty_directory"
-require "thor/actions/file_manipulation"
-require "thor/actions/inject_into_file"
+require_relative "core_ext/io_binary_read"
+require_relative "actions/create_file"
+require_relative "actions/create_link"
+require_relative "actions/directory"
+require_relative "actions/empty_directory"
+require_relative "actions/file_manipulation"
+require_relative "actions/inject_into_file"
 
 class Thor
   module Actions

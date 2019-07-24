@@ -1,4 +1,4 @@
-require "thor/actions/create_file"
+require_relative "create_file"
 
 class Thor
   module Actions

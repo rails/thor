@@ -1,4 +1,4 @@
-require "thor/parser/argument"
-require "thor/parser/arguments"
-require "thor/parser/option"
-require "thor/parser/options"
+require_relative "parser/argument"
+require_relative "parser/arguments"
+require_relative "parser/option"
+require_relative "parser/options"

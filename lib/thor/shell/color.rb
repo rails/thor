@@ -1,4 +1,4 @@
-require "thor/shell/basic"
+require_relative "basic"
 
 class Thor
   module Shell
