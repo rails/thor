@@ -13,10 +13,7 @@ class Thor
       def readline
         if echo?
           ::Readline.completion_append_character = nil
-          # Ruby 1.8.7 does not allow Readline.completion_proc= to receive nil.
-          if complete = completion_proc
-            ::Readline.completion_proc = complete
-          end
+          ::Readline.completion_proc = completion_proc
           ::Readline.readline(prompt, add_to_history?)
         else
           super

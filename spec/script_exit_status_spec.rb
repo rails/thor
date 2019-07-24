@@ -26,4 +26,4 @@ describe "when the Thor class's exit_with_failure? method returns true" do
   it "a command that does not raise a Thor::Error exits with a status of 0" do
     expect(thor_command("ok")).to eq(0)
   end
-end if RUBY_VERSION > "1.8.7"
+end

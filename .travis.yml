@@ -2,13 +2,9 @@ before_install:
   - gem update --system 2.7.9
   - gem install bundler:1.17.3
   - rvm @global do gem uninstall did_you_mean
-  - # Travis's rvm 2.5.5 installation comes with bundler 2.0.1 for some reason.
-  - if [ "$TRAVIS_RUBY_VERSION" = "2.5.5" ]; then rvm @global do gem uninstall bundler -v 2.0.1 -x; fi
 bundler_args: --without development
 language: ruby
 rvm:
-  - 1.8.7
-  - 1.9.3
   - 2.0.0
   - 2.1.10
   - 2.2.10

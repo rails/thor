@@ -1,15 +1,13 @@
 $TESTING = true
 
-if RUBY_VERSION >= "1.9"
-  require "simplecov"
-  require "coveralls"
+require "simplecov"
+require "coveralls"
 
-  SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, Coveralls::SimpleCov::Formatter]
+SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, Coveralls::SimpleCov::Formatter]
 
-  SimpleCov.start do
-    add_filter "/spec"
-    minimum_coverage(90)
-  end
+SimpleCov.start do
+  add_filter "/spec"
+  minimum_coverage(90)
 end
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
@@ -28,7 +26,6 @@ WebMock.disable_net_connect!(:allow => "coveralls.io")
 $0 = "thor"
 $thor_runner = true
 ARGV.clear
-Encoding.default_external = Encoding::UTF_8 if RUBY_VERSION > '1.8.7' && RUBY_VERSION < '2.0.0'
 Thor::Base.shell = Thor::Shell::Basic
 
 # Load fixtures
