@@ -166,6 +166,11 @@ class PackageNameScript < Thor
   package_name "Baboon"
 end
 
+class PackageNameAndDescriptionScript < Thor
+  package_name "marvel"
+  package_description "A command-line interpreter for the Marvel Corporation."
+end
+
 module Scripts
   class MyScript < MyChildScript
     argument :accessor, :type => :string

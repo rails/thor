@@ -13,6 +13,16 @@ class Thor
       @package_name = name.nil? || name == "" ? nil : name
     end
 
+    # Allow users to add a description of the package
+    #
+    # === Parameters
+    # description<String>
+    # options<Hash>
+    #
+    def package_description(description, _ = {})
+      @package_description = description.nil? || description == "" ? nil : description
+    end
+
     # Sets the default command when thor is executed without an explicit command to be called.
     #
     # ==== Parameters
@@ -193,6 +203,11 @@ class Thor
         list += klass.printable_commands(false)
       end
       list.sort! { |a, b| a[0] <=> b[0] }
+
+      if defined?(@package_description) && @package_description
+        shell.say "#{@package_description}"
+        shell.say
+      end
 
       if defined?(@package_name) && @package_name
         shell.say "#{@package_name} commands:"

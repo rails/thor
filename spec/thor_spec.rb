@@ -354,6 +354,14 @@ describe Thor do
       content = capture(:stdout) { MyScript.start(%w(help)) }
       expect(content).to match(/Commands:/m)
     end
+
+    describe "#package_description" do
+      it "provides a description for a command when the package_description is assigned" do
+        content = capture(:stdout) { PackageNameAndDescriptionScript.start(%w(help)) }
+        expect(content).to match(/A command-line interpreter for the Marvel Corporation./m)
+        expect(content).to match(/marvel commands:/m)
+      end
+    end
   end
 
   describe "#desc" do
