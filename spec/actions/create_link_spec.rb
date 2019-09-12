@@ -2,7 +2,7 @@ require "helper"
 require "thor/actions"
 require "tempfile"
 
-describe Thor::Actions::CreateLink do
+describe Thor::Actions::CreateLink, :unless => windows? do
   before do
     @silence = false
     @hardlink_to = File.join(Dir.tmpdir, "linkdest.rb")

@@ -96,7 +96,7 @@ describe Thor::Actions do
     end
   end
 
-  describe "#link_file" do
+  describe "#link_file", :unless => windows? do
     it "links file from source to default destination" do
       action :link_file, "command.thor"
       exists_and_identical?("command.thor", "command.thor")
