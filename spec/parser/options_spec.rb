@@ -6,7 +6,6 @@ describe Thor::Options do
     opts.each do |key, value|
       opts[key] = Thor::Option.parse(key, value) unless value.is_a?(Thor::Option)
     end
-
     @opt = Thor::Options.new(opts, defaults, stop_on_unknown)
   end
 
@@ -302,6 +301,13 @@ describe Thor::Options do
         expect { parse("--fruit", "orange") }.to raise_error(Thor::MalformattedArgumentError,
             "Expected '--fruit' to be one of #{enum.join(', ')}; got orange")
       end
+
+      it "allows multiple values if repeatable is specified" do
+        create :foo => Thor::Option.new("foo", :type => :string, :repeatable => true)
+
+        expect(parse("--foo=bar", "--foo", "12")["foo"]).to eq(["bar", "12"])
+        expect(parse("--foo", "13", "--foo", "14")["foo"]).to eq(["bar", "12", "13", "14"])
+      end
     end
 
     describe "with :boolean type" do
@@ -362,6 +368,11 @@ describe Thor::Options do
         expect(parse("--skip-foo", "bar")).to eq("foo" => false)
         expect(@opt.remaining).to eq(%w(bar))
       end
+
+      it "allows multiple values if repeatable is specified" do
+        create :verbose => Thor::Option.new("verbose", :type => :boolean, :aliases => '-v', :repeatable => true)
+        expect(parse("-v", "-v", "-v")["verbose"].count).to eq(3)
+      end
     end
 
     describe "with :hash type" do
@@ -384,6 +395,11 @@ describe Thor::Options do
       it "must not allow the same hash key to be specified multiple times" do
         expect { parse("--attributes", "name:string", "name:integer") }.to raise_error(Thor::MalformattedArgumentError, "You can't specify 'name' more than once in option '--attributes'; got name:string and name:integer")
       end
+
+      it "allows multiple values if repeatable is specified" do
+        create :attributes => Thor::Option.new("attributes", :type => :hash, :repeatable => true)
+        expect(parse("--attributes", "name:one", "foo:1", "--attributes", "name:two", "bar:2")["attributes"]).to eq({"name"=>"two", "foo"=>"1", "bar" => "2"})
+      end
     end
 
     describe "with :array type" do
@@ -401,6 +417,11 @@ describe Thor::Options do
 
       it "must not mix values with other switches" do
         expect(parse("--attributes", "a", "b", "c", "--baz", "cool")["attributes"]).to eq(%w(a b c))
+      end
+
+      it "allows multiple values if repeatable is specified" do
+        create :attributes => Thor::Option.new("attributes", :type => :array, :repeatable => true)
+        expect(parse("--attributes", "1", "2", "--attributes", "3", "4")["attributes"]).to eq([["1", "2"], ["3", "4"]])
       end
     end
 
@@ -427,6 +448,11 @@ describe Thor::Options do
         create :limit => Thor::Option.new("limit", :type => :numeric, :enum => enum)
         expect { parse("--limit", "3") }.to raise_error(Thor::MalformattedArgumentError,
                                                         "Expected '--limit' to be one of #{enum.join(', ')}; got 3")
+      end
+
+      it "allows multiple values if repeatable is specified" do
+        create :run => Thor::Option.new("run", :type => :numeric, :repeatable => true)
+        expect(parse("--run", "1", "--run", "2")["run"]).to eq([1, 2])
       end
     end
   end

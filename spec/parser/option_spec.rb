@@ -140,6 +140,30 @@ describe Thor::Option do
     end.to raise_error(ArgumentError, 'Expected numeric default value for \'--foo-bar\'; got "baz" (string)')
   end
 
+  it "raises an error if repeatable and default is inconsistent with type and check_default_type is true" do
+    expect do
+      option("foo_bar", :type => :numeric, :repeatable => true, :default => "baz", :check_default_type => true)
+    end.to raise_error(ArgumentError, 'Expected array default value for \'--foo-bar\'; got "baz" (string)')
+  end
+
+  it "raises an error type hash is repeatable and default is inconsistent with type and check_default_type is true" do
+    expect do
+      option("foo_bar", :type => :hash, :repeatable => true, :default => "baz", :check_default_type => true)
+    end.to raise_error(ArgumentError, 'Expected hash default value for \'--foo-bar\'; got "baz" (string)')
+  end
+
+  it "does not raises an error if type hash is repeatable and default is consistent with type and check_default_type is true" do
+    expect do
+      option("foo_bar", :type => :hash, :repeatable => true, :default => {}, :check_default_type => true)
+    end.not_to raise_error
+  end
+
+  it "does not raises an error if repeatable and default is consistent with type and check_default_type is true" do
+    expect do
+      option("foo_bar", :type => :numeric, :repeatable => true, :default => [1], :check_default_type => true)
+    end.not_to raise_error
+  end
+
   it "does not raises an error if default is an symbol and type string and check_default_type is true" do
     expect do
       option("foo", :type => :string, :default => :bar, :check_default_type => true)
