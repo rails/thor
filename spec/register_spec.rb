@@ -47,7 +47,7 @@ class ClassOptionGroupPlugin < Thor::Group
                :default => "zebra"
 end
 
-class CompatibleWith19Plugin < ClassOptionGroupPlugin
+class PluginInheritingFromClassOptionsGroup < ClassOptionGroupPlugin
   desc "animal"
   def animal
     p options[:who]
@@ -119,7 +119,7 @@ BoringVendorProvidedCLI.register(
 )
 
 BoringVendorProvidedCLI.register(
-  CompatibleWith19Plugin,
+  PluginInheritingFromClassOptionsGroup,
   "zoo",
   "zoo [-w animal]",
   "Shows a provided animal or just zebra"
@@ -221,13 +221,13 @@ describe ".register-ing a Thor::Group subclass" do
   end
 end
 
-describe "1.8 and 1.9 syntax compatibility" do
-  it "is compatible with both 1.8 and 1.9 syntax w/o command options" do
+describe ".register-ing a Thor::Group subclass with class options" do
+  it "works w/o command options" do
     group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w(zoo)) }
     expect(group_output).to match(/zebra/)
   end
 
-  it "is compatible with both 1.8 and 1.9 syntax w/command options" do
+  it "works w/command options" do
     group_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w(zoo -w lion)) }
     expect(group_output).to match(/lion/)
   end
