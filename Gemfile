@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "rake", "< 11"
+gem "rake"
 
 group :development do
   gem "pry"
@@ -16,8 +16,6 @@ end
 group :test do
   gem "childlabor"
   gem "coveralls", ">= 0.8.19"
-  gem "mime-types", "~> 1.25", :platforms => [:jruby]
-  gem "rest-client", "~> 1.6.0", :platforms => [:jruby]
   gem "rspec", ">= 3"
   gem "rspec-mocks", ">= 3"
   gem "rubocop", ">= 0.19"
