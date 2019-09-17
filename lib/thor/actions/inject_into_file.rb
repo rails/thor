@@ -23,7 +23,8 @@ class Thor
     #
     def insert_into_file(destination, *args, &block)
       data = block_given? ? block : args.shift
-      config = args.shift
+      config = args.shift || {}
+
       action InjectIntoFile.new(self, destination, data, config)
     end
     alias_method :inject_into_file, :insert_into_file
