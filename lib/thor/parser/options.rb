@@ -196,7 +196,10 @@ class Thor
     # Parse boolean values which can be given as --foo=true, --foo or --no-foo.
     #
     def parse_boolean(switch)
-      if current_is_value?
+      no_or_skip = no_or_skip?(switch)
+      if no_or_skip
+        @switches.key?(switch) || !no_or_skip
+      elsif current_is_value?
         if ["true", "TRUE", "t", "T", true].include?(peek)
           shift
           true
@@ -204,10 +207,10 @@ class Thor
           shift
           false
         else
-          !no_or_skip?(switch)
+          !no_or_skip
         end
       else
-        @switches.key?(switch) || !no_or_skip?(switch)
+        @switches.key?(switch) || !no_or_skip
       end
     end
 

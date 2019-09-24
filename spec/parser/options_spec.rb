@@ -337,6 +337,10 @@ describe Thor::Options do
         expect(parse("--skip-foo")["foo"]).to eq(false)
       end
 
+      it "accepts --[skip-]opt variant, setting false for value, even if there's a trailing non-switch" do
+        expect(parse("--skip-foo", "asdf")["foo"]).to eq(false)
+      end
+
       it "will prefer 'no-opt' variant over inverting 'opt' if explicitly set" do
         create "--no-foo" => true
         expect(parse("--no-foo")["no-foo"]).to eq(true)
@@ -345,6 +349,11 @@ describe Thor::Options do
       it "will prefer 'skip-opt' variant over inverting 'opt' if explicitly set" do
         create "--skip-foo" => true
         expect(parse("--skip-foo")["skip-foo"]).to eq(true)
+      end
+
+      it "will prefer 'skip-opt' variant over inverting 'opt' if explicitly set, even if there's a trailing non-switch" do
+        create "--skip-foo" => true
+        expect(parse("--skip-foo", "asdf")["skip-foo"]).to eq(true)
       end
 
       it "accepts inputs in the human name format" do
