@@ -4,13 +4,7 @@ gem "rake"
 
 group :development do
   gem "pry"
-  platforms :ruby_21 do
-    gem "pry-byebug"
-  end
-  platforms :ruby_20 do
-    gem "pry-debugger"
-    gem "pry-stack_explorer"
-  end
+  gem "pry-byebug"
 end
 
 group :test do
