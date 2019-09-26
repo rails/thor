@@ -171,7 +171,7 @@ class Thor
     end
 
     def switch?(arg)
-      switch_option(normalize_switch(arg))
+      !switch_option(normalize_switch(arg)).nil?
     end
 
     def switch_option(arg)
@@ -196,10 +196,7 @@ class Thor
     # Parse boolean values which can be given as --foo=true, --foo or --no-foo.
     #
     def parse_boolean(switch)
-      no_or_skip = no_or_skip?(switch)
-      if no_or_skip
-        @switches.key?(switch) || !no_or_skip
-      elsif current_is_value?
+      if current_is_value?
         if ["true", "TRUE", "t", "T", true].include?(peek)
           shift
           true
@@ -207,10 +204,10 @@ class Thor
           shift
           false
         else
-          !no_or_skip
+          @switches.key?(switch) || !no_or_skip?(switch)
         end
       else
-        @switches.key?(switch) || !no_or_skip
+        @switches.key?(switch) || !no_or_skip?(switch)
       end
     end
 

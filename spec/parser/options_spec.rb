@@ -356,6 +356,14 @@ describe Thor::Options do
         expect(parse("--skip-foo", "asdf")["skip-foo"]).to eq(true)
       end
 
+      it "will prefer 'skip-opt' variant over inverting 'opt' if explicitly set, and given a value" do
+        create "--skip-foo" => true
+        expect(parse("--skip-foo=f")["skip-foo"]).to eq(false)
+        expect(parse("--skip-foo=false")["skip-foo"]).to eq(false)
+        expect(parse("--skip-foo=t")["skip-foo"]).to eq(true)
+        expect(parse("--skip-foo=true")["skip-foo"]).to eq(true)
+      end
+
       it "accepts inputs in the human name format" do
         create :foo_bar => :boolean
         expect(parse("--foo-bar")["foo_bar"]).to eq(true)
