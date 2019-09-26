@@ -171,7 +171,7 @@ class Thor
     end
 
     def switch?(arg)
-      switch_option(normalize_switch(arg))
+      !switch_option(normalize_switch(arg)).nil?
     end
 
     def switch_option(arg)
