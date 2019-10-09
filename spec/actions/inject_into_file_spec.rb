@@ -39,6 +39,17 @@ describe Thor::Actions::InjectIntoFile do
       expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
     end
 
+    it "appends content to the file if before and after arguments not provided" do
+      invoke!("doc/README", "more content\n")
+      expect(File.read(file)).to eq("__start__\nREADME\n__end__\nmore content\n")
+    end
+
+    it "does not change the file and logs the warning if flag not found in the file" do
+      expect(invoke!("doc/README", "more content\n", after: "whatever")).to(
+        eq("#{Thor::Actions::WARNINGS[:unchanged_no_flag]}  doc/README\n")
+      )
+    end
+
     it "accepts data as a block" do
       invoke! "doc/README", :before => "__end__" do
         "more content\n"
