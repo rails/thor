@@ -19,6 +19,15 @@ describe Thor::Shell::Color do
       shell.ask "Is this green?", :green, :limited_to => %w(Yes No Maybe)
     end
 
+    it "does not set the color if specified and NO_COLOR is set" do
+      allow(ENV).to receive(:[]).with("NO_COLOR").and_return("")
+      expect(Thor::LineEditor).to receive(:readline).with("Is this green? ", anything).and_return("yes")
+      shell.ask "Is this green?", :green
+
+      expect(Thor::LineEditor).to receive(:readline).with("Is this green? [Yes, No, Maybe] ", anything).and_return("Yes")
+      shell.ask "Is this green?", :green, :limited_to => %w(Yes No Maybe)
+    end
+
     it "handles an Array of colors" do
       expect(Thor::LineEditor).to receive(:readline).with("\e[32m\e[47m\e[1mIs this green on white? \e[0m", anything).and_return("yes")
       shell.ask "Is this green on white?", [:green, :on_white, :bold]
@@ -42,6 +51,15 @@ describe Thor::Shell::Color do
     it "does not set the color if output is not a tty" do
       out = capture(:stdout) do
         expect($stdout).to receive(:tty?).and_return(false)
+        shell.say "Wow! Now we have colors!", :green
+      end
+
+      expect(out.chomp).to eq("Wow! Now we have colors!")
+    end
+
+    it "does not set the color if NO_COLOR is set" do
+      allow(ENV).to receive(:[]).with("NO_COLOR").and_return("")
+      out = capture(:stdout) do
         shell.say "Wow! Now we have colors!", :green
       end
 
@@ -115,6 +133,13 @@ describe Thor::Shell::Color do
 
     it "does nothing when the terminal does not support color" do
       allow($stdout).to receive(:tty?).and_return(false)
+      colorless = shell.set_color "hi!", :white
+      expect(colorless).to eq("hi!")
+    end
+
+    it "does nothing when the terminal has the NO_COLOR environment variable set" do
+      allow(ENV).to receive(:[]).with("NO_COLOR").and_return("")
+      allow($stdout).to receive(:tty?).and_return(true)
       colorless = shell.set_color "hi!", :white
       expect(colorless).to eq("hi!")
     end
