@@ -398,6 +398,7 @@ class Thor
     # the namespace should be displayed as arguments.
     #
     def banner(command, namespace = nil, subcommand = false)
+      $thor_runner ||= false
       command.formatted_usage(self, $thor_runner, subcommand).split("\n").map do |formatted_usage|
         "#{basename} #{formatted_usage}"
       end.join("\n")
