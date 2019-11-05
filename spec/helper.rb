@@ -42,6 +42,10 @@ RSpec.configure do |config|
     ARGV.replace []
   end
 
+  config.before(:each) do
+    allow_any_instance_of(Thor::Base::ClassMethods).to receive(:exit_on_failure?).and_return(false)
+  end
+
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
