@@ -1,12 +1,12 @@
-begin
-  require "readline"
-rescue LoadError
-end
-
 class Thor
   module LineEditor
     class Readline < Basic
       def self.available?
+        begin
+          require "readline"
+        rescue LoadError
+        end
+
         Object.const_defined?(:Readline)
       end
 
