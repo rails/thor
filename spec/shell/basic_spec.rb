@@ -81,6 +81,14 @@ describe Thor::Shell::Basic do
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq("chocolate")
     end
 
+    it "prints a message to the user with the available range and reasks the question after an incorrect response" do
+      ages = (1..120)
+      expect($stdout).to receive(:print).with("Your response must be in the range: [1-120]. Please try again.\n")
+      expect(Thor::LineEditor).to receive(:readline).with('How old are you? [1-120] ', :limited_to => ages).and_return("150", "20")
+      expect(shell.ask('How old are you?', :limited_to => ages)).to eq("20")
+    end
+
+
     it "prints a message to the user containing a default and sets the default if only enter is pressed" do
       expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? (vanilla) ', :default => "vanilla").and_return("")
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :default => "vanilla")).to eq("vanilla")
@@ -91,6 +99,13 @@ describe Thor::Shell::Basic do
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
       expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ', :default => "vanilla", :limited_to => flavors).and_return("moose tracks", "")
       expect(shell.ask("What's your favorite Neopolitan flavor?", :default => "vanilla", :limited_to => flavors)).to eq("vanilla")
+    end
+
+    it "prints a message to the user with the available range and reasks the question after an incorrect response and then returns the default" do
+      ages = (1..120)
+      expect($stdout).to receive(:print).with("Your response must be in the range: [1-120]. Please try again.\n")
+      expect(Thor::LineEditor).to receive(:readline).with('How old are you? [1-120] (20) ', :default => "20", :limited_to => ages).and_return("150", "")
+      expect(shell.ask("How old are you?", :default => "20", :limited_to => ages)).to eq("20")
     end
   end
 

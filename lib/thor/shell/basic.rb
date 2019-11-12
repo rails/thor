@@ -52,7 +52,7 @@ class Thor
       # option is ignored when limited answers are supplied.
       #
       # If asked to limit the correct responses, you can pass in an
-      # array of acceptable answers.  If one of those is not supplied,
+      # array or range of acceptable answers.  If one of those is not supplied,
       # they will be shown a message stating that one of those answers
       # must be given and re-asked the question.
       #
@@ -80,10 +80,46 @@ class Thor
         color = args.first
 
         if options[:limited_to]
-          ask_filtered(statement, color, options)
+          if options[:limited_to].is_a?(Range)
+            ask_range(statement, color, options)
+          else
+            ask_filtered(statement, color, options)
+          end
         else
           ask_simply(statement, color, options)
         end
+      end
+
+      # Asks something to the user and receives a response, but only if the
+      # provided value is nil.
+      #
+      # If asked to limit the correct responses, you can pass in an
+      # array or range of acceptable answers.  If one of those is not supplied,
+      # they will be shown a message stating that one of those answers
+      # must be given and re-asked the question.
+      #
+      # If asking for sensitive information, the :echo option can be set
+      # to false to mask user input from $stdin.
+      #
+      # If the required input is a path, then set the path option to
+      # true. This will enable tab completion for file paths relative
+      # to the current working directory on systems that support
+      # Readline.
+      #
+      # ==== Example
+      # ask("What is your name?")
+      #
+      # ask("What is your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])
+      #
+      # ask("How old are you?", :limited_to => (1...120))
+      #
+      # ask("What is your password?", :echo => false)
+      #
+      # ask("Where should the file be saved?", :path => true)
+      #
+      def ask_if_nil(value, statement, *args)
+        return value unless value.nil?
+        ask(statement, args)
       end
 
       # Say (print) something to the user. If the sentence ends with a whitespace
@@ -449,9 +485,21 @@ class Thor
         end
       end
 
+      def ask_range(statement, color, options)
+        answer_set          = options[:limited_to].to_a
+        correct_answer      = nil
+        until correct_answer
+          answers = "#{answer_set.min}-#{answer_set.max}"
+          answer = ask_simply("#{statement} [#{answers}]", color, options)
+          correct_answer = answer_set.map{ |a| a.to_s }.include?(answer) ? answer : nil
+          say("Your response must be in the range: [#{answers}]. Please try again.") unless correct_answer
+        end
+        correct_answer
+      end
+
       def ask_filtered(statement, color, options)
-        answer_set = options[:limited_to]
-        correct_answer = nil
+        answer_set          = options[:limited_to]
+        correct_answer      = nil
         until correct_answer
           answers = answer_set.join(", ")
           answer = ask_simply("#{statement} [#{answers}]", color, options)

@@ -7,26 +7,44 @@ class Thor
     #
     class Color < Basic
       # Embed in a String to clear all previous ANSI sequences.
-      CLEAR      = "\e[0m"
+      CLEAR           = "\e[0m"
       # The start of an ANSI bold sequence.
-      BOLD       = "\e[1m"
+      BOLD            = "\e[1m"
 
       # Set the terminal's foreground ANSI color to black.
-      BLACK      = "\e[30m"
+      BLACK           = "\e[30m"
+      # Set the terminal's foreground ANSI color to black.
+      BRIGHT_BLACK    = "\e[30;1m"
       # Set the terminal's foreground ANSI color to red.
-      RED        = "\e[31m"
+      RED             = "\e[31m"
+      # Set the terminal's foreground ANSI color to red.
+      BRIGHT_RED      = "\e[31;1m"
       # Set the terminal's foreground ANSI color to green.
-      GREEN      = "\e[32m"
+      GREEN           = "\e[32m"
+      # Set the terminal's foreground ANSI color to green.
+      BRIGHT_GREEN    = "\e[32;1m"
       # Set the terminal's foreground ANSI color to yellow.
-      YELLOW     = "\e[33m"
+      YELLOW          = "\e[33m"
+      # Set the terminal's foreground ANSI color to yellow.
+      BRIGHT_YELLOW   = "\e[33;1m"
       # Set the terminal's foreground ANSI color to blue.
-      BLUE       = "\e[34m"
+      BLUE            = "\e[34m"
+      # Set the terminal's foreground ANSI color to blue.
+      BRIGHT_BLUE     = "\e[34;1m"
       # Set the terminal's foreground ANSI color to magenta.
-      MAGENTA    = "\e[35m"
+      MAGENTA         = "\e[35m"
+      # Set the terminal's foreground ANSI color to magenta.
+      BRIGHT_MAGENTA  = "\e[35;1m"
       # Set the terminal's foreground ANSI color to cyan.
-      CYAN       = "\e[36m"
+      CYAN            = "\e[36m"
+      # Set the terminal's foreground ANSI color to cyan.
+      BRIGHT_CYAN     = "\e[36;1m"
       # Set the terminal's foreground ANSI color to white.
-      WHITE      = "\e[37m"
+      WHITE           = "\e[37m"
+      # Set the terminal's foreground ANSI color to white.
+      BRIGHT_WHITE    = "\e[37;1m"
+
+
 
       # Set the terminal's background ANSI color to black.
       ON_BLACK   = "\e[40m"
