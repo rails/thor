@@ -463,8 +463,11 @@ class Thor
       end
 
       def answer_match(possibilities, answer, case_insensitive)
-        return possibilities.detect{ |possibility| possibility == answer } unless case_insensitive
-        possibilities.detect{ |possibility| possibility.downcase == answer.downcase }
+        if case_insensitive
+          possibilities.detect{ |possibility| possibility.downcase == answer.downcase }
+        else
+          possibilities.detect{ |possibility| possibility == answer }
+        end 
       end
 
       def merge(destination, content) #:nodoc:

@@ -81,7 +81,6 @@ describe Thor::Shell::Basic do
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq("chocolate")
     end
 
-    #this one
     it "prints a message to the user with the available options, expects case-sensitive matching, and reasks the question after a case-insensitive match" do
       flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
