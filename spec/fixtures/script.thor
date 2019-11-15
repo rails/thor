@@ -1,6 +1,10 @@
 class MyScript < Thor
   check_unknown_options! :except => :with_optional
 
+  def self.exit_on_failure?
+    false
+  end
+
   attr_accessor :some_attribute
   attr_writer :another_attribute
   attr_reader :another_attribute
@@ -186,6 +190,10 @@ module Scripts
   class MyDefaults < Thor
     check_unknown_options!
 
+    def self.exit_on_failure?
+      false
+    end
+
     namespace :default
     desc "cow", "prints 'moo'"
     def cow
@@ -206,6 +214,10 @@ module Scripts
   end
 
   class Arities < Thor
+    def self.exit_on_failure?
+      false
+    end
+
     desc "zero_args", "takes zero args"
     def zero_args
     end

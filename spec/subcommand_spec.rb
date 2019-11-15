@@ -55,6 +55,10 @@ describe Thor do
       class Parent < Thor
         desc "child1", "child1 description"
         subcommand "child1", Child1
+
+        def self.exit_on_failure?
+          false
+        end
       end
     end
 

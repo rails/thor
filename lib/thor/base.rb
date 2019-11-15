@@ -645,6 +645,7 @@ class Thor
 
       # A flag that makes the process exit with status 1 if any error happens.
       def exit_on_failure?
+        Thor.deprecation_warning 'Thor exit with status 0 on errors. To keep this behavior, you must define `exit_on_failure?`'
         false
       end
 
