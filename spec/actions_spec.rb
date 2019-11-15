@@ -291,29 +291,41 @@ describe Thor::Actions do
       end
     end
 
-    describe "aborting on failure" do
-      it "aborts when abort_on_failure is given and command fails" do
-        expect { action :run, "false", :abort_on_failure => true }.to raise_error(SystemExit)
-      end
-
-      it "suceeds when abort_on_failure is given and command succeeds" do
-        expect { action :run, "true", :abort_on_failure => true }.not_to raise_error
-      end
-
-      it "aborts when abort_on_failure is given, capture is given and command fails" do
-        expect { action :run, "false", :abort_on_failure => true, :capture => true }.to raise_error(SystemExit)
-      end
-
-      it "suceeds when abort_on_failure is given and command succeeds" do
-        expect { action :run, "true", :abort_on_failure => true, :capture => true }.not_to raise_error
-      end
-    end
-
     describe "when pretending" do
       it "doesn't execute the command" do
         runner = MyCounter.new([1], %w(--pretend))
         expect(runner).not_to receive(:system)
         runner.run("ls", :verbose => false)
+      end
+    end
+
+    describe "when not capturing" do
+      it "aborts when abort_on_failure is given and command fails" do
+        expect { action :run, "false", :abort_on_failure => true }.to raise_error(SystemExit)
+      end
+
+      it "succeeds when abort_on_failure is given and command succeeds" do
+        expect { action :run, "true", :abort_on_failure => true }.not_to raise_error
+      end
+
+      it "supports env option" do
+        expect { action :run, "echo $BAR", :env => { "BAR" => "foo" } }.to output("foo\n").to_stdout_from_any_process
+      end
+    end
+
+    describe "when capturing" do
+      it "aborts when abort_on_failure is given, capture is given and command fails" do
+        expect { action :run, "false", :abort_on_failure => true, :capture => true }.to raise_error(SystemExit)
+      end
+
+      it "succeeds when abort_on_failure is given and command succeeds" do
+        expect { action :run, "true", :abort_on_failure => true, :capture => true }.not_to raise_error
+      end
+
+      it "supports env option" do
+        silence(:stdout) do
+          expect(runner.run "echo $BAR", :env => { "BAR" => "foo" }, :capture => true).to eq("foo\n")
+        end
       end
     end
   end
@@ -367,8 +379,8 @@ describe Thor::Actions do
     end
 
     it "captures the output when :capture is given" do
-      expect(runner).to receive(:`).with("thor foo bar")
-      action(:thor, "foo", "bar", :capture => true)
+      expect(runner).to receive(:run).with("list", hash_including(:capture => true))
+      action :thor, :list, :capture => true
     end
   end
 end
