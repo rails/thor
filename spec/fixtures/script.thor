@@ -156,6 +156,10 @@ class MyChildScript < MyScript
 end
 
 class Barn < Thor
+  def self.exit_on_failure?
+    false
+  end
+
   desc "open [ITEM]", "open the barn door"
   def open(item = nil)
     if item == "shotgun"
