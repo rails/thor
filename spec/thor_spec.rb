@@ -722,12 +722,30 @@ HELP
       expect(klass.start(%w(unknown foo --bar baz))).to eq(%w(foo))
     end
 
-    it "does not check the default type when check_default_type! is not called" do
+    it "issues a deprecation warning on incompatible types by default" do
       expect do
         Class.new(Thor) do
           option "bar", :type => :numeric, :default => "foo"
         end
-      end.not_to raise_error
+      end.to output(/^Deprecation warning/).to_stderr
+    end
+
+    it "allows incompatible types if allow_incompatible_default_type! is called" do
+      expect do
+        Class.new(Thor) do
+          allow_incompatible_default_type!
+
+          option "bar", :type => :numeric, :default => "foo"
+        end
+      end.not_to output.to_stderr
+    end
+
+    it "allows incompatible types if `check_default_type: false` is given" do
+      expect do
+        Class.new(Thor) do
+          option "bar", :type => :numeric, :default => "foo", :check_default_type => false
+        end
+      end.not_to output.to_stderr
     end
 
     it "checks the default type when check_default_type! is called" do
