@@ -258,12 +258,17 @@ class Thor
 
       return if options[:pretend]
 
-      result = config[:capture] ? `#{command}` : system(command.to_s)
+      env_splat = [config[:env]] if config[:env]
 
-      if config[:abort_on_failure]
-        success = config[:capture] ? $?.success? : result
-        abort unless success
+      if config[:capture]
+        result, status = Open3.capture2e(*env_splat, command.to_s)
+        success = status.success?
+      else
+        result = system(*env_splat, command.to_s)
+        success = result
       end
+
+      abort if config[:abort_on_failure] && !success
 
       result
     end
