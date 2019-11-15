@@ -85,4 +85,24 @@ RSpec.configure do |config|
   end
 
   alias silence capture
+
+  # Runs the fixture in a different process.
+  # Useful to deal with exit_on_failure?, which interrupts the tests when it calls `exit`
+  # This doesn't run on ruby 1.8.7
+  def run_thor_fixture_standalone(fixture, command)
+    gem_dir = File.expand_path("#{File.dirname(__FILE__)}/..")
+    lib_path = "#{gem_dir}/lib"
+    script_path = "#{gem_dir}/spec/fixtures/#{fixture}.thor"
+    ruby_lib = ENV['RUBYLIB'].nil? ? lib_path : "#{lib_path}:#{ENV['RUBYLIB']}"
+
+    if command.is_a?(String)
+      full_command = "ruby #{script_path} #{command}"
+    elsif command.is_a?(Array)
+      full_command = ['ruby', script_path] + command
+    end
+
+    require 'open3'
+    stdout, stderr, status = Open3.capture3({'RUBYLIB' => ruby_lib}, *full_command)
+    [stdout, stderr, status]
+  end
 end

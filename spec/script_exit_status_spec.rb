@@ -20,10 +20,12 @@ describe "when the Thor class's exit_with_failure? method returns true" do
   end
 
   it "a command that raises a Thor::Error exits with a status of 1" do
-    expect(thor_command("error")).to eq(1)
+    _stdout, _stderr, status = run_thor_fixture_standalone('exit_status', ['error'])
+    expect(status.exitstatus).to eq(1)
   end
 
   it "a command that does not raise a Thor::Error exits with a status of 0" do
-    expect(thor_command("ok")).to eq(0)
+    _stdout, _stderr, status = run_thor_fixture_standalone('exit_status', ['ok'])
+    expect(status.exitstatus).to eq(0)
   end
 end
