@@ -467,7 +467,7 @@ class Thor
           possibilities.detect{ |possibility| possibility.downcase == answer.downcase }
         else
           possibilities.detect{ |possibility| possibility == answer }
-        end 
+        end
       end
 
       def merge(destination, content) #:nodoc:
