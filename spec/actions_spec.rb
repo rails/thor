@@ -328,6 +328,20 @@ describe Thor::Actions do
         end
       end
     end
+
+    context "exit_on_failure? is true" do
+      before do
+        allow(MyCounter).to receive(:exit_on_failure?).and_return(true)
+      end
+
+      it "aborts when command fails even if abort_on_failure is not given" do
+        expect { action :run, "false" }.to raise_error(SystemExit)
+      end
+
+      it "does not abort when abort_on_failure is false even if the command fails" do
+        expect { action :run, "false", :abort_on_failure => false }.not_to raise_error
+      end
+    end
   end
 
   describe "#run_ruby_script" do

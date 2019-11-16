@@ -269,7 +269,7 @@ class Thor
         success = result
       end
 
-      abort if config[:abort_on_failure] && !success
+      abort if !success && config.fetch(:abort_on_failure, self.class.exit_on_failure?)
 
       result
     end

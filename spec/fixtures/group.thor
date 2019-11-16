@@ -2,6 +2,10 @@ class MyCounter < Thor::Group
   include Thor::Actions
   add_runtime_options!
 
+  def self.exit_on_failure?
+    false
+  end
+
   def self.get_from_super
     from_superclass(:get_from_super, 13)
   end
