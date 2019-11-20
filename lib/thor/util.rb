@@ -263,6 +263,22 @@ class Thor
       def escape_globs(path)
         path.to_s.gsub(/[*?{}\[\]]/, '\\\\\\&')
       end
+
+      # Returns a string that has had any HTML characters escaped.
+      #
+      # ==== Examples
+      #
+      #   Thor::Util.escape_html('<div>')   # => "&lt;div&gt;"
+      #
+      # ==== Parameters
+      # String
+      #
+      # ==== Returns
+      # String
+      #
+      def escape_html(string)
+        CGI.escapeHTML(string)
+      end
     end
   end
 end
