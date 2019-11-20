@@ -51,13 +51,13 @@ class Thor
       def set_color(string, *colors)
         if colors.all? { |color| color.is_a?(Symbol) || color.is_a?(String) }
           html_colors = colors.map { |color| lookup_color(color) }
-          "<span style=\"#{html_colors.join('; ')};\">#{string}</span>"
+          "<span style=\"#{html_colors.join('; ')};\">#{CGI.escapeHTML(string)}</span>"
         else
           color, bold = colors
           html_color = self.class.const_get(color.to_s.upcase) if color.is_a?(Symbol)
           styles = [html_color]
           styles << BOLD if bold
-          "<span style=\"#{styles.join('; ')};\">#{string}</span>"
+          "<span style=\"#{styles.join('; ')};\">#{CGI.escapeHTML(string)}</span>"
         end
       end
 
