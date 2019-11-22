@@ -28,4 +28,14 @@ describe Thor::Shell::HTML do
       shell.say_status :conflict, "README", :red
     end
   end
+
+  describe "#set_color" do
+    it "escapes HTML content when unsing the default colors" do
+      expect(shell.set_color("<htmlcontent>", :blue)).to eq "<span style=\"color: blue;\">&lt;htmlcontent&gt;</span>"
+    end
+
+    it "escapes HTML content when not using the default colors" do
+      expect(shell.set_color("<htmlcontent>", [:nocolor])).to eq "<span style=\";\">&lt;htmlcontent&gt;</span>"
+    end
+  end
 end
