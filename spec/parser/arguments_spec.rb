@@ -40,6 +40,12 @@ describe Thor::Arguments do
       expect(parse("product", "title", "age")["array"]).to eq(%w(title age))
     end
 
+    it "accepts - as an array argument" do
+      create :array => nil
+      expect(parse("-")["array"]).to eq(%w(-))
+      expect(parse("-", "title", "-")["array"]).to eq(%w(- title -))
+    end
+
     describe "with no inputs" do
       it "and no arguments returns an empty hash" do
         create
