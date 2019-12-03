@@ -1,6 +1,5 @@
 require_relative "../thor"
 require_relative "group"
-require_relative "core_ext/io_binary_read"
 
 require "yaml"
 require "digest/md5"
