@@ -1,4 +1,3 @@
-require "open3"
 require_relative "actions/create_file"
 require_relative "actions/create_link"
 require_relative "actions/directory"
@@ -260,6 +259,7 @@ class Thor
       env_splat = [config[:env]] if config[:env]
 
       if config[:capture]
+        require "open3"
         result, status = Open3.capture2e(*env_splat, command.to_s)
         success = status.success?
       else
