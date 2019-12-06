@@ -1,4 +1,3 @@
-require "uri"
 require "open3"
 require_relative "actions/create_file"
 require_relative "actions/create_link"
