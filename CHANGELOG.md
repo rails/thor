@@ -1,3 +1,15 @@
+# 1.0.0
+* Drop support to Ruby 1.8 and 1.9.
+* Deprecate relying on default `exit_on_failure?`.
+  In preparation to make Thor commands exit when there is a failure we are deprecating
+  defining a command without defining what behavior is expected when there is a failure.
+
+  To fix the deprecation you need to define a class method called `exit_on_failure?` returning
+
+  `false` if you want the current behavior or `true` if you want the new behavior.
+* Deprecate defining an option with the default value using a different type as defined in the option.
+* Allow options to be repeatable. See #674.
+
 # 0.20.3
 * Support old versions of `did_you_mean`.
 
