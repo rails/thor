@@ -28,7 +28,12 @@ class MyScript < Thor
   desc "animal TYPE", "horse around"
 
   no_commands do
-    def this_is_not_a_command
+    no_commands do
+      def this_is_not_a_command
+      end
+    end
+
+    def neither_is_this
     end
   end
 

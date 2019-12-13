@@ -49,6 +49,7 @@ describe Thor::Base do
     it "avoids methods being added as commands" do
       expect(MyScript.commands.keys).to include("animal")
       expect(MyScript.commands.keys).not_to include("this_is_not_a_command")
+      expect(MyScript.commands.keys).not_to include("neither_is_this")
     end
   end
 
