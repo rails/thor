@@ -93,6 +93,18 @@ describe Thor::Actions::CreateLink, :unless => windows? do
       invoke!
       expect(action.identical?).to be true
     end
+
+    context "with source path relative to destination" do
+      let(:source) do
+        destination_path = File.dirname(File.join(destination_root, destination))
+        Pathname.new(super()).relative_path_from(Pathname.new(destination_path)).to_s
+      end
+
+      it "returns true if the destination link exists and is identical" do
+        expect(action.identical?).to be false
+        invoke!
+        expect(action.identical?).to be true
+      end
     end
   end
 
