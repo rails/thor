@@ -13,6 +13,13 @@ Gem::Specification.new do |spec|
   spec.homepage = "http://whatisthor.com/"
   spec.licenses = %w(MIT)
   spec.name = "thor"
+  spec.metadata = {
+    "bug_tracker_uri" => "https://github.com/erikhuda/thor/issues",
+    "changelog_uri" => "https://github.com/erikhuda/thor/blob/master/CHANGELOG.md",
+    "documentation_uri" => "http://whatisthor.com/",
+    "source_code_uri" => "https://github.com/erikhuda/thor/tree/v#{Thor::VERSION}",
+    "wiki_uri" => "https://github.com/erikhuda/thor/wiki"
+  }
   spec.require_paths = %w(lib)
   spec.required_ruby_version = ">= 2.0.0"
   spec.required_rubygems_version = ">= 1.3.5"
