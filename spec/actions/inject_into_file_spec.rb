@@ -44,6 +44,13 @@ describe Thor::Actions::InjectIntoFile do
       expect(File.read(file)).to eq("__start__\nREADME\n__end__\nmore content\n")
     end
 
+    it "does not change the file if replacement present in the file" do
+      invoke!("doc/README", "more specific content\n")
+      expect(invoke!("doc/README", "more specific content\n")).to(
+        eq("   unchanged  doc/README\n")
+      )
+    end
+
     it "does not change the file and logs the warning if flag not found in the file" do
       expect(invoke!("doc/README", "more content\n", after: "whatever")).to(
         eq("#{Thor::Actions::WARNINGS[:unchanged_no_flag]}  doc/README\n")
