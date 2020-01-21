@@ -97,7 +97,11 @@ class Thor
     protected
 
       def can_display_colors?
-        stdout.tty? && !are_colors_disabled?
+        are_colors_supported? && !are_colors_disabled?
+      end
+
+      def are_colors_supported?
+        stdout.tty? && ![nil, "dumb"].include?(ENV["TERM"])
       end
 
       def are_colors_disabled?
