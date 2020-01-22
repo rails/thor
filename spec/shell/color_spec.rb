@@ -7,6 +7,8 @@ describe Thor::Shell::Color do
 
   before do
     allow($stdout).to receive(:tty?).and_return(true)
+    allow(ENV).to receive(:[]).and_return(nil)
+    allow(ENV).to receive(:[]).with("TERM").and_return("ansi")
     allow_any_instance_of(StringIO).to receive(:tty?).and_return(true)
   end
 
@@ -131,13 +133,25 @@ describe Thor::Shell::Color do
       expect(colorless).to eq("hi!")
     end
 
-    it "does nothing when the terminal does not support color" do
+    it "does nothing when stdout is not a tty" do
       allow($stdout).to receive(:tty?).and_return(false)
       colorless = shell.set_color "hi!", :white
       expect(colorless).to eq("hi!")
     end
 
-    it "does nothing when the terminal has the NO_COLOR environment variable set" do
+    it "does nothing when the TERM environment variable is set to 'dumb'" do
+      allow(ENV).to receive(:[]).with("TERM").and_return("dumb")
+      colorless = shell.set_color "hi!", :white
+      expect(colorless).to eq("hi!")
+    end
+
+    it "does nothing when the TERM environment variable is not set" do
+      allow(ENV).to receive(:[]).with("TERM").and_return(nil)
+      colorless = shell.set_color "hi!", :white
+      expect(colorless).to eq("hi!")
+    end
+
+    it "does nothing when the NO_COLOR environment variable is set" do
       allow(ENV).to receive(:[]).with("NO_COLOR").and_return("")
       allow($stdout).to receive(:tty?).and_return(true)
       colorless = shell.set_color "hi!", :white
