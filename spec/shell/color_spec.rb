@@ -145,12 +145,6 @@ describe Thor::Shell::Color do
       expect(colorless).to eq("hi!")
     end
 
-    it "does nothing when the TERM environment variable is not set" do
-      allow(ENV).to receive(:[]).with("TERM").and_return(nil)
-      colorless = shell.set_color "hi!", :white
-      expect(colorless).to eq("hi!")
-    end
-
     it "does nothing when the NO_COLOR environment variable is set" do
       allow(ENV).to receive(:[]).with("NO_COLOR").and_return("")
       allow($stdout).to receive(:tty?).and_return(true)
