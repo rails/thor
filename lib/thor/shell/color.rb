@@ -101,7 +101,7 @@ class Thor
       end
 
       def are_colors_supported?
-        stdout.tty? && ![nil, "dumb"].include?(ENV["TERM"])
+        stdout.tty? && ENV["TERM"] != "dumb"
       end
 
       def are_colors_disabled?
