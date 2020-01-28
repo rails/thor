@@ -161,6 +161,8 @@ class Thor
     # to the block you provide. The path is set back to the previous path when
     # the method exits.
     #
+    # Returns the value yielded by the block.
+    #
     # ==== Parameters
     # dir<String>:: the directory to move to.
     # config<Hash>:: give :verbose => true to log and use padding.
@@ -179,7 +181,7 @@ class Thor
         FileUtils.mkdir_p(destination_root)
       end
 
-      if pretend
+      result = if pretend
         # In pretend mode, just yield down to the block
         block.arity == 1 ? yield(destination_root) : yield
       else
@@ -189,6 +191,7 @@ class Thor
 
       @destination_stack.pop
       shell.padding -= 1 if verbose
+      result
     end
 
     # Goes to the root and execute the given block.

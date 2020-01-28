@@ -165,6 +165,10 @@ describe Thor::Actions do
       end
     end
 
+    it "returns the value yielded by the block" do
+      expect(runner.inside("foo") { 123 }).to eq(123)
+    end
+
     describe "when pretending" do
       it "no directories should be created" do
         runner.inside("bar", :pretend => true) {}
