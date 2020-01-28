@@ -174,6 +174,10 @@ describe Thor::Actions do
         runner.inside("bar", :pretend => true) {}
         expect(File.exist?("bar")).to be false
       end
+
+      it "returns the value yielded by the block" do
+        expect(runner.inside("foo") { 123 }).to eq(123)
+      end
     end
 
     describe "when verbose" do

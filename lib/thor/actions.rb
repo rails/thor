@@ -181,12 +181,13 @@ class Thor
         FileUtils.mkdir_p(destination_root)
       end
 
-      result = if pretend
+      result = nil
+      if pretend
         # In pretend mode, just yield down to the block
-        block.arity == 1 ? yield(destination_root) : yield
+        result = block.arity == 1 ? yield(destination_root) : yield
       else
         require "fileutils"
-        FileUtils.cd(destination_root) { block.arity == 1 ? yield(destination_root) : yield }
+        FileUtils.cd(destination_root) { result = block.arity == 1 ? yield(destination_root) : yield }
       end
 
       @destination_stack.pop
