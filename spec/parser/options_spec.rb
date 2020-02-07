@@ -308,6 +308,15 @@ describe Thor::Options do
         expect(parse("--foo=bar", "--foo", "12")["foo"]).to eq(["bar", "12"])
         expect(parse("--foo", "13", "--foo", "14")["foo"]).to eq(["bar", "12", "13", "14"])
       end
+
+      it "can reset parsed options back to defaults" do
+        create :foo => Thor::Option.new("foo", :type => :string, :repeatable => true)
+
+        expect(parse("--foo=bar", "--foo", "12")["foo"]).to eq(["bar", "12"])
+        @opt.reset_options
+        expect(parse("--foo=bar", "--foo", "12")["foo"]).to eq(["bar", "12"])
+        expect(parse("--foo", "13", "--foo", "14")["foo"]).to eq(["bar", "12", "13", "14"])
+      end
     end
 
     describe "with :boolean type" do

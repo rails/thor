@@ -40,6 +40,7 @@ class Thor
         @assigns[key.to_s] = value
         @non_assigned_required.delete(hash_options[key])
       end
+      @default_values = @assigns.dup
 
       @shorts = {}
       @switches = {}
@@ -54,6 +55,10 @@ class Thor
           @shorts[name] ||= option.switch_name
         end
       end
+    end
+
+    def reset_options
+      @assigns = @default_values.dup
     end
 
     def remaining
