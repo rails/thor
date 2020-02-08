@@ -1,3 +1,6 @@
+# next
+* Enable options to be reset to default values after parsing.
+
 # 1.0.1
 * Fix thor when `thor/base` and `thor/group` are required without `thor.rb`.
 * Handle relative source path in `create_link`.
