@@ -1,43 +1,11 @@
+inherit_from: .rubocop_todo.yml
+
 AllCops:
-  TargetRubyVersion: 2.2
-
-Metrics/ParameterLists:
-  Max: 6
-  CountKeywordArgs: true
-
-Metrics/MethodLength:
-  Max: 25
-  CountComments: false
-
-Metrics/AbcSize:
-  Enabled: false
-
-Metrics/ClassLength:
-  Max: 300
-
-Metrics/ModuleLength:
-  Max: 300
-
-Metrics/BlockLength:
-  Max: 30
-
-Metrics/CyclomaticComplexity:
-  Max: 12
-
-Metrics/PerceivedComplexity:
-  Max: 15
-
-BlockNesting:
-  Max: 4
-
-Metrics/LineLength:
-  Enabled: false
-
-AccessModifierIndentation:
-  Enabled: false
-
-Documentation:
-  Enabled: false
+  TargetRubyVersion: 2.0
+  DisabledByDefault: true
+  Exclude:
+    - spec/sandbox/**/*
+    - spec/fixtures/**/*
 
 # Enforce Ruby 1.8-compatible hash syntax
 HashSyntax:
@@ -46,14 +14,6 @@ HashSyntax:
 # No spaces inside hash literals
 SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
-
-# Allow dots at the end of lines
-DotPosition:
-  Enabled: false
-
-# Don't require magic comment at the top of every file
-Encoding:
-  Enabled: false
 
 # Enforce outdenting of access modifiers (i.e. public, private, protected)
 AccessModifierIndentation:
@@ -71,14 +31,8 @@ CaseIndentation:
   EnforcedStyle: end
   IndentOneStep: false
 
-DoubleNegation:
-  Enabled: false
-
 StringLiterals:
   EnforcedStyle: double_quotes
-
-Style/SymbolLiteral:
-  Enabled: false
 
 Lint/AssignmentInCondition:
   Exclude:
@@ -110,13 +64,13 @@ Lint/UnusedMethodArgument:
     - 'lib/thor/parser/arguments.rb'
     - 'lib/thor/shell/html.rb'
     - 'spec/actions/empty_directory_spec.rb'
+    - 'spec/fixtures/invoke.thor'
 
-Style/AccessorMethodName:
+Naming/AccessorMethodName:
   Exclude:
     - 'lib/thor/line_editor/basic.rb'
-
-Style/Alias:
-  Enabled: false
+    - 'spec/fixtures/group.thor'
+    - 'spec/sandbox/group.thor'
 
 Style/ClassAndModuleChildren:
   Exclude:
@@ -130,7 +84,7 @@ Style/ClassVars:
     - 'lib/thor/util.rb'
     - 'spec/util_spec.rb'
 
-Style/ConstantName:
+Naming/ConstantName:
   Exclude:
     - 'spec/line_editor_spec.rb'
 
@@ -145,16 +99,15 @@ Style/GlobalVars:
     - 'spec/register_spec.rb'
     - 'spec/thor_spec.rb'
 
-Style/IndentArray:
+Layout/IndentArray:
   EnforcedStyle: consistent
 
 Style/MethodMissing:
   Exclude:
     - 'lib/thor/core_ext/hash_with_indifferent_access.rb'
     - 'lib/thor/runner.rb'
-
-Style/MutableConstant:
-  Enabled: false
+    - 'spec/fixtures/script.thor'
+    - 'spec/sandbox/script.thor'
 
 Style/NumericLiteralPrefix:
   Exclude:
@@ -176,9 +129,6 @@ Style/TrailingUnderscoreVariable:
   Exclude:
     - 'lib/thor/group.rb'
 
-Style/TrailingWhitespace:
+Layout/TrailingWhitespace:
   Exclude:
     - 'spec/shell/basic_spec.rb'
-
-Style/AlignParameters:
-  Enabled: false

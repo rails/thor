@@ -12,7 +12,7 @@ group :test do
   gem "coveralls", ">= 0.8.19"
   gem "rspec", ">= 3"
   gem "rspec-mocks", ">= 3"
-  gem "rubocop", ">= 0.19"
+  gem "rubocop", "~> 0.50.0"
   gem "simplecov", ">= 0.13"
   gem "webmock"
 end

@@ -2,7 +2,7 @@ require "helper"
 
 describe Thor::NestedContext do
   subject(:context) { described_class.new }
-  
+
   describe "#enter" do
     it "is never empty within the entered block" do
       context.enter do
