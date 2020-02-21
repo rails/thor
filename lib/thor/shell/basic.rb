@@ -109,13 +109,14 @@ class Thor
       def say_status(status, message, log_status = true)
         return if quiet? || log_status == false
         spaces = "  " * (padding + 1)
-        color  = log_status.is_a?(Symbol) ? log_status : :green
-
         status = status.to_s.rjust(12)
+        margin = " " * status.length + spaces
+
+        color  = log_status.is_a?(Symbol) ? log_status : :green
         status = set_color status, color, true if color
 
-        buffer = "#{status}#{spaces}#{message}"
-        buffer = "#{buffer}\n" unless buffer.end_with?("\n")
+        message = message.to_s.chomp.gsub(/(?<!\A)^/, margin)
+        buffer = "#{status}#{spaces}#{message}\n"
 
         stdout.print(buffer)
         stdout.flush

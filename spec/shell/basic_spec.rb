@@ -186,6 +186,20 @@ describe Thor::Shell::Basic do
       shell.say_status(:create, "")
     end
 
+    it "indents a multiline message" do
+      status = :foobar
+      lines = ["first line", "second line", "  third line", "    fourth line"]
+
+      expect($stdout).to receive(:print) do |string|
+        formatted_status = string[/^\s*#{status}\s*/]
+        margin = " " * formatted_status.length
+
+        expect(string).to eq(formatted_status + lines.join("\n#{margin}") + "\n")
+      end
+
+      shell.say_status(status, lines.join("\n") + "\n")
+    end
+
     it "does not print a message if base is muted" do
       expect(shell).to receive(:mute?).and_return(true)
       expect($stdout).not_to receive(:print)
