@@ -302,11 +302,10 @@ describe Thor::Options do
             "Expected '--fruit' to be one of #{enum.join(', ')}; got orange")
       end
 
-      it "allows multiple values if repeatable is specified" do
-        create :foo => Thor::Option.new("foo", :type => :string, :repeatable => true)
-
+      it "does not erroneously mutate defaults" do
+        create :foo => Thor::Option.new("foo", :type => :string, :repeatable => true, :required => false, :default => [])
         expect(parse("--foo=bar", "--foo", "12")["foo"]).to eq(["bar", "12"])
-        expect(parse("--foo", "13", "--foo", "14")["foo"]).to eq(["bar", "12", "13", "14"])
+        expect(@opt.instance_variable_get(:@switches)["--foo"].default).to eq([])
       end
     end
 
