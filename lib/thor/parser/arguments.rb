@@ -34,7 +34,6 @@ class Thor
             @assigns[argument.human_name] = argument.default.dup
           rescue TypeError  # Compatibility shim for un-dup-able Fixnum in Ruby < 2.4
             @assigns[argument.human_name] = argument.default
-            next
           end
         elsif argument.required?
           @non_assigned_required << argument
