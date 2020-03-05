@@ -2,6 +2,8 @@ require "helper"
 
 describe Thor::LineEditor::Readline do
   before do
+    # Eagerly check Readline availability and cache for this spec
+    Thor::LineEditor::Readline.available?
     unless defined? ::Readline
       ::Readline = double("Readline")
       allow(::Readline).to receive(:completion_append_character=).with(nil)
