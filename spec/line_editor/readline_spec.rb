@@ -2,7 +2,7 @@ require "helper"
 
 describe Thor::LineEditor::Readline do
   before do
-    # Eagerly check Readline availability and cache for this spec
+    # Eagerly check Readline availability before mocking
     Thor::LineEditor::Readline.available?
     unless defined? ::Readline
       ::Readline = double("Readline")

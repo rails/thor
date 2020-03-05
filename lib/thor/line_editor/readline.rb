@@ -2,8 +2,8 @@ class Thor
   module LineEditor
     class Readline < Basic
       def self.available?
-        @readline_reqd ||= begin
-            require "readline"
+        begin
+          require "readline"
         rescue LoadError
         end
 
