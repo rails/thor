@@ -175,6 +175,46 @@ describe Thor::Shell::Basic do
     end
   end
 
+  describe "#print_wrapped" do
+    let(:message) do
+      "Creates a back-up of the given folder by compressing it in a .tar.gz\n"\
+      "file and then uploading it to the configured Amazon S3 Bucket.\n\n"\
+      "It does not verify the integrity of the generated back-up."
+    end
+
+    before do
+      allow(ENV).to receive(:[]).with("THOR_COLUMNS").and_return(80)
+    end
+
+    context "without indentation" do
+      subject(:wrap_text) { described_class.new.print_wrapped(message) }
+
+      let(:expected_output) do
+        "Creates a back-up of the given folder by compressing it in a .tar.gz file and\n"\
+        "then uploading it to the configured Amazon S3 Bucket.\n\n"\
+        "It does not verify the integrity of the generated back-up.\n"
+      end
+
+      it "properly wraps the text around the 80th column" do
+        expect { wrap_text }.to output(expected_output).to_stdout
+      end
+    end
+
+    context "with indentation" do
+      subject(:wrap_text) { described_class.new.print_wrapped(message, :indent => 4) }
+
+      let(:expected_output) do
+        "    Creates a back-up of the given folder by compressing it in a .tar.gz file\n"\
+        "    and then uploading it to the configured Amazon S3 Bucket.\n\n"\
+        "    It does not verify the integrity of the generated back-up.\n"
+      end
+
+      it "properly wraps the text around the 80th column" do
+        expect { wrap_text }.to output(expected_output).to_stdout
+      end
+    end
+  end
+
   describe "#say_status" do
     it "prints a message to the user with status" do
       expect($stdout).to receive(:print).with("      create  ~/.thor/command.thor\n")
