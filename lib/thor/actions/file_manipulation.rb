@@ -329,7 +329,7 @@ class Thor
       path = File.expand_path(path, destination_root)
 
       say_status :remove, relative_to_original_destination_root(path), config.fetch(:verbose, true)
-      if !options[:pretend] && File.exist?(path)
+      if !options[:pretend] && (File.exist?(path) || File.symlink?(path))
         require "fileutils"
         ::FileUtils.rm_rf(path)
       end
