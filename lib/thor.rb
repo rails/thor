@@ -197,7 +197,7 @@ class Thor
       Thor::Util.thor_classes_in(self).each do |klass|
         list += klass.printable_commands(false)
       end
-      list.sort! { |a, b| a[0] <=> b[0] }
+      sort_commands!(list)
 
       if defined?(@package_name) && @package_name
         shell.say "#{@package_name} commands:"
@@ -495,6 +495,23 @@ class Thor
 "
     end
     alias_method :subtask_help, :subcommand_help
+
+    # Sort the commands, lexicographically by default
+    #
+    # Can be overridden in the subclass to change the display order of the
+    # commands, for example defining
+    #
+    #   def self.sort_commands!(list)
+    #     list.sort_by! do |a,b|
+    #       a[0] == :help ? -1 : a[0] <=> b[0]
+    #     end
+    #  end
+    #
+    # will put the +help+ command at the top
+    def sort_commands!(list)
+      defined?(super) ? super(list) : list.sort! { |a, b| a[0] <=> b[0] }
+    end
+
   end
 
   include Thor::Base
