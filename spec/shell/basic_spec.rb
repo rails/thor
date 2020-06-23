@@ -173,6 +173,21 @@ describe Thor::Shell::Basic do
       expect($stdout).to receive(:print).with("this_is_not_a_string\n")
       shell.say(:this_is_not_a_string, nil, true)
     end
+
+    it "does not print a message if muted" do
+      expect($stdout).not_to receive(:print)
+      shell.mute do
+        shell.say("Running...")
+      end
+    end
+
+    it "does not print a message if base is set to quiet" do
+      shell.base = MyCounter.new [1, 2]
+      expect(shell.base).to receive(:options).and_return(:quiet => true)
+
+      expect($stdout).not_to receive(:print)
+      shell.say("Running...")
+    end
   end
 
   describe "#print_wrapped" do
