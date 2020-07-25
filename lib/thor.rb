@@ -151,6 +151,7 @@ class Thor
     # :type     - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
     # :banner   - String to show on usage notes.
     # :hide     - If you want to hide this option from the help.
+    # :inverse  - Set to false if you want to suppress --no-<option> to be generated for booleans.
     #
     def method_option(name, options = {})
       scope = if options[:for]
