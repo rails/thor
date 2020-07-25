@@ -13,6 +13,7 @@ class Thor
       @group          = options[:group].to_s.capitalize if options[:group]
       @aliases        = normalize_aliases(options[:aliases])
       @hide           = options[:hide]
+      @inverse        = options[:inverse]
     end
 
     # This parse quick options given as method_options. It makes several
@@ -89,7 +90,7 @@ class Thor
 
       sample = "[#{sample}]".dup unless required?
 
-      if boolean? && name != "force" && !name.match(/\A(no|skip)[\-_]/)
+      if inverse?
         sample << ", [#{dasherize('no-' + human_name)}], [#{dasherize('skip-' + human_name)}]"
       end
 
@@ -111,6 +112,11 @@ class Thor
       else
         super
       end
+    end
+
+    def inverse?
+      return false if name == "force" || name.match(/\A(no|skip)[\-_]/)
+      boolean? && @inverse.nil? || @inverse.eql?(true)
     end
 
     VALID_TYPES.each do |type|
