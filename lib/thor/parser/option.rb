@@ -13,6 +13,7 @@ class Thor
       @group          = options[:group].to_s.capitalize if options[:group]
       @aliases        = Array(options[:aliases])
       @hide           = options[:hide]
+      @inverse        = options[:inverse]
     end
 
     # This parse quick options given as method_options. It makes several
@@ -88,16 +89,18 @@ class Thor
       end
 
       sample = "[#{sample}]".dup unless required?
-
-      if boolean?
-        sample << ", [#{dasherize('no-' + human_name)}]" unless (name == "force") || name.start_with?("no-")
-      end
+      sample << ", [#{dasherize('no-' + human_name)}]" if inverse?
 
       if aliases.empty?
         (" " * padding) << sample
       else
         "#{aliases.join(', ')}, #{sample}"
       end
+    end
+
+    def inverse?
+      return false if (name == "force") || name.start_with?("no-")
+      boolean? && @inverse.nil? || @inverse.eql?(true)
     end
 
     VALID_TYPES.each do |type|
