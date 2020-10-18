@@ -96,6 +96,18 @@ END
   def name_with_dashes
   end
 
+  desc "long_description", "a" * 80
+  long_desc <<-D, wrap: false
+No added indentation,   Inline
+whatespace not merged,
+Linebreaks preserved
+  and
+    indentation
+  too
+  D
+  def long_description_unwrapped
+  end
+
   method_options :all => :boolean
   method_option :lazy, :lazy_default => "yes"
   method_option :lazy_numeric, :type => :numeric, :lazy_default => 42

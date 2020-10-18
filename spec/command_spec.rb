@@ -6,7 +6,7 @@ describe Thor::Command do
       options[key] = Thor::Option.parse(key, value)
     end
 
-    @command ||= Thor::Command.new(:can_has, "I can has cheezburger", "I can has cheezburger\nLots and lots of it", usage, options)
+    @command ||= Thor::Command.new(:can_has, "I can has cheezburger", "I can has cheezburger\nLots and lots of it", nil, usage, options)
   end
 
   describe "#formatted_usage" do
@@ -54,7 +54,7 @@ describe Thor::Command do
 
   describe "#dup" do
     it "dup options hash" do
-      command = Thor::Command.new("can_has", nil, nil, nil, foo: true, bar: :required)
+      command = Thor::Command.new("can_has", nil, nil, nil, nil, foo: true, bar: :required)
       command.dup.options.delete(:foo)
       expect(command.options[:foo]).to be
     end

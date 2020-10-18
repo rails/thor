@@ -642,6 +642,21 @@ Description:
 HELP
       end
 
+      it "prints long description unwrapped if asked for" do
+        expect(capture(:stdout) { MyScript.command_help(shell, "long_description_unwrapped") }).to eq(<<-HELP)
+Usage:
+  thor my_script:long_description
+
+Description:
+No added indentation,   Inline
+whatespace not merged,
+Linebreaks preserved
+  and
+    indentation
+  too
+HELP
+      end
+
       it "doesn't assign the long description to the next command without one" do
         expect(capture(:stdout) do
           MyScript.command_help(shell, "name_with_dashes")
