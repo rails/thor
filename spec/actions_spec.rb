@@ -231,13 +231,17 @@ describe Thor::Actions do
 
     it "accepts a URL as the path" do
       @file = "http://gist.github.com/103208.txt"
-      expect(runner).to receive(:open).with(@file, "Accept" => "application/x-thor-template").and_return(@template)
+      stub_request(:get, @file)
+
+      expect(runner).to receive(:apply).with(@file).and_return(@template)
       action(:apply, @file)
     end
 
     it "accepts a secure URL as the path" do
       @file = "https://gist.github.com/103208.txt"
-      expect(runner).to receive(:open).with(@file, "Accept" => "application/x-thor-template").and_return(@template)
+      stub_request(:get, @file)
+
+      expect(runner).to receive(:apply).with(@file).and_return(@template)
       action(:apply, @file)
     end
 
