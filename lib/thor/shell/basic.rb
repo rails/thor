@@ -94,6 +94,8 @@ class Thor
       # say("I know you knew that.")
       #
       def say(message = "", color = nil, force_new_line = (message.to_s !~ /( |\t)\Z/))
+        return if quiet?
+
         buffer = prepare_message(message, *color)
         buffer << "\n" if force_new_line && !message.to_s.end_with?("\n")
 
