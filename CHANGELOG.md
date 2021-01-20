@@ -1,3 +1,11 @@
+# 1.1.0
+* Don't use ANSI colors when terminal is dumb.
+* Ensure default option/argument is not erroneously aliased.
+* Fixes a bug in the calculation of the print_wrapped method.
+* Obey `:mute` and `options[:quiet]` in `Shell#say`.
+* Support Ruby 3.0.
+* Add force option to the `gsub_file` action.
+
 # 1.0.1
 * Fix thor when `thor/base` and `thor/group` are required without `thor.rb`.
 * Handle relative source path in `create_link`.
