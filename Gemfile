@@ -17,6 +17,4 @@ group :test do
   gem "webmock"
 end
 
-gem 'did_you_mean'
-
 gemspec
