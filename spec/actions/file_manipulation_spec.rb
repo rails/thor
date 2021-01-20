@@ -4,8 +4,8 @@ class Application; end
 module ApplicationHelper; end
 
 describe Thor::Actions do
-  def runner(options = {})
-    @runner ||= MyCounter.new([1], options, :destination_root => destination_root)
+  def runner(options = {}, behavior = :invoke)
+    @runner ||= MyCounter.new([1], options, :destination_root => destination_root, :behavior => behavior)
   end
 
   def action(*args, &block)
@@ -280,28 +280,92 @@ describe Thor::Actions do
     end
 
     describe "#gsub_file" do
-      it "replaces the content in the file" do
-        action :gsub_file, "doc/README", "__start__", "START"
-        expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
+      context "with invoke behavior" do
+        it "replaces the content in the file" do
+          action :gsub_file, "doc/README", "__start__", "START"
+          expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
+        end
+
+        it "does not replace if pretending" do
+          runner(:pretend => true)
+          action :gsub_file, "doc/README", "__start__", "START"
+          expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+        end
+
+        it "accepts a block" do
+          action(:gsub_file, "doc/README", "__start__") { |match| match.gsub("__", "").upcase }
+          expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
+        end
+
+        it "logs status" do
+          expect(action(:gsub_file, "doc/README", "__start__", "START")).to eq("        gsub  doc/README\n")
+        end
+
+        it "does not log status if required" do
+          expect(action(:gsub_file, file, "__", :verbose => false) { |match| match * 2 }).to be_empty
+        end
       end
 
-      it "does not replace if pretending" do
-        runner(:pretend => true)
-        action :gsub_file, "doc/README", "__start__", "START"
-        expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
-      end
+      context "with revoke behavior" do
+        context "and no force option" do
+          it "does not replace the content in the file" do
+            runner({}, :revoke)
+            action :gsub_file, "doc/README", "__start__", "START"
+            expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+          end
 
-      it "accepts a block" do
-        action(:gsub_file, "doc/README", "__start__") { |match| match.gsub("__", "").upcase }
-        expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
-      end
+          it "does not replace if pretending" do
+            runner({ :pretend => true }, :revoke)
+            action :gsub_file, "doc/README", "__start__", "START"
+            expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+          end
 
-      it "logs status" do
-        expect(action(:gsub_file, "doc/README", "__start__", "START")).to eq("        gsub  doc/README\n")
-      end
+          it "does not replace the content in the file when given a block" do
+            runner({}, :revoke)
+            action(:gsub_file, "doc/README", "__start__") { |match| match.gsub("__", "").upcase }
+            expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+          end
 
-      it "does not log status if required" do
-        expect(action(:gsub_file, file, "__", :verbose => false) { |match| match * 2 }).to be_empty
+          it "does not log status" do
+            runner({}, :revoke)
+            expect(action(:gsub_file, "doc/README", "__start__", "START")).to be_empty
+          end
+
+          it "does not log status if required" do
+            runner({}, :revoke)
+            expect(action(:gsub_file, file, "__", :verbose => false) { |match| match * 2 }).to be_empty
+          end
+        end
+
+        context "and force option" do
+          it "replaces the content in the file" do
+            runner({}, :revoke)
+            action :gsub_file, "doc/README", "__start__", "START", :force => true
+            expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
+          end
+
+          it "does not replace if pretending" do
+            runner({ :pretend => true }, :revoke)
+            action :gsub_file, "doc/README", "__start__", "START", :force => true
+            expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+          end
+
+          it "replaces the content in the file when given a block" do
+            runner({}, :revoke)
+            action(:gsub_file, "doc/README", "__start__", :force => true) { |match| match.gsub("__", "").upcase }
+            expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
+          end
+
+          it "logs status" do
+            runner({}, :revoke)
+            expect(action(:gsub_file, "doc/README", "__start__", "START", :force => true)).to eq("        gsub  doc/README\n")
+          end
+
+          it "does not log status if required" do
+            runner({}, :revoke)
+            expect(action(:gsub_file, file, "__", :verbose => false, :force => true) { |match| match * 2 }).to be_empty
+          end
+        end
       end
     end
 
