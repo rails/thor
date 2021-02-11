@@ -14,6 +14,17 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
     expect(@hash.delete(:foo)).to eq("bar")
   end
 
+  it "supports except" do
+    unexcepted_hash = @hash.dup
+    @hash.except("foo")
+    expect(@hash).to eq(unexcepted_hash)
+
+    expect(@hash.except("foo")).to eq("baz" => "bee", "force" => true)
+    expect(@hash.except("foo", "baz")).to eq("force" => true)
+    expect(@hash.except(:foo)).to eq("baz" => "bee", "force" => true)
+    expect(@hash.except(:foo, :baz)).to eq("force" => true)
+  end
+
   it "supports fetch" do
     expect(@hash.fetch("foo")).to eq("bar")
     expect(@hash.fetch("foo", nil)).to eq("bar")
