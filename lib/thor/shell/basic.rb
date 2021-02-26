@@ -103,6 +103,23 @@ class Thor
         stdout.flush
       end
 
+      # Say (print) an error to the user. If the sentence ends with a whitespace
+      # or tab character, a new line is not appended (print + flush). Otherwise
+      # are passed straight to puts (behavior got from Highline).
+      #
+      # ==== Example
+      # say_error("error: something went wrong")
+      #
+      def say_error(message = "", color = nil, force_new_line = (message.to_s !~ /( |\t)\Z/))
+        return if quiet?
+
+        buffer = prepare_message(message, *color)
+        buffer << "\n" if force_new_line && !message.to_s.end_with?("\n")
+
+        stderr.print(buffer)
+        stderr.flush
+      end
+
       # Say a status with the given color and appends the message. Since this
       # method is used frequently by actions, it allows nil or false to be given
       # in log_status, avoiding the message from being shown. If a Symbol is

@@ -190,6 +190,48 @@ describe Thor::Shell::Basic do
     end
   end
 
+  describe "#say_error" do
+    it "prints a message to the user" do
+      expect($stderr).to receive(:print).with("Running...\n")
+      shell.say_error("Running...")
+    end
+
+    it "prints a message to the user without new line if it ends with a whitespace" do
+      expect($stderr).to receive(:print).with("Running... ")
+      shell.say_error("Running... ")
+    end
+
+    it "does not use a new line with whitespace+newline embedded" do
+      expect($stderr).to receive(:print).with("It's \nRunning...\n")
+      shell.say_error("It's \nRunning...")
+    end
+
+    it "prints a message to the user without new line" do
+      expect($stderr).to receive(:print).with("Running...")
+      shell.say_error("Running...", nil, false)
+    end
+
+    it "coerces everything to a string before printing" do
+      expect($stderr).to receive(:print).with("this_is_not_a_string\n")
+      shell.say_error(:this_is_not_a_string, nil, true)
+    end
+
+    it "does not print a message if muted" do
+      expect($stderr).not_to receive(:print)
+      shell.mute do
+        shell.say_error("Running...")
+      end
+    end
+
+    it "does not print a message if base is set to quiet" do
+      shell.base = MyCounter.new [1, 2]
+      expect(shell.base).to receive(:options).and_return(:quiet => true)
+
+      expect($stderr).not_to receive(:print)
+      shell.say_error("Running...")
+    end
+  end
+
   describe "#print_wrapped" do
     let(:message) do
       "Creates a back-up of the given folder by compressing it in a .tar.gz\n"\
