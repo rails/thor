@@ -210,9 +210,9 @@ class Thor
     #
     # ==== Examples
     #
-    #   inject_into_class "app/controllers/application_controller.rb", ApplicationController, "  filter_parameter :password\n"
+    #   inject_into_class "app/controllers/application_controller.rb", "ApplicationController", "  filter_parameter :password\n"
     #
-    #   inject_into_class "app/controllers/application_controller.rb", ApplicationController do
+    #   inject_into_class "app/controllers/application_controller.rb", "ApplicationController" do
     #     "  filter_parameter :password\n"
     #   end
     #
@@ -233,9 +233,9 @@ class Thor
     #
     # ==== Examples
     #
-    #   inject_into_module "app/helpers/application_helper.rb", ApplicationHelper, "  def help; 'help'; end\n"
+    #   inject_into_module "app/helpers/application_helper.rb", "ApplicationHelper", "  def help; 'help'; end\n"
     #
-    #   inject_into_module "app/helpers/application_helper.rb", ApplicationHelper do
+    #   inject_into_module "app/helpers/application_helper.rb", "ApplicationHelper" do
     #     "  def help; 'help'; end\n"
     #   end
     #
