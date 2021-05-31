@@ -34,9 +34,19 @@ describe Thor::Actions::InjectIntoFile do
       expect(File.read(file)).to eq("__start__\nmore content\nREADME\n__end__\n")
     end
 
+    it "ignores duplicates before the after flag" do
+      invoke! "doc/README", "\nREADME", :after => "README"
+      expect(File.read(file)).to eq("__start__\nREADME\nREADME\n__end__\n")
+    end
+
     it "changes the file adding content before the flag" do
       invoke! "doc/README", "more content\n", :before => "__end__"
       expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
+    end
+
+    it "ignores duplicates before the before flag" do
+      invoke! "doc/README", "README\n", :before => "README"
+      expect(File.read(file)).to eq("__start__\nREADME\nREADME\n__end__\n")
     end
 
     it "appends content to the file if before and after arguments not provided" do
