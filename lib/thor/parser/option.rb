@@ -111,7 +111,7 @@ class Thor
     end
 
     def inverse_sample
-      return unless boolean? && name !~ /^(force|no-.*)$/
+      return if !boolean? || name =~ /^(force|no-.*)$/
 
       case @inverse
       when Symbol, String
