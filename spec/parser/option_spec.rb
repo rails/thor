@@ -123,6 +123,10 @@ describe Thor::Option do
     expect(option("bar", type: :boolean, :inverse => false).usage).to_not include("[--no-bar]")
   end
 
+  it "allow to override the inverse option" do
+    expect(option("colorful", type: :boolean, :inverse => :monochromatic).usage).to include("[--monochromatic]")
+  end
+
   it "creates the inversion flag by default" do
     expect(option("bar", type: :boolean).usage).to include("[--no-bar]")
   end

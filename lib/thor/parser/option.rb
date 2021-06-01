@@ -82,25 +82,13 @@ class Thor
     end
 
     def usage(padding = 0)
-      sample = if banner && !banner.to_s.empty?
-        "#{switch_name}=#{banner}".dup
-      else
-        switch_name
-      end
-
-      sample = "[#{sample}]".dup unless required?
-      sample << ", [#{dasherize('no-' + human_name)}]" if inverse?
+      sample = [ sample_banner, inverse_sample ].compact.join(", ")
 
       if aliases.empty?
         (" " * padding) << sample
       else
         "#{aliases.join(', ')}, #{sample}"
       end
-    end
-
-    def inverse?
-      return false if (name == "force") || name.start_with?("no-")
-      boolean? && @inverse.nil? || @inverse.eql?(true)
     end
 
     VALID_TYPES.each do |type|
@@ -112,6 +100,26 @@ class Thor
     end
 
   protected
+
+    def sample_banner
+      sample_banner = if banner && !banner.to_s.empty?
+                        "#{switch_name}=#{banner}".dup
+                      else
+                        switch_name
+                      end
+      required? ? sample_banner : "[#{sample_banner}]"
+    end
+
+    def inverse_sample
+      return unless boolean? && name !~ /^(force|no-.*)$/
+
+      case @inverse
+      when Symbol, String
+        "[#{dasherize(@inverse.to_s)}]"
+      when nil, true
+        "[#{dasherize('no-' + human_name)}]"
+      end
+    end
 
     def validate!
       raise ArgumentError, "An option cannot be boolean and required." if boolean? && required?
