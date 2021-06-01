@@ -124,7 +124,7 @@ class Thor
     end
 
     def inverse_sample
-      return unless boolean? && name != "force" && !name.match(/\A(no|skip)[\-_]/)
+      return if !boolean? || name == "force" || name.match(/\A(no|skip)[\-_]/)
 
       case @inverse
       when Symbol, String
