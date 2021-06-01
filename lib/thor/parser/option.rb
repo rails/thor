@@ -82,17 +82,7 @@ class Thor
     end
 
     def usage(padding = 0)
-      sample = if banner && !banner.to_s.empty?
-        "#{switch_name}=#{banner}".dup
-      else
-        switch_name
-      end
-
-      sample = "[#{sample}]".dup unless required?
-
-      if inverse?
-        sample << ", [#{dasherize('no-' + human_name)}], [#{dasherize('skip-' + human_name)}]"
-      end
+      sample = [ sample_banner, inverse_sample ].compact.join(", ")
 
       aliases_for_usage.ljust(padding) + sample
     end
@@ -114,11 +104,6 @@ class Thor
       end
     end
 
-    def inverse?
-      return false if name == "force" || name.match(/\A(no|skip)[\-_]/)
-      boolean? && @inverse.nil? || @inverse.eql?(true)
-    end
-
     VALID_TYPES.each do |type|
       class_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{type}?
@@ -128,6 +113,26 @@ class Thor
     end
 
   protected
+
+    def sample_banner
+      sample_banner = if banner && !banner.to_s.empty?
+                        "#{switch_name}=#{banner}".dup
+                      else
+                        switch_name
+                      end
+      required? ? sample_banner : "[#{sample_banner}]"
+    end
+
+    def inverse_sample
+      return unless boolean? && name != "force" && !name.match(/\A(no|skip)[\-_]/)
+
+      case @inverse
+      when Symbol, String
+        "[#{dasherize(@inverse.to_s)}]"
+      when nil, true
+        "[#{dasherize('no-' + human_name)}], [#{dasherize('skip-' + human_name)}]"
+      end
+    end
 
     def validate!
       raise ArgumentError, "An option cannot be boolean and required." if boolean? && required?
