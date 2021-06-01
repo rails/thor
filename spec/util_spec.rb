@@ -180,7 +180,7 @@ describe Thor::Util do
         '/home/apps\\{1\\}/Thorfile',
         '/home/apps\\{1\\}/*.thor',
         '/home/apps\\{1\\}/tasks/*.thor',
-        '/home/apps\\{1\\}/lib/tasks/*.thor'
+        '/home/apps\\{1\\}/lib/tasks/**/*.thor'
       ])
     end
   end
