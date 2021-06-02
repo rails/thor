@@ -256,6 +256,13 @@ describe Thor::Actions do
         expect(File.exist?(file)).to be false
       end
 
+      it "removes broken symlinks too" do
+        link_path = File.join(destination_root, "broken_symlink")
+        ::FileUtils.ln_s("invalid_reference", link_path)
+        action :remove_file, "broken_symlink"
+        expect(File.symlink?(link_path) || File.exist?(link_path)).to be false
+      end
+
       it "removes directories too" do
         action :remove_dir, "doc"
         expect(File.exist?(File.join(destination_root, "doc"))).to be false
