@@ -119,22 +119,6 @@ describe Thor::Option do
     expect(option("--foo").switch_name).to eq("--foo")
   end
 
-  it "suppresses the creation of a --no-option when explicitly requested" do
-    expect(option("bar", type: :boolean, :inverse => false).usage).to_not include("[--no-bar]")
-  end
-
-  it "allow to override the inverse option" do
-    expect(option("colorful", type: :boolean, :inverse => :monochromatic).usage).to include("[--monochromatic]")
-  end
-
-  it "creates the inversion flag by default" do
-    expect(option("bar", type: :boolean).usage).to include("[--no-bar]")
-  end
-
-  it "creates the inversion flag when requested" do
-    expect(option("bar", type: :boolean, :inverse => true).usage).to include("[--no-bar]")
-  end
-
   it "returns the human name" do
     expect(option("foo").human_name).to eq("foo")
     expect(option("--foo").human_name).to eq("foo")
@@ -259,6 +243,22 @@ describe Thor::Option do
 
     it "checks when banner is an empty string" do
       expect(option(:foo, :required => false, :type => :string, :banner => "").usage).to eq("[--foo]")
+    end
+
+    it "suppresses the creation of a --no-option when explicitly requested" do
+      expect(option("bar", type: :boolean, :inverse => false).usage).to_not include("[--no-bar]")
+    end
+
+    it "allow to override the inverse option" do
+      expect(option("colorful", type: :boolean, :inverse => :monochromatic).usage).to include("[--monochromatic]")
+    end
+
+    it "creates the inversion flag by default" do
+      expect(option("bar", type: :boolean).usage).to include("[--no-bar]")
+    end
+
+    it "creates the inversion flag when requested" do
+      expect(option("bar", type: :boolean, :inverse => true).usage).to include("[--no-bar]")
     end
 
     describe "with required values" do
