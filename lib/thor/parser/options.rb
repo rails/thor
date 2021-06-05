@@ -45,7 +45,7 @@ class Thor
       @switches = {}
       @extra = []
       @stopped_parsing_after_extra_index = nil
-      @force_current_to_be_value = false
+      @is_switch_value = false
 
       options.each do |option|
         @switches[option.switch_name] = option
@@ -76,18 +76,18 @@ class Thor
     end
 
     def shift
-      @force_current_to_be_value = false
+      @is_switch_value = false
       super
     end
 
     def unshift(arg, force_value: false)
-      @force_current_to_be_value = force_value
+      @is_switch_value = force_value
       super(arg)
     end
 
     def parse(args) # rubocop:disable MethodLength
       @pile = args.dup
-      @force_current_to_be_value = false
+      @is_switch_value = false
       @parsing_options = true
 
       while peek
@@ -163,7 +163,7 @@ class Thor
     # Two booleans are returned.  The first is true if the current value
     # starts with a hyphen; the second is true if it is a registered switch.
     def current_is_switch?
-      return [false, false] if @force_current_to_be_value
+      return [false, false] if @is_switch_value
       case peek
       when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM
         [true, switch?($1)]
@@ -175,7 +175,7 @@ class Thor
     end
 
     def current_is_switch_formatted?
-      return false if @force_current_to_be_value
+      return false if @is_switch_value
       case peek
       when LONG_RE, SHORT_RE, EQ_RE, SHORT_NUM, SHORT_SQ_RE
         true
@@ -185,7 +185,7 @@ class Thor
     end
 
     def current_is_value?
-      return true if @force_current_to_be_value
+      return true if @is_switch_value
       peek && (!parsing_options? || super)
     end
 
