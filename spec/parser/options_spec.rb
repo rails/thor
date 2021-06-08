@@ -263,6 +263,8 @@ describe Thor::Options do
         expect(parse("-f=12")["foo"]).to eq("12")
         expect(parse("--foo=12")["foo"]).to eq("12")
         expect(parse("--foo=bar=baz")["foo"]).to eq("bar=baz")
+        expect(parse("--foo=-bar")["foo"]).to eq("-bar")
+        expect(parse("--foo=-bar -baz")["foo"]).to eq("-bar -baz")
       end
 
       it "must accept underscores switch=value assignment" do
@@ -398,6 +400,7 @@ describe Thor::Options do
 
       it "accepts a switch=<value> assignment" do
         expect(parse("--attributes=name:string", "age:integer")["attributes"]).to eq("name" => "string", "age" => "integer")
+        expect(parse("--attributes=-name:string", "age:integer", "--gender:string")["attributes"]).to eq("-name" => "string", "age" => "integer")
       end
 
       it "accepts a switch <value> assignment" do
@@ -425,6 +428,7 @@ describe Thor::Options do
 
       it "accepts a switch=<value> assignment" do
         expect(parse("--attributes=a", "b", "c")["attributes"]).to eq(%w(a b c))
+        expect(parse("--attributes=-a", "b", "-c")["attributes"]).to eq(%w(-a b))
       end
 
       it "accepts a switch <value> assignment" do
