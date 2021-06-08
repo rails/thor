@@ -72,6 +72,11 @@ describe Thor::Actions::InjectIntoFile do
       expect(invoke!("doc/README", "\nmore content", :after => "__start__")).to eq("      insert  doc/README\n")
     end
 
+    it "logs status if pretending" do
+      invoker(:pretend => true)
+      expect(invoke!("doc/README", "\nmore content", :after => "__start__")).to eq("      insert  doc/README\n")
+    end
+
     it "does not change the file if pretending" do
       invoker :pretend => true
       invoke! "doc/README", "\nmore content", :after => "__start__"
