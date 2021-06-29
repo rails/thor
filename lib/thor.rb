@@ -151,7 +151,7 @@ class Thor
     # :type     - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
     # :banner   - String to show on usage notes.
     # :hide     - If you want to hide this option from the help.
-    # :inverse  - false if yo don't want an inverse option of your boolean type, String or Symbol
+    # :inverse  - false if you don't want an inverse option of your boolean type, String or Symbol
     #             if you want to override the inverse option name.
     #
     def method_option(name, options = {})
