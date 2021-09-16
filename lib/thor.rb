@@ -399,7 +399,7 @@ class Thor
     #
     def banner(command, namespace = nil, subcommand = false)
       command.formatted_usage(self, $thor_runner, subcommand).split("\n").map do |formatted_usage|
-        "#{basename} #{formatted_usage}"
+        "#{formatted_usage}"
       end.join("\n")
     end
 
