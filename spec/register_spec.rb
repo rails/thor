@@ -194,7 +194,7 @@ describe ".register-ing a Thor subclass" do
       begin
         $thor_runner = false
         help_output = capture(:stdout) { BoringVendorProvidedCLI.start(%w(exciting)) }
-        expect(help_output).to include("thor exciting fireworks")
+        expect(help_output).to include("exciting fireworks")
       ensure
         $thor_runner = true
       end

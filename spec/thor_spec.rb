@@ -371,14 +371,14 @@ describe Thor do
   describe "#desc" do
     it "provides description for a command" do
       content = capture(:stdout) { MyScript.start(%w(help)) }
-      expect(content).to match(/thor my_script:zoo\s+# zoo around/m)
+      expect(content).to match(/my_script:zoo\s+# zoo around/m)
     end
 
     it "provides no namespace if $thor_runner is false" do
       begin
         $thor_runner = false
         content = capture(:stdout) { MyScript.start(%w(help)) }
-        expect(content).to match(/thor zoo\s+# zoo around/m)
+        expect(content).to match(/zoo\s+# zoo around/m)
       ensure
         $thor_runner = true
       end
@@ -441,20 +441,20 @@ describe Thor do
         expect(stderr.strip).to eq(msg)
       end
       arity_asserter.call %w(zero_args one), 'ERROR: "thor zero_args" was called with arguments ["one"]
-Usage: "thor scripts:arities:zero_args"'
+Usage: "scripts:arities:zero_args"'
       arity_asserter.call %w(one_arg), 'ERROR: "thor one_arg" was called with no arguments
-Usage: "thor scripts:arities:one_arg ARG"'
+Usage: "scripts:arities:one_arg ARG"'
       arity_asserter.call %w(one_arg one two), 'ERROR: "thor one_arg" was called with arguments ["one", "two"]
-Usage: "thor scripts:arities:one_arg ARG"'
+Usage: "scripts:arities:one_arg ARG"'
       arity_asserter.call %w(one_arg one two), 'ERROR: "thor one_arg" was called with arguments ["one", "two"]
-Usage: "thor scripts:arities:one_arg ARG"'
+Usage: "scripts:arities:one_arg ARG"'
       arity_asserter.call %w(two_args one), 'ERROR: "thor two_args" was called with arguments ["one"]
-Usage: "thor scripts:arities:two_args ARG1 ARG2"'
+Usage: "scripts:arities:two_args ARG1 ARG2"'
       arity_asserter.call %w(optional_arg one two), 'ERROR: "thor optional_arg" was called with arguments ["one", "two"]
-Usage: "thor scripts:arities:optional_arg [ARG]"'
+Usage: "scripts:arities:optional_arg [ARG]"'
       arity_asserter.call %w(multiple_usages), 'ERROR: "thor multiple_usages" was called with no arguments
-Usage: "thor scripts:arities:multiple_usages ARG --foo"
-       "thor scripts:arities:multiple_usages ARG --bar"'
+Usage: "scripts:arities:multiple_usages ARG --foo"
+       "scripts:arities:multiple_usages ARG --bar"'
     end
 
     it "raises an error if the invoked command does not exist" do
@@ -556,7 +556,7 @@ Usage: "thor scripts:arities:multiple_usages ARG --foo"
       it "provides full help info when talking about a specific command" do
         expect(capture(:stdout) { MyScript.command_help(shell, "foo") }).to eq(<<-END)
 Usage:
-  thor my_script:foo BAR
+  my_script:foo BAR
 
 Options:
   [--force]  # Force to do some fooing
@@ -570,8 +570,8 @@ END
       it "provides full help info when talking about a specific command with multiple usages" do
         expect(capture(:stdout) { MyScript.command_help(shell, "baz") }).to eq(<<-END)
 Usage:
-  thor my_script:baz THING
-  thor my_script:baz --all
+  my_script:baz THING
+  my_script:baz --all
 
 Options:
   [--all=ALL]  # Do bazing for all the things
@@ -587,13 +587,13 @@ END
       end
 
       it "normalizes names before claiming they don't exist" do
-        expect(capture(:stdout) { MyScript.command_help(shell, "name-with-dashes") }).to match(/thor my_script:name-with-dashes/)
+        expect(capture(:stdout) { MyScript.command_help(shell, "name-with-dashes") }).to match(/my_script:name-with-dashes/)
       end
 
       it "uses the long description if it exists" do
         expect(capture(:stdout) { MyScript.command_help(shell, "long_description") }).to eq(<<-HELP)
 Usage:
-  thor my_script:long_description
+  my_script:long_description
 
 Description:
   This is a really really really long description. Here you go. So very long.

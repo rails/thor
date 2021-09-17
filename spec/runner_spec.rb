@@ -113,7 +113,7 @@ describe Thor::Runner do
       ARGV.replace %w(my_script:animal)
       content = capture(:stderr) { Thor::Runner.start }
       expect(content.strip).to eq('ERROR: "thor animal" was called with no arguments
-Usage: "thor my_script:animal TYPE"')
+Usage: "my_script:animal TYPE"')
     end
   end
 
@@ -171,7 +171,7 @@ Usage: "thor my_script:animal TYPE"')
 
       it "presents commands in the default namespace with an empty namespace" do
         ARGV.replace %w(list)
-        expect(capture(:stdout) { Thor::Runner.start }).to match(/^thor :cow\s+# prints 'moo'/m)
+        expect(capture(:stdout) { Thor::Runner.start }).to match(/^:cow\s+# prints 'moo'/m)
       end
 
       it "runs commands with an empty namespace from the default namespace" do
