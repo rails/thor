@@ -2,10 +2,8 @@ Thor
 ====
 
 [![Gem Version](http://img.shields.io/gem/v/thor.svg)][gem]
-[![Build Status](http://img.shields.io/travis/rails/thor.svg)][travis]
 
 [gem]: https://rubygems.org/gems/thor
-[travis]: http://travis-ci.org/rails/thor
 
 Description
 -----------
