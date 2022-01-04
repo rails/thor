@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.name = "thor"
   spec.metadata = {
     "bug_tracker_uri" => "https://github.com/rails/thor/issues",
-    "changelog_uri" => "https://github.com/rails/thor/blob/master/CHANGELOG.md",
+    "changelog_uri" => "https://github.com/rails/thor/releases/tag/v#{Thor::VERSION}",
     "documentation_uri" => "http://whatisthor.com/",
     "source_code_uri" => "https://github.com/rails/thor/tree/v#{Thor::VERSION}",
     "wiki_uri" => "https://github.com/rails/thor/wiki"
