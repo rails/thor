@@ -37,7 +37,7 @@ describe "The library itself" do
   end
 
   it "has no malformed whitespace" do
-    exempt = /\.gitmodules|\.marshal|fixtures|vendor|spec|ssl_certs|LICENSE/
+    exempt = /\.gitmodules|\.marshal|fixtures|vendor|spec|ssl_certs|LICENSE|.devcontainer/
     error_messages = []
     Dir.chdir(File.expand_path("../..", __FILE__)) do
       `git ls-files`.split("\n").each do |filename|
