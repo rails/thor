@@ -166,6 +166,9 @@ files to keep your CLI description short and readable. You can then use
 Thor makes it easy to specify options and flags as metadata about a Thor
 command:
 
+ # Note  
+  option(and options)  are aliases for method_option (and methodo_options) respectively.
+
 <ruby>
 class MyCLI < Thor
   desc "hello NAME", "say hello to NAME"
