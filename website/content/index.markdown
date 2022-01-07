@@ -167,7 +167,8 @@ Thor makes it easy to specify options and flags as metadata about a Thor
 command:
 
  # Note  
-  option(and options)  are aliases for method_option (and methodo_options) respectively.
+ 
+  method_option is an alias for option.
 
 <ruby>
 class MyCLI < Thor
