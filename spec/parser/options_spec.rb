@@ -417,7 +417,7 @@ describe Thor::Options do
 
       it "allows multiple values if repeatable is specified" do
         create :attributes => Thor::Option.new("attributes", :type => :hash, :repeatable => true)
-        expect(parse("--attributes", "name:one", "foo:1", "--attributes", "name:two", "bar:2")["attributes"]).to eq({"name"=>"two", "foo"=>"1", "bar" => "2"})
+        expect(parse("--attributes", "name:one", "foo:1", "--attributes", "name:two", "bar:2")["attributes"]).to eq([{"name"=>"one", "foo"=>"1"}, {"name"=>"two", "bar" => "2"}])
       end
     end
 

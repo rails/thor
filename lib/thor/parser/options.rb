@@ -149,9 +149,7 @@ class Thor
   protected
 
     def assign_result!(option, result)
-      if option.repeatable && option.type == :hash
-        (@assigns[option.human_name] ||= {}).merge!(result)
-      elsif option.repeatable
+      if option.repeatable
         (@assigns[option.human_name] ||= []) << result
       else
         @assigns[option.human_name] = result
