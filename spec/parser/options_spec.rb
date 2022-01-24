@@ -116,7 +116,15 @@ describe Thor::Options do
       expected = "Unknown switches \"--baz\""
       expected << "\nDid you mean?  \"--bar\"" if Thor::Correctable
 
-      expect { check_unknown! }.to raise_error(Thor::UnknownArgumentError, expected)
+      # raise_error checks the original_message on the Error in this
+      # case, to account for Ruby 3.1 default enabling of DidYouMean?
+      # So use a custom error check rather than the raise_error
+      # matcher
+      begin
+        check_unknown!
+      rescue Thor::UnknownArgumentError => uae
+        expect(uae.message).to eq(expected)
+      end
     end
 
     it "skips leading non-switches" do
