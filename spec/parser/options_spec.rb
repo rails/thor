@@ -330,6 +330,10 @@ describe Thor::Options do
         expect(parse("--foo=false")["foo"]).to eq(false)
       end
 
+      it "accepts '--no-opt' variant with separator '--', setting false for value" do
+        expect(parse("--no-foo", "--")["foo"]).to eq(false)
+      end
+
       it "accepts --[no-]opt variant, setting false for value" do
         expect(parse("--no-foo")["foo"]).to eq(false)
       end
