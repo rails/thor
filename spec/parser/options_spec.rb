@@ -529,11 +529,18 @@ describe Thor::Options do
                                                      "Expected numeric value for '-n'; got \"foo\"")
       end
 
-      it "raises error when value isn't in enum" do
+      it "raises error when value isn't in Array enum" do
         enum = [1, 2]
         create limit: Thor::Option.new("limit", type: :numeric, enum: enum)
         expect { parse("--limit", "3") }.to raise_error(Thor::MalformattedArgumentError,
-                                                        "Expected '--limit' to be one of #{enum.join(', ')}; got 3")
+                                                        "Expected '--limit' to be one of 1, 2; got 3")
+      end
+
+      it "raises error when value isn't in Range enum" do
+        enum = 1..2
+        create limit: Thor::Option.new("limit", type: :numeric, enum: enum)
+        expect { parse("--limit", "3") }.to raise_error(Thor::MalformattedArgumentError,
+                                                        "Expected '--limit' to be one of 1..2; got 3")
       end
 
       it "allows multiple values if repeatable is specified" do
