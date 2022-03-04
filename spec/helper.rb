@@ -1,13 +1,15 @@
 $TESTING = true
 
-require "simplecov"
-require "coveralls"
+if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.6.0")
+  require "simplecov"
+  require "coveralls"
 
-SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, Coveralls::SimpleCov::Formatter]
+  SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, Coveralls::SimpleCov::Formatter]
 
-SimpleCov.start do
-  add_filter "/spec"
-  minimum_coverage(90)
+  SimpleCov.start do
+    add_filter "/spec"
+    minimum_coverage(90)
+  end
 end
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
