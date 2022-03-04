@@ -116,7 +116,9 @@ describe Thor::Options do
       expected = "Unknown switches \"--baz\""
       expected << "\nDid you mean?  \"--bar\"" if Thor::Correctable
 
-      expect { check_unknown! }.to raise_error(Thor::UnknownArgumentError, expected)
+      expect { check_unknown! }.to raise_error(Thor::UnknownArgumentError) do |error|
+        expect(error.to_s).to eq(expected)
+      end
     end
 
     it "skips leading non-switches" do
