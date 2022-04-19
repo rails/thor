@@ -122,7 +122,15 @@ class Thor
     def parse_array(name)
       return shift if peek.is_a?(Array)
       array = []
-      array << shift while current_is_value?
+      while current_is_value?
+        value = shift
+        if !value.empty? && @switches.is_a?(Hash) && switch = @switches[name]
+          if switch.enum && !switch.enum.include?(value)
+            raise MalformattedArgumentError, "Expected all values of '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
+          end
+        end
+        array << value
+      end
       array
     end
 
