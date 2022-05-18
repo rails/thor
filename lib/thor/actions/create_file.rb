@@ -43,6 +43,7 @@ class Thor
       # Boolean:: true if it is identical, false otherwise.
       #
       def identical?
+        # binread uses ASCII-8BIT, so to avoid false negatives, the string must use the same
         exists? && File.binread(destination) == String.new(render).force_encoding("ASCII-8BIT")
       end
 
