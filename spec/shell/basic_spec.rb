@@ -70,80 +70,80 @@ describe Thor::Shell::Basic do
 
     it "prints a message to the user with the available options, expects case-sensitive matching, and determines the correctness of the answer" do
       flavors = %w(strawberry chocolate vanilla)
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', :limited_to => flavors).and_return("chocolate")
+      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', { :limited_to => flavors }).and_return("chocolate")
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq("chocolate")
     end
 
     it "prints a message to the user with the available options, expects case-sensitive matching, and reasks the question after an incorrect response" do
       flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', :limited_to => flavors).and_return("moose tracks", "chocolate")
+      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', { :limited_to => flavors }).and_return("moose tracks", "chocolate")
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq("chocolate")
     end
 
     it "prints a message to the user with the available options, expects case-sensitive matching, and reasks the question after a case-insensitive match" do
       flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', :limited_to => flavors).and_return("cHoCoLaTe", "chocolate")
+      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', { :limited_to => flavors }).and_return("cHoCoLaTe", "chocolate")
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq("chocolate")
     end
 
     it "prints a message to the user with the available options, expects case-insensitive matching, and determines the correctness of the answer" do
       flavors = %w(strawberry chocolate vanilla)
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', :limited_to => flavors, :case_insensitive => true).and_return("CHOCOLATE")
+      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', { :limited_to => flavors, :case_insensitive => true }).and_return("CHOCOLATE")
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors, :case_insensitive => true)).to eq("chocolate")
     end
 
     it "prints a message to the user with the available options, expects case-insensitive matching, and reasks the question after an incorrect response" do
       flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', :limited_to => flavors, :case_insensitive => true).and_return("moose tracks", "chocolate")
+      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', { :limited_to => flavors, :case_insensitive => true }).and_return("moose tracks", "chocolate")
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors, :case_insensitive => true)).to eq("chocolate")
     end
 
     it "prints a message to the user containing a default and sets the default if only enter is pressed" do
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? (vanilla) ', :default => "vanilla").and_return("")
+      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? (vanilla) ', { :default => "vanilla" }).and_return("")
       expect(shell.ask('What\'s your favorite Neopolitan flavor?', :default => "vanilla")).to eq("vanilla")
     end
 
     it "prints a message to the user with the available options and reasks the question after an incorrect response and then returns the default" do
       flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ', :default => "vanilla", :limited_to => flavors).and_return("moose tracks", "")
+      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ', { :default => "vanilla", :limited_to => flavors }).and_return("moose tracks", "")
       expect(shell.ask("What's your favorite Neopolitan flavor?", :default => "vanilla", :limited_to => flavors)).to eq("vanilla")
     end
   end
 
   describe "#yes?" do
     it "asks the user and returns true if the user replies yes" do
-      expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", :add_to_history => false).and_return("y")
+      expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", { :add_to_history => false }).and_return("y")
       expect(shell.yes?("Should I overwrite it?")).to be true
     end
 
     it "asks the user and returns false if the user replies no" do
-      expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", :add_to_history => false).and_return("n")
+      expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", { :add_to_history => false }).and_return("n")
       expect(shell.yes?("Should I overwrite it?")).not_to be true
     end
 
     it "asks the user and returns false if the user replies with an answer other than yes or no" do
-      expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", :add_to_history => false).and_return("foobar")
+      expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", { :add_to_history => false }).and_return("foobar")
       expect(shell.yes?("Should I overwrite it?")).to be false
     end
   end
 
   describe "#no?" do
     it "asks the user and returns true if the user replies no" do
-      expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", :add_to_history => false).and_return("n")
+      expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", { :add_to_history => false }).and_return("n")
       expect(shell.no?("Should I overwrite it?")).to be true
     end
 
     it "asks the user and returns false if the user replies yes" do
-      expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", :add_to_history => false).and_return("Yes")
+      expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", { :add_to_history => false }).and_return("Yes")
       expect(shell.no?("Should I overwrite it?")).to be false
     end
 
     it "asks the user and returns false if the user replies with an answer other than yes or no" do
-      expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", :add_to_history => false).and_return("foobar")
+      expect(Thor::LineEditor).to receive(:readline).with("Should I overwrite it? ", { :add_to_history => false }).and_return("foobar")
       expect(shell.no?("Should I overwrite it?")).to be false
     end
   end
@@ -437,7 +437,7 @@ TABLE
 
   describe "#file_collision" do
     it "shows a menu with options" do
-      expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqh] ', :add_to_history => false).and_return("n")
+      expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqh] ', { :add_to_history => false }).and_return("n")
       shell.file_collision("foo")
     end
 
@@ -478,7 +478,7 @@ TABLE
     end
 
     it "always returns true if the user chooses always" do
-      expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqh] ', :add_to_history => false).and_return("a")
+      expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqh] ', { :add_to_history => false }).and_return("a")
 
       expect(shell.file_collision("foo")).to be true
 
@@ -488,7 +488,7 @@ TABLE
 
     describe "when a block is given" do
       it "displays diff and merge options to the user" do
-        expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqdhm] ', :add_to_history => false).and_return("s")
+        expect(Thor::LineEditor).to receive(:readline).with('Overwrite foo? (enter "h" for help) [Ynaqdhm] ', { :add_to_history => false }).and_return("s")
         shell.file_collision("foo") {}
       end
 
