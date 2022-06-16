@@ -4,11 +4,13 @@ require "readline"
 describe Thor::LineEditor, "on a system with Readline support" do
   before do
     @original_readline = ::Readline
-    silence_warnings { ::Readline = double("Readline") }
+    Object.send(:remove_const, :Readline)
+    ::Readline = double("Readline")
   end
 
   after do
-    silence_warnings { ::Readline = @original_readline }
+    Object.send(:remove_const, :Readline)
+    ::Readline = @original_readline
   end
 
   describe ".readline" do
@@ -28,7 +30,7 @@ describe Thor::LineEditor, "on a system without Readline support" do
   end
 
   after do
-    silence_warnings { ::Readline = @original_readline }
+    ::Readline = @original_readline
   end
 
   describe ".readline" do
