@@ -1,4 +1,5 @@
 require "helper"
+require "readline"
 
 describe Thor::LineEditor, "on a system with Readline support" do
   before do
