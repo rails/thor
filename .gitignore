@@ -21,6 +21,7 @@
 .yardoc
 Desktop.ini
 Gemfile.lock
+lint_gems.rb.lock
 Icon?
 InstalledFiles
 Session.vim

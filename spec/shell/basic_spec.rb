@@ -63,53 +63,53 @@ describe Thor::Shell::Basic do
     end
 
     it "prints a message to the user and does not echo stdin if the echo option is set to false" do
-      expect($stdout).to receive(:print).with('What\'s your password? ')
+      expect($stdout).to receive(:print).with("What's your password? ")
       expect($stdin).to receive(:noecho).and_return("mysecretpass")
       expect(shell.ask("What's your password?", :echo => false)).to eq("mysecretpass")
     end
 
     it "prints a message to the user with the available options, expects case-sensitive matching, and determines the correctness of the answer" do
       flavors = %w(strawberry chocolate vanilla)
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', {:limited_to => flavors}).and_return("chocolate")
-      expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq("chocolate")
+      expect(Thor::LineEditor).to receive(:readline).with("What's your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ", {:limited_to => flavors}).and_return("chocolate")
+      expect(shell.ask("What's your favorite Neopolitan flavor?", :limited_to => flavors)).to eq("chocolate")
     end
 
     it "prints a message to the user with the available options, expects case-sensitive matching, and reasks the question after an incorrect response" do
       flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', {:limited_to => flavors}).and_return("moose tracks", "chocolate")
-      expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq("chocolate")
+      expect(Thor::LineEditor).to receive(:readline).with("What's your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ", {:limited_to => flavors}).and_return("moose tracks", "chocolate")
+      expect(shell.ask("What's your favorite Neopolitan flavor?", :limited_to => flavors)).to eq("chocolate")
     end
 
     it "prints a message to the user with the available options, expects case-sensitive matching, and reasks the question after a case-insensitive match" do
       flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', {:limited_to => flavors}).and_return("cHoCoLaTe", "chocolate")
-      expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors)).to eq("chocolate")
+      expect(Thor::LineEditor).to receive(:readline).with("What's your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ", {:limited_to => flavors}).and_return("cHoCoLaTe", "chocolate")
+      expect(shell.ask("What's your favorite Neopolitan flavor?", :limited_to => flavors)).to eq("chocolate")
     end
 
     it "prints a message to the user with the available options, expects case-insensitive matching, and determines the correctness of the answer" do
       flavors = %w(strawberry chocolate vanilla)
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', {:limited_to => flavors, :case_insensitive => true}).and_return("CHOCOLATE")
-      expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors, :case_insensitive => true)).to eq("chocolate")
+      expect(Thor::LineEditor).to receive(:readline).with("What's your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ", {:limited_to => flavors, :case_insensitive => true}).and_return("CHOCOLATE")
+      expect(shell.ask("What's your favorite Neopolitan flavor?", :limited_to => flavors, :case_insensitive => true)).to eq("chocolate")
     end
 
     it "prints a message to the user with the available options, expects case-insensitive matching, and reasks the question after an incorrect response" do
       flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ', {:limited_to => flavors, :case_insensitive => true}).and_return("moose tracks", "chocolate")
-      expect(shell.ask('What\'s your favorite Neopolitan flavor?', :limited_to => flavors, :case_insensitive => true)).to eq("chocolate")
+      expect(Thor::LineEditor).to receive(:readline).with("What's your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ", {:limited_to => flavors, :case_insensitive => true}).and_return("moose tracks", "chocolate")
+      expect(shell.ask("What's your favorite Neopolitan flavor?", :limited_to => flavors, :case_insensitive => true)).to eq("chocolate")
     end
 
     it "prints a message to the user containing a default and sets the default if only enter is pressed" do
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? (vanilla) ', {:default => "vanilla"}).and_return("")
-      expect(shell.ask('What\'s your favorite Neopolitan flavor?', :default => "vanilla")).to eq("vanilla")
+      expect(Thor::LineEditor).to receive(:readline).with("What's your favorite Neopolitan flavor? (vanilla) ", {:default => "vanilla"}).and_return("")
+      expect(shell.ask("What's your favorite Neopolitan flavor?", :default => "vanilla")).to eq("vanilla")
     end
 
     it "prints a message to the user with the available options and reasks the question after an incorrect response and then returns the default" do
       flavors = %w(strawberry chocolate vanilla)
       expect($stdout).to receive(:print).with("Your response must be one of: [strawberry, chocolate, vanilla]. Please try again.\n")
-      expect(Thor::LineEditor).to receive(:readline).with('What\'s your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ', {:default => "vanilla", :limited_to => flavors}).and_return("moose tracks", "")
+      expect(Thor::LineEditor).to receive(:readline).with("What's your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ", {:default => "vanilla", :limited_to => flavors}).and_return("moose tracks", "")
       expect(shell.ask("What's your favorite Neopolitan flavor?", :default => "vanilla", :limited_to => flavors)).to eq("vanilla")
     end
   end
@@ -400,7 +400,7 @@ TABLE
 
     it "prints a table with small numbers and right-aligns them" do
       table = [
-        ["Name", "Number", "Color"], # rubocop: disable WordArray
+        ["Name", "Number", "Color"], # rubocop: disable Style/WordArray
         ["Erik", 1, "green"]
       ]
       content = capture(:stdout) { shell.print_table(table) }
@@ -412,7 +412,7 @@ TABLE
 
     it "doesn't output extra spaces for right-aligned columns in the last column" do
       table = [
-        ["Name", "Number"], # rubocop: disable WordArray
+        ["Name", "Number"], # rubocop: disable Style/WordArray
         ["Erik", 1]
       ]
       content = capture(:stdout) { shell.print_table(table) }
@@ -424,7 +424,7 @@ TABLE
 
     it "prints a table with big numbers" do
       table = [
-        ["Name", "Number", "Color"], # rubocop: disable WordArray
+        ["Name", "Number", "Color"], # rubocop: disable Style/WordArray
         ["Erik", 1_234_567_890_123, "green"]
       ]
       content = capture(:stdout) { shell.print_table(table) }

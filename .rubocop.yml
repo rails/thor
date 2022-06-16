@@ -6,32 +6,38 @@ AllCops:
   Exclude:
     - spec/sandbox/**/*
     - spec/fixtures/**/*
+    - vendor/bundle/**/**
 
 # Enforce Ruby 1.8-compatible hash syntax
-HashSyntax:
+Style/HashSyntax:
   EnforcedStyle: hash_rockets
 
 # No spaces inside hash literals
-SpaceInsideHashLiteralBraces:
+Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
 # Enforce outdenting of access modifiers (i.e. public, private, protected)
-AccessModifierIndentation:
+Layout/AccessModifierIndentation:
   EnforcedStyle: outdent
 
-EmptyLinesAroundAccessModifier:
+Layout/EmptyLinesAroundAccessModifier:
   Enabled: true
 
 # Align ends correctly
-EndAlignment:
+Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
+  Exclude:
+    - 'lib/thor/actions.rb'
+    - 'lib/thor/error.rb'
+    - 'lib/thor/shell/basic.rb'
+    - 'lib/thor/parser/option.rb'
 
 # Indentation of when/else
-CaseIndentation:
+Layout/CaseIndentation:
   EnforcedStyle: end
   IndentOneStep: false
 
-StringLiterals:
+Style/StringLiterals:
   EnforcedStyle: double_quotes
 
 Lint/AssignmentInCondition:
@@ -39,16 +45,11 @@ Lint/AssignmentInCondition:
     - 'lib/thor/line_editor/readline.rb'
     - 'lib/thor/parser/arguments.rb'
 
-Lint/EndAlignment:
-  Exclude:
-    - 'lib/thor/actions.rb'
-    - 'lib/thor/parser/option.rb'
-
 Security/Eval:
   Exclude:
     - 'spec/helper.rb'
 
-Lint/HandleExceptions:
+Lint/SuppressedException:
   Exclude:
     - 'lib/thor/line_editor/readline.rb'
 
@@ -99,10 +100,15 @@ Style/GlobalVars:
     - 'spec/register_spec.rb'
     - 'spec/thor_spec.rb'
 
-Layout/IndentArray:
+Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 
-Style/MethodMissing:
+Lint/MissingSuper:
+  Exclude:
+    - 'lib/thor/error.rb'
+    - 'spec/rake_compat_spec.rb'
+
+Style/MissingRespondToMissing:
   Exclude:
     - 'lib/thor/core_ext/hash_with_indifferent_access.rb'
     - 'lib/thor/runner.rb'

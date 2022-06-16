@@ -5,7 +5,7 @@ require "yaml"
 require "digest/md5"
 require "pathname"
 
-class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
+class Thor::Runner < Thor #:nodoc:
   autoload :OpenURI, "open-uri"
 
   map "-T" => :list, "-i" => :install, "-u" => :update, "-v" => :version
@@ -45,7 +45,7 @@ class Thor::Runner < Thor #:nodoc: # rubocop:disable ClassLength
 
   desc "install NAME", "Install an optionally named Thor file into your system commands"
   method_options :as => :string, :relative => :boolean, :force => :boolean
-  def install(name) # rubocop:disable MethodLength
+  def install(name) # rubocop:disable Metrics/MethodLength
     initialize_thorfiles
 
     # If a directory name is provided as the argument, look for a 'main.thor'

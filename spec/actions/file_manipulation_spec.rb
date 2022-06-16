@@ -319,7 +319,7 @@ describe Thor::Actions do
           end
 
           it "does not replace if pretending" do
-            runner({ :pretend => true }, :revoke)
+            runner({:pretend => true}, :revoke)
             action :gsub_file, "doc/README", "__start__", "START"
             expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
           end
@@ -349,7 +349,7 @@ describe Thor::Actions do
           end
 
           it "does not replace if pretending" do
-            runner({ :pretend => true }, :revoke)
+            runner({:pretend => true}, :revoke)
             action :gsub_file, "doc/README", "__start__", "START", :force => true
             expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
           end
