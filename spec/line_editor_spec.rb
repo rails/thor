@@ -3,7 +3,7 @@ require "readline"
 
 describe Thor::LineEditor, "on a system with Readline support" do
   before do
-    @original_readline = ::Readline if defined? ::Readline
+    @original_readline = ::Readline
     silence_warnings { ::Readline = double("Readline") }
   end
 
@@ -23,10 +23,8 @@ end
 
 describe Thor::LineEditor, "on a system without Readline support" do
   before do
-    if defined? ::Readline
-      @original_readline = ::Readline
-      Object.send(:remove_const, :Readline)
-    end
+    @original_readline = ::Readline
+    Object.send(:remove_const, :Readline)
   end
 
   after do
