@@ -1,13 +1,16 @@
 require "helper"
+require "readline"
 
 describe Thor::LineEditor, "on a system with Readline support" do
   before do
-    @original_readline = ::Readline if defined? ::Readline
-    silence_warnings { ::Readline = double("Readline") }
+    @original_readline = ::Readline
+    Object.send(:remove_const, :Readline)
+    ::Readline = double("Readline")
   end
 
   after do
-    silence_warnings { ::Readline = @original_readline }
+    Object.send(:remove_const, :Readline)
+    ::Readline = @original_readline
   end
 
   describe ".readline" do
@@ -22,14 +25,12 @@ end
 
 describe Thor::LineEditor, "on a system without Readline support" do
   before do
-    if defined? ::Readline
-      @original_readline = ::Readline
-      Object.send(:remove_const, :Readline)
-    end
+    @original_readline = ::Readline
+    Object.send(:remove_const, :Readline)
   end
 
   after do
-    silence_warnings { ::Readline = @original_readline }
+    ::Readline = @original_readline
   end
 
   describe ".readline" do
