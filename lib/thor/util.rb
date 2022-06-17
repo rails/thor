@@ -90,7 +90,7 @@ class Thor
       def snake_case(str)
         return str.downcase if str =~ /^[A-Z_]+$/
         str.gsub(/\B[A-Z]/, '_\&').squeeze("_") =~ /_*(.*)/
-        $+.downcase
+        Regexp.last_match(-1).downcase
       end
 
       # Receives a string and convert it to camel case. camel_case returns CamelCase.
@@ -189,7 +189,7 @@ class Thor
       # Returns the root where thor files are located, depending on the OS.
       #
       def thor_root
-        File.join(user_home, ".thor").tr('\\', "/")
+        File.join(user_home, ".thor").tr("\\", "/")
       end
 
       # Returns the files in the thor root. On Windows thor_root will be something
@@ -236,7 +236,7 @@ class Thor
                 # symlink points to 'ruby_install_name'
                 ruby = alternate_ruby if linked_ruby == ruby_name || linked_ruby == ruby
               end
-            rescue NotImplementedError # rubocop:disable HandleExceptions
+            rescue NotImplementedError # rubocop:disable Lint/HandleExceptions
               # just ignore on windows
             end
           end

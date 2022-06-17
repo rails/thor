@@ -610,7 +610,7 @@ class Thor
       def find_and_refresh_command(name) #:nodoc:
         if commands[name.to_s]
           commands[name.to_s]
-        elsif command = all_commands[name.to_s] # rubocop:disable AssignmentInCondition
+        elsif command = all_commands[name.to_s] # rubocop:disable Lint/AssignmentInCondition
           commands[name.to_s] = command.clone
         else
           raise ArgumentError, "You supplied :for => #{name.inspect}, but the command #{name.inspect} could not be found."

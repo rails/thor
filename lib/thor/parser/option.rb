@@ -58,7 +58,7 @@ class Thor
         default = nil
         if VALID_TYPES.include?(value)
           value
-        elsif required = (value == :required) # rubocop:disable AssignmentInCondition
+        elsif required = (value == :required) # rubocop:disable Lint/AssignmentInCondition
           :string
         end
       when TrueClass, FalseClass

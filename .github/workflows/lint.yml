@@ -1,0 +1,14 @@
+name: Run linters
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_GEMFILE: lint_gems.rb
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.1
+        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+    - run: bundle exec rubocop
