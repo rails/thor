@@ -219,7 +219,7 @@ Usage: "thor my_script:animal TYPE"')
         allow(FileUtils).to receive(:touch)
         allow(Thor::LineEditor).to receive(:readline).and_return("Y")
 
-        path = File.join(Thor::Util.thor_root, Digest::MD5.hexdigest(@location + "random"))
+        path = File.join(Thor::Util.thor_root, Digest::SHA256.hexdigest(@location + "random"))
         expect(File).to receive(:open).with(path, "w")
       end
 

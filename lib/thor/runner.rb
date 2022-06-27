@@ -2,7 +2,7 @@ require_relative "../thor"
 require_relative "group"
 
 require "yaml"
-require "digest/md5"
+require "digest/sha2"
 require "pathname"
 
 class Thor::Runner < Thor #:nodoc:
@@ -91,7 +91,7 @@ class Thor::Runner < Thor #:nodoc:
     end
 
     thor_yaml[as] = {
-      :filename   => Digest::MD5.hexdigest(name + as),
+      :filename   => Digest::SHA256.hexdigest(name + as),
       :location   => location,
       :namespaces => Thor::Util.namespaces_in_content(contents, base)
     }
