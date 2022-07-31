@@ -195,7 +195,7 @@ describe Thor::Base do
       expect(Thor::Base.subclass_files[File.expand_path(thorfile)]).to eq([
         MyScript, MyScript::AnotherScript, MyChildScript, Barn,
         PackageNameScript, Scripts::MyScript, Scripts::MyDefaults,
-        Scripts::ChildDefault, Scripts::Arities
+        Scripts::ChildDefault, Scripts::Arities, Apple, Pear
       ])
     end
 

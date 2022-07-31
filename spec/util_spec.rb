@@ -109,6 +109,11 @@ describe Thor::Util do
     it "falls back on the default namespace class if nothing else matches" do
       expect(Thor::Util.find_class_and_command_by_namespace("test")).to eq([Scripts::MyDefaults, "test"])
     end
+
+    it "returns correct Thor class and the command name when shared namespaces" do
+      expect(Thor::Util.find_class_and_command_by_namespace("fruits:apple")).to eq([Apple, "apple"])
+      expect(Thor::Util.find_class_and_command_by_namespace("fruits:pear")).to eq([Pear, "pear"])
+    end
   end
 
   describe "#thor_classes_in" do
