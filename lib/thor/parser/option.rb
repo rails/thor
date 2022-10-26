@@ -90,7 +90,7 @@ class Thor
       sample = "[#{sample}]".dup unless required?
 
       if boolean?
-        sample << ", [#{dasherize('no-' + human_name)}]" unless (name == "force") || name.start_with?(/no[\-_]/)
+        sample << ", [#{dasherize('no-' + human_name)}]" unless (name == "force") || name.match(/\Ano[\-_]/)
       end
 
       if aliases.empty?
