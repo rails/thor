@@ -105,11 +105,11 @@ describe Thor::Option do
 
     describe "with key as an array" do
       it "sets the first items in the array to the name" do
-        expect(parse([:foo, :bar, :baz], true).name).to eq("foo")
+        expect(parse([:foo, :b, "--bar"], true).name).to eq("foo")
       end
 
       it "sets all other items as aliases" do
-        expect(parse([:foo, :bar, :baz], true).aliases).to eq([:bar, :baz])
+        expect(parse([:foo, :b, "--bar"], true).aliases).to eq([:b, "--bar"])
       end
     end
   end
