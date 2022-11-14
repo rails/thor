@@ -11,7 +11,7 @@ class Thor
       super
       @lazy_default   = options[:lazy_default]
       @group          = options[:group].to_s.capitalize if options[:group]
-      @aliases        = Array(options[:aliases])
+      @aliases        = normalize_aliases(options[:aliases])
       @hide           = options[:hide]
     end
 
@@ -154,6 +154,12 @@ class Thor
 
     def dasherize(str)
       (str.length > 1 ? "--" : "-") + str.tr("_", "-")
+    end
+
+  private
+
+    def normalize_aliases(aliases)
+      Array(aliases).map { |short| short.to_s.sub(/^(?!\-)/, "-") }
     end
   end
 end
