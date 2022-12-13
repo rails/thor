@@ -234,7 +234,7 @@ describe Thor::Actions do
       allow(@template).to receive(:read).and_return(@template)
 
       @file = "/"
-      allow(runner).to receive(:open).and_return(@template)
+      allow(File).to receive(:open).and_return(@template)
     end
 
     it "accepts a URL as the path" do
@@ -255,7 +255,7 @@ describe Thor::Actions do
 
     it "accepts a local file path with spaces" do
       @file = File.expand_path("fixtures/path with spaces", File.dirname(__FILE__))
-      expect(runner).to receive(:open).with(@file).and_return(@template)
+      expect(File).to receive(:open).with(@file).and_return(@template)
       action(:apply, @file)
     end
 

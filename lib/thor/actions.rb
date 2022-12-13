@@ -225,7 +225,7 @@ class Thor
         require "open-uri"
         URI.open(path, "Accept" => "application/x-thor-template", &:read)
       else
-        open(path, &:read)
+        File.open(path, &:read)
       end
 
       instance_eval(contents, path)
