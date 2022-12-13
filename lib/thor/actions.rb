@@ -223,7 +223,8 @@ class Thor
 
       contents = if is_uri
         require "open-uri"
-        URI.open(path, "Accept" => "application/x-thor-template", &:read)
+        # for ruby 2.1-2.4
+        URI.send(:open, path, "Accept" => "application/x-thor-template", &:read)
       else
         File.open(path, &:read)
       end
