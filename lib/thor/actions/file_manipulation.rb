@@ -85,7 +85,7 @@ class Thor
         URI.send(:open, source) { |input| input.binmode.read }
       else
         source = File.expand_path(find_in_source_paths(source.to_s))
-        open(source) { |input| input.binmode.read }
+        File.open(source) { |input| input.binmode.read }
       end
 
       destination ||= if block_given?
