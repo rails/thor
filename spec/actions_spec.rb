@@ -86,7 +86,7 @@ describe Thor::Actions do
         expect(runner.relative_to_original_destination_root("/test/file")).to eq("/test/file")
       end
 
-      it "doesn't remove the root path from the absolute path if it is not at the begining" do
+      it "doesn't remove the root path from the absolute path if it is not at the beginning" do
         runner.destination_root = "/app"
         expect(runner.relative_to_original_destination_root("/something/app/project")).to eq("/something/app/project")
       end
