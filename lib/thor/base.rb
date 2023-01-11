@@ -506,7 +506,7 @@ class Thor
       #
       def public_command(*names)
         names.each do |name|
-          class_eval "def #{name}(*); super end"
+          class_eval "def #{name}(*); super end", __FILE__, __LINE__
         end
       end
       alias_method :public_task, :public_command
