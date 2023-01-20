@@ -15,6 +15,7 @@ group :test do
   gem "simplecov", ">= 0.13"
   gem "webmock", '~> 3.14.0' if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.4.0")
   gem "webmock", '>= 3.14' if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.4.0")
+  gem "rexml", '3.2.4' if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.1.0")
 end
 
 gemspec
