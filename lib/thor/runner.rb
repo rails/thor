@@ -6,8 +6,6 @@ require "digest/sha2"
 require "pathname"
 
 class Thor::Runner < Thor #:nodoc:
-  autoload :OpenURI, "open-uri"
-
   map "-T" => :list, "-i" => :install, "-u" => :update, "-v" => :version
 
   def self.banner(command, all = false, subcommand = false)
@@ -48,22 +46,33 @@ class Thor::Runner < Thor #:nodoc:
   def install(name) # rubocop:disable Metrics/MethodLength
     initialize_thorfiles
 
-    # If a directory name is provided as the argument, look for a 'main.thor'
-    # command in said directory.
-    begin
-      if File.directory?(File.expand_path(name))
-        base = File.join(name, "main.thor")
-        package = :directory
-        contents = open(base, &:read)
-      else
-        base = name
-        package = :file
-        contents = open(name, &:read)
+    is_uri  = name =~ %r{^https?\://}
+
+    if is_uri
+      base = name
+      package = :file
+      require "open-uri"
+      begin
+        contents = URI.send(:open, name, &:read) # Using `send` for Ruby 2.4- support
+      rescue OpenURI::HTTPError
+        raise Error, "Error opening URI '#{name}'"
       end
-    rescue OpenURI::HTTPError
-      raise Error, "Error opening URI '#{name}'"
-    rescue Errno::ENOENT
-      raise Error, "Error opening file '#{name}'"
+    else
+      # If a directory name is provided as the argument, look for a 'main.thor'
+      # command in said directory.
+      begin
+        if File.directory?(File.expand_path(name))
+          base = File.join(name, "main.thor")
+          package = :directory
+          contents = open(base, &:read)
+        else
+          base = name
+          package = :file
+          contents = open(name, &:read)
+        end
+      rescue Errno::ENOENT
+        raise Error, "Error opening file '#{name}'"
+      end
     end
 
     say "Your Thorfile contains:"
@@ -84,7 +93,7 @@ class Thor::Runner < Thor #:nodoc:
       as = basename if as.empty?
     end
 
-    location = if options[:relative] || name =~ %r{^https?://}
+    location = if options[:relative] || is_uri
       name
     else
       File.expand_path(name)
