@@ -395,7 +395,7 @@ describe Thor do
         expect(capture(:stdout) { MyScript.start(%w(help)) }).not_to match(/this is hidden/m)
       end
 
-      it "but the command is still invokable, does not show the command in help" do
+      it "but the command is still invocable, does not show the command in help" do
         expect(MyScript.start(%w(hidden yesyes))).to eq(%w(yesyes))
       end
     end

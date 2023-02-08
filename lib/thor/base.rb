@@ -618,7 +618,7 @@ class Thor
       end
       alias_method :find_and_refresh_task, :find_and_refresh_command
 
-      # Everytime someone inherits from a Thor class, register the klass
+      # Every time someone inherits from a Thor class, register the klass
       # and file into baseclass.
       def inherited(klass)
         super(klass)
