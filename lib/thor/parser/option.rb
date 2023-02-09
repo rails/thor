@@ -93,10 +93,14 @@ class Thor
         sample << ", [#{dasherize('no-' + human_name)}]" unless (name == "force") || name.start_with?("no-")
       end
 
+      aliases_for_usage.ljust(padding) + sample
+    end
+
+    def aliases_for_usage
       if aliases.empty?
-        (" " * padding) << sample
+        ""
       else
-        "#{aliases.join(', ')}, #{sample}"
+        "#{aliases.join(', ')}, "
       end
     end
 

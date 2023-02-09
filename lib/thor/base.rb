@@ -558,8 +558,7 @@ class Thor
         return if options.empty?
 
         list = []
-        padding = options.map { |o| o.aliases.size }.max.to_i * 4
-
+        padding = options.map { |o| o.aliases_for_usage.size }.max.to_i
         options.each do |option|
           next if option.hide
           item = [option.usage(padding)]
