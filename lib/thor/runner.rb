@@ -64,11 +64,12 @@ class Thor::Runner < Thor #:nodoc:
         if File.directory?(File.expand_path(name))
           base = File.join(name, "main.thor")
           package = :directory
-          contents = open(base, &:read)
+          contents = File.open(base, &:read)
         else
           base = name
           package = :file
-          contents = open(name, &:read)
+          require "open-uri"
+          contents = URI.send(:open, name, &:read) # for ruby 2.1-2.4
         end
       rescue Errno::ENOENT
         raise Error, "Error opening file '#{name}'"
