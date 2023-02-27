@@ -39,7 +39,7 @@ class Thor
       end
 
       def slice(*keys)
-        super(*keys.map{ convert_key(_1) })
+        super(*keys.map{ |key| convert_key(key) })
       end
 
       def key?(key)
