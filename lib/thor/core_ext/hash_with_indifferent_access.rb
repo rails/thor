@@ -38,6 +38,10 @@ class Thor
         super(convert_key(key), *args)
       end
 
+      def slice(*keys)
+        super(*keys.map{ convert_key(_1) })
+      end
+
       def key?(key)
         super(convert_key(key))
       end
