@@ -231,6 +231,7 @@ describe Thor::Option do
 
     it "does not document a negative option for a negative boolean" do
       expect(parse(:'no-foo', :boolean).usage).not_to include("[--no-no-foo]")
+      expect(parse(:no_foo, :boolean).usage).not_to include("[--no-no-foo]")
     end
 
     it "documents a negative option for a positive boolean starting with 'no'" do
