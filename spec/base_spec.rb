@@ -155,6 +155,32 @@ describe Thor::Base do
       content = capture(:stdout) { Enum.help(Thor::Base.shell.new) }
       expect(content).to match(/Possible values\: apple, banana/)
     end
+
+    it "does not display class options in help if it has been ignored for a command" do
+      help = capture(:stdout) { IgnoreClassOptions.start(%w(help shake)) }
+
+      expect(help).not_to match (/-c, --cheese=CHEESE/)
+    end
+
+    it "displays class options in help if it has been not ignored for a command" do
+      help = capture(:stdout) { IgnoreClassOptions.start(%w(help snack)) }
+
+      expect(help).to match (/-c, --cheese=CHEESE/)
+    end
+  end
+
+  describe "#ignore_class_options" do
+    it "ignores class options when used ignore_class_options" do
+      options = IgnoreClassOptions.start(%w(shake --fruit apple --milk 1))
+
+      expect(options).to eq ({"fruit"=>"apple", "milk"=>1})
+    end
+
+    it "does not ignore class options when ignore_class_options is not used" do
+      options_when_not_ignored = IgnoreClassOptions.start(%w(snack --fruit apple --cheese provlone))
+
+      expect(options_when_not_ignored).to eq ({ "cheese" => "provlone", "fruit" => "apple" })
+    end
   end
 
   describe "#namespace" do

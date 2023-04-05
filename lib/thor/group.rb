@@ -162,7 +162,7 @@ class Thor::Group
       get_options_from_invocations(groups, class_options) do |klass|
         klass.send(:get_options_from_invocations, groups, class_options)
       end
-      super(shell, groups)
+      super(shell, [], groups)
     end
 
     # Get invocations array and merge options from invocations. Those
