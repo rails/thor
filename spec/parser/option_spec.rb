@@ -256,8 +256,16 @@ describe Thor::Option do
         expect(parse([:foo, "-f", "-b"], :required).usage).to eq("-f, -b, --foo=FOO")
       end
 
+      it "does not show the usage between brackets(include non-dash-prefixed aliases)" do
+        expect(parse([:foo, "f", "-b"], :required).usage).to eq("-f, -b, --foo=FOO")
+      end
+
       it "does not negate the aliases" do
         expect(parse([:foo, "-f", "-b"], :boolean).usage).to eq("-f, -b, [--foo], [--no-foo]")
+      end
+
+      it "does not negate the aliases(include non-dash-prefixed aliases)" do
+        expect(parse([:foo, "f", "-b"], :boolean).usage).to eq("-f, -b, [--foo], [--no-foo]")
       end
     end
   end

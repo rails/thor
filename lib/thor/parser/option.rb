@@ -96,7 +96,7 @@ class Thor
       if aliases.empty?
         (" " * padding) << sample
       else
-        "#{aliases.join(', ')}, #{sample}"
+        "#{aliases.map{|e|e.to_s.sub(/^(?!\-)/, '-')}.join(', ')}, #{sample}"
       end
     end
 
