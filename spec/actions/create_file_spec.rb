@@ -33,6 +33,14 @@ describe Thor::Actions::CreateFile do
       expect(File.exist?(File.join(destination_root, "doc/config.rb"))).to be true
     end
 
+    it "allows setting file permissions" do
+      create_file("config/private.key", :perm => 0o600)
+      invoke!
+
+      stat = File.stat(File.join(destination_root, "config/private.key"))
+      expect(stat.mode.to_s(8)).to eq "100600"
+    end
+
     it "does not create a file if pretending" do
       create_file("doc/config.rb", {}, :pretend => true)
       invoke!
