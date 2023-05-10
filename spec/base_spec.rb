@@ -139,8 +139,9 @@ describe Thor::Base do
     end
 
     it "use padding in options that do not have aliases" do
-      expect(@content).to match(/^  -t, \[--third/)
-      expect(@content).to match(/^          \[--fourth/)
+      expect(@content).to match(/^  -t,   \[--third/)
+      expect(@content).to match(/^        \[--fourth/)
+      expect(@content).to match(/^  y, r, \[--symbolic/)
     end
 
     it "allows extra options to be given" do
