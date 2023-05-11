@@ -55,15 +55,15 @@ describe Thor::Argument do
       expect(argument(:foo, {
         :required => false,
         :type     => :array,
-        :default  => ['one','two']
+        :default  => ["one","two"]
       }).print_default).to eq('"one" "two"')
     end
     it "prints arrays with a single string default as before" do
       expect(argument(:foo,    {
         :required => false,
         :type     => :array,
-        :default  => 'foobar'
-      }).print_default).to eq('foobar')
+        :default  => "foobar"
+      }).print_default).to eq("foobar")
     end
     it "prints none arrays as default" do
       expect(argument(:foo, {
