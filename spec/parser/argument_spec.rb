@@ -49,4 +49,28 @@ describe Thor::Argument do
       expect(argument(:foo, :type => :hash).usage).to eq("key:value")
     end
   end
+
+  describe "#print_default" do
+    it "prints arrays in a copy pasteable way" do
+      expect(argument(:foo, {
+        :required => false,
+        :type     => :array,
+        :default  => ['one','two']
+      }).print_default).to eq('"one" "two"')
+    end
+    it "prints arrays with a single string default as before" do
+      expect(argument(:foo,    {
+        :required => false,
+        :type     => :array,
+        :default  => 'foobar'
+      }).print_default).to eq('foobar')
+    end
+    it "prints none arrays as default" do
+      expect(argument(:foo, {
+        :required => false,
+        :type     => :numeric,
+        :default  => 13,
+      }).print_default).to eq(13)
+    end
+  end
 end
