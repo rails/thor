@@ -159,6 +159,16 @@ describe Thor::Actions do
         expect(content).to eq(body)
       end
     end
+
+    it "accepts http headers" do
+      body = "__start__\nHTTPFILE\n__end__\n"
+      headers = {"Content-Type" => "application/json"}
+      stub_request(:get, "https://example.com/file.txt").with(:headers => headers).to_return(:body => body.dup)
+      action :get, "https://example.com/file.txt", {:http_headers => headers} do |content|
+        expect(a_request(:get, "https://example.com/file.txt")).to have_been_made
+        expect(content).to eq(body)
+      end
+    end
   end
 
   describe "#template" do
