@@ -122,9 +122,9 @@ Usage: "thor my_script:animal TYPE"')
     before do
       @original_yaml = {
         "random" => {
-          :location  => location,
-          :filename  => "4a33b894ffce85d7b412fc1b36f88fe0",
-          :namespaces => %w(amazing)
+          location: location,
+          filename: "4a33b894ffce85d7b412fc1b36f88fe0",
+          namespaces: %w(amazing)
         }
       }
 
@@ -249,7 +249,7 @@ Usage: "thor my_script:animal TYPE"')
 
         it "installs thor files" do
           allow(Thor::LineEditor).to receive(:readline).and_return("Y", "random")
-          stub_request(:get, location).to_return(:body => "class Foo < Thor; end")
+          stub_request(:get, location).to_return(body: "class Foo < Thor; end")
           path = File.join(Thor::Util.thor_root, Digest::SHA256.hexdigest(location + "random"))
           expect(File).to receive(:open).with(path, "w")
           expect { silence(:stdout) { Thor::Runner.start(%W(install #{location})) } }.not_to raise_error

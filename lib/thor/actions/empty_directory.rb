@@ -33,7 +33,7 @@ class Thor
       #
       def initialize(base, destination, config = {})
         @base = base
-        @config = {:verbose => true}.merge(config)
+        @config = {verbose: true}.merge(config)
         self.destination = destination
       end
 

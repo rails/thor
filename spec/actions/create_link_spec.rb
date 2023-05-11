@@ -2,7 +2,7 @@ require "helper"
 require "thor/actions"
 require "tempfile"
 
-describe Thor::Actions::CreateLink, :unless => windows? do
+describe Thor::Actions::CreateLink, unless: windows? do
   before do
     @hardlink_to = File.join(Dir.tmpdir, "linkdest.rb")
     ::FileUtils.rm_rf(destination_root)
@@ -13,7 +13,7 @@ describe Thor::Actions::CreateLink, :unless => windows? do
   let(:options) { {} }
 
   let(:base) do
-    base = MyCounter.new([1, 2], options, :destination_root => destination_root)
+    base = MyCounter.new([1, 2], options, destination_root: destination_root)
     allow(base).to receive(:file_name).and_return("rdoc")
     base
   end
@@ -38,7 +38,7 @@ describe Thor::Actions::CreateLink, :unless => windows? do
 
   describe "#invoke!" do
     context "specifying :symbolic => true" do
-      let(:config) { {:symbolic => true} }
+      let(:config) { {symbolic: true} }
 
       it "creates a symbolic link" do
         invoke!
@@ -49,7 +49,7 @@ describe Thor::Actions::CreateLink, :unless => windows? do
     end
 
     context "specifying :symbolic => false" do
-      let(:config) { {:symbolic => false} }
+      let(:config) { {symbolic: false} }
       let(:destination) { @hardlink_to }
 
       it "creates a hard link" do
@@ -68,7 +68,7 @@ describe Thor::Actions::CreateLink, :unless => windows? do
     end
 
     context "specifying :pretend => true" do
-      let(:options) { {:pretend => true} }
+      let(:options) { {pretend: true} }
       it "does not create a link" do
         invoke!
         expect(File.exist?(File.join(destination_root, "doc/config.rb"))).to be false
@@ -80,7 +80,7 @@ describe Thor::Actions::CreateLink, :unless => windows? do
     end
 
     context "specifying :verbose => false" do
-      let(:config) { {:verbose => false} }
+      let(:config) { {verbose: false} }
       it "does not show any information" do
         expect(invoke!).to be_empty
       end

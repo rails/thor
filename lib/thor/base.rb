@@ -24,9 +24,9 @@ class Thor
 
   class << self
     def deprecation_warning(message) #:nodoc:
-      unless ENV['THOR_SILENCE_DEPRECATION']
+      unless ENV["THOR_SILENCE_DEPRECATION"]
         warn "Deprecation warning: #{message}\n" +
-          'You can silence deprecations warning by setting the environment variable THOR_SILENCE_DEPRECATION.'
+          "You can silence deprecations warning by setting the environment variable THOR_SILENCE_DEPRECATION."
       end
     end
   end
@@ -79,7 +79,7 @@ class Thor
       # Give a relation of options.
       # After parsing, Thor::Options check whether right relations are kept
       relations = if current_command.nil?
-        {:exclusive_option_names => [], :at_least_one_option_names => []}
+        {exclusive_option_names: [], at_least_one_option_names: []}
       else
         current_command.options_relation
       end
@@ -664,7 +664,7 @@ class Thor
         end
 
         shell.say(group_name ? "#{group_name} options:" : "Options:")
-        shell.print_table(list, :indent => 2)
+        shell.print_table(list, indent: 2)
         shell.say ""
       end
 
@@ -681,7 +681,7 @@ class Thor
       # options<Hash>:: Described in both class_option and method_option.
       # scope<Hash>:: Options hash that is being built up
       def build_option(name, options, scope) #:nodoc:
-        scope[name] = Thor::Option.new(name, {:check_default_type => check_default_type}.merge!(options))
+        scope[name] = Thor::Option.new(name, {check_default_type: check_default_type}.merge!(options))
       end
 
       # Receives a hash of options, parse them and add to the scope. This is a

@@ -69,7 +69,7 @@ class Thor
         value.class.name.downcase.to_sym
       end
 
-      new(name.to_s, :required => required, :type => type, :default => default, :aliases => aliases)
+      new(name.to_s, required: required, type: type, default: default, aliases: aliases)
     end
 
     def switch_name
@@ -142,8 +142,8 @@ class Thor
           raise ArgumentError, err
         elsif @check_default_type == nil
           Thor.deprecation_warning "#{err}.\n" +
-            'This will be rejected in the future unless you explicitly pass the options `check_default_type: false`' +
-            ' or call `allow_incompatible_default_type!` in your code'
+            "This will be rejected in the future unless you explicitly pass the options `check_default_type: false`" +
+            " or call `allow_incompatible_default_type!` in your code"
         end
       end
     end

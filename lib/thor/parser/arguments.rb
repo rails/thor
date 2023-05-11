@@ -30,11 +30,7 @@ class Thor
 
       arguments.each do |argument|
         if !argument.default.nil?
-          begin
-            @assigns[argument.human_name] = argument.default.dup
-          rescue TypeError  # Compatibility shim for un-dup-able Fixnum in Ruby < 2.4
-            @assigns[argument.human_name] = argument.default
-          end
+          @assigns[argument.human_name] = argument.default.dup
         elsif argument.required?
           @non_assigned_required << argument
         end

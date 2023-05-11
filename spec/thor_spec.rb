@@ -91,8 +91,8 @@ describe Thor do
 
   describe "#stop_on_unknown_option!" do
     my_script = Class.new(Thor) do
-      class_option "verbose",   :type => :boolean
-      class_option "mode",      :type => :string
+      class_option "verbose",   type: :boolean
+      class_option "mode",      type: :string
 
       stop_on_unknown_option! :exec
 
@@ -140,9 +140,9 @@ describe Thor do
         stop_on_unknown_option! :foo, :bar
       end
       it "affects all specified commands" do
-        expect(klass.stop_on_unknown_option?(double(:name => "foo"))).to be true
-        expect(klass.stop_on_unknown_option?(double(:name => "bar"))).to be true
-        expect(klass.stop_on_unknown_option?(double(:name => "baz"))).to be false
+        expect(klass.stop_on_unknown_option?(double(name: "foo"))).to be true
+        expect(klass.stop_on_unknown_option?(double(name: "bar"))).to be true
+        expect(klass.stop_on_unknown_option?(double(name: "baz"))).to be false
       end
     end
 
@@ -152,9 +152,9 @@ describe Thor do
         stop_on_unknown_option! :bar
       end
       it "affects all specified commands" do
-        expect(klass.stop_on_unknown_option?(double(:name => "foo"))).to be true
-        expect(klass.stop_on_unknown_option?(double(:name => "bar"))).to be true
-        expect(klass.stop_on_unknown_option?(double(:name => "baz"))).to be false
+        expect(klass.stop_on_unknown_option?(double(name: "foo"))).to be true
+        expect(klass.stop_on_unknown_option?(double(name: "bar"))).to be true
+        expect(klass.stop_on_unknown_option?(double(name: "baz"))).to be false
       end
     end
 
@@ -164,8 +164,8 @@ describe Thor do
 
     context "along with check_unknown_options!" do
       my_script2 = Class.new(Thor) do
-        class_option "verbose",   :type => :boolean
-        class_option "mode",      :type => :string
+        class_option "verbose",   type: :boolean
+        class_option "mode",      type: :string
         check_unknown_options!
         stop_on_unknown_option! :exec
 
@@ -219,8 +219,8 @@ describe Thor do
 
   describe "#check_unknown_options!" do
     my_script = Class.new(Thor) do
-      class_option "verbose",   :type => :boolean
-      class_option "mode",      :type => :string
+      class_option "verbose",   type: :boolean
+      class_option "mode",      type: :string
       check_unknown_options!
 
       desc "checked", "a command with checked"
@@ -280,7 +280,7 @@ describe Thor do
 
   describe "#disable_required_check!" do
     my_script = Class.new(Thor) do
-      class_option "foo", :required => true
+      class_option "foo", required: true
 
       disable_required_check! :boring
 
@@ -309,7 +309,7 @@ describe Thor do
     end
 
     it "does affects help by default" do
-      expect(my_script.disable_required_check?(double(:name => "help"))).to be true
+      expect(my_script.disable_required_check?(double(name: "help"))).to be true
     end
 
     context "when provided with multiple command names" do
@@ -318,10 +318,10 @@ describe Thor do
       end
 
       it "affects all specified commands" do
-        expect(klass.disable_required_check?(double(:name => "help"))).to be true
-        expect(klass.disable_required_check?(double(:name => "foo"))).to be true
-        expect(klass.disable_required_check?(double(:name => "bar"))).to be true
-        expect(klass.disable_required_check?(double(:name => "baz"))).to be false
+        expect(klass.disable_required_check?(double(name: "help"))).to be true
+        expect(klass.disable_required_check?(double(name: "foo"))).to be true
+        expect(klass.disable_required_check?(double(name: "bar"))).to be true
+        expect(klass.disable_required_check?(double(name: "baz"))).to be false
       end
     end
 
@@ -332,10 +332,10 @@ describe Thor do
       end
 
       it "affects all specified commands" do
-        expect(klass.disable_required_check?(double(:name => "help"))).to be true
-        expect(klass.disable_required_check?(double(:name => "foo"))).to be true
-        expect(klass.disable_required_check?(double(:name => "bar"))).to be true
-        expect(klass.disable_required_check?(double(:name => "baz"))).to be false
+        expect(klass.disable_required_check?(double(name: "help"))).to be true
+        expect(klass.disable_required_check?(double(name: "foo"))).to be true
+        expect(klass.disable_required_check?(double(name: "bar"))).to be true
+        expect(klass.disable_required_check?(double(name: "baz"))).to be false
       end
     end
   end
@@ -516,13 +516,13 @@ Usage: "thor scripts:arities:multiple_usages ARG --foo"
       it "raises an exception and displays a message that explains the ambiguity" do
         shell = Thor::Base.shell.new
         expect(shell).to receive(:error).with("Ambiguous command call matches [call_myself_with_wrong_arity, call_unexistent_method]")
-        MyScript.start(%w(call), :shell => shell)
+        MyScript.start(%w(call), shell: shell)
       end
 
       it "raises an exception when there is an alias" do
         shell = Thor::Base.shell.new
         expect(shell).to receive(:error).with("Ambiguous command f matches [foo, fu]")
-        MyScript.start(%w(f), :shell => shell)
+        MyScript.start(%w(f), shell: shell)
       end
     end
   end
@@ -677,7 +677,7 @@ HELP
     context "with required class_options" do
       let(:klass) do
         Class.new(Thor) do
-          class_option :foo, :required => true
+          class_option :foo, required: true
 
           desc "bar", "do something"
           def bar; end
@@ -722,7 +722,7 @@ HELP
   describe "edge-cases" do
     it "can handle boolean options followed by arguments" do
       klass = Class.new(Thor) do
-        method_option :loud, :type => :boolean
+        method_option :loud, type: :boolean
         desc "hi NAME", "say hi to name"
         def hi(name)
           name = name.upcase if options[:loud]
@@ -780,7 +780,7 @@ HELP
     it "issues a deprecation warning on incompatible types by default" do
       expect do
         Class.new(Thor) do
-          option "bar", :type => :numeric, :default => "foo"
+          option "bar", type: :numeric, default: "foo"
         end
       end.to output(/^Deprecation warning/).to_stderr
     end
@@ -790,7 +790,7 @@ HELP
         Class.new(Thor) do
           allow_incompatible_default_type!
 
-          option "bar", :type => :numeric, :default => "foo"
+          option "bar", type: :numeric, default: "foo"
         end
       end.not_to output.to_stderr
     end
@@ -798,7 +798,7 @@ HELP
     it "allows incompatible types if `check_default_type: false` is given" do
       expect do
         Class.new(Thor) do
-          option "bar", :type => :numeric, :default => "foo", :check_default_type => false
+          option "bar", type: :numeric, default: "foo", check_default_type: false
         end
       end.not_to output.to_stderr
     end
@@ -808,7 +808,7 @@ HELP
         Class.new(Thor) do
           check_default_type!
 
-          option "bar", :type => :numeric, :default => "foo"
+          option "bar", type: :numeric, default: "foo"
         end
       end.to raise_error(ArgumentError, "Expected numeric default value for '--bar'; got \"foo\" (string)")
     end
