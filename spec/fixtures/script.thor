@@ -251,10 +251,10 @@ end
 
 class Apple < Thor
   namespace :fruits
- desc 'apple', 'apple'; def apple; end
+  desc 'apple', 'apple'; def apple; end
 end
 
 class Pear < Thor
   namespace :fruits
- desc 'pear', 'pear'; def pear; end
+  desc 'pear', 'pear'; def pear; end
 end

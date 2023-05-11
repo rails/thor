@@ -21,9 +21,9 @@ class Thor
       # ==== Parameters
       # namespace<String>:: The namespace to search for.
       #
-      def find_by_namespace(namespace, command = nil)
+      def find_by_namespace(namespace)
         namespace = "default#{namespace}" if namespace.empty? || namespace =~ /^:/
-        Thor::Base.subclasses.detect { |klass| klass.namespace == namespace and command.nil? || klass.commands.keys.include?(command) }
+        Thor::Base.subclasses.detect { |klass| klass.namespace == namespace }
       end
 
       # Receives a constant and converts it to a Thor namespace. Since Thor
@@ -130,10 +130,10 @@ class Thor
       #
       def find_class_and_command_by_namespace(namespace, fallback = true)
         if namespace.include?(":") # look for a namespaced command
-          pieces  = namespace.split(":")
-          command = pieces.pop
-          klass   = Thor::Util.find_by_namespace(pieces.join(":"), command)
-          klass ||= Thor::Util.find_by_namespace(pieces.join(":"))
+          *pieces, command  = namespace.split(":")
+          namespace = pieces.join(":")
+          namespace = "default" if namespace.empty?
+          klass = Thor::Base.subclasses.detect { |klass| klass.namespace == namespace && klass.commands.keys.include?(command) }
         end
         unless klass # look for a Thor::Group with the right name
           klass = Thor::Util.find_by_namespace(namespace)
