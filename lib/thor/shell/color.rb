@@ -1,5 +1,5 @@
 require_relative "basic"
-require_relative "diff_lines"
+require_relative "lcs_diff"
 
 class Thor
   module Shell
@@ -7,7 +7,7 @@ class Thor
     # Thor::Shell::Basic to see all available methods.
     #
     class Color < Basic
-      include DiffLines
+      include LCSDiff
 
       # Embed in a String to clear all previous ANSI sequences.
       CLEAR      = "\e[0m"
@@ -110,25 +110,6 @@ class Thor
       def are_colors_disabled?
         !ENV['NO_COLOR'].nil? && !ENV['NO_COLOR'].empty?
       end
-
-        # Overwrite show_diff to show diff with colors if Diff::LCS is
-        # available.
-        #
-        def show_diff(destination, content) #:nodoc:
-          show_diff_common(destination, content)
-        end
-
-        def output_diff_line(diff)
-          output_diff_line_common(diff)
-        end
-
-        # Check if Diff::LCS is loaded. If it is, use it to create pretty output
-        # for diff.
-        #
-        def diff_lcs_loaded? #:nodoc:
-          diff_lcs_loaded_common?
-        end
-
     end
   end
 end

@@ -1,4 +1,5 @@
 require_relative "basic"
+require_relative "lcs_diff"
 
 class Thor
   module Shell
@@ -6,7 +7,7 @@ class Thor
     # Thor::Shell::Basic to see all available methods.
     #
     class HTML < Basic
-      include DiffLines
+      include LCSDiff
 
       # The start of an HTML bold sequence.
       BOLD       = "font-weight: bold"
@@ -78,25 +79,6 @@ class Thor
       def can_display_colors?
         true
       end
-
-        # Overwrite show_diff to show diff with colors if Diff::LCS is
-        # available.
-        #
-        def show_diff(destination, content) #:nodoc:
-          show_diff_common(destination, content)
-        end
-
-        def output_diff_line(diff) #:nodoc:
-          output_diff_line_common(diff)
-        end
-
-        # Check if Diff::LCS is loaded. If it is, use it to create pretty output
-        # for diff.
-        #
-        def diff_lcs_loaded? #:nodoc:
-          diff_lcs_loaded_common?
-        end
-
     end
   end
 end

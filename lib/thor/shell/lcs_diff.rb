@@ -1,8 +1,10 @@
-module DiffLines
+module LCSDiff
+protected
 
-  protected
-  def show_diff_common(destination, content) #:nodoc:
-    if diff_lcs_loaded? && ENV['THOR_DIFF'].nil? && ENV['RAILS_DIFF'].nil?
+  # Overwrite show_diff to show diff with colors if Diff::LCS is
+  # available.
+  def show_diff(destination, content) #:nodoc:
+    if diff_lcs_loaded? && ENV["THOR_DIFF"].nil? && ENV["RAILS_DIFF"].nil?
       actual  = File.binread(destination).to_s.split("\n")
       content = content.to_s.split("\n")
 
@@ -14,13 +16,15 @@ module DiffLines
     end
   end
 
-  def output_diff_line_common(diff) #:nodoc:
+private
+
+  def output_diff_line(diff) #:nodoc:
     case diff.action
-    when '-'
+    when "-"
       say "- #{diff.old_element.chomp}", :red, true
-    when '+'
+    when "+"
       say "+ #{diff.new_element.chomp}", :green, true
-    when '!'
+    when "!"
       say "- #{diff.old_element.chomp}", :red, true
       say "+ #{diff.new_element.chomp}", :green, true
     else
@@ -28,12 +32,14 @@ module DiffLines
     end
   end
 
-  def diff_lcs_loaded_common? #:nodoc:
-    return true  if defined?(Diff::LCS)
+  # Check if Diff::LCS is loaded. If it is, use it to create pretty output
+  # for diff.
+  def diff_lcs_loaded? #:nodoc:
+    return true if defined?(Diff::LCS)
     return @diff_lcs_loaded unless @diff_lcs_loaded.nil?
 
     @diff_lcs_loaded = begin
-      require 'diff/lcs'
+      require "diff/lcs"
       true
     rescue LoadError
       false
