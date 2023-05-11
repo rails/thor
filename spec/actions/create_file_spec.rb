@@ -7,11 +7,11 @@ describe Thor::Actions::CreateFile do
     ::FileUtils.rm_rf(destination_root)
   end
 
-  def create_file(destination = nil, config = {}, options = {})
+  def create_file(destination = nil, config = {}, options = {}, contents = "CONFIGURATION")
     @base = MyCounter.new([1, 2], options, :destination_root => destination_root)
     allow(@base).to receive(:file_name).and_return("rdoc")
 
-    @action = Thor::Actions::CreateFile.new(@base, destination, "CONFIGURATION", {:verbose => !@silence}.merge(config))
+    @action = Thor::Actions::CreateFile.new(@base, destination, contents, {:verbose => !@silence}.merge(config))
   end
 
   def invoke!
@@ -200,6 +200,13 @@ describe Thor::Actions::CreateFile do
   describe "#identical?" do
     it "returns true if the destination file exists and is identical" do
       create_file("doc/config.rb")
+      expect(@action.identical?).to be false
+      invoke!
+      expect(@action.identical?).to be true
+    end
+
+    it "returns true if the destination file exists and is identical and contains multi-byte UTF-8 codepoints" do
+      create_file("doc/config.rb", {}, {}, "€")
       expect(@action.identical?).to be false
       invoke!
       expect(@action.identical?).to be true
