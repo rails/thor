@@ -5,6 +5,7 @@ gem "rake"
 group :development do
   gem "pry"
   gem "pry-byebug"
+  gem "rubocop", "~> 1.30"
 end
 
 group :test do

@@ -3,6 +3,7 @@ inherit_from: .rubocop_todo.yml
 AllCops:
   TargetRubyVersion: 2.6
   DisabledByDefault: true
+  SuggestExtensions: false
   Exclude:
     - spec/sandbox/**/*
     - spec/fixtures/**/*

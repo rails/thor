@@ -13,7 +13,7 @@ class Thor
     end
 
     def entered?
-      @depth > 0
+      @depth.positive?
     end
 
     private

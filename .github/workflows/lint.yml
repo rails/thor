@@ -3,8 +3,6 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      BUNDLE_GEMFILE: lint_gems.rb
     steps:
     - uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1
