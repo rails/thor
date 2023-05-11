@@ -9,11 +9,11 @@ describe Thor::Actions::Directory do
   end
 
   def invoker
-    @invoker ||= WhinyGenerator.new([1, 2], {}, :destination_root => destination_root)
+    @invoker ||= WhinyGenerator.new([1, 2], {}, destination_root: destination_root)
   end
 
   def revoker
-    @revoker ||= WhinyGenerator.new([1, 2], {}, :destination_root => destination_root, :behavior => :revoke)
+    @revoker ||= WhinyGenerator.new([1, 2], {}, destination_root: destination_root, behavior: :revoke)
   end
 
   def invoke!(*args, &block)
@@ -42,7 +42,7 @@ describe Thor::Actions::Directory do
     end
 
     it "does not create a directory in pretend mode" do
-      invoke! "doc", "ghost", :pretend => true
+      invoke! "doc", "ghost", pretend: true
       expect(File.exist?("ghost")).to be false
     end
 
@@ -57,7 +57,7 @@ describe Thor::Actions::Directory do
     end
 
     it "copies only the first level files if recursive" do
-      invoke! ".", "commands", :recursive => false
+      invoke! ".", "commands", recursive: false
 
       file = File.join(destination_root, "commands", "group.thor")
       expect(File.exist?(file)).to be true
@@ -70,7 +70,7 @@ describe Thor::Actions::Directory do
     end
 
     it "ignores files within excluding/ directories when exclude_pattern is provided" do
-      invoke! "doc", "docs", :exclude_pattern => %r{excluding/}
+      invoke! "doc", "docs", exclude_pattern: %r{excluding/}
       file = File.join(destination_root, "docs", "excluding", "rdoc.rb")
       expect(File.exist?(file)).to be false
     end
@@ -97,7 +97,7 @@ describe Thor::Actions::Directory do
     end
 
     it "copies directories and preserves file mode" do
-      invoke! "preserve", "preserved", :mode => :preserve
+      invoke! "preserve", "preserved", mode: :preserve
       original = File.join(source_root, "preserve", "script.sh")
       copy = File.join(destination_root, "preserved", "script.sh")
       expect(File.stat(original).mode).to eq(File.stat(copy).mode)
@@ -148,7 +148,7 @@ describe Thor::Actions::Directory do
       expect(content).to match(%r{create  app\{1\}/README})
     end
 
-    context "windows temp directories", :if => windows? do
+    context "windows temp directories", if: windows? do
       let(:spec_dir) { File.join(@temp_dir, "spec") }
 
       before(:each) do

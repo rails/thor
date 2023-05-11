@@ -123,12 +123,7 @@ class Thor
       context = config.delete(:context) || instance_eval("binding")
 
       create_file destination, nil, config do
-        match = ERB.version.match(/(\d+\.\d+\.\d+)/)
-        capturable_erb = if match && match[1] >= "2.2.0" # Ruby 2.6+
-          CapturableERB.new(::File.binread(source), :trim_mode => "-", :eoutvar => "@output_buffer")
-        else
-          CapturableERB.new(::File.binread(source), nil, "-", "@output_buffer")
-        end
+        capturable_erb = CapturableERB.new(::File.binread(source), trim_mode: "-", eoutvar: "@output_buffer")
         content = capturable_erb.tap do |erb|
           erb.filename = source
         end.result(context)

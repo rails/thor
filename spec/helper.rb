@@ -1,15 +1,13 @@
 $TESTING = true
 
-if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.6.0")
-  require "simplecov"
-  require "coveralls"
+require "simplecov"
+require "coveralls"
 
-  SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, Coveralls::SimpleCov::Formatter]
+SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, Coveralls::SimpleCov::Formatter]
 
-  SimpleCov.start do
-    add_filter "/spec"
-    minimum_coverage(90)
-  end
+SimpleCov.start do
+  add_filter "/spec"
+  minimum_coverage(90)
 end
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
@@ -22,7 +20,7 @@ require "rspec"
 require "diff/lcs" # You need diff/lcs installed to run specs (but not to run Thor).
 require "webmock/rspec"
 
-WebMock.disable_net_connect!(:allow => "coveralls.io")
+WebMock.disable_net_connect!(allow: "coveralls.io")
 
 # Set shell to basic
 ENV["THOR_COLUMNS"] = "10000"

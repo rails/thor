@@ -9,9 +9,8 @@ AllCops:
     - spec/fixtures/**/*
     - vendor/bundle/**/**
 
-# Enforce Ruby 1.8-compatible hash syntax
 Style/HashSyntax:
-  EnforcedStyle: hash_rockets
+  EnforcedStyle: ruby19
 
 # No spaces inside hash literals
 Layout/SpaceInsideHashLiteralBraces:

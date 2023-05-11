@@ -258,7 +258,7 @@ class Thor
 
       if command.long_description
         shell.say "Description:"
-        shell.print_wrapped(command.long_description, :indent => 2)
+        shell.print_wrapped(command.long_description, indent: 2)
       else
         shell.say command.description
       end
@@ -283,7 +283,7 @@ class Thor
         shell.say "Commands:"
       end
 
-      shell.print_table(list, :indent => 2, :truncate => true)
+      shell.print_table(list, indent: 2, truncate: true)
       shell.say
       class_options_help(shell)
       print_exclusive_options(shell)
@@ -318,7 +318,7 @@ class Thor
 
       define_method(subcommand) do |*args|
         args, opts = Thor::Arguments.split(args)
-        invoke_args = [args, opts, {:invoked_via_subcommand => true, :class_options => options}]
+        invoke_args = [args, opts, {invoked_via_subcommand: true, class_options: options}]
         invoke_args.unshift "help" if opts.delete("--help") || opts.delete("-h")
         invoke subcommand_class, *invoke_args
       end
@@ -459,7 +459,7 @@ class Thor
       opts += class_exclusive_option_names
       unless opts.empty?
         shell.say "Exclusive Options:"
-        shell.print_table(opts.map{ |ex| ex.map{ |e| "--#{e}"}}, :indent => 2 )
+        shell.print_table(opts.map{ |ex| ex.map{ |e| "--#{e}"}}, indent: 2 )
         shell.say
       end
     end
@@ -470,7 +470,7 @@ class Thor
       opts += class_at_least_one_option_names
       unless opts.empty?
         shell.say "Required At Least One:"
-        shell.print_table(opts.map{ |ex| ex.map{ |e| "--#{e}"}}, :indent => 2 )
+        shell.print_table(opts.map{ |ex| ex.map{ |e| "--#{e}"}}, indent: 2 )
         shell.say
       end
     end
@@ -539,8 +539,8 @@ class Thor
 
       if @usage && @desc
         base_class = @hide ? Thor::HiddenCommand : Thor::Command
-        relations = {:exclusive_option_names => method_exclusive_option_names,
-          :at_least_one_option_names => method_at_least_one_option_names}
+        relations = {exclusive_option_names: method_exclusive_option_names,
+          at_least_one_option_names: method_at_least_one_option_names}
         commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options, relations)
         @usage, @desc, @long_desc, @method_options, @hide = nil
         @method_exclusive_option_names, @method_at_least_one_option_names = nil

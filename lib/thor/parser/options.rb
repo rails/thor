@@ -103,7 +103,7 @@ class Thor
               unshift($1.split("").map { |f| "-#{f}" })
               next
             when EQ_RE
-              unshift($2, :is_value => true)
+              unshift($2, is_value: true)
               switch = $1
             when SHORT_NUM
               unshift($2)

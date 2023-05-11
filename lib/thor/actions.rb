@@ -46,17 +46,17 @@ class Thor
       # Add runtime options that help actions execution.
       #
       def add_runtime_options!
-        class_option :force, :type => :boolean, :aliases => "-f", :group => :runtime,
-                             :desc => "Overwrite files that already exist"
+        class_option :force, type: :boolean, aliases: "-f", group: :runtime,
+                             desc: "Overwrite files that already exist"
 
-        class_option :pretend, :type => :boolean, :aliases => "-p", :group => :runtime,
-                               :desc => "Run but do not make any changes"
+        class_option :pretend, type: :boolean, aliases: "-p", group: :runtime,
+                               desc: "Run but do not make any changes"
 
-        class_option :quiet, :type => :boolean, :aliases => "-q", :group => :runtime,
-                             :desc => "Suppress status output"
+        class_option :quiet, type: :boolean, aliases: "-q", group: :runtime,
+                             desc: "Suppress status output"
 
-        class_option :skip, :type => :boolean, :aliases => "-s", :group => :runtime,
-                            :desc => "Skip files that already exist"
+        class_option :skip, type: :boolean, aliases: "-s", group: :runtime,
+                            desc: "Skip files that already exist"
       end
     end
 
@@ -223,8 +223,7 @@ class Thor
 
       contents = if is_uri
         require "open-uri"
-        # for ruby 2.1-2.4
-        URI.send(:open, path, "Accept" => "application/x-thor-template", &:read)
+        URI.open(path, "Accept" => "application/x-thor-template", &:read)
       else
         File.open(path, &:read)
       end
@@ -285,7 +284,7 @@ class Thor
     #
     def run_ruby_script(command, config = {})
       return unless behavior == :invoke
-      run command, config.merge(:with => Thor::Util.ruby_command)
+      run command, config.merge(with: Thor::Util.ruby_command)
     end
 
     # Run a thor command. A hash of options can be given and it's converted to
@@ -316,7 +315,7 @@ class Thor
       args.push Thor::Options.to_switches(config)
       command = args.join(" ").strip
 
-      run command, :with => :thor, :verbose => verbose, :pretend => pretend, :capture => capture
+      run command, with: :thor, verbose: verbose, pretend: pretend, capture: capture
     end
 
   protected
@@ -324,7 +323,7 @@ class Thor
     # Allow current root to be shared between invocations.
     #
     def _shared_configuration #:nodoc:
-      super.merge!(:destination_root => destination_root)
+      super.merge!(destination_root: destination_root)
     end
 
     def _cleanup_options_and_set(options, key) #:nodoc:

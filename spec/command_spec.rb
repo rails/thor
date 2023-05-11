@@ -12,28 +12,28 @@ describe Thor::Command do
   describe "#formatted_usage" do
     it "includes namespace within usage" do
       object = Struct.new(:namespace, :arguments).new("foo", [])
-      expect(command(:bar => :required).formatted_usage(object)).to eq("foo:can_has --bar=BAR")
+      expect(command(bar: :required).formatted_usage(object)).to eq("foo:can_has --bar=BAR")
     end
 
     it "includes subcommand name within subcommand usage" do
       object = Struct.new(:namespace, :arguments).new("main:foo", [])
-      expect(command(:bar => :required).formatted_usage(object, false, true)).to eq("foo can_has --bar=BAR")
+      expect(command(bar: :required).formatted_usage(object, false, true)).to eq("foo can_has --bar=BAR")
     end
 
     it "removes default from namespace" do
       object = Struct.new(:namespace, :arguments).new("default:foo", [])
-      expect(command(:bar => :required).formatted_usage(object)).to eq(":foo:can_has --bar=BAR")
+      expect(command(bar: :required).formatted_usage(object)).to eq(":foo:can_has --bar=BAR")
     end
 
     it "injects arguments into usage" do
-      options = {:required => true, :type => :string}
+      options = {required: true, type: :string}
       object = Struct.new(:namespace, :arguments).new("foo", [Thor::Argument.new(:bar, options)])
-      expect(command(:foo => :required).formatted_usage(object)).to eq("foo:can_has BAR --foo=FOO")
+      expect(command(foo: :required).formatted_usage(object)).to eq("foo:can_has BAR --foo=FOO")
     end
 
     it "allows multiple usages" do
       object = Struct.new(:namespace, :arguments).new("foo", [])
-      expect(command({ :bar => :required }, ["can_has FOO", "can_has BAR"]).formatted_usage(object, false)).to eq("can_has FOO --bar=BAR\ncan_has BAR --bar=BAR")
+      expect(command({ bar: :required }, ["can_has FOO", "can_has BAR"]).formatted_usage(object, false)).to eq("can_has FOO --bar=BAR\ncan_has BAR --bar=BAR")
     end
   end
 
@@ -54,7 +54,7 @@ describe Thor::Command do
 
   describe "#dup" do
     it "dup options hash" do
-      command = Thor::Command.new("can_has", nil, nil, nil, :foo => true, :bar => :required)
+      command = Thor::Command.new("can_has", nil, nil, nil, foo: true, bar: :required)
       command.dup.options.delete(:foo)
       expect(command.options[:foo]).to be
     end

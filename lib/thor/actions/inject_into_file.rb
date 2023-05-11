@@ -37,7 +37,7 @@ class Thor
       attr_reader :replacement, :flag, :behavior
 
       def initialize(base, destination, data, config)
-        super(base, destination, {:verbose => true}.merge(config))
+        super(base, destination, {verbose: true}.merge(config))
 
         @behavior, @flag = if @config.key?(:after)
           [:after, @config.delete(:after)]

@@ -4,7 +4,7 @@ require "thor/parser"
 describe Thor::Arguments do
   def create(opts = {})
     arguments = opts.map do |type, default|
-      options = {:required => default.nil?, :type => type, :default => default}
+      options = {required: default.nil?, type: type, default: default}
       Thor::Argument.new(type.to_s, options)
     end
 
@@ -18,7 +18,7 @@ describe Thor::Arguments do
 
   describe "#parse" do
     it "parses arguments in the given order" do
-      create :string => nil, :numeric => nil
+      create string: nil, numeric: nil
       expect(parse("name", "13")["string"]).to eq("name")
       expect(parse("name", "13")["numeric"]).to eq(13)
       expect(parse("name", "+13")["numeric"]).to eq(13)
@@ -28,20 +28,20 @@ describe Thor::Arguments do
     end
 
     it "accepts hashes" do
-      create :string => nil, :hash => nil
+      create string: nil, hash: nil
       expect(parse("product", "title:string", "age:integer")["string"]).to eq("product")
       expect(parse("product", "title:string", "age:integer")["hash"]).to eq("title" => "string", "age" => "integer")
       expect(parse("product", "url:http://www.amazon.com/gp/product/123")["hash"]).to eq("url" => "http://www.amazon.com/gp/product/123")
     end
 
     it "accepts arrays" do
-      create :string => nil, :array => nil
+      create string: nil, array: nil
       expect(parse("product", "title", "age")["string"]).to eq("product")
       expect(parse("product", "title", "age")["array"]).to eq(%w(title age))
     end
 
     it "accepts - as an array argument" do
-      create :array => nil
+      create array: nil
       expect(parse("-")["array"]).to eq(%w(-))
       expect(parse("-", "title", "-")["array"]).to eq(%w(- title -))
     end
@@ -53,23 +53,23 @@ describe Thor::Arguments do
       end
 
       it "and required arguments raises an error" do
-        create :string => nil, :numeric => nil
+        create string: nil, numeric: nil
         expect { parse }.to raise_error(Thor::RequiredArgumentMissingError, "No value provided for required arguments 'string', 'numeric'")
       end
 
       it "and default arguments returns default values" do
-        create :string => "name", :numeric => 13
+        create string: "name", numeric: 13
         expect(parse).to eq("string" => "name", "numeric" => 13)
       end
     end
 
     it "returns the input if it's already parsed" do
-      create :string => nil, :hash => nil, :array => nil, :numeric => nil
+      create string: nil, hash: nil, array: nil, numeric: nil
       expect(parse("", 0, {}, [])).to eq("string" => "", "numeric" => 0, "hash" => {}, "array" => [])
     end
 
     it "returns the default value if none is provided" do
-      create :string => "foo", :numeric => 3.0
+      create string: "foo", numeric: 3.0
       expect(parse("bar")).to eq("string" => "bar", "numeric" => 3.0)
     end
   end

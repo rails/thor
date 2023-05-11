@@ -9,7 +9,7 @@ describe "when the Thor class's exit_with_failure? method returns true" do
     r,w= IO.pipe
     pid= spawn({'RUBYLIB' => ruby_lib},
                full_command,
-               {:out => w, :err => [:child, :out]})
+               {out: w, err: [:child, :out]})
     w.close
 
     _, exit_status= Process.wait2(pid)

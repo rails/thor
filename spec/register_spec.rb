@@ -42,9 +42,9 @@ end
 
 class ClassOptionGroupPlugin < Thor::Group
   class_option :who,
-               :type => :string,
-               :aliases => "-w",
-               :default => "zebra"
+               type: :string,
+               aliases: "-w",
+               default: "zebra"
 end
 
 class PluginInheritingFromClassOptionsGroup < ClassOptionGroupPlugin
@@ -108,7 +108,7 @@ BoringVendorProvidedCLI.register(
   "secret",
   "secret stuff",
   "Nothing to see here. Move along.",
-  :hide => true
+  hide: true
 )
 
 BoringVendorProvidedCLI.register(

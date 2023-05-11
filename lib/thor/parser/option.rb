@@ -69,7 +69,7 @@ class Thor
         value.class.name.downcase.to_sym
       end
 
-      new(name.to_s, :required => required, :type => type, :default => default, :aliases => aliases)
+      new(name.to_s, required: required, type: type, default: default, aliases: aliases)
     end
 
     def switch_name

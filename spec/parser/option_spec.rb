@@ -47,11 +47,11 @@ describe Thor::Option do
 
     describe "with value as hash" do
       it "has default type :hash" do
-        expect(parse(:foo, :a => :b).type).to eq(:hash)
+        expect(parse(:foo, a: :b).type).to eq(:hash)
       end
 
       it "has default value equal to the hash" do
-        expect(parse(:foo, :a => :b).default).to eq(:a => :b)
+        expect(parse(:foo, a: :b).default).to eq(a: :b)
       end
     end
 
@@ -129,62 +129,62 @@ describe Thor::Option do
   end
 
   it "can be required and have default values" do
-    option = option("foo", :required => true, :type => :string, :default => "bar")
+    option = option("foo", required: true, type: :string, default: "bar")
     expect(option.default).to eq("bar")
     expect(option).to be_required
   end
 
   it "raises an error if default is inconsistent with type and check_default_type is true" do
     expect do
-      option("foo_bar", :type => :numeric, :default => "baz", :check_default_type => true)
+      option("foo_bar", type: :numeric, default: "baz", check_default_type: true)
     end.to raise_error(ArgumentError, 'Expected numeric default value for \'--foo-bar\'; got "baz" (string)')
   end
 
   it "raises an error if repeatable and default is inconsistent with type and check_default_type is true" do
     expect do
-      option("foo_bar", :type => :numeric, :repeatable => true, :default => "baz", :check_default_type => true)
+      option("foo_bar", type: :numeric, repeatable: true, default: "baz", check_default_type: true)
     end.to raise_error(ArgumentError, 'Expected array default value for \'--foo-bar\'; got "baz" (string)')
   end
 
   it "raises an error type hash is repeatable and default is inconsistent with type and check_default_type is true" do
     expect do
-      option("foo_bar", :type => :hash, :repeatable => true, :default => "baz", :check_default_type => true)
+      option("foo_bar", type: :hash, repeatable: true, default: "baz", check_default_type: true)
     end.to raise_error(ArgumentError, 'Expected hash default value for \'--foo-bar\'; got "baz" (string)')
   end
 
   it "does not raises an error if type hash is repeatable and default is consistent with type and check_default_type is true" do
     expect do
-      option("foo_bar", :type => :hash, :repeatable => true, :default => {}, :check_default_type => true)
+      option("foo_bar", type: :hash, repeatable: true, default: {}, check_default_type: true)
     end.not_to raise_error
   end
 
   it "does not raises an error if repeatable and default is consistent with type and check_default_type is true" do
     expect do
-      option("foo_bar", :type => :numeric, :repeatable => true, :default => [1], :check_default_type => true)
+      option("foo_bar", type: :numeric, repeatable: true, default: [1], check_default_type: true)
     end.not_to raise_error
   end
 
   it "does not raises an error if default is an symbol and type string and check_default_type is true" do
     expect do
-      option("foo", :type => :string, :default => :bar, :check_default_type => true)
+      option("foo", type: :string, default: :bar, check_default_type: true)
     end.not_to raise_error
   end
 
   it "does not raises an error if default is inconsistent with type and check_default_type is false" do
     expect do
-      option("foo_bar", :type => :numeric, :default => "baz", :check_default_type => false)
+      option("foo_bar", type: :numeric, default: "baz", check_default_type: false)
     end.not_to raise_error
   end
 
   it "boolean options cannot be required" do
     expect do
-      option("foo", :required => true, :type => :boolean)
+      option("foo", required: true, type: :boolean)
     end.to raise_error(ArgumentError, "An option cannot be boolean and required.")
   end
 
   it "does not raises an error if default is a boolean and it is required" do
     expect do
-      option("foo", :required => true, :default => true)
+      option("foo", required: true, default: true)
     end.not_to raise_error
   end
 
@@ -242,11 +242,11 @@ describe Thor::Option do
     end
 
     it "uses banner when supplied" do
-      expect(option(:foo, :required => false, :type => :string, :banner => "BAR").usage).to eq("[--foo=BAR]")
+      expect(option(:foo, required: false, type: :string, banner: "BAR").usage).to eq("[--foo=BAR]")
     end
 
     it "checks when banner is an empty string" do
-      expect(option(:foo, :required => false, :type => :string, :banner => "").usage).to eq("[--foo]")
+      expect(option(:foo, required: false, type: :string, banner: "").usage).to eq("[--foo]")
     end
 
     describe "with required values" do

@@ -18,7 +18,7 @@ describe Thor::Shell::Color do
       shell.ask "Is this green?", :green
 
       expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? [Yes, No, Maybe] \e[0m", anything).and_return("Yes")
-      shell.ask "Is this green?", :green, :limited_to => %w(Yes No Maybe)
+      shell.ask "Is this green?", :green, limited_to: %w(Yes No Maybe)
     end
 
     it "does not set the color if specified and NO_COLOR is set to a non-empty value" do
@@ -27,7 +27,7 @@ describe Thor::Shell::Color do
       shell.ask "Is this green?", :green
 
       expect(Thor::LineEditor).to receive(:readline).with("Is this green? [Yes, No, Maybe] ", anything).and_return("Yes")
-      shell.ask "Is this green?", :green, :limited_to => %w(Yes No Maybe)
+      shell.ask "Is this green?", :green, limited_to: %w(Yes No Maybe)
     end
 
     it "sets the color when NO_COLOR is ignored because the environment variable is nil" do
@@ -36,7 +36,7 @@ describe Thor::Shell::Color do
       shell.ask "Is this green?", :green
 
       expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? [Yes, No, Maybe] \e[0m", anything).and_return("Yes")
-      shell.ask "Is this green?", :green, :limited_to => %w(Yes No Maybe)
+      shell.ask "Is this green?", :green, limited_to: %w(Yes No Maybe)
     end
 
     it "sets the color when NO_COLOR is ignored because the environment variable is an empty-string" do
@@ -45,7 +45,7 @@ describe Thor::Shell::Color do
       shell.ask "Is this green?", :green
 
       expect(Thor::LineEditor).to receive(:readline).with("\e[32mIs this green? [Yes, No, Maybe] \e[0m", anything).and_return("Yes")
-      shell.ask "Is this green?", :green, :limited_to => %w(Yes No Maybe)
+      shell.ask "Is this green?", :green, limited_to: %w(Yes No Maybe)
     end
 
     it "handles an Array of colors" do

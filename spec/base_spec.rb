@@ -27,7 +27,7 @@ describe Thor::Base do
     end
 
     it "allows options to be given as symbols or strings" do
-      base = MyCounter.new [1, 2], :third => 4
+      base = MyCounter.new [1, 2], third: 4
       expect(base.options[:third]).to eq(4)
 
       base = MyCounter.new [1, 2], "third" => 4
@@ -35,12 +35,12 @@ describe Thor::Base do
     end
 
     it "creates options with indifferent access" do
-      base = MyCounter.new [1, 2], :third => 3
+      base = MyCounter.new [1, 2], third: 3
       expect(base.options["third"]).to eq(3)
     end
 
     it "creates options with magic predicates" do
-      base = MyCounter.new [1, 2], :third => 3
+      base = MyCounter.new [1, 2], third: 3
       expect(base.options.third).to eq(3)
     end
   end
@@ -313,7 +313,7 @@ describe Thor::Base do
 
     it "raises an error instead of rescuing if :debug option is given" do
       expect do
-        MyScript.start %w(what), :debug => true
+        MyScript.start %w(what), debug: true
       end.to raise_error(Thor::UndefinedCommandError, 'Could not find command "what" in "my_script" namespace.')
     end
 
