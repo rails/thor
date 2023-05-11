@@ -3,11 +3,11 @@ describe "when the Thor class's exit_with_failure? method returns true" do
     gem_dir= File.expand_path("#{File.dirname(__FILE__)}/..")
     lib_path= "#{gem_dir}/lib"
     script_path= "#{gem_dir}/spec/fixtures/exit_status.thor"
-    ruby_lib= ENV['RUBYLIB'].nil? ? lib_path : "#{lib_path}:#{ENV['RUBYLIB']}"
+    ruby_lib= ENV["RUBYLIB"].nil? ? lib_path : "#{lib_path}:#{ENV['RUBYLIB']}"
 
     full_command= "ruby #{script_path} #{command}"
     r,w= IO.pipe
-    pid= spawn({'RUBYLIB' => ruby_lib},
+    pid= spawn({"RUBYLIB" => ruby_lib},
                full_command,
                {out: w, err: [:child, :out]})
     w.close

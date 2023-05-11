@@ -454,7 +454,7 @@ describe Thor::Options do
       end
 
       it "allows multiple values if repeatable is specified" do
-        create verbose: Thor::Option.new("verbose", type: :boolean, aliases: '-v', repeatable: true)
+        create verbose: Thor::Option.new("verbose", type: :boolean, aliases: "-v", repeatable: true)
         expect(parse("-v", "-v", "-v")["verbose"].count).to eq(3)
       end
     end

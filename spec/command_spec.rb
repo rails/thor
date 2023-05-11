@@ -33,7 +33,7 @@ describe Thor::Command do
 
     it "allows multiple usages" do
       object = Struct.new(:namespace, :arguments).new("foo", [])
-      expect(command({ bar: :required }, ["can_has FOO", "can_has BAR"]).formatted_usage(object, false)).to eq("can_has FOO --bar=BAR\ncan_has BAR --bar=BAR")
+      expect(command({bar: :required}, ["can_has FOO", "can_has BAR"]).formatted_usage(object, false)).to eq("can_has FOO --bar=BAR\ncan_has BAR --bar=BAR")
     end
   end
 

@@ -321,7 +321,7 @@ describe Thor::Actions do
       end
 
       it "supports env option" do
-        expect { action :run, "echo $BAR", env: { "BAR" => "foo" } }.to output("foo\n").to_stdout_from_any_process
+        expect { action :run, "echo $BAR", env: {"BAR" => "foo"} }.to output("foo\n").to_stdout_from_any_process
       end
     end
 
@@ -336,7 +336,7 @@ describe Thor::Actions do
 
       it "supports env option" do
         silence(:stdout) do
-          expect(runner.run "echo $BAR", env: { "BAR" => "foo" }, capture: true).to eq("foo\n")
+          expect(runner.run "echo $BAR", env: {"BAR" => "foo"}, capture: true).to eq("foo\n")
         end
       end
     end

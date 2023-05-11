@@ -24,9 +24,9 @@ class Thor
 
   class << self
     def deprecation_warning(message) #:nodoc:
-      unless ENV['THOR_SILENCE_DEPRECATION']
+      unless ENV["THOR_SILENCE_DEPRECATION"]
         warn "Deprecation warning: #{message}\n" +
-          'You can silence deprecations warning by setting the environment variable THOR_SILENCE_DEPRECATION.'
+          "You can silence deprecations warning by setting the environment variable THOR_SILENCE_DEPRECATION."
       end
     end
   end

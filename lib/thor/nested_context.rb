@@ -16,7 +16,7 @@ class Thor
       @depth.positive?
     end
 
-    private
+  private
 
     def push
       @depth += 1

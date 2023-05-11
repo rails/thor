@@ -108,7 +108,7 @@ class Thor
       end
 
       def are_colors_disabled?
-        !ENV['NO_COLOR'].nil? && !ENV['NO_COLOR'].empty?
+        !ENV["NO_COLOR"].nil? && !ENV["NO_COLOR"].empty?
       end
     end
   end
