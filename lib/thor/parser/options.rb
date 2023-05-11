@@ -52,8 +52,7 @@ class Thor
       options.each do |option|
         @switches[option.switch_name] = option
 
-        option.aliases.each do |short|
-          name = short.to_s.sub(/^(?!\-)/, "-")
+        option.aliases.each do |name|
           @shorts[name] ||= option.switch_name
         end
       end

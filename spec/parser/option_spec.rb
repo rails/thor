@@ -105,11 +105,11 @@ describe Thor::Option do
 
     describe "with key as an array" do
       it "sets the first items in the array to the name" do
-        expect(parse([:foo, :bar, :baz], true).name).to eq("foo")
+        expect(parse([:foo, :b, "--bar"], true).name).to eq("foo")
       end
 
-      it "sets all other items as aliases" do
-        expect(parse([:foo, :bar, :baz], true).aliases).to eq([:bar, :baz])
+      it "sets all other items as normalized aliases" do
+        expect(parse([:foo, :b, "--bar"], true).aliases).to eq(["-b", "--bar"])
       end
     end
   end
@@ -262,6 +262,10 @@ describe Thor::Option do
 
       it "does not negate the aliases" do
         expect(parse([:foo, "-f", "-b"], :boolean).usage).to eq("-f, -b, [--foo], [--no-foo]")
+      end
+
+      it "normalizes the aliases" do
+        expect(parse([:foo, :f, "-b"], :required).usage).to eq("-f, -b, --foo=FOO")
       end
     end
   end
