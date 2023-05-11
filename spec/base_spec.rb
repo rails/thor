@@ -70,6 +70,55 @@ describe Thor::Base do
     end
   end
 
+  describe "#class_exclusive_option_names" do
+    it "returns the exclusive option names for the class" do
+      expect(MyClassOptionScript.class_exclusive_option_names.size).to be(1)
+      expect(MyClassOptionScript.class_exclusive_option_names.first.size).to be(2)
+    end
+  end
+
+  describe "#class_at_least_one_option_names" do
+    it "returns the at least one of option names for the class" do
+      expect(MyClassOptionScript.class_at_least_one_option_names.size).to be(1)
+      expect(MyClassOptionScript.class_at_least_one_option_names.first.size).to be(2)
+    end
+  end
+
+  describe "#class_exclusive" do
+    it "raise error when exclusive options are given" do
+      begin
+        ENV["THOR_DEBUG"] = "1"
+        expect do
+          MyClassOptionScript.start %w[mix --one --two --three --five]
+        end.to raise_error(Thor::ExclusiveArgumentError, "Found exclusive options '--one', '--two'")
+
+        expect do
+          MyClassOptionScript.start %w[mix --one --three --five --six]
+        end.to raise_error(Thor::ExclusiveArgumentError,  "Found exclusive options '--five', '--six'")
+      ensure
+        ENV["THOR_DEBUG"] = nil
+      end
+    end
+  end
+
+  describe "#class_at_least_one" do
+    it "raise error when at least one of required options are not given" do
+      begin
+        ENV["THOR_DEBUG"] = "1"
+
+        expect do
+          MyClassOptionScript.start %w[mix --five]
+        end.to raise_error(Thor::AtLeastOneRequiredArgumentError, "Not found at least one of required options '--three', '--four'")
+
+        expect do
+          MyClassOptionScript.start %w[mix --one --three]
+        end.to raise_error(Thor::AtLeastOneRequiredArgumentError, "Not found at least one of required options '--five', '--six', '--seven'")
+      ensure
+        ENV["THOR_DEBUG"] = nil
+      end
+    end
+  end
+
   describe ":aliases" do
     it "supports string aliases without a dash prefix" do
       expect(MyCounter.start(%w(1 2 -z 3))[4]).to eq(3)
@@ -200,7 +249,7 @@ describe Thor::Base do
       expect(Thor::Base.subclass_files[File.expand_path(thorfile)]).to eq([
         MyScript, MyScript::AnotherScript, MyChildScript, Barn,
         PackageNameScript, Scripts::MyScript, Scripts::MyDefaults,
-        Scripts::ChildDefault, Scripts::Arities, Apple, Pear
+        Scripts::ChildDefault, Scripts::Arities, Apple, Pear, MyClassOptionScript, MyOptionScript
       ])
     end
 

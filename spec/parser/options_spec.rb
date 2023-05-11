@@ -2,11 +2,15 @@ require "helper"
 require "thor/parser"
 
 describe Thor::Options do
-  def create(opts, defaults = {}, stop_on_unknown = false)
+  def create(opts, defaults = {}, stop_on_unknown = false, exclusives = [], at_least_ones = [])
+    relation = {
+      :exclusive_option_names => exclusives,
+      :at_least_one_option_names => at_least_ones
+    }
     opts.each do |key, value|
       opts[key] = Thor::Option.parse(key, value) unless value.is_a?(Thor::Option)
     end
-    @opt = Thor::Options.new(opts, defaults, stop_on_unknown)
+    @opt = Thor::Options.new(opts, defaults, stop_on_unknown, false, relation)
   end
 
   def parse(*args)
@@ -249,6 +253,66 @@ describe Thor::Options do
       it "still interprets everything after -- as args instead of options" do
         expect(parse(%w(-- --verbose))).to eq({})
         expect(remaining).to eq(%w(--verbose))
+      end
+    end
+
+    context "when exclusives is given" do
+      before do
+        create({:foo => :boolean, :bar => :boolean, :baz =>:boolean, :qux => :boolean}, {}, false,
+               [["foo", "bar"], ["baz","qux"]])
+      end
+
+      it "raises an error if exclusive argumets are given" do
+        expect{parse(%w[--foo --bar])}.to raise_error(Thor::ExclusiveArgumentError, "Found exclusive options '--foo', '--bar'")
+      end
+
+      it "does not raise an error if exclusive argumets are not given" do
+        expect{parse(%w[--foo --baz])}.not_to raise_error
+      end
+    end
+
+    context "when at_least_ones is given" do
+      before do
+        create({:foo => :string, :bar => :boolean, :baz =>:boolean, :qux => :boolean}, {}, false,
+               [], [["foo", "bar"], ["baz","qux"]])
+      end
+
+      it "raises an error if at least one of required argumet is not given" do
+        expect{parse(%w[--baz])}.to raise_error(Thor::AtLeastOneRequiredArgumentError, "Not found at least one of required options '--foo', '--bar'")
+      end
+
+      it "does not raise an error if at least one of required argument is given" do
+        expect{parse(%w[--foo --baz])}.not_to raise_error
+      end
+    end
+
+    context "when exclusives is given" do
+      before do
+        create({:foo => :boolean, :bar => :boolean, :baz =>:boolean, :qux => :boolean}, {}, false,
+               [["foo", "bar"], ["baz","qux"]])
+      end
+
+      it "raises an error if exclusive argumets are given" do
+        expect{parse(%w[--foo --bar])}.to raise_error(Thor::ExclusiveArgumentError, "Found exclusive options '--foo', '--bar'")
+      end
+
+      it "does not raise an error if exclusive argumets are not given" do
+        expect{parse(%w[--foo --baz])}.not_to raise_error
+      end
+    end
+
+    context "when at_least_ones is given" do
+      before do
+        create({:foo => :string, :bar => :boolean, :baz =>:boolean, :qux => :boolean}, {}, false,
+               [], [["foo", "bar"], ["baz","qux"]])
+      end
+
+      it "raises an error if at least one of required argumet is not given" do
+        expect{parse(%w[--baz])}.to raise_error(Thor::AtLeastOneRequiredArgumentError, "Not found at least one of required options '--foo', '--bar'")
+      end
+
+      it "does not raise an error if at least one of required argument is given" do
+        expect{parse(%w[--foo --baz])}.not_to raise_error
       end
     end
 
