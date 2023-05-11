@@ -501,7 +501,7 @@ class Thor
     # Can be overridden in the subclass to change the display order of the
     # commands.
     def sort_commands!(list)
-      defined?(super) ? super(list) : list.sort! { |a, b| a[0] <=> b[0] }
+      list.sort! { |a, b| a[0] <=> b[0] }
     end
   end
 
