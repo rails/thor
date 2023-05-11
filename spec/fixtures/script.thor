@@ -270,6 +270,7 @@ class MyClassOptionScript < Thor
     class_option :three
     class_option :four
   end
+
   desc "mix", ""
   exclusive do
     at_least_one do
@@ -281,6 +282,7 @@ class MyClassOptionScript < Thor
   def mix
   end
 end
+
 class MyOptionScript < Thor
   desc "exclusive", ""
   exclusive do
@@ -292,6 +294,7 @@ class MyOptionScript < Thor
   method_option :after2
   def exclusive
   end
+
   exclusive :after1, :after2, {:for => :exclusive}
 
   desc "at_least_one", ""
@@ -321,6 +324,5 @@ class MyOptionScript < Thor
   option :no_rel1
   option :no_rel2
   def no_relations
-
   end
 end

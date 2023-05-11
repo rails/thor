@@ -91,6 +91,7 @@ class Thor
     def required_options
       @required_options ||= options.map { |_, o| o.usage if o.required? }.compact.sort.join(" ")
     end
+
     # Given a target, checks if this class name is a public method.
     def public_method?(instance) #:nodoc:
       !(instance.public_methods & [name.to_s, name.to_sym]).empty?

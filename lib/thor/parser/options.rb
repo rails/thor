@@ -153,6 +153,7 @@ class Thor
         fail ExclusiveArgumentError, "Found exclusive #{class_name} #{names.join(", ")}"
       end
     end
+
     def check_at_least_one!
       opts = @assigns.keys
       # When at least one is required of the options A and B,
@@ -174,6 +175,7 @@ class Thor
     end
 
   protected
+
     # Option names changes to swith name or human name
     def names_to_switch_names(names = [])
       @switches.map do |_, o|

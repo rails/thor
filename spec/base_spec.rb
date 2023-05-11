@@ -76,12 +76,14 @@ describe Thor::Base do
       expect(MyClassOptionScript.class_exclusive_option_names.first.size).to be(2)
     end
   end
+
   describe "#class_at_least_one_option_names" do
     it "returns the at least one of option names for the class" do
       expect(MyClassOptionScript.class_at_least_one_option_names.size).to be(1)
       expect(MyClassOptionScript.class_at_least_one_option_names.first.size).to be(2)
     end
   end
+
   describe "#class_exclusive" do
     it "raise error when exclusive options are given" do
       begin
@@ -98,6 +100,7 @@ describe Thor::Base do
       end
     end
   end
+
   describe "#class_at_least_one" do
     it "raise error when at least one of required options are not given" do
       begin
@@ -115,6 +118,7 @@ describe Thor::Base do
       end
     end
   end
+
   describe ":aliases" do
     it "supports string aliases without a dash prefix" do
       expect(MyCounter.start(%w(1 2 -z 3))[4]).to eq(3)
@@ -142,7 +146,6 @@ describe Thor::Base do
       expect(options[:force]).not_to be_required
     end
   end
-
 
   describe "#remove_argument" do
     it "removes previously defined arguments from class" do

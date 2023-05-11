@@ -163,19 +163,11 @@ class Thor
     end
     alias_method :option, :method_option
 
-    # Returns this class exclusive options array set.
-    #
-    # ==== Rturns
-    # Array[Array[Thor::Option.name]]
-    #
-    def method_exclusive_option_names
-      @method_exclusive_option_names ||=[]
-    end
-
-    # Adds and declareds option group for exclusive options in the
+    # Adds and declares option group for exclusive options in the
     # block and arguments. You can declare options as the outside of the block.
-    # If :for is given as option,
-    # it allows you to change the options from a prvious defined command.
+    #
+    # If :for is given as option, it allows you to change the options from
+    # a previous defined command.
     #
     # ==== Parameters
     # Array[Thor::Option.name]
@@ -186,7 +178,7 @@ class Thor
     #   exclusive do
     #     option :one
     #     option :two
-    #    end
+    #   end
     #
     # Or
     #
@@ -194,8 +186,8 @@ class Thor
     #   option :two
     #   exclusive :one, :two
     #
-    # If you give "--one" and "--two" at the same time.
-    # ExclusiveArgumentsError will be raised.
+    # If you give "--one" and "--two" at the same time ExclusiveArgumentsError
+    # will be raised.
     #
     def method_exclusive(*args, &block)
       register_options_relation_for(:method_options,
@@ -203,19 +195,11 @@ class Thor
     end
     alias_method :exclusive, :method_exclusive
 
-    # Returns this class at least one of required options array set.
-    #
-    # ==== Rturns
-    # Array[Array[Thor::Option.name]]
-    #
-    def method_at_least_one_option_names
-      @method_at_least_one_option_names ||=[]
-    end
-
-    # Adds and declareds option group for required at least one of options in the
+    # Adds and declares option group for required at least one of options in the
     # block of arguments. You can declare options as the outside of the block.
-    # If :for is given as option,
-    # it allows you to change the options from a prvious defined command.
+    #
+    # If :for is given as option, it allows you to change the options from
+    # a previous defined command.
     #
     # ==== Parameters
     # Array[Thor::Option.name]
@@ -226,7 +210,7 @@ class Thor
     #   at_least_one do
     #     option :one
     #     option :two
-    #    end
+    #   end
     #
     # Or
     #
@@ -234,8 +218,8 @@ class Thor
     #   option :two
     #   at_least_one :one, :two
     #
-    # If you do not give "--one" and "--two".
-    # AtLeastOneRequiredArgumentError will be raised.
+    # If you do not give "--one" and "--two" AtLeastOneRequiredArgumentError
+    # will be raised.
     #
     # You can use at_least_one and exclusive at the same time.
     #
@@ -318,26 +302,6 @@ class Thor
     end
     alias_method :printable_tasks, :printable_commands
 
-    def print_exclusive_options(shell, command = nil)
-      opts = []
-      opts  = command.method_exclusive_option_names unless command.nil?
-      opts += class_exclusive_option_names
-      unless opts.empty?
-        shell.say "Exclusive Options:"
-        shell.print_table(opts.map{ |ex| ex.map{ |e| "--#{e}"}}, :indent => 2 )
-        shell.say
-      end
-    end
-    def print_at_least_one_required_options(shell, command = nil)
-      opts = []
-      opts = command.method_at_least_one_option_names unless command.nil?
-      opts += class_at_least_one_option_names
-      unless opts.empty?
-        shell.say "Required At Least One:"
-        shell.print_table(opts.map{ |ex| ex.map{ |e| "--#{e}"}}, :indent => 2 )
-        shell.say
-      end
-    end
     def subcommands
       @subcommands ||= from_superclass(:subcommands, [])
     end
@@ -462,6 +426,24 @@ class Thor
 
   protected
 
+    # Returns this class exclusive options array set.
+    #
+    # ==== Returns
+    # Array[Array[Thor::Option.name]]
+    #
+    def method_exclusive_option_names #:nodoc:
+      @method_exclusive_option_names ||= []
+    end
+
+    # Returns this class at least one of required options array set.
+    #
+    # ==== Returns
+    # Array[Array[Thor::Option.name]]
+    #
+    def method_at_least_one_option_names #:nodoc:
+      @method_at_least_one_option_names ||= []
+    end
+
     def stop_on_unknown_option #:nodoc:
       @stop_on_unknown_option ||= []
     end
@@ -469,6 +451,28 @@ class Thor
     # help command has the required check disabled by default.
     def disable_required_check #:nodoc:
       @disable_required_check ||= [:help]
+    end
+
+    def print_exclusive_options(shell, command = nil) # :nodoc:
+      opts = []
+      opts  = command.method_exclusive_option_names unless command.nil?
+      opts += class_exclusive_option_names
+      unless opts.empty?
+        shell.say "Exclusive Options:"
+        shell.print_table(opts.map{ |ex| ex.map{ |e| "--#{e}"}}, :indent => 2 )
+        shell.say
+      end
+    end
+
+    def print_at_least_one_required_options(shell, command = nil) # :nodoc:
+      opts = []
+      opts = command.method_at_least_one_option_names unless command.nil?
+      opts += class_at_least_one_option_names
+      unless opts.empty?
+        shell.say "Required At Least One:"
+        shell.print_table(opts.map{ |ex| ex.map{ |e| "--#{e}"}}, :indent => 2 )
+        shell.say
+      end
     end
 
     # The method responsible for dispatching given the args.

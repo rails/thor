@@ -431,6 +431,7 @@ describe Thor do
       expect(exclusives.last).to eq(%w[after1 after2])
     end
   end
+
   describe "#method_at_least_one" do
     it "returns the at least one of option names for the class" do
       cmd =  MyOptionScript.commands["at_least_one"]
