@@ -117,14 +117,16 @@ class Thor
     #
     def parse_array(name)
       return shift if peek.is_a?(Array)
+
       array = []
+
       while current_is_value?
         value = shift
-        if !value.empty? && @switches.is_a?(Hash) && switch = @switches[name]
-          if switch.enum && !switch.enum.include?(value)
-            raise MalformattedArgumentError, "Expected all values of '#{name}' to be one of #{switch.enum_to_s}; got #{value}"
-          end
+
+        if !value.empty?
+          validate_enum_value!(name, value, "Expected all values of '%s' to be one of %s; got %s")
         end
+
         array << value
       end
       array
@@ -142,11 +144,9 @@ class Thor
       end
 
       value = $&.index(".") ? shift.to_f : shift.to_i
-      if @switches.is_a?(Hash) && switch = @switches[name]
-        if switch.enum && !switch.enum.include?(value)
-          raise MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum_to_s}; got #{value}"
-        end
-      end
+
+      validate_enum_value!(name, value, "Expected '%s' to be one of %s; got %s")
+
       value
     end
 
@@ -160,12 +160,24 @@ class Thor
         nil
       else
         value = shift
-        if @switches.is_a?(Hash) && switch = @switches[name]
-          if switch.enum && !switch.enum.include?(value)
-            raise MalformattedArgumentError, "Expected '#{name}' to be one of #{switch.enum_to_s}; got #{value}"
-          end
-        end
+
+        validate_enum_value!(name, value, "Expected '%s' to be one of %s; got %s")
+
         value
+      end
+    end
+
+    # Raises an error if the switch is an enum and the values aren't included on it.
+    #
+    def validate_enum_value!(name, value, message)
+      return unless @switches.is_a?(Hash)
+
+      switch = @switches[name]
+
+      return unless switch
+
+      if switch.enum && !switch.enum.include?(value)
+        raise MalformattedArgumentError, message % [name, switch.enum_to_s, value]
       end
     end
 

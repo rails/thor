@@ -512,7 +512,7 @@ describe Thor::Options do
 
       it "raises error when value isn't in enum" do
         enum = %w(apple banana)
-        create :fruit => Thor::Option.new("fruits", :type => :array, :enum => enum)
+        create fruit: Thor::Option.new("fruits", type: :array, enum: enum)
         expect { parse("--fruits=", "apple", "banana", "strawberry") }.to raise_error(Thor::MalformattedArgumentError,
             "Expected all values of '--fruits' to be one of #{enum.join(', ')}; got strawberry")
       end
