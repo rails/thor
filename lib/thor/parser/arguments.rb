@@ -122,7 +122,7 @@ class Thor
         value = shift
         if !value.empty? && @switches.is_a?(Hash) && switch = @switches[name]
           if switch.enum && !switch.enum.include?(value)
-            raise MalformattedArgumentError, "Expected all values of '#{name}' to be one of #{switch.enum.join(', ')}; got #{value}"
+            raise MalformattedArgumentError, "Expected all values of '#{name}' to be one of #{switch.enum_to_s}; got #{value}"
           end
         end
         array << value
