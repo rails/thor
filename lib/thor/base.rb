@@ -60,6 +60,7 @@ class Thor
 
       command_options = config.delete(:command_options) # hook for start
       parse_options = parse_options.merge(command_options) if command_options
+
       if local_options.is_a?(Array)
         array_options = local_options
         hash_options = {}
@@ -85,8 +86,9 @@ class Thor
       end
 
       self.class.class_exclusive_option_names.map { |n| relations[:exclusive_option_names] << n }
-      disable_required_check = self.class.disable_required_check? config[:current_command]
       self.class.class_at_least_one_option_names.map { |n| relations[:at_least_one_option_names] << n }
+
+      disable_required_check = self.class.disable_required_check? current_command
 
       opts = Thor::Options.new(parse_options, hash_options, stop_on_unknown, disable_required_check, relations)
 
