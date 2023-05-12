@@ -792,7 +792,7 @@ class Thor
 
       # Register a relation of options for target(method_option/class_option)
       # by args and block.
-      def register_options_relation_for( target, relation, *args, &block) # :nodoc:
+      def register_options_relation_for(target, relation, *args, &block) # :nodoc:
         opt = args.pop if args.last.is_a? Hash
         opt ||= {}
         names = args.map{ |arg| arg.to_s }
