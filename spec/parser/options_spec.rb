@@ -509,6 +509,13 @@ describe Thor::Options do
         create attributes: Thor::Option.new("attributes", type: :array, repeatable: true)
         expect(parse("--attributes", "1", "2", "--attributes", "3", "4")["attributes"]).to eq([["1", "2"], ["3", "4"]])
       end
+
+      it "raises error when value isn't in enum" do
+        enum = %w(apple banana)
+        create :fruit => Thor::Option.new("fruits", :type => :array, :enum => enum)
+        expect { parse("--fruits=", "apple", "banana", "strawberry") }.to raise_error(Thor::MalformattedArgumentError,
+            "Expected all values of '--fruits' to be one of #{enum.join(', ')}; got strawberry")
+      end
     end
 
     describe "with :numeric type" do
