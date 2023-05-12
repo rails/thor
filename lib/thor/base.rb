@@ -660,7 +660,7 @@ class Thor
 
           list << item
           list << ["", "# Default: #{option.print_default}"] if option.show_default?
-          list << ["", "# Possible values: #{option.enum.join(', ')}"] if option.enum
+          list << ["", "# Possible values: #{option.enum_to_s}"] if option.enum
         end
 
         shell.say(group_name ? "#{group_name} options:" : "Options:")

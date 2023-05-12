@@ -25,10 +25,10 @@ describe Thor::Argument do
       end.to raise_error(ArgumentError, "An argument cannot be required and have default value.")
     end
 
-    it "raises an error if enum isn't an array" do
+    it "raises an error if enum isn't enumerable" do
       expect do
         argument(:command, type: :string, enum: "bar")
-      end.to raise_error(ArgumentError, "An argument cannot have an enum other than an array.")
+      end.to raise_error(ArgumentError, "An argument cannot have an enum other than an enumerable.")
     end
   end
 
