@@ -59,6 +59,8 @@ class Thor
         if exists?
           if replace!(/#{flag}/, content, config[:force])
             say_status(:invoke)
+          elsif replacement_present?
+            say_status(:unchanged, color: :blue)
           else
             say_status(:unchanged, warning: WARNINGS[:unchanged_no_flag], color: :red)
           end
@@ -96,6 +98,8 @@ class Thor
           end
         elsif warning
           warning
+        elsif behavior == :unchanged
+          :unchanged
         else
           :subtract
         end
@@ -103,11 +107,18 @@ class Thor
         super(status, (color || config[:verbose]))
       end
 
+      def content
+        @content ||= File.read(destination)
+      end
+
+      def replacement_present?
+        content.include?(replacement)
+      end
+
       # Adds the content to the file.
       #
       def replace!(regexp, string, force)
-        content = File.read(destination)
-        if force || !content.include?(replacement)
+        if force || !replacement_present?
           success = content.gsub!(regexp, string)
 
           File.open(destination, "wb") { |file| file.write(content) } unless pretend?
