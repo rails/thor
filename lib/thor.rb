@@ -81,7 +81,7 @@ class Thor
         command.long_description = long_description if long_description
       else
         @long_desc = long_description
-        @long_desc_wrap = options[:wrap] || options[:wrap].nil?
+        @long_desc_wrap = options[:wrap] != false
       end
     end
 
