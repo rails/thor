@@ -1,9 +1,9 @@
 class Thor
-  class Command < Struct.new(:name, :description, :long_description, :usage, :options, :options_relation, :ancestor_name)
+  class Command < Struct.new(:name, :description, :long_description, :wrap_long_description, :usage, :options, :options_relation, :ancestor_name)
     FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
 
-    def initialize(name, description, long_description, usage, options = nil, options_relation = nil)
-      super(name.to_s, description, long_description, usage, options || {}, options_relation || {})
+    def initialize(name, description, long_description, wrap_long_description, usage, options = nil, options_relation = nil)
+      super(name.to_s, description, long_description, wrap_long_description, usage, options || {}, options_relation || {})
     end
 
     def initialize_copy(other) #:nodoc:
@@ -136,7 +136,7 @@ class Thor
   # A dynamic command that handles method missing scenarios.
   class DynamicCommand < Command
     def initialize(name, options = nil)
-      super(name.to_s, "A dynamically-generated command", name.to_s, name.to_s, options)
+      super(name.to_s, "A dynamically-generated command", name.to_s, nil, name.to_s, options)
     end
 
     def run(instance, args = [])
