@@ -104,6 +104,10 @@ class Thor
       end
     end
 
+    def show_default?
+      super || [TrueClass, FalseClass].any? { |c| default.is_a?(c) }
+    end
+
     VALID_TYPES.each do |type|
       class_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{type}?
