@@ -104,6 +104,15 @@ class Thor
       end
     end
 
+    def show_default?
+      case default
+      when TrueClass, FalseClass
+        true
+      else
+        super
+      end
+    end
+
     VALID_TYPES.each do |type|
       class_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{type}?
