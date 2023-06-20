@@ -272,14 +272,14 @@ describe Thor::Option do
 
   describe "#print_default" do
     it "prints boolean with true default value" do
-      expect(option(:foo,    {
+      expect(option(:foo, {
         required: false,
         type: :boolean,
         default: true
       }).print_default).to eq(true)
     end
     it "prints boolean with false default value" do
-      expect(option(:foo,    {
+      expect(option(:foo, {
         required: false,
         type: :boolean,
         default: false

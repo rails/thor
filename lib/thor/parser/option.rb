@@ -105,7 +105,12 @@ class Thor
     end
 
     def show_default?
-      super || [TrueClass, FalseClass].any? { |c| default.is_a?(c) }
+      case default
+      when TrueClass, FalseClass
+        true
+      else
+        super
+      end
     end
 
     VALID_TYPES.each do |type|
