@@ -368,8 +368,7 @@ TABLE
     it "uses maximum terminal width" do
       @table << ["def", "#456", "Lançam foo bar"]
       @table << ["ghi", "#789", "بالله  عليكم"]
-      expect(shell).to receive(:terminal_width).and_return(20)
-      content = capture(:stdout) { shell.print_table(@table, indent: 2, truncate: true) }
+      content = capture(:stdout) { shell.print_table(@table, indent: 2, truncate: 20) }
       expect(content).to eq(<<-TABLE)
   abc  #123  firs...
        #0    empty
