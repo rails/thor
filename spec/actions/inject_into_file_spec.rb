@@ -159,11 +159,15 @@ describe Thor::Actions::InjectIntoFile do
       encoding_original = Encoding.default_external
 
       begin
-        Encoding.default_external = Encoding.find("UTF-8")
+        silence_warnings do
+          Encoding.default_external = Encoding.find("UTF-8")
+        end
         invoke! "doc/README.zh", "\n中文", after: "__start__"
         expect(File.read(File.join(destination_root, "doc/README.zh"))).to eq("__start__\n中文\n说明\n__end__\n")
       ensure
-        Encoding.default_external = encoding_original
+        silence_warnings do
+          Encoding.default_external = encoding_original
+        end
       end
     end
   end
