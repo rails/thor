@@ -141,7 +141,7 @@ class Thor
     #     # magic
     #   end
     #
-    #   method_option :foo => :bar, :for => :previous_command
+    #   method_option :foo, :for => :previous_command
     #
     #   def next_command
     #     # magic
@@ -161,6 +161,9 @@ class Thor
     # :hide     - If you want to hide this option from the help.
     #
     def method_option(name, options = {})
+      unless [ Symbol, String ].any? { |klass| name.is_a?(klass) }
+        raise ArgumentError, "Expected a Symbol or String, got #{name.inspect}"
+      end
       scope = if options[:for]
         find_and_refresh_command(options[:for]).options
       else

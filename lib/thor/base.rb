@@ -326,6 +326,9 @@ class Thor
       # :hide::     -- If you want to hide this option from the help.
       #
       def class_option(name, options = {})
+        unless [ Symbol, String ].any? { |klass| name.is_a?(klass) }
+          raise ArgumentError, "Expected a Symbol or String, got #{name.inspect}"
+        end
         build_option(name, options, class_options)
       end
 
