@@ -316,7 +316,7 @@ class Thor
 
             say "Please specify merge tool to `THOR_MERGE` env."
           else
-            say file_collision_help
+            say file_collision_help(block_given?)
           end
         end
       end
@@ -384,16 +384,21 @@ class Thor
         end
       end
 
-      def file_collision_help #:nodoc:
-        <<-HELP
+      def file_collision_help(block_given) #:nodoc:
+        help = <<-HELP
         Y - yes, overwrite
         n - no, do not overwrite
         a - all, overwrite this and all others
         q - quit, abort
-        d - diff, show the differences between the old and the new
         h - help, show this help
-        m - merge, run merge tool
         HELP
+        if block_given
+          help << <<-HELP
+        d - diff, show the differences between the old and the new
+        m - merge, run merge tool
+          HELP
+        end
+        help
       end
 
       def show_diff(destination, content) #:nodoc:
