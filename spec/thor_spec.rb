@@ -546,7 +546,7 @@ Usage: "thor scripts:arities:multiple_usages ARG --foo"
       end
 
       it "uses the maximum terminal size to show commands" do
-        expect(@shell).to receive(:terminal_width).and_return(80)
+        expect(Thor::Shell::Terminal).to receive(:terminal_width).and_return(80)
         content = capture(:stdout) { MyScript.help(shell) }
         expect(content).to match(/aaa\.\.\.$/)
       end
