@@ -432,6 +432,44 @@ Name  Number         Color
 Erik  1234567890123  green
       TABLE
     end
+
+    it "prints a table with borders" do
+      content = capture(:stdout) { shell.print_table(@table, borders: true) }
+      expect(content).to eq(<<-TABLE)
++-----+------+-------------+
+| abc | #123 | first three |
+|     | #0   | empty       |
+| xyz | #786 | last three  |
++-----+------+-------------+
+TABLE
+    end
+
+    it "prints a table with borders and separators" do
+      @table.insert(1, :separator)
+      content = capture(:stdout) { shell.print_table(@table, borders: true) }
+      expect(content).to eq(<<-TABLE)
++-----+------+-------------+
+| abc | #123 | first three |
++-----+------+-------------+
+|     | #0   | empty       |
+| xyz | #786 | last three  |
++-----+------+-------------+
+TABLE
+    end
+
+    it "prints a table with borders and small numbers and right-aligns them" do
+      table = [
+        ["Name", "Number", "Color"], # rubocop: disable Style/WordArray
+        ["Erik", 1, "green"]
+      ]
+      content = capture(:stdout) { shell.print_table(table, borders: true) }
+      expect(content).to eq(<<-TABLE)
++------+--------+-------+
+| Name | Number | Color |
+| Erik |      1 | green |
++------+--------+-------+
+TABLE
+    end
   end
 
   describe "#file_collision" do

@@ -175,6 +175,7 @@ class Thor
       # ==== Options
       # indent<Integer>:: Indent the first column by indent value.
       # colwidth<Integer>:: Force the first column to colwidth spaces wide.
+      # borders<Boolean>:: Adds ascii borders.
       #
       def print_table(array, options = {}) # rubocop:disable Metrics/MethodLength
         printer = TablePrinter.new(stdout, options)
