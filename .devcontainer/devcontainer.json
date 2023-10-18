@@ -14,13 +14,14 @@
 		}
 	},
 
-	// Set *default* container specific settings.json values on container create.
-	"settings": {},
-
 	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"rebornix.Ruby"
-	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"Shopify.ruby-lsp"
+			]
+		}
+	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
@@ -30,8 +31,8 @@
 
 	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
+
 	"features": {
 		"github-cli": "latest"
 	}
-
 }
