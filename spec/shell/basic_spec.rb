@@ -470,6 +470,20 @@ TABLE
 +------+--------+-------+
 TABLE
     end
+
+    it "prints a table with borders and indentation" do
+      table = [
+        ["Name", "Number", "Color"], # rubocop: disable Style/WordArray
+        ["Erik", 1, "green"]
+      ]
+      content = capture(:stdout) { shell.print_table(table, borders: true, indent: 2) }
+      expect(content).to eq(<<-TABLE)
+  +------+--------+-------+
+  | Name | Number | Color |
+  | Erik |      1 | green |
+  +------+--------+-------+
+TABLE
+    end
   end
 
   describe "#file_collision" do

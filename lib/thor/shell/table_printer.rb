@@ -36,7 +36,7 @@ class Thor
 
           sentence = truncate(sentence)
           sentence << "|" if options[:borders]
-          stdout.puts sentence
+          stdout.puts indentation + sentence
 
         end
         print_border_separator if options[:borders]
@@ -66,7 +66,6 @@ class Thor
           end
         end
 
-        @formats[0] = @formats[0].insert(0, " " * @indent)
         @formats << "%s"
       end
 
@@ -95,10 +94,10 @@ class Thor
       end
 
       def print_border_separator
-        top = @maximas.map do |maxima|
-          " " * @indent + "+" + "-" * (maxima + 2 * @padding)
+        separator = @maximas.map do |maxima|
+          "+" + "-" * (maxima + 2 * @padding)
         end
-        stdout.puts top.join + "+"
+        stdout.puts indentation + separator.join + "+"
       end
 
       def truncate(string)
@@ -108,9 +107,13 @@ class Thor
           if chars.length <= @truncate
             chars.join
           else
-            chars[0, @truncate - 3].join + "..."
+            chars[0, @truncate - 3 - @indent].join + "..."
           end
         end
+      end
+
+      def indentation
+        " " * @indent
       end
 
       if "".respond_to?(:encode)
@@ -129,4 +132,3 @@ class Thor
     end
   end
 end
-
