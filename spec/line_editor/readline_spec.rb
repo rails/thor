@@ -33,7 +33,7 @@ describe Thor::LineEditor::Readline do
     it "supports the add_to_history option" do
       expect(::Readline).to receive(:readline).with("> ", false).and_return("foo")
       expect(::Readline).to_not receive(:completion_proc=)
-      editor = Thor::LineEditor::Readline.new("> ", :add_to_history => false)
+      editor = Thor::LineEditor::Readline.new("> ", add_to_history: false)
       expect(editor.readline).to eq("foo")
     end
 
@@ -45,7 +45,7 @@ describe Thor::LineEditor::Readline do
         expect(proc.call("Chi")).to eq ["Chicken"]
       end
 
-      editor = Thor::LineEditor::Readline.new("Best food: ", :limited_to => %w(Apples Chicken Chocolate))
+      editor = Thor::LineEditor::Readline.new("Best food: ", limited_to: %w(Apples Chicken Chocolate))
       editor.readline
     end
 
@@ -55,7 +55,7 @@ describe Thor::LineEditor::Readline do
         expect(proc.call("../line_ed").sort).to eq ["../line_editor/", "../line_editor_spec.rb"].sort
       end
 
-      editor = Thor::LineEditor::Readline.new("Path to file: ", :path => true)
+      editor = Thor::LineEditor::Readline.new("Path to file: ", path: true)
       Dir.chdir(File.dirname(__FILE__)) { editor.readline }
     end
 
@@ -64,7 +64,7 @@ describe Thor::LineEditor::Readline do
       noecho_stdin = double("noecho_stdin")
       expect(noecho_stdin).to receive(:gets).and_return("secret")
       expect($stdin).to receive(:noecho).and_yield(noecho_stdin)
-      editor = Thor::LineEditor::Readline.new("Password: ", :echo => false)
+      editor = Thor::LineEditor::Readline.new("Password: ", echo: false)
       expect(editor.readline).to eq("secret")
     end
   end

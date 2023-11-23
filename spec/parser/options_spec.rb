@@ -2,11 +2,15 @@ require "helper"
 require "thor/parser"
 
 describe Thor::Options do
-  def create(opts, defaults = {}, stop_on_unknown = false)
+  def create(opts, defaults = {}, stop_on_unknown = false, exclusives = [], at_least_ones = [])
+    relation = {
+      exclusive_option_names: exclusives,
+      at_least_one_option_names: at_least_ones
+    }
     opts.each do |key, value|
       opts[key] = Thor::Option.parse(key, value) unless value.is_a?(Thor::Option)
     end
-    @opt = Thor::Options.new(opts, defaults, stop_on_unknown)
+    @opt = Thor::Options.new(opts, defaults, stop_on_unknown, false, relation)
   end
 
   def parse(*args)
@@ -23,40 +27,40 @@ describe Thor::Options do
 
   describe "#to_switches" do
     it "turns true values into a flag" do
-      expect(Thor::Options.to_switches(:color => true)).to eq("--color")
+      expect(Thor::Options.to_switches(color: true)).to eq("--color")
     end
 
     it "ignores nil" do
-      expect(Thor::Options.to_switches(:color => nil)).to eq("")
+      expect(Thor::Options.to_switches(color: nil)).to eq("")
     end
 
     it "ignores false" do
-      expect(Thor::Options.to_switches(:color => false)).to eq("")
+      expect(Thor::Options.to_switches(color: false)).to eq("")
     end
 
     it "avoids extra spaces" do
-      expect(Thor::Options.to_switches(:color => false, :foo => nil)).to eq("")
+      expect(Thor::Options.to_switches(color: false, foo: nil)).to eq("")
     end
 
     it "writes --name value for anything else" do
-      expect(Thor::Options.to_switches(:format => "specdoc")).to eq('--format "specdoc"')
+      expect(Thor::Options.to_switches(format: "specdoc")).to eq('--format "specdoc"')
     end
 
     it "joins several values" do
-      switches = Thor::Options.to_switches(:color => true, :foo => "bar").split(" ").sort
+      switches = Thor::Options.to_switches(color: true, foo: "bar").split(" ").sort
       expect(switches).to eq(%w("bar" --color --foo))
     end
 
     it "accepts arrays" do
-      expect(Thor::Options.to_switches(:count => [1, 2, 3])).to eq("--count 1 2 3")
+      expect(Thor::Options.to_switches(count: [1, 2, 3])).to eq("--count 1 2 3")
     end
 
     it "accepts hashes" do
-      expect(Thor::Options.to_switches(:count => {:a => :b})).to eq("--count a:b")
+      expect(Thor::Options.to_switches(count: {a: :b})).to eq("--count a:b")
     end
 
     it "accepts underscored options" do
-      expect(Thor::Options.to_switches(:under_score_option => "foo bar")).to eq('--under_score_option "foo bar"')
+      expect(Thor::Options.to_switches(under_score_option: "foo bar")).to eq('--under_score_option "foo bar"')
     end
   end
 
@@ -95,80 +99,82 @@ describe Thor::Options do
     end
 
     it "returns the default value if none is provided" do
-      create :foo => "baz", :bar => :required
+      create foo: "baz", bar: :required
       expect(parse("--bar", "boom")["foo"]).to eq("baz")
     end
 
     it "returns the default value from defaults hash to required arguments" do
-      create Hash[:bar => :required], Hash[:bar => "baz"]
+      create Hash[bar: :required], Hash[bar: "baz"]
       expect(parse["bar"]).to eq("baz")
     end
 
     it "gives higher priority to defaults given in the hash" do
-      create Hash[:bar => true], Hash[:bar => false]
+      create Hash[bar: true], Hash[bar: false]
       expect(parse["bar"]).to eq(false)
     end
 
     it "raises an error for unknown switches" do
-      create :foo => "baz", :bar => :required
+      create foo: "baz", bar: :required
       parse("--bar", "baz", "--baz", "unknown")
 
       expected = "Unknown switches \"--baz\""
       expected << "\nDid you mean?  \"--bar\"" if Thor::Correctable
 
-      expect { check_unknown! }.to raise_error(Thor::UnknownArgumentError, expected)
+      expect { check_unknown! }.to raise_error(Thor::UnknownArgumentError) do |error|
+        expect(error.to_s).to eq(expected)
+      end
     end
 
     it "skips leading non-switches" do
-      create(:foo => "baz")
+      create(foo: "baz")
 
       expect(parse("asdf", "--foo", "bar")).to eq("foo" => "bar")
     end
 
     it "correctly recognizes things that look kind of like options, but aren't, as not options" do
-      create(:foo => "baz")
+      create(foo: "baz")
       expect(parse("--asdf---asdf", "baz", "--foo", "--asdf---dsf--asdf")).to eq("foo" => "--asdf---dsf--asdf")
       check_unknown!
     end
 
     it "accepts underscores in commandline args hash for boolean" do
-      create :foo_bar => :boolean
+      create foo_bar: :boolean
       expect(parse("--foo_bar")["foo_bar"]).to eq(true)
       expect(parse("--no_foo_bar")["foo_bar"]).to eq(false)
     end
 
     it "accepts underscores in commandline args hash for strings" do
-      create :foo_bar => :string, :baz_foo => :string
+      create foo_bar: :string, baz_foo: :string
       expect(parse("--foo_bar", "baz")["foo_bar"]).to eq("baz")
       expect(parse("--baz_foo", "foo bar")["baz_foo"]).to eq("foo bar")
     end
 
     it "interprets everything after -- as args instead of options" do
-      create(:foo => :string, :bar => :required)
+      create(foo: :string, bar: :required)
       expect(parse(%w(--bar abc moo -- --foo def -a))).to eq("bar" => "abc")
       expect(remaining).to eq(%w(moo --foo def -a))
     end
 
     it "ignores -- when looking for single option values" do
-      create(:foo => :string, :bar => :required)
+      create(foo: :string, bar: :required)
       expect(parse(%w(--bar -- --foo def -a))).to eq("bar" => "--foo")
       expect(remaining).to eq(%w(def -a))
     end
 
     it "ignores -- when looking for array option values" do
-      create(:foo => :array)
+      create(foo: :array)
       expect(parse(%w(--foo a b -- c d -e))).to eq("foo" => %w(a b c d -e))
       expect(remaining).to eq([])
     end
 
     it "ignores -- when looking for hash option values" do
-      create(:foo => :hash)
+      create(foo: :hash)
       expect(parse(%w(--foo a:b -- c:d -e))).to eq("foo" => {"a" => "b", "c" => "d"})
       expect(remaining).to eq(%w(-e))
     end
 
     it "ignores trailing --" do
-      create(:foo => :string)
+      create(foo: :string)
       expect(parse(%w(--foo --))).to eq("foo" => nil)
       expect(remaining).to eq([])
     end
@@ -208,15 +214,15 @@ describe Thor::Options do
       end
 
       it "does not raises an error if the required option has a default value" do
-        options = {:required => true, :type => :string, :default => "baz"}
-        create :foo => Thor::Option.new("foo", options), :bar => :boolean
+        options = {required: true, type: :string, default: "baz"}
+        create foo: Thor::Option.new("foo", options), bar: :boolean
         expect { parse("--bar") }.not_to raise_error
       end
     end
 
     context "when stop_on_unknown is true" do
       before do
-        create({:foo => :string, :verbose => :boolean}, {}, true)
+        create({foo: :string, verbose: :boolean}, {}, true)
       end
 
       it "stops parsing on first non-option" do
@@ -250,6 +256,66 @@ describe Thor::Options do
       end
     end
 
+    context "when exclusives is given" do
+      before do
+        create({foo: :boolean, bar: :boolean, baz: :boolean, qux: :boolean}, {}, false,
+               [["foo", "bar"], ["baz","qux"]])
+      end
+
+      it "raises an error if exclusive argumets are given" do
+        expect{parse(%w[--foo --bar])}.to raise_error(Thor::ExclusiveArgumentError, "Found exclusive options '--foo', '--bar'")
+      end
+
+      it "does not raise an error if exclusive argumets are not given" do
+        expect{parse(%w[--foo --baz])}.not_to raise_error
+      end
+    end
+
+    context "when at_least_ones is given" do
+      before do
+        create({foo: :string, bar: :boolean, baz: :boolean, qux: :boolean}, {}, false,
+               [], [["foo", "bar"], ["baz","qux"]])
+      end
+
+      it "raises an error if at least one of required argumet is not given" do
+        expect{parse(%w[--baz])}.to raise_error(Thor::AtLeastOneRequiredArgumentError, "Not found at least one of required options '--foo', '--bar'")
+      end
+
+      it "does not raise an error if at least one of required argument is given" do
+        expect{parse(%w[--foo --baz])}.not_to raise_error
+      end
+    end
+
+    context "when exclusives is given" do
+      before do
+        create({foo: :boolean, bar: :boolean, baz: :boolean, qux: :boolean}, {}, false,
+               [["foo", "bar"], ["baz","qux"]])
+      end
+
+      it "raises an error if exclusive argumets are given" do
+        expect{parse(%w[--foo --bar])}.to raise_error(Thor::ExclusiveArgumentError, "Found exclusive options '--foo', '--bar'")
+      end
+
+      it "does not raise an error if exclusive argumets are not given" do
+        expect{parse(%w[--foo --baz])}.not_to raise_error
+      end
+    end
+
+    context "when at_least_ones is given" do
+      before do
+        create({foo: :string, bar: :boolean, baz: :boolean, qux: :boolean}, {}, false,
+               [], [["foo", "bar"], ["baz","qux"]])
+      end
+
+      it "raises an error if at least one of required argumet is not given" do
+        expect{parse(%w[--baz])}.to raise_error(Thor::AtLeastOneRequiredArgumentError, "Not found at least one of required options '--foo', '--bar'")
+      end
+
+      it "does not raise an error if at least one of required argument is given" do
+        expect{parse(%w[--foo --baz])}.not_to raise_error
+      end
+    end
+
     describe "with :string type" do
       before do
         create %w(--foo -f) => :required
@@ -263,10 +329,12 @@ describe Thor::Options do
         expect(parse("-f=12")["foo"]).to eq("12")
         expect(parse("--foo=12")["foo"]).to eq("12")
         expect(parse("--foo=bar=baz")["foo"]).to eq("bar=baz")
+        expect(parse("--foo=-bar")["foo"]).to eq("-bar")
+        expect(parse("--foo=-bar -baz")["foo"]).to eq("-bar -baz")
       end
 
       it "must accept underscores switch=value assignment" do
-        create :foo_bar => :required
+        create foo_bar: :required
         expect(parse("--foo_bar=http://example.com/under_score/")["foo_bar"]).to eq("http://example.com/under_score/")
       end
 
@@ -297,13 +365,13 @@ describe Thor::Options do
 
       it "raises error when value isn't in enum" do
         enum = %w(apple banana)
-        create :fruit => Thor::Option.new("fruit", :type => :string, :enum => enum)
+        create fruit: Thor::Option.new("fruit", type: :string, enum: enum)
         expect { parse("--fruit", "orange") }.to raise_error(Thor::MalformattedArgumentError,
             "Expected '--fruit' to be one of #{enum.join(', ')}; got orange")
       end
 
       it "does not erroneously mutate defaults" do
-        create :foo => Thor::Option.new("foo", :type => :string, :repeatable => true, :required => false, :default => [])
+        create foo: Thor::Option.new("foo", type: :string, repeatable: true, required: false, default: [])
         expect(parse("--foo=bar", "--foo", "12")["foo"]).to eq(["bar", "12"])
         expect(@opt.instance_variable_get(:@switches)["--foo"].default).to eq([])
       end
@@ -364,7 +432,7 @@ describe Thor::Options do
       end
 
       it "accepts inputs in the human name format" do
-        create :foo_bar => :boolean
+        create foo_bar: :boolean
         expect(parse("--foo-bar")["foo_bar"]).to eq(true)
         expect(parse("--no-foo-bar")["foo_bar"]).to eq(false)
         expect(parse("--skip-foo-bar")["foo_bar"]).to eq(false)
@@ -386,7 +454,7 @@ describe Thor::Options do
       end
 
       it "allows multiple values if repeatable is specified" do
-        create :verbose => Thor::Option.new("verbose", :type => :boolean, :aliases => '-v', :repeatable => true)
+        create verbose: Thor::Option.new("verbose", type: :boolean, aliases: "-v", repeatable: true)
         expect(parse("-v", "-v", "-v")["verbose"].count).to eq(3)
       end
     end
@@ -398,6 +466,7 @@ describe Thor::Options do
 
       it "accepts a switch=<value> assignment" do
         expect(parse("--attributes=name:string", "age:integer")["attributes"]).to eq("name" => "string", "age" => "integer")
+        expect(parse("--attributes=-name:string", "age:integer", "--gender:string")["attributes"]).to eq("-name" => "string", "age" => "integer")
       end
 
       it "accepts a switch <value> assignment" do
@@ -413,7 +482,7 @@ describe Thor::Options do
       end
 
       it "allows multiple values if repeatable is specified" do
-        create :attributes => Thor::Option.new("attributes", :type => :hash, :repeatable => true)
+        create attributes: Thor::Option.new("attributes", type: :hash, repeatable: true)
         expect(parse("--attributes", "name:one", "foo:1", "--attributes", "name:two", "bar:2")["attributes"]).to eq({"name"=>"two", "foo"=>"1", "bar" => "2"})
       end
     end
@@ -425,6 +494,7 @@ describe Thor::Options do
 
       it "accepts a switch=<value> assignment" do
         expect(parse("--attributes=a", "b", "c")["attributes"]).to eq(%w(a b c))
+        expect(parse("--attributes=-a", "b", "-c")["attributes"]).to eq(%w(-a b))
       end
 
       it "accepts a switch <value> assignment" do
@@ -436,8 +506,15 @@ describe Thor::Options do
       end
 
       it "allows multiple values if repeatable is specified" do
-        create :attributes => Thor::Option.new("attributes", :type => :array, :repeatable => true)
+        create attributes: Thor::Option.new("attributes", type: :array, repeatable: true)
         expect(parse("--attributes", "1", "2", "--attributes", "3", "4")["attributes"]).to eq([["1", "2"], ["3", "4"]])
+      end
+
+      it "raises error when value isn't in enum" do
+        enum = %w(apple banana)
+        create fruit: Thor::Option.new("fruits", type: :array, enum: enum)
+        expect { parse("--fruits=", "apple", "banana", "strawberry") }.to raise_error(Thor::MalformattedArgumentError,
+            "Expected all values of '--fruits' to be one of #{enum.join(', ')}; got strawberry")
       end
     end
 
@@ -459,15 +536,22 @@ describe Thor::Options do
                                                      "Expected numeric value for '-n'; got \"foo\"")
       end
 
-      it "raises error when value isn't in enum" do
+      it "raises error when value isn't in Array enum" do
         enum = [1, 2]
-        create :limit => Thor::Option.new("limit", :type => :numeric, :enum => enum)
+        create limit: Thor::Option.new("limit", type: :numeric, enum: enum)
         expect { parse("--limit", "3") }.to raise_error(Thor::MalformattedArgumentError,
-                                                        "Expected '--limit' to be one of #{enum.join(', ')}; got 3")
+                                                        "Expected '--limit' to be one of 1, 2; got 3")
+      end
+
+      it "raises error when value isn't in Range enum" do
+        enum = 1..2
+        create limit: Thor::Option.new("limit", type: :numeric, enum: enum)
+        expect { parse("--limit", "3") }.to raise_error(Thor::MalformattedArgumentError,
+                                                        "Expected '--limit' to be one of 1..2; got 3")
       end
 
       it "allows multiple values if repeatable is specified" do
-        create :run => Thor::Option.new("run", :type => :numeric, :repeatable => true)
+        create run: Thor::Option.new("run", type: :numeric, repeatable: true)
         expect(parse("--run", "1", "--run", "2")["run"]).to eq([1, 2])
       end
     end

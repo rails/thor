@@ -19,7 +19,7 @@ describe Thor::Actions::EmptyDirectory do
   end
 
   def base
-    @base ||= MyCounter.new([1, 2], {}, :destination_root => destination_root)
+    @base ||= MyCounter.new([1, 2], {}, destination_root: destination_root)
   end
 
   describe "#destination" do
@@ -63,7 +63,7 @@ describe Thor::Actions::EmptyDirectory do
     end
 
     it "does not create a directory if pretending" do
-      base.inside("foo", :pretend => true) do
+      base.inside("foo", pretend: true) do
         empty_directory("ghost")
       end
       expect(File.exist?(File.join(base.destination_root, "ghost"))).to be false

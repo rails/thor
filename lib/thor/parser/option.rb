@@ -11,7 +11,7 @@ class Thor
       super
       @lazy_default   = options[:lazy_default]
       @group          = options[:group].to_s.capitalize if options[:group]
-      @aliases        = Array(options[:aliases])
+      @aliases        = normalize_aliases(options[:aliases])
       @hide           = options[:hide]
       @inverse        = options[:inverse]
     end
@@ -59,7 +59,7 @@ class Thor
         default = nil
         if VALID_TYPES.include?(value)
           value
-        elsif required = (value == :required) # rubocop:disable AssignmentInCondition
+        elsif required = (value == :required) # rubocop:disable Lint/AssignmentInCondition
           :string
         end
       when TrueClass, FalseClass
@@ -70,7 +70,7 @@ class Thor
         value.class.name.downcase.to_sym
       end
 
-      new(name.to_s, :required => required, :type => type, :default => default, :aliases => aliases)
+      new(name.to_s, required: required, type: type, default: default, aliases: aliases)
     end
 
     def switch_name
@@ -84,10 +84,23 @@ class Thor
     def usage(padding = 0)
       sample = [ sample_banner, inverse_sample ].compact.join(", ")
 
+      aliases_for_usage.ljust(padding) + sample
+    end
+
+    def aliases_for_usage
       if aliases.empty?
-        (" " * padding) << sample
+        ""
       else
-        "#{aliases.join(', ')}, #{sample}"
+        "#{aliases.join(', ')}, "
+      end
+    end
+
+    def show_default?
+      case default
+      when TrueClass, FalseClass
+        true
+      else
+        super
       end
     end
 
@@ -111,7 +124,7 @@ class Thor
     end
 
     def inverse_sample
-      return if !boolean? || name =~ /^(force|no-.*)$/
+      return if !boolean? || name =~ /^(force|\Ano[\-_])$/
 
       case @inverse
       when Symbol, String
@@ -149,8 +162,8 @@ class Thor
           raise ArgumentError, err
         elsif @check_default_type == nil
           Thor.deprecation_warning "#{err}.\n" +
-            'This will be rejected in the future unless you explicitly pass the options `check_default_type: false`' +
-            ' or call `allow_incompatible_default_type!` in your code'
+            "This will be rejected in the future unless you explicitly pass the options `check_default_type: false`" +
+            " or call `allow_incompatible_default_type!` in your code"
         end
       end
     end
@@ -165,6 +178,12 @@ class Thor
 
     def dasherize(str)
       (str.length > 1 ? "--" : "-") + str.tr("_", "-")
+    end
+
+  private
+
+    def normalize_aliases(aliases)
+      Array(aliases).map { |short| short.to_s.sub(/^(?!\-)/, "-") }
     end
   end
 end

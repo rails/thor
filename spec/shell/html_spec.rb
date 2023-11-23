@@ -30,7 +30,7 @@ describe Thor::Shell::HTML do
   end
 
   describe "#set_color" do
-    it "escapes HTML content when unsing the default colors" do
+    it "escapes HTML content when using the default colors" do
       expect(shell.set_color("<htmlcontent>", :blue)).to eq "<span style=\"color: blue;\">&lt;htmlcontent&gt;</span>"
     end
 

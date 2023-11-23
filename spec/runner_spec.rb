@@ -118,13 +118,13 @@ Usage: "thor my_script:animal TYPE"')
   end
 
   describe "commands" do
+    let(:location) { "#{File.dirname(__FILE__)}/fixtures/command.thor" }
     before do
-      @location = "#{File.dirname(__FILE__)}/fixtures/command.thor"
       @original_yaml = {
         "random" => {
-          :location  => @location,
-          :filename  => "4a33b894ffce85d7b412fc1b36f88fe0",
-          :namespaces => %w(amazing)
+          location: location,
+          filename: "4a33b894ffce85d7b412fc1b36f88fe0",
+          namespaces: %w(amazing)
         }
       }
 
@@ -214,31 +214,52 @@ Usage: "thor my_script:animal TYPE"')
     end
 
     describe "install/update" do
-      before do
-        allow(FileUtils).to receive(:mkdir_p)
-        allow(FileUtils).to receive(:touch)
-        allow(Thor::LineEditor).to receive(:readline).and_return("Y")
+      context "with local thor files" do
+        before do
+          allow(FileUtils).to receive(:mkdir_p)
+          allow(FileUtils).to receive(:touch)
+          allow(Thor::LineEditor).to receive(:readline).and_return("Y")
 
-        path = File.join(Thor::Util.thor_root, Digest::MD5.hexdigest(@location + "random"))
-        expect(File).to receive(:open).with(path, "w")
+          path = File.join(Thor::Util.thor_root, Digest::SHA256.hexdigest(location + "random"))
+          expect(File).to receive(:open).with(path, "w")
+        end
+
+        it "updates existing thor files" do
+          path = File.join(Thor::Util.thor_root, @original_yaml["random"][:filename])
+          if File.directory? path
+            expect(FileUtils).to receive(:rm_rf).with(path)
+          else
+            expect(File).to receive(:delete).with(path)
+          end
+          silence_warnings do
+            silence(:stdout) { Thor::Runner.start(%w(update random)) }
+          end
+        end
+
+        it "installs thor files" do
+          ARGV.replace %W(install #{location})
+          silence_warnings do
+            silence(:stdout) { Thor::Runner.start }
+          end
+        end
       end
 
-      it "updates existing thor files" do
-        path = File.join(Thor::Util.thor_root, @original_yaml["random"][:filename])
-        if File.directory? path
-          expect(FileUtils).to receive(:rm_rf).with(path)
-        else
-          expect(File).to receive(:delete).with(path)
-        end
-        silence_warnings do
-          silence(:stdout) { Thor::Runner.start(%w(update random)) }
-        end
-      end
+      context "with remote thor files" do
+        let(:location) { "https://example.com/Thorfile" }
 
-      it "installs thor files" do
-        ARGV.replace %W(install #{@location})
-        silence_warnings do
-          silence(:stdout) { Thor::Runner.start }
+        it "installs thor files" do
+          allow(Thor::LineEditor).to receive(:readline).and_return("Y", "random")
+          stub_request(:get, location).to_return(body: "class Foo < Thor; end")
+          path = File.join(Thor::Util.thor_root, Digest::SHA256.hexdigest(location + "random"))
+          expect(File).to receive(:open).with(path, "w")
+          expect { silence(:stdout) { Thor::Runner.start(%W(install #{location})) } }.not_to raise_error
+        end
+
+        it "shows proper errors" do
+          expect(Thor::Runner).to receive :exit
+          expect(URI).to receive(:open).with(location).and_raise(OpenURI::HTTPError.new("foo", StringIO.new))
+          content = capture(:stderr) { Thor::Runner.start(%W(install #{location})) }
+          expect(content).to include("Error opening URI '#{location}'")
         end
       end
     end

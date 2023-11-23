@@ -2,7 +2,7 @@ require "helper"
 
 describe Thor::Actions do
   def runner(options = {})
-    @runner ||= MyCounter.new([1], options, :destination_root => destination_root)
+    @runner ||= MyCounter.new([1], options, destination_root: destination_root)
   end
 
   def action(*args, &block)
@@ -28,18 +28,18 @@ describe Thor::Actions do
     end
 
     it "can have behavior revoke" do
-      expect(MyCounter.new([1], {}, :behavior => :revoke).behavior).to eq(:revoke)
+      expect(MyCounter.new([1], {}, behavior: :revoke).behavior).to eq(:revoke)
     end
 
     it "when behavior is set to force, overwrite options" do
-      runner = MyCounter.new([1], {:force => false, :skip => true}, :behavior => :force)
+      runner = MyCounter.new([1], {force: false, skip: true}, behavior: :force)
       expect(runner.behavior).to eq(:invoke)
       expect(runner.options.force).to be true
       expect(runner.options.skip).not_to be true
     end
 
     it "when behavior is set to skip, overwrite options" do
-      runner = MyCounter.new([1], %w(--force), :behavior => :skip)
+      runner = MyCounter.new([1], %w(--force), behavior: :skip)
       expect(runner.behavior).to eq(:invoke)
       expect(runner.options.force).not_to be true
       expect(runner.options.skip).to be true
@@ -86,7 +86,7 @@ describe Thor::Actions do
         expect(runner.relative_to_original_destination_root("/test/file")).to eq("/test/file")
       end
 
-      it "doesn't remove the root path from the absolute path if it is not at the begining" do
+      it "doesn't remove the root path from the absolute path if it is not at the beginning" do
         runner.destination_root = "/app"
         expect(runner.relative_to_original_destination_root("/something/app/project")).to eq("/something/app/project")
       end
@@ -102,7 +102,7 @@ describe Thor::Actions do
       end
 
       it "does not fail with files containing regexp characters" do
-        runner = MyCounter.new([1], {}, :destination_root => File.join(destination_root, "fo[o-b]ar"))
+        runner = MyCounter.new([1], {}, destination_root: File.join(destination_root, "fo[o-b]ar"))
         expect(runner.relative_to_original_destination_root("bar")).to eq("bar")
       end
 
@@ -165,23 +165,31 @@ describe Thor::Actions do
       end
     end
 
+    it "returns the value yielded by the block" do
+      expect(runner.inside("foo") { 123 }).to eq(123)
+    end
+
     describe "when pretending" do
       it "no directories should be created" do
-        runner.inside("bar", :pretend => true) {}
+        runner.inside("bar", pretend: true) {}
         expect(File.exist?("bar")).to be false
+      end
+
+      it "returns the value yielded by the block" do
+        expect(runner.inside("foo") { 123 }).to eq(123)
       end
     end
 
     describe "when verbose" do
       it "logs status" do
         expect(capture(:stdout) do
-          runner.inside("foo", :verbose => true) {}
+          runner.inside("foo", verbose: true) {}
         end).to match(/inside  foo/)
       end
 
       it "uses padding in next status" do
         expect(capture(:stdout) do
-          runner.inside("foo", :verbose => true) do
+          runner.inside("foo", verbose: true) do
             runner.say_status :cool, :padding
           end
         end).to match(/cool    padding/)
@@ -189,7 +197,7 @@ describe Thor::Actions do
 
       it "removes padding after block" do
         expect(capture(:stdout) do
-          runner.inside("foo", :verbose => true) {}
+          runner.inside("foo", verbose: true) {}
           runner.say_status :no, :padding
         end).to match(/no  padding/)
       end
@@ -226,7 +234,7 @@ describe Thor::Actions do
       allow(@template).to receive(:read).and_return(@template)
 
       @file = "/"
-      allow(runner).to receive(:open).and_return(@template)
+      allow(File).to receive(:open).and_return(@template)
     end
 
     it "accepts a URL as the path" do
@@ -247,7 +255,7 @@ describe Thor::Actions do
 
     it "accepts a local file path with spaces" do
       @file = File.expand_path("fixtures/path with spaces", File.dirname(__FILE__))
-      expect(runner).to receive(:open).with(@file).and_return(@template)
+      expect(File).to receive(:open).with(@file).and_return(@template)
       action(:apply, @file)
     end
 
@@ -265,7 +273,7 @@ describe Thor::Actions do
     end
 
     it "does not log status" do
-      content = action(:apply, @file, :verbose => false)
+      content = action(:apply, @file, verbose: false)
       expect(content).to match(/cool  padding/)
       expect(content).not_to match(/apply http/)
     end
@@ -286,12 +294,12 @@ describe Thor::Actions do
       end
 
       it "does not log status if required" do
-        expect(action(:run, "ls", :verbose => false)).to be_empty
+        expect(action(:run, "ls", verbose: false)).to be_empty
       end
 
       it "accepts a color as status" do
         expect(runner.shell).to receive(:say_status).with(:run, 'ls from "."', :yellow)
-        action :run, "ls", :verbose => :yellow
+        action :run, "ls", verbose: :yellow
       end
     end
 
@@ -299,36 +307,36 @@ describe Thor::Actions do
       it "doesn't execute the command" do
         runner = MyCounter.new([1], %w(--pretend))
         expect(runner).not_to receive(:system)
-        runner.run("ls", :verbose => false)
+        runner.run("ls", verbose: false)
       end
     end
 
     describe "when not capturing" do
       it "aborts when abort_on_failure is given and command fails" do
-        expect { action :run, "false", :abort_on_failure => true }.to raise_error(SystemExit)
+        expect { action :run, "false", abort_on_failure: true }.to raise_error(SystemExit)
       end
 
       it "succeeds when abort_on_failure is given and command succeeds" do
-        expect { action :run, "true", :abort_on_failure => true }.not_to raise_error
+        expect { action :run, "true", abort_on_failure: true }.not_to raise_error
       end
 
       it "supports env option" do
-        expect { action :run, "echo $BAR", :env => { "BAR" => "foo" } }.to output("foo\n").to_stdout_from_any_process
+        expect { action :run, "echo $BAR", env: {"BAR" => "foo"} }.to output("foo\n").to_stdout_from_any_process
       end
     end
 
     describe "when capturing" do
       it "aborts when abort_on_failure is given, capture is given and command fails" do
-        expect { action :run, "false", :abort_on_failure => true, :capture => true }.to raise_error(SystemExit)
+        expect { action :run, "false", abort_on_failure: true, capture: true }.to raise_error(SystemExit)
       end
 
       it "succeeds when abort_on_failure is given and command succeeds" do
-        expect { action :run, "true", :abort_on_failure => true, :capture => true }.not_to raise_error
+        expect { action :run, "true", abort_on_failure: true, capture: true }.not_to raise_error
       end
 
       it "supports env option" do
         silence(:stdout) do
-          expect(runner.run "echo $BAR", :env => { "BAR" => "foo" }, :capture => true).to eq("foo\n")
+          expect(runner.run "echo $BAR", env: {"BAR" => "foo"}, capture: true).to eq("foo\n")
         end
       end
     end
@@ -343,7 +351,7 @@ describe Thor::Actions do
       end
 
       it "does not abort when abort_on_failure is false even if the command fails" do
-        expect { action :run, "false", :abort_on_failure => false }.not_to raise_error
+        expect { action :run, "false", abort_on_failure: false }.not_to raise_error
       end
     end
   end
@@ -363,14 +371,14 @@ describe Thor::Actions do
     end
 
     it "does not log status if required" do
-      expect(action(:run_ruby_script, "script.rb", :verbose => false)).to be_empty
+      expect(action(:run_ruby_script, "script.rb", verbose: false)).to be_empty
     end
   end
 
   describe "#thor" do
     it "executes the thor command" do
       expect(runner).to receive(:system).with("thor list")
-      action :thor, :list, :verbose => true
+      action :thor, :list, verbose: true
     end
 
     it "converts extra arguments to command arguments" do
@@ -380,10 +388,10 @@ describe Thor::Actions do
 
     it "converts options hash to switches" do
       expect(runner).to receive(:system).with("thor list foo bar --foo")
-      action :thor, :list, "foo", "bar", :foo => true
+      action :thor, :list, "foo", "bar", foo: true
 
       expect(runner).to receive(:system).with("thor list --foo 1 2 3")
-      action :thor, :list, :foo => [1, 2, 3]
+      action :thor, :list, foo: [1, 2, 3]
     end
 
     it "logs status" do
@@ -393,12 +401,12 @@ describe Thor::Actions do
 
     it "does not log status if required" do
       expect(runner).to receive(:system).with("thor list --foo 1 2 3")
-      expect(action(:thor, :list, :foo => [1, 2, 3], :verbose => false)).to be_empty
+      expect(action(:thor, :list, foo: [1, 2, 3], verbose: false)).to be_empty
     end
 
     it "captures the output when :capture is given" do
-      expect(runner).to receive(:run).with("list", hash_including(:capture => true))
-      action :thor, :list, :capture => true
+      expect(runner).to receive(:run).with("list", hash_including(capture: true))
+      action :thor, :list, capture: true
     end
   end
 end

@@ -40,6 +40,20 @@ describe Thor::CoreExt::HashWithIndifferentAccess do
     expect(@hash.fetch(:missing, :found)).to eq(:found)
   end
 
+  it "supports slice" do
+    expect(@hash.slice("foo")).to eq({"foo" => "bar"})
+    expect(@hash.slice(:foo)).to eq({"foo" => "bar"})
+
+    expect(@hash.slice("baz")).to eq({"baz" => "bee"})
+    expect(@hash.slice(:baz)).to eq({"baz" => "bee"})
+
+    expect(@hash.slice("foo", "baz")).to eq({"foo" => "bar", "baz" => "bee"})
+    expect(@hash.slice(:foo, :baz)).to eq({"foo" => "bar", "baz" => "bee"})
+
+    expect(@hash.slice("missing")).to eq({})
+    expect(@hash.slice(:missing)).to eq({})
+  end
+
   it "has key checkable by either strings or symbols" do
     expect(@hash.key?("foo")).to be true
     expect(@hash.key?(:foo)).to be true

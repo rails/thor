@@ -15,38 +15,62 @@ describe Thor::Argument do
 
     it "raises an error if type is unknown" do
       expect do
-        argument(:command, :type => :unknown)
+        argument(:command, type: :unknown)
       end.to raise_error(ArgumentError, "Type :unknown is not valid for arguments.")
     end
 
     it "raises an error if argument is required and has default values" do
       expect do
-        argument(:command, :type => :string, :default => "bar", :required => true)
+        argument(:command, type: :string, default: "bar", required: true)
       end.to raise_error(ArgumentError, "An argument cannot be required and have default value.")
     end
 
-    it "raises an error if enum isn't an array" do
+    it "raises an error if enum isn't enumerable" do
       expect do
-        argument(:command, :type => :string, :enum => "bar")
-      end.to raise_error(ArgumentError, "An argument cannot have an enum other than an array.")
+        argument(:command, type: :string, enum: "bar")
+      end.to raise_error(ArgumentError, "An argument cannot have an enum other than an enumerable.")
     end
   end
 
   describe "#usage" do
     it "returns usage for string types" do
-      expect(argument(:foo, :type => :string).usage).to eq("FOO")
+      expect(argument(:foo, type: :string).usage).to eq("FOO")
     end
 
     it "returns usage for numeric types" do
-      expect(argument(:foo, :type => :numeric).usage).to eq("N")
+      expect(argument(:foo, type: :numeric).usage).to eq("N")
     end
 
     it "returns usage for array types" do
-      expect(argument(:foo, :type => :array).usage).to eq("one two three")
+      expect(argument(:foo, type: :array).usage).to eq("one two three")
     end
 
     it "returns usage for hash types" do
-      expect(argument(:foo, :type => :hash).usage).to eq("key:value")
+      expect(argument(:foo, type: :hash).usage).to eq("key:value")
+    end
+  end
+
+  describe "#print_default" do
+    it "prints arrays in a copy pasteable way" do
+      expect(argument(:foo, {
+        required: false,
+        type: :array,
+        default: ["one","two"]
+      }).print_default).to eq('"one" "two"')
+    end
+    it "prints arrays with a single string default as before" do
+      expect(argument(:foo,    {
+        required: false,
+        type: :array,
+        default: "foobar"
+      }).print_default).to eq("foobar")
+    end
+    it "prints none arrays as default" do
+      expect(argument(:foo, {
+        required: false,
+        type: :numeric,
+        default: 13,
+      }).print_default).to eq(13)
     end
   end
 end

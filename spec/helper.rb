@@ -20,7 +20,7 @@ require "rspec"
 require "diff/lcs" # You need diff/lcs installed to run specs (but not to run Thor).
 require "webmock/rspec"
 
-WebMock.disable_net_connect!(:allow => "coveralls.io")
+WebMock.disable_net_connect!(allow: "coveralls.io")
 
 # Set shell to basic
 ENV["THOR_COLUMNS"] = "10000"

@@ -33,13 +33,13 @@ describe Thor::Invocation do
     end
 
     it "accepts a class as argument with a command to invoke" do
-      base = A.new([], :last_name => "Valim")
+      base = A.new([], last_name: "Valim")
       expect(base.invoke(B, :one, %w(Jose))).to eq("Valim, Jose")
     end
 
     it "allows customized options to be given" do
-      base = A.new([], :last_name => "Wrong")
-      expect(base.invoke(B, :one, %w(Jose), :last_name => "Valim")).to eq("Valim, Jose")
+      base = A.new([], last_name: "Wrong")
+      expect(base.invoke(B, :one, %w(Jose), last_name: "Valim")).to eq("Valim, Jose")
     end
 
     it "reparses options in the new class" do
@@ -47,7 +47,7 @@ describe Thor::Invocation do
     end
 
     it "shares initialize options with invoked class" do
-      expect(A.new([], :foo => :bar).invoke("b:two")).to eq("foo" => :bar)
+      expect(A.new([], foo: :bar).invoke("b:two")).to eq("foo" => :bar)
     end
 
     it "uses default options from invoked class if no matching arguments are given" do
@@ -55,7 +55,7 @@ describe Thor::Invocation do
     end
 
     it "overrides default options if options are passed to the invoker" do
-      expect(A.new([], :defaulted_value => "not default").invoke("b:four")).to eq("not default")
+      expect(A.new([], defaulted_value: "not default").invoke("b:four")).to eq("not default")
     end
 
     it "returns the command chain" do
@@ -72,7 +72,7 @@ describe Thor::Invocation do
     it "allow extra configuration values to be given" do
       base = A.new
       shell = Thor::Base.shell.new
-      expect(base.invoke("b:three", [], {}, :shell => shell).shell).to eq(shell)
+      expect(base.invoke("b:three", [], {}, shell: shell).shell).to eq(shell)
     end
 
     it "invokes a Thor::Group and all of its commands" do

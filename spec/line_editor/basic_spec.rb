@@ -21,7 +21,7 @@ describe Thor::LineEditor::Basic do
       noecho_stdin = double("noecho_stdin")
       expect(noecho_stdin).to receive(:gets).and_return("secret")
       expect($stdin).to receive(:noecho).and_yield(noecho_stdin)
-      editor = Thor::LineEditor::Basic.new("Password: ", :echo => false)
+      editor = Thor::LineEditor::Basic.new("Password: ", echo: false)
       expect(editor.readline).to eq("secret")
     end
   end

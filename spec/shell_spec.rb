@@ -7,12 +7,12 @@ describe Thor::Shell do
 
   describe "#initialize" do
     it "sets shell value" do
-      base = MyCounter.new [1, 2], {}, :shell => shell
+      base = MyCounter.new [1, 2], {}, shell: shell
       expect(base.shell).to eq(shell)
     end
 
     it "sets the base value on the shell if an accessor is available" do
-      base = MyCounter.new [1, 2], {}, :shell => shell
+      base = MyCounter.new [1, 2], {}, shell: shell
       expect(shell.base).to eq(base)
     end
   end

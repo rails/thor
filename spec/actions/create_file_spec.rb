@@ -7,11 +7,11 @@ describe Thor::Actions::CreateFile do
     ::FileUtils.rm_rf(destination_root)
   end
 
-  def create_file(destination = nil, config = {}, options = {})
-    @base = MyCounter.new([1, 2], options, :destination_root => destination_root)
+  def create_file(destination = nil, config = {}, options = {}, contents = "CONFIGURATION")
+    @base = MyCounter.new([1, 2], options, destination_root: destination_root)
     allow(@base).to receive(:file_name).and_return("rdoc")
 
-    @action = Thor::Actions::CreateFile.new(@base, destination, "CONFIGURATION", {:verbose => !@silence}.merge(config))
+    @action = Thor::Actions::CreateFile.new(@base, destination, contents, {verbose: !@silence}.merge(config))
   end
 
   def invoke!
@@ -33,8 +33,16 @@ describe Thor::Actions::CreateFile do
       expect(File.exist?(File.join(destination_root, "doc/config.rb"))).to be true
     end
 
+    it "allows setting file permissions" do
+      create_file("config/private.key", perm: 0o600)
+      invoke!
+
+      stat = File.stat(File.join(destination_root, "config/private.key"))
+      expect(stat.mode.to_s(8)).to eq "100600"
+    end
+
     it "does not create a file if pretending" do
-      create_file("doc/config.rb", {}, :pretend => true)
+      create_file("doc/config.rb", {}, pretend: true)
       invoke!
       expect(File.exist?(File.join(destination_root, "doc/config.rb"))).to be false
     end
@@ -82,22 +90,22 @@ describe Thor::Actions::CreateFile do
         end
 
         it "shows forced status to the user if force is given" do
-          expect(create_file("doc/config.rb", {}, :force => true)).not_to be_identical
+          expect(create_file("doc/config.rb", {}, force: true)).not_to be_identical
           expect(invoke!).to eq("       force  doc/config.rb\n")
         end
 
         it "shows skipped status to the user if skip is given" do
-          expect(create_file("doc/config.rb", {}, :skip => true)).not_to be_identical
+          expect(create_file("doc/config.rb", {}, skip: true)).not_to be_identical
           expect(invoke!).to eq("        skip  doc/config.rb\n")
         end
 
         it "shows forced status to the user if force is configured" do
-          expect(create_file("doc/config.rb", :force => true)).not_to be_identical
+          expect(create_file("doc/config.rb", force: true)).not_to be_identical
           expect(invoke!).to eq("       force  doc/config.rb\n")
         end
 
         it "shows skipped status to the user if skip is configured" do
-          expect(create_file("doc/config.rb", :skip => true)).not_to be_identical
+          expect(create_file("doc/config.rb", skip: true)).not_to be_identical
           expect(invoke!).to eq("        skip  doc/config.rb\n")
         end
 
@@ -192,6 +200,13 @@ describe Thor::Actions::CreateFile do
   describe "#identical?" do
     it "returns true if the destination file exists and is identical" do
       create_file("doc/config.rb")
+      expect(@action.identical?).to be false
+      invoke!
+      expect(@action.identical?).to be true
+    end
+
+    it "returns true if the destination file exists and is identical and contains multi-byte UTF-8 codepoints" do
+      create_file("doc/config.rb", {}, {}, "€")
       expect(@action.identical?).to be false
       invoke!
       expect(@action.identical?).to be true
