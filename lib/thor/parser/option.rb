@@ -13,6 +13,7 @@ class Thor
       @group          = options[:group].to_s.capitalize if options[:group]
       @aliases        = normalize_aliases(options[:aliases])
       @hide           = options[:hide]
+      @inverse        = options[:inverse]
     end
 
     # This parse quick options given as method_options. It makes several
@@ -81,17 +82,7 @@ class Thor
     end
 
     def usage(padding = 0)
-      sample = if banner && !banner.to_s.empty?
-        "#{switch_name}=#{banner}".dup
-      else
-        switch_name
-      end
-
-      sample = "[#{sample}]".dup unless required?
-
-      if boolean?
-        sample << ", [#{dasherize('no-' + human_name)}]" unless (name == "force") || name.match(/\Ano[\-_]/)
-      end
+      sample = [ sample_banner, inverse_sample ].compact.join(", ")
 
       aliases_for_usage.ljust(padding) + sample
     end
@@ -122,6 +113,26 @@ class Thor
     end
 
   protected
+
+    def sample_banner
+      sample_banner = if banner && !banner.to_s.empty?
+                        "#{switch_name}=#{banner}".dup
+                      else
+                        switch_name
+                      end
+      required? ? sample_banner : "[#{sample_banner}]"
+    end
+
+    def inverse_sample
+      return if !boolean? || name =~ /^(force|\Ano[\-_])$/
+
+      case @inverse
+      when Symbol, String
+        "[#{dasherize(@inverse.to_s)}]"
+      when nil, true
+        "[#{dasherize('no-' + human_name)}]"
+      end
+    end
 
     def validate!
       raise ArgumentError, "An option cannot be boolean and required." if boolean? && required?

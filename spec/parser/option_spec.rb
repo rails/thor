@@ -249,6 +249,22 @@ describe Thor::Option do
       expect(option(:foo, required: false, type: :string, banner: "").usage).to eq("[--foo]")
     end
 
+    it "suppresses the creation of a --no-option when explicitly requested" do
+      expect(option("bar", type: :boolean, :inverse => false).usage).to_not include("[--no-bar]")
+    end
+
+    it "allow to override the inverse option" do
+      expect(option("colorful", type: :boolean, :inverse => :monochromatic).usage).to include("[--monochromatic]")
+    end
+
+    it "creates the inversion flag by default" do
+      expect(option("bar", type: :boolean).usage).to include("[--no-bar]")
+    end
+
+    it "creates the inversion flag when requested" do
+      expect(option("bar", type: :boolean, :inverse => true).usage).to include("[--no-bar]")
+    end
+
     describe "with required values" do
       it "does not show the usage between brackets" do
         expect(parse(:foo, :required).usage).to eq("--foo=FOO")
