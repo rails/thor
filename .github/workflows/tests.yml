@@ -12,5 +12,6 @@ jobs:
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
+        bundler: ${{ (matrix.ruby_version < '3' && '2.4.21') || 'lagest' }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
     - run: bundle exec thor spec
