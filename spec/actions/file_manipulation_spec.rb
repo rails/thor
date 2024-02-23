@@ -293,6 +293,104 @@ describe Thor::Actions do
       end
     end
 
+    describe "#gsub_file!" do
+      context "with invoke behavior" do
+        it "replaces the content in the file" do
+          action :gsub_file!, "doc/README", "__start__", "START"
+          expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
+        end
+
+        it "does not replace if pretending" do
+          runner(pretend: true)
+          action :gsub_file!, "doc/README", "__start__", "START"
+          expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+        end
+
+        it "accepts a block" do
+          action(:gsub_file!, "doc/README", "__start__") { |match| match.gsub("__", "").upcase }
+          expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
+        end
+
+        it "logs status" do
+          expect(action(:gsub_file!, "doc/README", "__start__", "START")).to eq("        gsub  doc/README\n")
+        end
+
+        it "does not log status if required" do
+          expect(action(:gsub_file!, file, "__", verbose: false) { |match| match * 2 }).to be_empty
+        end
+
+        it "cares if the file contents did not change" do
+          expect do
+            action :gsub_file!, "doc/README", "___start___", "START"
+          end.to raise_error(Thor::Error, "The content of #{destination_root}/doc/README did not change")
+
+          expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+        end
+      end
+
+      context "with revoke behavior" do
+        context "and no force option" do
+          it "does not replace the content in the file" do
+            runner({}, :revoke)
+            action :gsub_file!, "doc/README", "__start__", "START"
+            expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+          end
+
+          it "does not replace if pretending" do
+            runner({pretend: true}, :revoke)
+            action :gsub_file!, "doc/README", "__start__", "START"
+            expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+          end
+
+          it "does not replace the content in the file when given a block" do
+            runner({}, :revoke)
+            action(:gsub_file!, "doc/README", "__start__") { |match| match.gsub("__", "").upcase }
+            expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+          end
+
+          it "does not log status" do
+            runner({}, :revoke)
+            expect(action(:gsub_file!, "doc/README", "__start__", "START")).to be_empty
+          end
+
+          it "does not log status if required" do
+            runner({}, :revoke)
+            expect(action(:gsub_file!, file, "__", verbose: false) { |match| match * 2 }).to be_empty
+          end
+        end
+
+        context "and force option" do
+          it "replaces the content in the file" do
+            runner({}, :revoke)
+            action :gsub_file!, "doc/README", "__start__", "START", force: true
+            expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
+          end
+
+          it "does not replace if pretending" do
+            runner({pretend: true}, :revoke)
+            action :gsub_file!, "doc/README", "__start__", "START", force: true
+            expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+          end
+
+          it "replaces the content in the file when given a block" do
+            runner({}, :revoke)
+            action(:gsub_file!, "doc/README", "__start__", force: true) { |match| match.gsub("__", "").upcase }
+            expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
+          end
+
+          it "logs status" do
+            runner({}, :revoke)
+            expect(action(:gsub_file!, "doc/README", "__start__", "START", force: true)).to eq("        gsub  doc/README\n")
+          end
+
+          it "does not log status if required" do
+            runner({}, :revoke)
+            expect(action(:gsub_file!, file, "__", verbose: false, force: true) { |match| match * 2 }).to be_empty
+          end
+        end
+      end
+    end
+
     describe "#gsub_file" do
       context "with invoke behavior" do
         it "replaces the content in the file" do
