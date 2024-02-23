@@ -242,6 +242,32 @@ class Thor
       insert_into_file(path, *(args << config), &block)
     end
 
+    # Run a regular expression replacement on a file, raising an error if the
+    # contents of the file are not changed.
+    #
+    # ==== Parameters
+    # path<String>:: path of the file to be changed
+    # flag<Regexp|String>:: the regexp or string to be replaced
+    # replacement<String>:: the replacement, can be also given as a block
+    # config<Hash>:: give :verbose => false to not log the status, and
+    #                :force => true, to force the replacement regardless of runner behavior.
+    #
+    # ==== Example
+    #
+    #   gsub_file 'app/controllers/application_controller.rb', /#\s*(filter_parameter_logging :password)/, '\1'
+    #
+    #   gsub_file 'README', /rake/, :green do |match|
+    #     match << " no more. Use thor!"
+    #   end
+    #
+    def gsub_file!(path, flag, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
+
+      config[:error_on_no_change] = true
+
+      gsub_file(path, flag, *args, config, &block)
+    end
+
     # Run a regular expression replacement on a file.
     #
     # ==== Parameters
