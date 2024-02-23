@@ -248,7 +248,8 @@ class Thor
     # path<String>:: path of the file to be changed
     # flag<Regexp|String>:: the regexp or string to be replaced
     # replacement<String>:: the replacement, can be also given as a block
-    # config<Hash>:: give :verbose => false to not log the status, and
+    # config<Hash>:: give :verbose => false to not log the status,
+    #                :error_on_no_change => true to raise an error if the file does not change, and
     #                :force => true, to force the replacement regardless of runner behavior.
     #
     # ==== Example
@@ -269,7 +270,12 @@ class Thor
 
       unless options[:pretend]
         content = File.binread(path)
-        content.gsub!(flag, *args, &block)
+        success = content.gsub!(flag, *args, &block)
+
+        if success.nil? && config.fetch(:error_on_no_change, false)
+          raise Thor::Error, "The content of #{path} did not change"
+        end
+
         File.open(path, "wb") { |file| file.write(content) }
       end
     end
