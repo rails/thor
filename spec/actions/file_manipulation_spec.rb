@@ -318,6 +318,26 @@ describe Thor::Actions do
         it "does not log status if required" do
           expect(action(:gsub_file, file, "__", verbose: false) { |match| match * 2 }).to be_empty
         end
+
+        it "does not care if the file contents did not change" do
+          action :gsub_file, "doc/README", "___start___", "START"
+          expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+        end
+
+        context "with error_on_no_change" do
+          it "replaces the content in the file" do
+            action :gsub_file, "doc/README", "__start__", "START", error_on_no_change: true
+            expect(File.binread(file)).to eq("START\nREADME\n__end__\n")
+          end
+
+          it "raises if the file contents did not change" do
+            expect do
+              action :gsub_file, "doc/README", "___start___", "START", error_on_no_change: true
+            end.to raise_error(Thor::Error, "The content of #{destination_root}/doc/README did not change")
+
+            expect(File.binread(file)).to eq("__start__\nREADME\n__end__\n")
+          end
+        end
       end
 
       context "with revoke behavior" do
