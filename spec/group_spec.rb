@@ -28,7 +28,11 @@ describe Thor::Group do
     end
 
     it "raises when an exception happens within the command call" do
-      expect { BrokenCounter.start(%w(1 2 --fail)) }.to raise_error(NameError, /undefined local variable or method `this_method_does_not_exist'/)
+      if RUBY_VERSION < "3.4.0"
+        expect { BrokenCounter.start(%w(1 2 --fail)) }.to raise_error(NameError, /undefined local variable or method `this_method_does_not_exist'/)
+      else
+        expect { BrokenCounter.start(%w(1 2 --fail)) }.to raise_error(NameError, /undefined local variable or method 'this_method_does_not_exist'/)
+      end
     end
 
     it "raises an error when a Thor group command expects arguments" do
