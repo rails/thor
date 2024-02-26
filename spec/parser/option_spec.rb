@@ -218,11 +218,11 @@ describe Thor::Option do
     end
 
     it "returns usage for boolean types" do
-      expect(parse(:foo, :boolean).usage).to eq("[--foo], [--no-foo]")
+      expect(parse(:foo, :boolean).usage).to eq("[--foo], [--no-foo], [--skip-foo]")
     end
 
     it "does not use padding when no aliases are given" do
-      expect(parse(:foo, :boolean).usage).to eq("[--foo], [--no-foo]")
+      expect(parse(:foo, :boolean).usage).to eq("[--foo], [--no-foo], [--skip-foo]")
     end
 
     it "documents a negative option when boolean" do
@@ -231,6 +231,9 @@ describe Thor::Option do
 
     it "does not document a negative option for a negative boolean" do
       expect(parse(:'no-foo', :boolean).usage).not_to include("[--no-no-foo]")
+      expect(parse(:'no-foo', :boolean).usage).not_to include("[--skip-no-foo]")
+      expect(parse(:'skip-foo', :boolean).usage).not_to include("[--no-skip-foo]")
+      expect(parse(:'skip-foo', :boolean).usage).not_to include("[--skip-skip-foo]")
     end
 
     it "does not document a negative option for an underscored negative boolean" do
@@ -261,7 +264,7 @@ describe Thor::Option do
       end
 
       it "does not negate the aliases" do
-        expect(parse([:foo, "-f", "-b"], :boolean).usage).to eq("-f, -b, [--foo], [--no-foo]")
+        expect(parse([:foo, "-f", "-b"], :boolean).usage).to eq("-f, -b, [--foo], [--no-foo], [--skip-foo]")
       end
 
       it "normalizes the aliases" do
