@@ -143,14 +143,14 @@ class Thor
         stdout.flush
       end
 
-      # Make a question the to user and returns true if the user replies "y" or
+      # Asks the user a question and returns true if the user replies "y" or
       # "yes".
       #
       def yes?(statement, color = nil)
         !!(ask(statement, color, add_to_history: false) =~ is?(:yes))
       end
 
-      # Make a question the to user and returns true if the user replies "n" or
+      # Asks the user a question and returns true if the user replies "n" or
       # "no".
       #
       def no?(statement, color = nil)
