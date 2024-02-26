@@ -67,15 +67,15 @@ class Thor
       # Readline.
       #
       # ==== Example
-      # ask("What is your name?")
+      #   ask("What is your name?")
       #
-      # ask("What is the planet furthest from the sun?", :default => "Pluto")
+      #   ask("What is the planet furthest from the sun?", :default => "Neptune")
       #
-      # ask("What is your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])
+      #   ask("What is your favorite Neopolitan flavor?", :limited_to => ["strawberry", "chocolate", "vanilla"])
       #
-      # ask("What is your password?", :echo => false)
+      #   ask("What is your password?", :echo => false)
       #
-      # ask("Where should the file be saved?", :path => true)
+      #   ask("Where should the file be saved?", :path => true)
       #
       def ask(statement, *args)
         options = args.last.is_a?(Hash) ? args.pop : {}
@@ -93,7 +93,7 @@ class Thor
       # are passed straight to puts (behavior got from Highline).
       #
       # ==== Example
-      # say("I know you knew that.")
+      #   say("I know you knew that.")
       #
       def say(message = "", color = nil, force_new_line = (message.to_s !~ /( |\t)\Z/))
         return if quiet?
@@ -110,7 +110,7 @@ class Thor
       # are passed straight to puts (behavior got from Highline).
       #
       # ==== Example
-      # say_error("error: something went wrong")
+      #   say_error("error: something went wrong")
       #
       def say_error(message = "", color = nil, force_new_line = (message.to_s !~ /( |\t)\Z/))
         return if quiet?
