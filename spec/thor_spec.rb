@@ -340,6 +340,18 @@ describe Thor do
     end
   end
 
+  describe "#command_exists?" do
+    it "returns true for a command that is defined in the class" do
+      expect(MyScript.command_exists?("zoo")).to be true
+      expect(MyScript.command_exists?("name-with-dashes")).to be true
+      expect(MyScript.command_exists?("animal_prison")).to be true
+    end
+
+    it "returns false for a command that is not defined in the class" do
+      expect(MyScript.command_exists?("animal_heaven")).to be false
+    end
+  end
+
   describe "#map" do
     it "calls the alias of a method if one is provided" do
       expect(MyScript.start(%w(-T fish))).to eq(%w(fish))

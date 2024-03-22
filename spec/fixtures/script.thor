@@ -264,12 +264,15 @@ end
 class Apple < Thor
   namespace :fruits
   desc 'apple', 'apple'; def apple; end
+  desc 'rotten-apple', 'rotten apple'; def rotten_apple; end
+  map "ra" => :rotten_apple
 end
 
 class Pear < Thor
   namespace :fruits
   desc 'pear', 'pear'; def pear; end
 end
+
 class MyClassOptionScript < Thor
   class_option :free
 
