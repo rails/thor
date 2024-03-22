@@ -114,6 +114,14 @@ describe Thor::Util do
       expect(Thor::Util.find_class_and_command_by_namespace("fruits:apple")).to eq([Apple, "apple"])
       expect(Thor::Util.find_class_and_command_by_namespace("fruits:pear")).to eq([Pear, "pear"])
     end
+
+    it "returns correct Thor class and the command name with hypen when shared namespaces" do
+      expect(Thor::Util.find_class_and_command_by_namespace("fruits:rotten-apple")).to eq([Apple, "rotten-apple"])
+    end
+
+    it "returns correct Thor class and the associated alias command name when shared namespaces" do
+      expect(Thor::Util.find_class_and_command_by_namespace("fruits:ra")).to eq([Apple, "ra"])
+    end
   end
 
   describe "#thor_classes_in" do
