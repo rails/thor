@@ -133,7 +133,7 @@ class Thor
           *pieces, command  = namespace.split(":")
           namespace = pieces.join(":")
           namespace = "default" if namespace.empty?
-          klass = Thor::Base.subclasses.detect { |thor| thor.namespace == namespace && thor.commands.keys.include?(command) }
+          klass = Thor::Base.subclasses.detect { |thor| thor.namespace == namespace && thor.command_exists?(command) }
         end
         unless klass # look for a Thor::Group with the right name
           klass = Thor::Util.find_by_namespace(namespace)
