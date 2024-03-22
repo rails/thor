@@ -186,6 +186,16 @@ describe Thor::Group do
     end
   end
 
+  describe "#command_exists?" do
+    it "returns true for a command that is defined in the class" do
+      expect(MyCounter.command_exists?("one")).to be true
+    end
+
+    it "returns false for a command that is not defined in the class" do
+      expect(MyCounter.command_exists?("zero")).to be false
+    end
+  end
+
   describe "edge-cases" do
     it "can handle boolean options followed by arguments" do
       klass = Class.new(Thor::Group) do
