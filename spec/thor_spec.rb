@@ -581,7 +581,7 @@ Usage: "thor scripts:arities:multiple_usages ARG --foo"
         expect(content).not_to match(/Exclusive Options:/)
       end
 
-      it "prints class at least one of requred options" do
+      it "prints class at least one of required options" do
         content = capture(:stdout) { MyClassOptionScript.help(shell) }
         expect(content).to match(/Required At Least One:\n\s+--three\s+--four\n/)
       end

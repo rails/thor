@@ -262,11 +262,11 @@ describe Thor::Options do
                [["foo", "bar"], ["baz","qux"]])
       end
 
-      it "raises an error if exclusive argumets are given" do
+      it "raises an error if exclusive arguments are given" do
         expect{parse(%w[--foo --bar])}.to raise_error(Thor::ExclusiveArgumentError, "Found exclusive options '--foo', '--bar'")
       end
 
-      it "does not raise an error if exclusive argumets are not given" do
+      it "does not raise an error if exclusive arguments are not given" do
         expect{parse(%w[--foo --baz])}.not_to raise_error
       end
     end
@@ -277,7 +277,7 @@ describe Thor::Options do
                [], [["foo", "bar"], ["baz","qux"]])
       end
 
-      it "raises an error if at least one of required argumet is not given" do
+      it "raises an error if at least one of required argument is not given" do
         expect{parse(%w[--baz])}.to raise_error(Thor::AtLeastOneRequiredArgumentError, "Not found at least one of required options '--foo', '--bar'")
       end
 
@@ -292,11 +292,11 @@ describe Thor::Options do
                [["foo", "bar"], ["baz","qux"]])
       end
 
-      it "raises an error if exclusive argumets are given" do
+      it "raises an error if exclusive arguments are given" do
         expect{parse(%w[--foo --bar])}.to raise_error(Thor::ExclusiveArgumentError, "Found exclusive options '--foo', '--bar'")
       end
 
-      it "does not raise an error if exclusive argumets are not given" do
+      it "does not raise an error if exclusive arguments are not given" do
         expect{parse(%w[--foo --baz])}.not_to raise_error
       end
     end
@@ -307,7 +307,7 @@ describe Thor::Options do
                [], [["foo", "bar"], ["baz","qux"]])
       end
 
-      it "raises an error if at least one of required argumet is not given" do
+      it "raises an error if at least one of required argument is not given" do
         expect{parse(%w[--baz])}.to raise_error(Thor::AtLeastOneRequiredArgumentError, "Not found at least one of required options '--foo', '--bar'")
       end
 
