@@ -254,9 +254,9 @@ class Thor
     #
     # ==== Example
     #
-    #   gsub_file 'app/controllers/application_controller.rb', /#\s*(filter_parameter_logging :password)/, '\1'
+    #   gsub_file! 'app/controllers/application_controller.rb', /#\s*(filter_parameter_logging :password)/, '\1'
     #
-    #   gsub_file 'README', /rake/, :green do |match|
+    #   gsub_file! 'README', /rake/, :green do |match|
     #     match << " no more. Use thor!"
     #   end
     #
