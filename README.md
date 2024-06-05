@@ -14,8 +14,8 @@ build tool.  The syntax is Rake-like, so it should be familiar to most Rake
 users.
 
 Please note: Thor, by design, is a system tool created to allow seamless file and url
-access, which should not receive application user input. It relies on [open-uri][open-uri],
-which combined with application user input would provide a command injection attack
+access, which, should not receive application user input. It relies on [open-uri][open-uri],
+which combined with application user input, would provide a command injection attack
 vector.
 
 [rake]: https://github.com/ruby/rake
@@ -27,7 +27,7 @@ Installation
 
 Usage and documentation
 -----------------------
-Please see the [wiki][] for basic usage and other documentation on using Thor. You can also checkout the [official homepage][homepage].
+Please see the [wiki][] for basic usage and other documentation on using Thor. You can also check out the [official homepage][homepage].
 
 [wiki]: https://github.com/rails/thor/wiki
 [homepage]: http://whatisthor.com/
