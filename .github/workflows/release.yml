@@ -20,6 +20,7 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
+        ruby-version: 3.3.4
     - name: Configure trusted publishing credentials
       uses: rubygems/configure-rubygems-credentials@v1.0.0
     - name: Run release rake task
