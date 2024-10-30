@@ -117,7 +117,7 @@ describe Thor::Options do
       create foo: "baz", bar: :required
       parse("--bar", "baz", "--baz", "unknown")
 
-      expected = "Unknown switches \"--baz\""
+      expected = "Unknown switches \"--baz\"".dup
       expected << "\nDid you mean?  \"--bar\"" if Thor::Correctable
 
       expect { check_unknown! }.to raise_error(Thor::UnknownArgumentError) do |error|

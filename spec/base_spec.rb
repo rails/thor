@@ -318,7 +318,7 @@ describe Thor::Base do
     end
 
     it "suggests commands that are similar if there is a typo" do
-      expected = "Could not find command \"paintz\" in \"barn\" namespace.\n"
+      expected = "Could not find command \"paintz\" in \"barn\" namespace.\n".dup
       expected << "Did you mean?  \"paint\"\n" if Thor::Correctable
 
       expect(capture(:stderr) { Barn.start(%w(paintz)) }).to eq(expected)
