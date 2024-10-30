@@ -767,7 +767,7 @@ HELP
         Class.new(Thor) do
           method_option loud: true, type: :boolean
         end
-      end.to raise_error(ArgumentError, "Expected a Symbol or String, got {:loud=>true, :type=>:boolean}")
+      end.to raise_error(ArgumentError, "Expected a Symbol or String, got #{{loud: true, type: :boolean}}")
     end
 
     it "class_option raises an ArgumentError if name is not a Symbol or String" do
@@ -775,7 +775,7 @@ HELP
         Class.new(Thor) do
           class_option loud: true, type: :boolean
         end
-      end.to raise_error(ArgumentError, "Expected a Symbol or String, got {:loud=>true, :type=>:boolean}")
+      end.to raise_error(ArgumentError, "Expected a Symbol or String, got #{{loud: true, type: :boolean}}")
     end
 
     it "passes through unknown options" do
