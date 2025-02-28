@@ -142,7 +142,7 @@ describe Thor::Actions::CreateFile do
           create_file("doc/config.rb")
           allow(@base.shell).to receive(:merge_tool).and_return("meld")
           expect(Thor::LineEditor).to receive(:readline).and_return("m")
-          expect(@base.shell).to receive(:system).with(/meld/)
+          expect(@base.shell).to receive(:system).with("meld", /doc\/config\.rb/, /doc\/config\.rb/)
           invoke!
         end
       end

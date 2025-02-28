@@ -372,7 +372,7 @@ class Thor
         Tempfile.open([File.basename(destination), File.extname(destination)], File.dirname(destination)) do |temp|
           temp.write content
           temp.rewind
-          system %(#{merge_tool} "#{temp.path}" "#{destination}")
+          system(merge_tool, temp.path, destination)
         end
       end
 

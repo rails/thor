@@ -553,14 +553,14 @@ TABLE
       it "invokes the merge tool" do
         allow(shell).to receive(:merge_tool).and_return("meld")
         expect(Thor::LineEditor).to receive(:readline).and_return("m")
-        expect(shell).to receive(:system).with(/meld/)
+        expect(shell).to receive(:system).with("meld", /foo/, "foo")
         capture(:stdout) { shell.file_collision("foo") {} }
       end
 
       it "invokes the merge tool that specified at ENV['THOR_MERGE']" do
         allow(ENV).to receive(:[]).with("THOR_MERGE").and_return("meld")
         expect(Thor::LineEditor).to receive(:readline).and_return("m")
-        expect(shell).to receive(:system).with(/meld/)
+        expect(shell).to receive(:system).with("meld", /foo/, "foo")
         capture(:stdout) { shell.file_collision("foo") {} }
       end
 
