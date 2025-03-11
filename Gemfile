@@ -15,6 +15,7 @@ group :test do
   gem "rspec-mocks", ">= 3"
   gem "simplecov", ">= 0.13"
   gem "webmock", ">= 3.14"
+  gem "rdoc"
 end
 
 gemspec
