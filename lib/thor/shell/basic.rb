@@ -377,11 +377,7 @@ class Thor
       end
 
       def merge_tool #:nodoc:
-        @merge_tool ||= ENV["THOR_MERGE"] || git_merge_tool
-      end
-
-      def git_merge_tool #:nodoc:
-        `git config merge.tool`.rstrip rescue ""
+        @merge_tool ||= ENV["THOR_MERGE"] || "git difftool --no-index"
       end
     end
   end
