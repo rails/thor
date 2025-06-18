@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
-        ruby-version: 3.3.4
+        ruby-version: 3.4.4
     - name: Configure trusted publishing credentials
       uses: rubygems/configure-rubygems-credentials@v1.0.0
     - name: Run release rake task
