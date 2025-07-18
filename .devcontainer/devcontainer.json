@@ -1,38 +1,8 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.209.6/containers/ruby
 {
-	"name": "Ruby",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"args": {
-			// Update 'VARIANT' to pick a Ruby version: 3, 3.0, 2, 2.7, 2.6
-			// Append -bullseye or -buster to pin to an OS version.
-			// Use -bullseye variants on local on arm64/Apple Silicon.
-			"VARIANT": "3-bullseye",
-			// Options
-			"NODE_VERSION": "lts/*"
-		}
-	},
-
-	// Add the IDs of extensions you want installed when the container is created.
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"Shopify.ruby-lsp"
-			]
-		}
-	},
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "ruby --version",
-
-	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "vscode",
+	"name": "thor",
+	"image": "ghcr.io/rails/devcontainer/images/ruby:3.4.5",
 
 	"features": {
-		"github-cli": "latest"
+    "ghcr.io/devcontainers/features/github-cli:1": {}
 	}
 }
