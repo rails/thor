@@ -314,7 +314,7 @@ class Thor
         diff_cmd = ENV["THOR_DIFF"] || ENV["RAILS_DIFF"] || "diff -u"
 
         require "tempfile"
-        Tempfile.open(File.basename(destination), File.dirname(destination)) do |temp|
+        Tempfile.open(File.basename(destination), File.dirname(destination), binmode: true) do |temp|
           temp.write content
           temp.rewind
           system %(#{diff_cmd} "#{destination}" "#{temp.path}")

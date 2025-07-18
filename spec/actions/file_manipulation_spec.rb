@@ -81,6 +81,29 @@ describe Thor::Actions do
       expect(File.stat(original).mode).to eq(File.stat(copy).mode)
     end
 
+    it "shows the diff when there is a collision and source has utf-8 characters" do
+      previous_internal = Encoding.default_internal
+
+      silence_warnings do
+        Encoding.default_internal = Encoding::UTF_8
+      end
+
+      destination = File.join(destination_root, "encoding_with_utf8.thor")
+      FileUtils.mkdir_p(destination_root)
+
+      File.write(destination, "blabla")
+
+      expect(Thor::LineEditor).to receive(:readline).and_return("d", "y")
+      expect(runner.shell).to receive(:system).with(/diff -u/)
+      action :copy_file, "encoding_with_utf8.thor"
+
+      exists_and_identical?("encoding_with_utf8.thor", "encoding_with_utf8.thor")
+    ensure
+      silence_warnings do
+        Encoding.default_internal = previous_internal
+      end
+    end
+
     it "logs status" do
       expect(action(:copy_file, "command.thor")).to eq("      create  command.thor\n")
     end
