@@ -13,8 +13,9 @@ class Thor
   autoload :RakeCompat, File.expand_path("rake_compat", __dir__)
   autoload :Group,      File.expand_path("group", __dir__)
 
-  # Shortcuts for help.
+  # Shortcuts for help and tree commands.
   HELP_MAPPINGS       = %w(-h -? --help -D)
+  TREE_MAPPINGS       = %w(-t --tree)
 
   # Thor methods that should not be overwritten by the user.
   THOR_RESERVED_WORDS = %w(invoke shell options behavior root destination_root relative_root
