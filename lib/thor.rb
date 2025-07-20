@@ -671,4 +671,37 @@ class Thor
       self.class.help(shell, subcommand)
     end
   end
+
+  map TREE_MAPPINGS => :tree
+
+  desc "tree", "Print a tree of all available commands"
+  def tree
+    build_command_tree(self.class, "")
+  end
+
+private
+
+  def build_command_tree(klass, indent)
+    # Print current class name if it's not the root Thor class
+    unless klass == Thor
+      say "#{indent}#{klass.namespace || 'default'}", :blue
+      indent = "#{indent}  "
+    end
+
+    # Print all commands for this class
+    visible_commands = klass.commands.reject { |_, cmd| cmd.hidden? || cmd.name == "help" }
+    commands_count = visible_commands.count
+    visible_commands.sort.each_with_index do |(command_name, command), i|
+      description = command.description.split("\n").first || ""
+      icon = i == (commands_count - 1) ? "└─" : "├─"
+      say "#{indent}#{icon} ", nil, false
+      say command_name, :green, false
+      say " (#{description})" unless description.empty?
+    end
+
+    # Print all subcommands (from registered Thor subclasses)
+    klass.subcommand_classes.each do |_, subclass|
+      build_command_tree(subclass, indent)
+    end
+  end
 end
