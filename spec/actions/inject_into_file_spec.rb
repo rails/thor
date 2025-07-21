@@ -20,6 +20,10 @@ describe Thor::Actions::InjectIntoFile do
     capture(:stdout) { invoker.insert_into_file(*args, &block) }
   end
 
+  def invoke_with_a_bang!(*args, &block)
+    capture(:stdout) { invoker.insert_into_file!(*args, &block) }
+  end
+
   def revoke!(*args, &block)
     capture(:stdout) { revoker.insert_into_file(*args, &block) }
   end
@@ -168,6 +172,164 @@ describe Thor::Actions::InjectIntoFile do
         silence_warnings do
           Encoding.default_external = encoding_original
         end
+      end
+    end
+
+    context "with a bang" do
+      it "changes the file adding content after the flag" do
+        invoke_with_a_bang! "doc/README", "\nmore content", after: "__start__"
+        expect(File.read(file)).to eq("__start__\nmore content\nREADME\n__end__\n")
+      end
+
+      it "changes the file adding content before the flag" do
+        invoke_with_a_bang! "doc/README", "more content\n", before: "__end__"
+        expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
+      end
+
+      it "appends content to the file if before and after arguments not provided" do
+        invoke_with_a_bang!("doc/README", "more content\n")
+        expect(File.read(file)).to eq("__start__\nREADME\n__end__\nmore content\n")
+      end
+
+      it "does not change the file and raises an error if replacement present in the file" do
+        invoke_with_a_bang!("doc/README", "more specific content\n")
+        expect do
+          invoke_with_a_bang!("doc/README", "more specific content\n")
+        end.to raise_error(Thor::Error, "The content of #{destination_root}/doc/README did not change")
+      end
+
+      it "does not change the file and raises an error if flag not found in the file" do
+        expect do
+          invoke_with_a_bang!("doc/README", "more content\n", after: "whatever")
+        end.to raise_error(Thor::Error, "The content of #{destination_root}/doc/README did not change")
+      end
+
+      it "accepts data as a block" do
+        invoke_with_a_bang! "doc/README", before: "__end__" do
+          "more content\n"
+        end
+
+        expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
+      end
+
+      it "logs status" do
+        expect(invoke_with_a_bang!("doc/README", "\nmore content", after: "__start__")).to eq("      insert  doc/README\n")
+      end
+
+      it "logs status if pretending" do
+        invoker(pretend: true)
+        expect(invoke_with_a_bang!("doc/README", "\nmore content", after: "__start__")).to eq("      insert  doc/README\n")
+      end
+
+      it "does not change the file if pretending" do
+        invoker pretend: true
+        invoke_with_a_bang! "doc/README", "\nmore content", after: "__start__"
+        expect(File.read(file)).to eq("__start__\nREADME\n__end__\n")
+      end
+
+      it "does not change the file and raises an error if already includes content" do
+        invoke_with_a_bang! "doc/README", before: "__end__" do
+          "more content\n"
+        end
+
+        expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
+
+        expect do
+          invoke_with_a_bang! "doc/README", before: "__end__" do
+            "more content\n"
+          end
+        end.to raise_error(Thor::Error, "The content of #{destination_root}/doc/README did not change")
+
+        expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
+      end
+
+      it "does not change the file and raises an error if already includes content using before with capture" do
+        invoke_with_a_bang! "doc/README", before: /(__end__)/ do
+          "more content\n"
+        end
+
+        expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
+
+        expect do
+          invoke_with_a_bang! "doc/README", before: /(__end__)/ do
+            "more content\n"
+          end
+        end.to raise_error(Thor::Error, "The content of #{destination_root}/doc/README did not change")
+
+        expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
+      end
+
+      it "does not change the file and raises an error if already includes content using after with capture" do
+        invoke_with_a_bang! "doc/README", after: /(README\n)/ do
+          "more content\n"
+        end
+
+        expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
+
+        expect do
+          invoke_with_a_bang! "doc/README", after: /(README\n)/ do
+            "more content\n"
+          end
+        end.to raise_error(Thor::Error, "The content of #{destination_root}/doc/README did not change")
+
+        expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
+      end
+
+      it "does not attempt to change the file if it doesn't exist - instead raises Thor::Error" do
+        expect do
+          invoke_with_a_bang! "idontexist", before: "something" do
+            "any content"
+          end
+        end.to raise_error(Thor::Error, /does not appear to exist/)
+        expect(File.exist?("idontexist")).to be_falsey
+      end
+
+      it "does not attempt to change the file if it doesn't exist and pretending" do
+        expect do
+          invoker pretend: true
+          invoke_with_a_bang! "idontexist", before: "something" do
+            "any content"
+          end
+        end.not_to raise_error
+        expect(File.exist?("idontexist")).to be_falsey
+      end
+
+      it "does change the file if already includes content and :force is true" do
+        invoke_with_a_bang! "doc/README", before: "__end__" do
+          "more content\n"
+        end
+
+        expect(File.read(file)).to eq("__start__\nREADME\nmore content\n__end__\n")
+
+        invoke_with_a_bang! "doc/README", before: "__end__", force: true do
+          "more content\n"
+        end
+
+        expect(File.read(file)).to eq("__start__\nREADME\nmore content\nmore content\n__end__\n")
+      end
+
+      it "can insert chinese" do
+        encoding_original = Encoding.default_external
+
+        begin
+          silence_warnings do
+            Encoding.default_external = Encoding.find("UTF-8")
+          end
+          invoke_with_a_bang! "doc/README.zh", "\n中文", after: "__start__"
+          expect(File.read(File.join(destination_root, "doc/README.zh"))).to eq("__start__\n中文\n说明\n__end__\n")
+        ensure
+          silence_warnings do
+            Encoding.default_external = encoding_original
+          end
+        end
+      end
+
+      it "does not mutate the provided config" do
+        config = {after: "__start__"}
+        invoke_with_a_bang! "doc/README", "\nmore content", config
+        expect(File.read(file)).to eq("__start__\nmore content\nREADME\n__end__\n")
+
+        expect(config).to eq({after: "__start__"})
       end
     end
   end
