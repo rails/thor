@@ -94,7 +94,7 @@ describe Thor::Actions do
       File.write(destination, "blabla")
 
       expect(Thor::LineEditor).to receive(:readline).and_return("d", "y")
-      expect(runner.shell).to receive(:system).with(/diff -u/)
+      expect(runner.shell).to receive(:system).with("diff", "-u", /encoding_with_utf8.thor/, /encoding_with_utf8.thor/)
       action :copy_file, "encoding_with_utf8.thor"
 
       exists_and_identical?("encoding_with_utf8.thor", "encoding_with_utf8.thor")

@@ -311,13 +311,11 @@ class Thor
       end
 
       def show_diff(destination, content) #:nodoc:
-        diff_cmd = ENV["THOR_DIFF"] || ENV["RAILS_DIFF"] || "diff -u"
-
         require "tempfile"
         Tempfile.open(File.basename(destination), File.dirname(destination), binmode: true) do |temp|
           temp.write content
           temp.rewind
-          system %(#{diff_cmd} "#{destination}" "#{temp.path}")
+          system(*diff_tool, destination, temp.path)
         end
       end
 
@@ -380,6 +378,13 @@ class Thor
         @merge_tool ||= begin
           require "shellwords"
           Shellwords.split(ENV["THOR_MERGE"] || "git difftool --no-index")
+        end
+      end
+
+      def diff_tool #:nodoc:
+        @diff_cmd ||= begin
+          require "shellwords"
+          Shellwords.split(ENV["THOR_DIFF"] || ENV["RAILS_DIFF"] || "diff -u")
         end
       end
     end

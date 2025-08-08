@@ -546,7 +546,7 @@ TABLE
       it "invokes the diff command" do
         expect(Thor::LineEditor).to receive(:readline).and_return("d")
         expect(Thor::LineEditor).to receive(:readline).and_return("n")
-        expect(shell).to receive(:system).with(/diff -u/)
+        expect(shell).to receive(:system).with("diff", "-u", "foo", /foo/)
         capture(:stdout) { shell.file_collision("foo") {} }
       end
 

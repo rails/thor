@@ -134,7 +134,7 @@ describe Thor::Actions::CreateFile do
         it "executes the block given to show file content" do
           create_file("doc/config.rb")
           expect(Thor::LineEditor).to receive(:readline).and_return("d", "n")
-          expect(@base.shell).to receive(:system).with(/diff -u/)
+          expect(@base.shell).to receive(:system).with("diff", "-u", /doc\/config\.rb/, /doc\/config\.rb/)
           invoke!
         end
 
