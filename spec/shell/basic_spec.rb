@@ -546,7 +546,7 @@ TABLE
       it "invokes the diff command" do
         expect(Thor::LineEditor).to receive(:readline).and_return("d")
         expect(Thor::LineEditor).to receive(:readline).and_return("n")
-        expect(shell).to receive(:system).with(/diff -u/)
+        expect(shell).to receive(:system).with("diff", "-u", "foo", /foo/)
         capture(:stdout) { shell.file_collision("foo") {} }
       end
 
@@ -561,6 +561,19 @@ TABLE
         allow(ENV).to receive(:[]).with("THOR_MERGE").and_return("meld")
         expect(Thor::LineEditor).to receive(:readline).and_return("m")
         expect(shell).to receive(:system).with("meld", /foo/, "foo")
+        capture(:stdout) { shell.file_collision("foo") {} }
+      end
+
+      it "invokes the merge tool with arguments when THOR_MERGE contains them" do
+        allow(ENV).to receive(:[]).with("THOR_MERGE").and_return("nvim -d")
+        expect(Thor::LineEditor).to receive(:readline).and_return("m")
+        expect(shell).to receive(:system).with("nvim", "-d", /foo/, "foo")
+        capture(:stdout) { shell.file_collision("foo") {} }
+      end
+
+      it "invokes the merge tool with arguments when there is no THOR_MERGE" do
+        expect(Thor::LineEditor).to receive(:readline).and_return("m")
+        expect(shell).to receive(:system).with("git", "difftool", "--no-index", /foo/, "foo")
         capture(:stdout) { shell.file_collision("foo") {} }
       end
 
