@@ -372,12 +372,15 @@ class Thor
         Tempfile.open([File.basename(destination), File.extname(destination)], File.dirname(destination)) do |temp|
           temp.write content
           temp.rewind
-          system(merge_tool, temp.path, destination)
+          system(*merge_tool, temp.path, destination)
         end
       end
 
       def merge_tool #:nodoc:
-        @merge_tool ||= ENV["THOR_MERGE"] || "git difftool --no-index"
+        @merge_tool ||= begin
+          require "shellwords"
+          Shellwords.split(ENV["THOR_MERGE"] || "git difftool --no-index")
+        end
       end
     end
   end

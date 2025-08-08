@@ -564,6 +564,19 @@ TABLE
         capture(:stdout) { shell.file_collision("foo") {} }
       end
 
+      it "invokes the merge tool with arguments when THOR_MERGE contains them" do
+        allow(ENV).to receive(:[]).with("THOR_MERGE").and_return("nvim -d")
+        expect(Thor::LineEditor).to receive(:readline).and_return("m")
+        expect(shell).to receive(:system).with("nvim", "-d", /foo/, "foo")
+        capture(:stdout) { shell.file_collision("foo") {} }
+      end
+
+      it "invokes the merge tool with arguments when there is no THOR_MERGE" do
+        expect(Thor::LineEditor).to receive(:readline).and_return("m")
+        expect(shell).to receive(:system).with("git", "difftool", "--no-index", /foo/, "foo")
+        capture(:stdout) { shell.file_collision("foo") {} }
+      end
+
       it "show warning if user chooses merge but merge tool is not specified" do
         allow(shell).to receive(:merge_tool).and_return("")
         expect(Thor::LineEditor).to receive(:readline).and_return("m")
