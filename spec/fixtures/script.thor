@@ -129,6 +129,16 @@ Linebreaks preserved
     true
   end
 
+  desc "potentially_ambiguous", "not really ambiguous because conflicting command is hidden"
+  def potentially_ambiguous
+    true
+  end
+
+  desc "potentially_ambiguous_but_hidden", "not considered for ambiguous check because it's hidden", hide: true
+  def potentially_ambiguous_but_hidden
+    false
+  end
+
   private
 
     def method_missing(meth, *args)

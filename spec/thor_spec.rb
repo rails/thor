@@ -522,6 +522,10 @@ Usage: "thor scripts:arities:multiple_usages ARG --foo"
       it "invokes an alias" do
         expect(MyScript.start(%w(animal_pri))).to eq(MyScript.start(%w(zoo)))
       end
+
+      it "invokes a command, even when there's a hidden command that makes invokation ambiguous" do
+        expect(MyScript.start(%w(potentially_))).to eq(MyScript.start(%w(potentially_ambiguous)))
+      end
     end
 
     context "when the user enters an ambiguous substring of a command" do
