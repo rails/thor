@@ -9,14 +9,14 @@ Gem::Specification.new do |spec|
   spec.licenses = %w(MIT)
   spec.authors = ["Yehuda Katz", "José Valim"]
   spec.email = "ruby-thor@googlegroups.com"
-  spec.homepage = "http://whatisthor.com/"
+  spec.homepage = "https://github.com/rails/thor"
   spec.description = "Thor is a toolkit for building powerful command-line interfaces."
   spec.summary = spec.description
 
   spec.metadata = {
     "bug_tracker_uri" => "https://github.com/rails/thor/issues",
     "changelog_uri" => "https://github.com/rails/thor/releases/tag/v#{Thor::VERSION}",
-    "documentation_uri" => "http://whatisthor.com/",
+    "documentation_uri" => "https://github.com/rails/thor/wiki",
     "source_code_uri" => "https://github.com/rails/thor/tree/v#{Thor::VERSION}",
     "wiki_uri" => "https://github.com/rails/thor/wiki",
     "rubygems_mfa_required" => "true",

@@ -27,10 +27,9 @@ Installation
 
 Usage and documentation
 -----------------------
-Please see the [wiki][] for basic usage and other documentation on using Thor. You can also check out the [official homepage][homepage].
+Please see the [wiki][] for basic usage and other documentation on using Thor.
 
 [wiki]: https://github.com/rails/thor/wiki
-[homepage]: http://whatisthor.com/
 
 Contributing
 ------------
