@@ -29,5 +29,5 @@ Gem::Specification.new do |spec|
   spec.executables = %w(thor)
   spec.require_paths = %w(lib)
 
-  spec.add_development_dependency "bundler", ">= 1.0", "< 3"
+  spec.add_development_dependency "bundler", ">= 1.0"
 end
