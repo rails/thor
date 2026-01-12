@@ -327,6 +327,8 @@ class Thor
     end
 
     def subcommand(subcommand, subcommand_class)
+      return subcommand_classes[subcommand.to_s] if subcommands.include? subcommand.to_s
+
       subcommands << subcommand.to_s
       subcommand_class.subcommand_help subcommand
       subcommand_classes[subcommand.to_s] = subcommand_class
