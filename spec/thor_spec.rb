@@ -748,6 +748,15 @@ HELP
         klass.class_eval "def help; end"
       end).to be_empty
     end
+
+    it "does not print if a method is defined by code in an installed gem" do
+      klass = Class.new(Thor)
+      allow(klass).to receive(:defined_in_gem?).and_return(true)
+
+      expect(capture(:stdout) do
+        klass.class_eval "def some_gem_method; end"
+      end).to be_empty
+    end
   end
 
   describe "edge-cases" do

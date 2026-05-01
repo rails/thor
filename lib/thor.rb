@@ -575,13 +575,21 @@ class Thor
       elsif all_commands[meth] || meth == "method_missing"
         true
       else
-        puts "[WARNING] Attempted to create command #{meth.inspect} without usage or description. " \
-             "Call desc if you want this method to be available as command or declare it inside a " \
-             "no_commands{} block. Invoked from #{caller[1].inspect}."
+        unless defined_in_gem?(meth)
+          puts "[WARNING] Attempted to create command #{meth.inspect} without usage or description. " \
+               "Call desc if you want this method to be available as command or declare it inside a " \
+               "no_commands{} block. Invoked from #{caller[1].inspect}."
+        end
         false
       end
     end
     alias_method :create_task, :create_command
+
+    def defined_in_gem?(meth) #:nodoc:
+      source_file = public_instance_method(meth.to_sym).source_location&.first
+      return false unless source_file
+      Gem.path.any? { |path| source_file.start_with?(path) }
+    end
 
     def initialize_added #:nodoc:
       class_options.merge!(method_options)
