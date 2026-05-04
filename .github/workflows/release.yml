@@ -22,7 +22,7 @@ jobs:
         bundler-cache: true
         ruby-version: 3.4.4
     - name: Configure trusted publishing credentials
-      uses: rubygems/configure-rubygems-credentials@v1.0.0
+      uses: rubygems/configure-rubygems-credentials@v2.0.0
     - name: Run release rake task
       run: bundle exec thor release
       shell: bash
