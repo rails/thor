@@ -37,6 +37,12 @@ describe Thor::LineEditor::Readline do
       expect(editor.readline).to eq("foo")
     end
 
+    it "with colored prompt message" do
+      expect(::Readline).to receive(:readline).with("\001\e[32m\002> \001\e[0m\002", true).and_return("foo")
+      editor = Thor::LineEditor::Readline.new("\e[32m> \e[0m", {})
+      expect(editor.readline).to eq("foo")
+    end
+
     it "provides tab completion when given a limited_to option" do
       expect(::Readline).to receive(:readline)
       expect(::Readline).to receive(:completion_proc=) do |proc|
@@ -67,5 +73,6 @@ describe Thor::LineEditor::Readline do
       editor = Thor::LineEditor::Readline.new("Password: ", echo: false)
       expect(editor.readline).to eq("secret")
     end
+
   end
 end
