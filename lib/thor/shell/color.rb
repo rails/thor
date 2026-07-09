@@ -102,7 +102,7 @@ class Thor
     protected
 
       def can_display_colors?
-        are_colors_supported? && !are_colors_disabled?
+        ENV['FORCE_COLOR'] || (are_colors_supported? && !are_colors_disabled?)
       end
 
       def are_colors_supported?
