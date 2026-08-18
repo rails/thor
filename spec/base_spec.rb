@@ -34,6 +34,18 @@ describe Thor::Base do
       expect(base.options[:third]).to eq(4)
     end
 
+    it "allows required options to be given as symbols or strings" do
+      counter = Class.new(MyCounter) do
+        class_option :third, required: true, type: :numeric
+      end
+
+      base = counter.new [1, 2], third: 4
+      expect(base.options[:third]).to eq(4)
+
+      base = counter.new [1, 2], "third" => 4
+      expect(base.options[:third]).to eq(4)
+    end
+
     it "creates options with indifferent access" do
       base = MyCounter.new [1, 2], third: 3
       expect(base.options["third"]).to eq(3)
