@@ -46,4 +46,30 @@ RSpec.describe "Thor tree command" do
   it "shows tree command in help" do
     expect(capture(:stdout) { TreeApp.start(["help"]) }).to match(/tree.*Print a tree of all available commands/)
   end
+
+  context "with class_option constraints" do
+    let(:tree_app) do
+      Class.new(Thor).tap do |klass|
+        # Copy TreeApp command structure without globally mutating that class.
+        klass.commands.merge!(TreeApp.commands)
+        klass.subcommand_classes.merge!(TreeApp.subcommand_classes)
+
+        klass.class_eval do
+          class_option :required_option, required: true
+          class_option :one
+          class_option :two
+          class_at_least_one :one, :two
+        end
+      end
+    end
+
+    it "prints a tree of all commands without validating class_option requirements" do
+      output = capture(:stdout) { tree_app.start(["tree"]) }
+
+      expect(output).to match(/├─ command1/)
+      expect(output).to match(/├─ command2/)
+      expect(output).to match(/└─ sub/)
+      expect(output).to match(/subcommand1/)
+    end
+  end
 end
