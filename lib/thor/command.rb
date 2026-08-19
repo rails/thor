@@ -3,7 +3,9 @@ class Thor
     FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
 
     def initialize(name, description, long_description, wrap_long_description, usage, options = nil, options_relation = nil)
-      super(name.to_s, description, long_description, wrap_long_description, usage, options || {}, options_relation || {})
+      options_relation = options_relation_with_defaults(options_relation)
+
+      super(name.to_s, description, long_description, wrap_long_description, usage, options || {}, options_relation)
     end
 
     def initialize_copy(other) #:nodoc:
@@ -64,14 +66,25 @@ class Thor
     end
 
     def method_exclusive_option_names #:nodoc:
-      self.options_relation[:exclusive_option_names] || []
+      self.options_relation[:exclusive_option_names]
     end
 
     def method_at_least_one_option_names #:nodoc:
-      self.options_relation[:at_least_one_option_names] || []
+      self.options_relation[:at_least_one_option_names]
     end
 
   protected
+
+  def options_relation_with_defaults(relations)
+    default_options_relation.merge(relations || {})
+  end
+
+  def default_options_relation
+    {
+      exclusive_option_names: [],
+      at_least_one_option_names: []
+    }
+  end
 
     # Add usage with required arguments
     def required_arguments_for(klass, usage)

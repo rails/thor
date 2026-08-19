@@ -541,6 +541,56 @@ Usage: "thor scripts:arities:multiple_usages ARG --foo"
         MyScript.start(%w(f), shell: shell)
       end
     end
+
+    context "with class option relations" do
+      module ClassOptionRelationsTest
+        class Exclusive < Thor
+          class_exclusive do
+            class_option :foo
+            class_option :bar
+          end
+
+          def self.exit_on_failure?
+            false
+          end
+
+          desc "exec", "Run a command"
+          def exec(*args)
+            [options, args]
+          end
+        end
+
+        class AtLeastOne < Thor
+          class_at_least_one do
+            class_option :foo
+            class_option :bar
+          end
+
+          def self.exit_on_failure?
+            false
+          end
+
+          desc "exec", "Run a command"
+          def exec(*args)
+            [options, args]
+          end
+        end
+      end
+
+      context "when class_exclusive is configured" do
+        it "raises an error if the invoked command does not exist" do
+          output = capture(:stderr) { ClassOptionRelationsTest::Exclusive.start(%w(typo)) }.strip
+          expect(output).to eq('Could not find command "typo" in "class_option_relations_test:exclusive" namespace.')
+        end
+      end
+
+      context "when class_at_least_one is configured" do
+        it "raises an error if the invoked command does not exist" do
+          output = capture(:stderr) { ClassOptionRelationsTest::AtLeastOne.start(%w(typo)) }.strip
+          expect(output).to eq("Not found at least one of required options '--foo', '--bar'")
+        end
+      end
+    end
   end
 
   describe "#help" do

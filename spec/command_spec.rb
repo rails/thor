@@ -43,6 +43,7 @@ describe Thor::Command do
       expect(Thor::DynamicCommand.new("command").description).to eq("A dynamically-generated command")
       expect(Thor::DynamicCommand.new("command").usage).to eq("command")
       expect(Thor::DynamicCommand.new("command").options).to eq({})
+      expect(Thor::DynamicCommand.new("command").options_relation).to eq(exclusive_option_names: [], at_least_one_option_names: [])
     end
 
     it "does not invoke an existing method" do
