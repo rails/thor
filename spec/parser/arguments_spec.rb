@@ -72,5 +72,40 @@ describe Thor::Arguments do
       create string: "foo", numeric: 3.0
       expect(parse("bar")).to eq("string" => "bar", "numeric" => 3.0)
     end
+
+    describe "with enum" do
+      it "raises error when string value isn't in enum" do
+        enum = %w(apple banana)
+        @opt = Thor::Arguments.new([Thor::Argument.new("fruit", type: :string, enum: enum)])
+        expect { parse("orange") }.to raise_error(Thor::MalformattedArgumentError,
+            "Expected 'fruit' to be one of #{enum.join(', ')}; got orange")
+      end
+
+      it "accepts string value when it is in enum" do
+        enum = %w(apple banana)
+        @opt = Thor::Arguments.new([Thor::Argument.new("fruit", type: :string, enum: enum)])
+        expect(parse("apple")["fruit"]).to eq("apple")
+      end
+
+      it "raises error when numeric value isn't in enum" do
+        enum = [1, 2]
+        @opt = Thor::Arguments.new([Thor::Argument.new("limit", type: :numeric, enum: enum)])
+        expect { parse("3") }.to raise_error(Thor::MalformattedArgumentError,
+            "Expected 'limit' to be one of #{enum.join(', ')}; got 3")
+      end
+
+      it "raises error when an array value isn't in enum" do
+        enum = %w(apple banana)
+        @opt = Thor::Arguments.new([Thor::Argument.new("fruits", type: :array, enum: enum)])
+        expect { parse("apple", "strawberry") }.to raise_error(Thor::MalformattedArgumentError,
+            "Expected all values of 'fruits' to be one of #{enum.join(', ')}; got strawberry")
+      end
+
+      it "accepts array values when all are in enum" do
+        enum = %w(apple banana)
+        @opt = Thor::Arguments.new([Thor::Argument.new("fruits", type: :array, enum: enum)])
+        expect(parse("apple", "banana")["fruits"]).to eq(%w(apple banana))
+      end
+    end
   end
 end
