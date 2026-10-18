@@ -289,9 +289,9 @@ class Thor
     # resolves. Requirements are listed in the command's +help+ output.
     #
     def requires(*names, args: nil, options: nil)
-      raise ArgumentError, "requires expects at least one command name" if names.empty?
+      raise ArgumentError, "Expected at least one command name for requires" if names.empty?
       if (args || options) && names.length > 1
-        raise ArgumentError, "requires maps args:/options: into a single command; declare one requires per mapped command"
+        raise ArgumentError, "Expected one command name when args: or options: is given; declare one requires per mapped command"
       end
 
       names.each do |name|
@@ -517,7 +517,7 @@ class Thor
 
   protected
 
-    def print_requirements(shell, command) # :nodoc:
+    def print_requirements(shell, command) #:nodoc:
       return if command.requirements.empty?
       shell.say "Requirements:"
       shell.print_table(command.requirements.map { |requirement| [requirement.name] }, indent: 2)

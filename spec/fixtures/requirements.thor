@@ -295,6 +295,30 @@ class ReqsPipeline < Thor
     Reqs.journal << [:takes, name]
   end
 
+  desc "splat [ITEMS...]", "Takes any number of positional arguments"
+  requires :fetch
+  def splat(*items)
+    Reqs.journal << [:splat, items]
+  end
+
+  desc "invents", "Maps an option the required command does not declare"
+  requires "reqs_tools:isolated", options: {undeclared: "invented"}
+  def invents
+    Reqs.journal << [:invents]
+  end
+
+  desc "shared_ns", "Requires a command of a namespace two classes share"
+  requires "reqs_shared:right"
+  def shared_ns
+    Reqs.journal << [:shared_ns]
+  end
+
+  desc "from_default", "Requires a command of the default namespace"
+  requires "default:plain"
+  def from_default
+    Reqs.journal << [:from_default]
+  end
+
   desc "retrier", "Rescues a failed requirement, then invokes the command again"
   def retrier
     begin
@@ -331,4 +355,31 @@ class ReqsClean < Thor
   desc "two", "Requires a command in another class"
   requires "reqs_tools:prep"
   def two; end
+end
+
+class ReqsSharedLeft < Thor
+  namespace :reqs_shared
+
+  desc "left", "Lives in the first class of a shared namespace"
+  def left
+    Reqs.journal << [:shared_left]
+  end
+end
+
+class ReqsSharedRight < Thor
+  namespace :reqs_shared
+
+  desc "right", "Lives in the second class of a shared namespace"
+  def right
+    Reqs.journal << [:shared_right]
+  end
+end
+
+class ReqsDefault < Thor
+  namespace :default
+
+  desc "plain", "Lives in the default namespace"
+  def plain
+    Reqs.journal << [:plain]
+  end
 end

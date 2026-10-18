@@ -1,7 +1,7 @@
 require "helper"
 require "thor/runner"
 
-describe "Thor requirements" do
+describe Thor::Requirement do
   before do
     Reqs.reset
   end
@@ -10,7 +10,7 @@ describe "Thor requirements" do
     Reqs.journal
   end
 
-  describe ".requires" do
+  describe "#requires" do
     it "rejects a declaration without command names" do
       expect do
         Class.new(Thor) do
@@ -18,7 +18,7 @@ describe "Thor requirements" do
           requires
           def broken; end
         end
-      end.to raise_error(ArgumentError, "requires expects at least one command name")
+      end.to raise_error(ArgumentError, "Expected at least one command name for requires")
     end
 
     it "rejects a value that is not a command name" do
@@ -28,7 +28,7 @@ describe "Thor requirements" do
           requires 42
           def broken; end
         end
-      end.to raise_error(ArgumentError, "requires takes command names, not 42")
+      end.to raise_error(ArgumentError, "Expected a command name for requires, got 42")
     end
 
     it "rejects an empty name" do
@@ -38,7 +38,7 @@ describe "Thor requirements" do
           requires ""
           def broken; end
         end
-      end.to raise_error(ArgumentError, 'requires takes command names, not ""')
+      end.to raise_error(ArgumentError, 'Expected a command name for requires, got ""')
     end
 
     it "rejects args:/options: mappings combined with several names" do
@@ -48,7 +48,7 @@ describe "Thor requirements" do
           requires :a, :b, args: ["v1"]
           def broken; end
         end
-      end.to raise_error(ArgumentError, /single command/)
+      end.to raise_error(ArgumentError, /one command name when args: or options: is given/)
     end
 
     it "rejects args: that is not an Array or a callable" do
@@ -58,7 +58,7 @@ describe "Thor requirements" do
           requires :a, args: "v1"
           def broken; end
         end
-      end.to raise_error(ArgumentError, /args: expects an Array or a callable/)
+      end.to raise_error(ArgumentError, /Expected an Array or a callable for args:/)
     end
 
     it "rejects options: that is not a Hash or a callable" do
@@ -68,7 +68,7 @@ describe "Thor requirements" do
           requires :a, options: [:target]
           def broken; end
         end
-      end.to raise_error(ArgumentError, /options: expects a Hash or a callable/)
+      end.to raise_error(ArgumentError, /Expected a Hash or a callable for options:/)
     end
 
     it "records requirements on the command in declaration order" do
@@ -84,7 +84,7 @@ describe "Thor requirements" do
       expect(ReqsPipeline.all_commands["hopeless"].requirements).to eq([])
     end
 
-    it "is inherited with the command" do
+    it "inherits a command's requirements in a subclass" do
       expect(ReqsChild.all_commands["verify"].requirements.map(&:name)).to eq(%w(compile))
     end
 
@@ -119,7 +119,7 @@ describe "Thor requirements" do
       expect(journal).to eq([[:fetch, "dev"], [:compile, nil, nil], [:package]])
     end
 
-    it "composes requirements recursively and runs a command required twice once" do
+    it "composes requirements recursively and runs overlapping requirements only once" do
       ReqsPipeline.start(%w(release))
       expect(journal).to eq([[:fetch, "dev"], [:compile, nil, nil], [:package], [:ship], [:release]])
     end
@@ -129,7 +129,7 @@ describe "Thor requirements" do
       expect(journal).to eq([[:branch_a1], [:branch_a], [:branch_b1], [:branch_b], [:two_branch]])
     end
 
-    it "runs a command listed twice in one declaration once" do
+    it "runs a command listed twice in one declaration only once" do
       ReqsPipeline.start(%w(double))
       expect(journal).to eq([[:fetch, "dev"], [:double]])
     end
@@ -177,7 +177,7 @@ describe "Thor requirements" do
     end
 
     it "does not run requirements for help" do
-      capture(:stdout) { ReqsPipeline.start(%w(help release)) }
+      silence(:stdout) { ReqsPipeline.start(%w(help release)) }
       expect(journal).to be_empty
     end
 
@@ -191,15 +191,38 @@ describe "Thor requirements" do
 
     it "does not run requirements when the command is called with too many arguments" do
       stderr = capture(:stderr) do
-        expect { ReqsPipeline.start(%w(fetch extra)) && ReqsPipeline.start(%w(takes one two)) }.to raise_error(SystemExit)
+        expect { ReqsPipeline.start(%w(fetch extra)) }.to raise_error(SystemExit)
       end
       expect(stderr).to include("was called with arguments")
+      expect(journal).to be_empty
+    end
+
+    it "does not run requirements when a command with a parameter is called with too many arguments" do
+      stderr = capture(:stderr) do
+        expect { ReqsPipeline.start(%w(takes one two)) }.to raise_error(SystemExit)
+      end
+      expect(stderr).to include('takes" was called with arguments')
       expect(journal).to be_empty
     end
 
     it "runs requirements when the arguments are well formed" do
       ReqsPipeline.start(%w(takes one))
       expect(journal).to eq([[:fetch, "dev"], [:takes, "one"]])
+    end
+
+    it "runs requirements for a command with a splat parameter" do
+      ReqsPipeline.start(%w(splat a b c))
+      expect(journal).to eq([[:fetch, "dev"], [:splat, %w(a b c)]])
+    end
+
+    it "resolves to the class that defines the command when two classes share a namespace" do
+      ReqsPipeline.start(%w(shared_ns))
+      expect(journal).to eq([[:shared_right], [:shared_ns]])
+    end
+
+    it "resolves a name in the default namespace" do
+      ReqsPipeline.start(%w(from_default))
+      expect(journal).to eq([[:plain], [:from_default]])
     end
 
     it "lets a command whose requirement failed run again on a later invoke" do
@@ -244,6 +267,11 @@ describe "Thor requirements" do
       expect(journal).to eq([[:tools_isolated, nil], [:insulated]])
     end
 
+    it "passes an explicit options: key through even when the required command does not declare it" do
+      ReqsPipeline.start(%w(invents))
+      expect(journal).to eq([[:tools_isolated, "invented"], [:invents]])
+    end
+
     it "does not pass the requiring command's own arguments" do
       ReqsPipeline.start(%w(verify))
       expect(journal.first).to eq([:compile, nil, nil])
@@ -270,12 +298,12 @@ describe "Thor requirements" do
     end
 
     it "raises ArgumentError when an args: callable does not return an Array" do
-      expect { ReqsPipeline.start(%w(bad_args)) }.to raise_error(ArgumentError, /args: for "compile" must resolve to an Array/)
+      expect { ReqsPipeline.start(%w(bad_args)) }.to raise_error(ArgumentError, /args: for "compile" to resolve to an Array/)
       expect(journal).to be_empty
     end
 
     it "raises ArgumentError when an options: callable does not return a Hash" do
-      expect { ReqsPipeline.start(%w(bad_options)) }.to raise_error(ArgumentError, /options: for "compile" must resolve to a Hash/)
+      expect { ReqsPipeline.start(%w(bad_options)) }.to raise_error(ArgumentError, /options: for "compile" to resolve to a Hash/)
       expect(journal).to be_empty
     end
 
@@ -379,7 +407,7 @@ describe "Thor requirements" do
     end
   end
 
-  describe ".validate_requirements!" do
+  describe "#validate_requirements!" do
     it "returns true when every requirement resolves" do
       expect(ReqsClean.validate_requirements!).to be true
     end
@@ -404,11 +432,7 @@ describe "Thor requirements" do
     end
 
     it "does not run any command" do
-      begin
-        ReqsPipeline.validate_requirements!
-      rescue Thor::RequirementError
-        nil
-      end
+      expect { ReqsPipeline.validate_requirements! }.to raise_error(Thor::RequirementError)
       expect(journal).to be_empty
     end
   end

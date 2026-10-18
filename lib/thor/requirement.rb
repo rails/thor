@@ -129,14 +129,14 @@ class Thor
     attr_reader :name
 
     def initialize(name, args: nil, options: nil)
-      unless (name.is_a?(Symbol) || name.is_a?(String)) && !name.to_s.empty?
-        raise ArgumentError, "requires takes command names, not #{name.inspect}"
+      unless [ Symbol, String ].any? { |klass| name.is_a?(klass) } && !name.to_s.empty?
+        raise ArgumentError, "Expected a command name for requires, got #{name.inspect}"
       end
       unless args.nil? || args.is_a?(Array) || args.respond_to?(:call)
-        raise ArgumentError, "requires args: expects an Array or a callable, got #{args.inspect}"
+        raise ArgumentError, "Expected an Array or a callable for args:, got #{args.inspect}"
       end
       unless options.nil? || options.is_a?(Hash) || options.respond_to?(:call)
-        raise ArgumentError, "requires options: expects a Hash or a callable, got #{options.inspect}"
+        raise ArgumentError, "Expected a Hash or a callable for options:, got #{options.inspect}"
       end
 
       @name = name.to_s
@@ -181,12 +181,14 @@ class Thor
       raise RequirementError, message
     end
 
+  private
+
     # Positional arguments to pass to the required command.
     def args_for(current_args, current_options)
       resolved = resolve(@args, current_args, current_options)
       return [] if resolved.nil?
       unless resolved.is_a?(Array)
-        raise ArgumentError, "requires args: for #{name.inspect} must resolve to an Array, got #{resolved.inspect}"
+        raise ArgumentError, "Expected args: for #{name.inspect} to resolve to an Array, got #{resolved.inspect}"
       end
       resolved
     end
@@ -207,7 +209,7 @@ class Thor
       explicit = resolve(@options, current_args, current_options)
       return passed if explicit.nil?
       unless explicit.is_a?(Hash)
-        raise ArgumentError, "requires options: for #{name.inspect} must resolve to a Hash, got #{explicit.inspect}"
+        raise ArgumentError, "Expected options: for #{name.inspect} to resolve to a Hash, got #{explicit.inspect}"
       end
       explicit.each do |key, value|
         declared = declared_keys.find { |declared_key| declared_key.to_s == key.to_s }
@@ -215,8 +217,6 @@ class Thor
       end
       passed
     end
-
-  private
 
     def resolve(mapping, args, options)
       mapping.respond_to?(:call) ? mapping.call(args, options) : mapping
