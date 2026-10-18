@@ -1,15 +1,16 @@
 class Thor
-  class Command < Struct.new(:name, :description, :long_description, :wrap_long_description, :usage, :options, :options_relation, :ancestor_name)
+  class Command < Struct.new(:name, :description, :long_description, :wrap_long_description, :usage, :options, :options_relation, :ancestor_name, :requirements)
     FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
 
-    def initialize(name, description, long_description, wrap_long_description, usage, options = nil, options_relation = nil)
-      super(name.to_s, description, long_description, wrap_long_description, usage, options || {}, options_relation || {})
+    def initialize(name, description, long_description, wrap_long_description, usage, options = nil, options_relation = nil, requirements = nil)
+      super(name.to_s, description, long_description, wrap_long_description, usage, options || {}, options_relation || {}, nil, requirements || [])
     end
 
     def initialize_copy(other) #:nodoc:
       super(other)
       self.options = other.options.dup if other.options
       self.options_relation = other.options_relation.dup if other.options_relation
+      self.requirements = other.requirements.dup if other.requirements
     end
 
     def hidden?
