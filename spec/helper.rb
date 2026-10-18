@@ -36,6 +36,7 @@ load File.join(File.dirname(__FILE__), "fixtures", "invoke.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "script.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "subcommand.thor")
 load File.join(File.dirname(__FILE__), "fixtures", "command.thor")
+load File.join(File.dirname(__FILE__), "fixtures", "requirements.thor")
 
 RSpec.configure do |config|
   config.before do

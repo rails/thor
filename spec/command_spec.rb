@@ -58,6 +58,26 @@ describe Thor::Command do
       command.dup.options.delete(:foo)
       expect(command.options[:foo]).to be
     end
+
+    it "dups the requirements list" do
+      command = Thor::Command.new("can_has", nil, nil, nil, nil, {}, {}, [Thor::Requirement.new(:other)])
+      command.dup.requirements.clear
+      expect(command.requirements.size).to eq(1)
+    end
+  end
+
+  describe "#requirements" do
+    it "defaults to an empty list for the seven-argument form" do
+      command = Thor::Command.new("can_has", nil, nil, nil, nil, {}, {})
+      expect(command.requirements).to eq([])
+      expect(command.ancestor_name).to be_nil
+    end
+
+    it "accepts a list as the trailing argument" do
+      requirement = Thor::Requirement.new(:other)
+      command = Thor::Command.new("can_has", nil, nil, nil, nil, {}, {}, [requirement])
+      expect(command.requirements).to eq([requirement])
+    end
   end
 
   describe "#run" do

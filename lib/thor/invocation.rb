@@ -22,6 +22,7 @@ class Thor
     # Make initializer aware of invocations and the initialization args.
     def initialize(args = [], options = {}, config = {}, &block) #:nodoc:
       @_invocations = config[:invocations] || Hash.new { |h, k| h[k] = [] }
+      @_requirement_stack = config[:requirement_stack] || []
       @_initializer = [args, options, config]
       super
     end
@@ -124,6 +125,12 @@ class Thor
 
       unless current.include?(command.name)
         current << command.name
+        begin
+          satisfy_requirements(command, args.first || [])
+        rescue StandardError
+          current.delete(command.name)
+          raise
+        end
         command.run(self, *args)
       end
     end
@@ -143,7 +150,13 @@ class Thor
 
     # Configuration values that are shared between invocations.
     def _shared_configuration #:nodoc:
-      {invocations: @_invocations}
+      {invocations: @_invocations, requirement_stack: @_requirement_stack}
+    end
+
+    # Runs the requirements a command declared with +requires+ before the
+    # command body. See Thor::Requirement.satisfy_all.
+    def satisfy_requirements(command, command_args) #:nodoc:
+      Thor::Requirement.satisfy_all(self, command, command_args, @_requirement_stack)
     end
 
     # This method simply retrieves the class and command to be invoked.

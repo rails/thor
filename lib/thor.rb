@@ -249,6 +249,70 @@ class Thor
     end
     alias_method :at_least_one, :method_at_least_one
 
+    # Declares that the next command requires other commands to have run
+    # first. Required commands run through the standard invocation machinery
+    # before the command body, depth-first and in declaration order, so a
+    # command runs at most once per invocation (the same rule as +invoke+):
+    # a command required twice, even with different arguments, runs the first
+    # time only. A required command satisfies its own requirements first.
+    #
+    # Takes one or more command names: a command of the same class, or a
+    # "namespace:command" string naming a command of another Thor class.
+    # Names must be exact (dashes normalize to underscores); the prefix and
+    # +map+ matching of the command line does not apply. The other class must
+    # be loaded when the command runs: a Thorfile that requires its files is
+    # enough, but Thor::Runner loads installed thorfiles (+thor install+) by
+    # namespace, so a requirement into another installed thorfile does not
+    # resolve. +args+ and +options+ map the current invocation into
+    # a single required command; each can be a static Array/Hash or a callable
+    # receiving the current invocation's (args, options). Options declared by
+    # both commands (class options included) always auto-pass by name with
+    # their current value, which is the current command's default when the
+    # command line did not set them; an explicit +options+ mapping merges
+    # over them. Requirements run only when the command line is well formed:
+    # a usage error is raised first and no requirement runs.
+    #
+    #   desc "publish", "Publish the built package"
+    #   method_option :target, type: :string, required: true
+    #   method_option :env, type: :string, default: "development"
+    #   requires :check_credentials, :package
+    #   requires :build, args: ->(args, options) { [options[:target]] }
+    #   # no options mapping needed: :env auto-passes because both commands declare it
+    #   def publish
+    #     # runs after :check_credentials, :package, and :build have run
+    #   end
+    #
+    # A required command that does not exist, a cycle between requirements, or
+    # a Thor::Error raised by a required command raises Thor::RequirementError
+    # with the original error as +cause+. Other exceptions propagate unchanged.
+    # Use validate_requirements! in a test to check every declared name
+    # resolves. Requirements are listed in the command's +help+ output.
+    #
+    def requires(*names, args: nil, options: nil)
+      raise ArgumentError, "Expected at least one command name for requires" if names.empty?
+      if (args || options) && names.length > 1
+        raise ArgumentError, "Expected one command name when args: or options: is given; declare one requires per mapped command"
+      end
+
+      names.each do |name|
+        (@requirements ||= []) << Thor::Requirement.new(name, args: args, options: options)
+      end
+    end
+
+    # Resolves every requirement reachable from the commands of this class,
+    # through other classes too, and raises Thor::RequirementError listing
+    # the names that do not resolve to a command and the chains that form a
+    # cycle. Call it from a test so a requirement on a renamed or removed
+    # command fails before anyone runs it. Returns true when all is well.
+    #
+    #   Package.validate_requirements!
+    #
+    def validate_requirements!
+      problems = Thor::Requirement.problems(self)
+      raise RequirementError, problems.join("\n") unless problems.empty?
+      true
+    end
+
     # Prints help information for the given command.
     #
     # ==== Parameters
@@ -266,6 +330,7 @@ class Thor
       class_options_help(shell, nil => command.options.values)
       print_exclusive_options(shell, command)
       print_at_least_one_required_options(shell, command)
+      print_requirements(shell, command)
 
       if command.long_description
         shell.say "Description:"
@@ -452,6 +517,13 @@ class Thor
 
   protected
 
+    def print_requirements(shell, command) #:nodoc:
+      return if command.requirements.empty?
+      shell.say "Requirements:"
+      shell.print_table(command.requirements.map { |requirement| [requirement.name] }, indent: 2)
+      shell.say
+    end
+
     # Returns this class exclusive options array set.
     #
     # ==== Returns
@@ -563,14 +635,16 @@ class Thor
       @long_desc ||= nil
       @long_desc_wrap ||= nil
       @hide ||= nil
+      @requirements ||= nil
 
       if @usage && @desc
         base_class = @hide ? Thor::HiddenCommand : Thor::Command
         relations = {exclusive_option_names: method_exclusive_option_names,
           at_least_one_option_names: method_at_least_one_option_names}
-        commands[meth] = base_class.new(meth, @desc, @long_desc, @long_desc_wrap, @usage, method_options, relations)
+        commands[meth] = base_class.new(meth, @desc, @long_desc, @long_desc_wrap, @usage, method_options, relations, @requirements)
         @usage, @desc, @long_desc, @long_desc_wrap, @method_options, @hide = nil
         @method_exclusive_option_names, @method_at_least_one_option_names = nil
+        @requirements = nil
         true
       elsif all_commands[meth] || meth == "method_missing"
         true

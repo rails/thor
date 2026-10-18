@@ -103,4 +103,11 @@ class Thor
 
   class AtLeastOneRequiredArgumentError < InvocationError
   end
+
+  # Raised when a command's requirement (declared with +requires+) cannot be
+  # satisfied: the required command does not exist, the requirements form a
+  # cycle, or the required command failed with a Thor::Error. The original
+  # error, when there is one, is available as +cause+.
+  class RequirementError < Error
+  end
 end
