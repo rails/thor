@@ -99,6 +99,15 @@ describe Thor::Base do
         ENV["THOR_DEBUG"] = nil
       end
     end
+
+    it "does not add class option relations to the command on each run" do
+      MyClassOptionScript.start %w[mix --one --three --five]
+      MyClassOptionScript.start %w[mix --one --three --five]
+
+      content = capture(:stdout) { MyClassOptionScript.command_help(Thor::Base.shell.new, "mix") }
+      expect(content.scan(/--one\s+--two/).size).to eq(1)
+      expect(content.scan(/--three\s+--four/).size).to eq(1)
+    end
   end
 
   describe "#class_at_least_one" do

@@ -80,14 +80,15 @@ class Thor
 
       # Give a relation of options.
       # After parsing, Thor::Options check whether right relations are kept
-      relations = if current_command.nil?
-        {exclusive_option_names: [], at_least_one_option_names: []}
-      else
-        current_command.options_relation
+      relations = {exclusive_option_names: [], at_least_one_option_names: []}
+
+      unless current_command.nil?
+        relations[:exclusive_option_names].concat(current_command.method_exclusive_option_names)
+        relations[:at_least_one_option_names].concat(current_command.method_at_least_one_option_names)
       end
 
-      self.class.class_exclusive_option_names.map { |n| relations[:exclusive_option_names] << n }
-      self.class.class_at_least_one_option_names.map { |n| relations[:at_least_one_option_names] << n }
+      relations[:exclusive_option_names].concat(self.class.class_exclusive_option_names)
+      relations[:at_least_one_option_names].concat(self.class.class_at_least_one_option_names)
 
       disable_required_check = self.class.disable_required_check? current_command
 
