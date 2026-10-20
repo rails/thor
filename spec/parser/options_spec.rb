@@ -457,6 +457,79 @@ describe Thor::Options do
         create verbose: Thor::Option.new("verbose", type: :boolean, aliases: "-v", repeatable: true)
         expect(parse("-v", "-v", "-v")["verbose"].count).to eq(3)
       end
+
+      describe "with :inverse" do
+        def create_inverse(inverse, name = "foo")
+          create name.to_sym => Thor::Option.new(name, type: :boolean, default: true, inverse: inverse)
+        end
+
+        it "accepts --[no-]opt and --[skip-]opt variants when true" do
+          create_inverse true
+          expect(parse("--no-foo")["foo"]).to eq(false)
+          create_inverse true
+          expect(parse("--skip-foo")["foo"]).to eq(false)
+        end
+
+        it "does not accept --[no-]opt and --[skip-]opt variants when false" do
+          create_inverse false
+          expect(parse("--no-foo")["foo"]).to eq(true)
+          expect(remaining).to eq(%w(--no-foo))
+          create_inverse false
+          expect(parse("--skip-foo")["foo"]).to eq(true)
+          expect(remaining).to eq(%w(--skip-foo))
+        end
+
+        it "raises an error for --[no-]opt variant when false and checking unknown options" do
+          create_inverse false
+          parse("--no-foo")
+          expect { check_unknown! }.to raise_error(Thor::UnknownArgumentError, /Unknown switches "--no-foo"/)
+        end
+
+        it "still accepts --opt assignment when false" do
+          create_inverse false
+          expect(parse("--foo")["foo"]).to eq(true)
+          create_inverse false
+          expect(parse("--foo=false")["foo"]).to eq(false)
+        end
+
+        it "accepts a custom inverse switch, setting false for value" do
+          create_inverse :monochrome, "color"
+          expect(parse("--monochrome")["color"]).to eq(false)
+        end
+
+        it "doesn't eat the next part of the param with a custom inverse switch" do
+          create_inverse :monochrome, "color"
+          expect(parse("--monochrome", "bar")).to eq("color" => false)
+          expect(remaining).to eq(%w(bar))
+        end
+
+        it "accepts a custom inverse switch in the human name format" do
+          create_inverse :black_and_white, "color"
+          expect(parse("--black-and-white")["color"]).to eq(false)
+          create_inverse :black_and_white, "color"
+          expect(parse("--black_and_white")["color"]).to eq(false)
+        end
+
+        it "does not accept --[no-]opt and --[skip-]opt variants with a custom inverse switch" do
+          create_inverse :monochrome, "color"
+          expect(parse("--no-color")["color"]).to eq(true)
+          create_inverse :monochrome, "color"
+          expect(parse("--skip-color")["color"]).to eq(true)
+        end
+
+        it "accepts a custom inverse switch that starts with no-" do
+          create_inverse :no_colors, "color"
+          expect(parse("--no-colors")["color"]).to eq(false)
+          create_inverse :no_colors, "color"
+          expect(parse("--no-color")["color"]).to eq(true)
+        end
+
+        it "is ignored by non-boolean options" do
+          create foo: Thor::Option.new("foo", type: :string, inverse: false)
+          expect(parse("--no-foo")["foo"]).to eq(nil)
+          expect(remaining).to eq([])
+        end
+      end
     end
 
     describe "with :hash type" do

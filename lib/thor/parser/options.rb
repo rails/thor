@@ -45,12 +45,14 @@ class Thor
 
       @shorts = {}
       @switches = {}
+      @inverses = {}
       @extra = []
       @stopped_parsing_after_extra_index = nil
       @is_treated_as_value = false
 
       options.each do |option|
         @switches[option.switch_name] = option
+        @inverses[option.inverse_switch_name] = option if option.inverse_switch_name
 
         option.aliases.each do |name|
           @shorts[name] ||= option.switch_name
@@ -232,11 +234,21 @@ class Thor
     end
 
     def switch_option(arg)
-      if match = no_or_skip?(arg) # rubocop:disable Lint/AssignmentInCondition
-        @switches[arg] || @switches["--#{match}"]
-      else
-        @switches[arg]
-      end
+      option = @switches[arg] || @inverses[arg]
+      return option if option
+
+      match = no_or_skip?(arg)
+      option = @switches["--#{match}"] if match
+      option if option && option.default_inverse?
+    end
+
+    # Check if the given switch sets a boolean option to false, either through
+    # --no-<option>, --skip-<option> or a custom :inverse switch.
+    #
+    def inverse_switch?(switch)
+      return false if @switches.key?(switch)
+
+      @inverses.key?(switch) || !no_or_skip?(switch).nil?
     end
 
     # Check if the given argument is actually a shortcut.
@@ -262,10 +274,10 @@ class Thor
           shift
           false
         else
-          @switches.key?(switch) || !no_or_skip?(switch)
+          !inverse_switch?(switch)
         end
       else
-        @switches.key?(switch) || !no_or_skip?(switch)
+        !inverse_switch?(switch)
       end
     end
 
