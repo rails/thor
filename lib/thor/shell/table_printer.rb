@@ -103,7 +103,7 @@ class Thor
       def truncate(string)
         return string unless @truncate
         chars = string.chars.to_a
-        if chars.length <= @truncate
+        if chars.length <= @truncate - @indent
           chars.join
         else
           chars[0, @truncate - 3 - @indent].join + "..."

@@ -378,6 +378,13 @@ TABLE
 TABLE
     end
 
+    it "includes the indentation when checking the maximum terminal width" do
+      content = capture(:stdout) { shell.print_table([["abc", "#123", "first thr"]], indent: 2, truncate: 20) }
+      expect(content).to eq(<<-TABLE)
+  abc  #123  firs...
+TABLE
+    end
+
     it "honors the colwidth option" do
       content = capture(:stdout) { shell.print_table(@table, colwidth: 10) }
       expect(content).to eq(<<-TABLE)
