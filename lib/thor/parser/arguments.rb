@@ -9,7 +9,7 @@ class Thor
       arguments = []
 
       args.each do |item|
-        break if item.is_a?(String) && item =~ /^-/
+        break if item.is_a?(String) && item =~ /\A-/
         arguments << item
       end
 
@@ -82,7 +82,7 @@ class Thor
     end
 
     def current_is_value?
-      peek && peek.to_s !~ /^-{1,2}\S+/
+      peek && peek.to_s !~ /\A-{1,2}\S+/
     end
 
     # Runs through the argument array getting strings that contains ":" and

@@ -16,6 +16,16 @@ describe Thor::Arguments do
     @opt.parse(args)
   end
 
+  describe ".split" do
+    it "splits at the first argument that starts with a dash" do
+      expect(Thor::Arguments.split(%w(a b --c d))).to eq([%w(a b), %w(--c d)])
+    end
+
+    it "does not split at a later line of a multi-line argument" do
+      expect(Thor::Arguments.split(["a\n-b", "--c"])).to eq([["a\n-b"], ["--c"]])
+    end
+  end
+
   describe "#parse" do
     it "parses arguments in the given order" do
       create string: nil, numeric: nil
@@ -38,6 +48,11 @@ describe Thor::Arguments do
       create string: nil, array: nil
       expect(parse("product", "title", "age")["string"]).to eq("product")
       expect(parse("product", "title", "age")["array"]).to eq(%w(title age))
+    end
+
+    it "accepts multi-line values in arrays" do
+      create array: nil
+      expect(parse("title\n-a", "age\n--b")["array"]).to eq(["title\n-a", "age\n--b"])
     end
 
     it "accepts - as an array argument" do
