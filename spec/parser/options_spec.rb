@@ -131,6 +131,24 @@ describe Thor::Options do
       expect(parse("asdf", "--foo", "bar")).to eq("foo" => "bar")
     end
 
+    it "does not treat later lines of a multi-line argument as switches" do
+      create foo: "baz", bar: :boolean
+
+      expect(parse("asdf\n--bar", "--foo", "boom")).to eq("foo" => "boom")
+      expect(remaining).to eq(["asdf\n--bar"])
+      expect { check_unknown! }.not_to raise_error
+    end
+
+    it "raises an error for unknown switches with a multi-line value" do
+      create foo: "baz"
+      parse("--baz=one\ntwo")
+
+      expect { check_unknown! }.to raise_error(Thor::UnknownArgumentError, /\AUnknown switches "--baz=one\\ntwo"/)
+
+      parse("--baz=one\n--two")
+      expect { check_unknown! }.to raise_error(Thor::UnknownArgumentError)
+    end
+
     it "correctly recognizes things that look kind of like options, but aren't, as not options" do
       create(foo: "baz")
       expect(parse("--asdf---asdf", "baz", "--foo", "--asdf---dsf--asdf")).to eq("foo" => "--asdf---dsf--asdf")
@@ -333,6 +351,25 @@ describe Thor::Options do
         expect(parse("--foo=-bar -baz")["foo"]).to eq("-bar -baz")
       end
 
+      it "accepts a multi-line value" do
+        expect(parse("--foo", "bar\nbaz")["foo"]).to eq("bar\nbaz")
+        expect(parse("--foo=bar\nbaz")["foo"]).to eq("bar\nbaz")
+        expect(parse("-f=bar\nbaz")["foo"]).to eq("bar\nbaz")
+      end
+
+      it "ignores a trailing newline on a switch" do
+        expect(parse("--foo\n", "bar")["foo"]).to eq("bar")
+        expect(parse("-f\n", "bar")["foo"]).to eq("bar")
+        expect(parse("--foo=bar\n")["foo"]).to eq("bar")
+        expect(parse("--foo=bar\nbaz\n")["foo"]).to eq("bar\nbaz")
+      end
+
+      it "accepts a multi-line value with a line that looks like a switch" do
+        expect(parse("--foo", "bar\n-f")["foo"]).to eq("bar\n-f")
+        expect(parse("--foo", "bar\n--foo")["foo"]).to eq("bar\n--foo")
+        expect(parse("--foo", "bar\n--foo=baz")["foo"]).to eq("bar\n--foo=baz")
+      end
+
       it "must accept underscores switch=value assignment" do
         create foo_bar: :required
         expect(parse("--foo_bar=http://example.com/under_score/")["foo_bar"]).to eq("http://example.com/under_score/")
@@ -477,6 +514,10 @@ describe Thor::Options do
         expect(parse("--attributes", "name:string", "age:integer", "--baz", "cool")["attributes"]).to eq("name" => "string", "age" => "integer")
       end
 
+      it "accepts multi-line values" do
+        expect(parse("--attributes", "name:string", "desc:one\n-two", "age:integer")["attributes"]).to eq("name" => "string", "desc" => "one\n-two", "age" => "integer")
+      end
+
       it "must not allow the same hash key to be specified multiple times" do
         expect { parse("--attributes", "name:string", "name:integer") }.to raise_error(Thor::MalformattedArgumentError, "You can't specify 'name' more than once in option '--attributes'; got name:string and name:integer")
       end
@@ -499,6 +540,10 @@ describe Thor::Options do
 
       it "accepts a switch <value> assignment" do
         expect(parse("--attributes", "a", "b", "c")["attributes"]).to eq(%w(a b c))
+      end
+
+      it "accepts multi-line values" do
+        expect(parse("--attributes", "a", "b\n-c", "d")["attributes"]).to eq(["a", "b\n-c", "d"])
       end
 
       it "must not mix values with other switches" do

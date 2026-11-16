@@ -1,10 +1,10 @@
 class Thor
   class Options < Arguments #:nodoc:
-    LONG_RE     = /^(--\w+(?:-\w+)*)$/
-    SHORT_RE    = /^(-[a-z])$/i
-    EQ_RE       = /^(--\w+(?:-\w+)*|-[a-z])=(.*)$/i
-    SHORT_SQ_RE = /^-([a-z]{2,})$/i # Allow either -x -v or -xv style for single char args
-    SHORT_NUM   = /^(-[a-z])#{NUMERIC}$/i
+    LONG_RE     = /\A(--\w+(?:-\w+)*)\Z/
+    SHORT_RE    = /\A(-[a-z])\Z/i
+    EQ_RE       = /\A(--\w+(?:-\w+)*|-[a-z])=(.*?)\n?\z/im
+    SHORT_SQ_RE = /\A-([a-z]{2,})\Z/i # Allow either -x -v or -xv style for single char args
+    SHORT_NUM   = /\A(-[a-z])#{NUMERIC}\Z/i
     OPTS_END    = "--".freeze
 
     # Receives a hash and makes it switches.
@@ -123,7 +123,7 @@ class Thor
             break
           elsif match
             @extra << shifted
-            @extra << shift while peek && peek !~ /^-/
+            @extra << shift while peek && peek !~ /\A-/
           else
             @extra << shifted
           end
@@ -169,7 +169,7 @@ class Thor
       to_check = @stopped_parsing_after_extra_index ? @extra[0...@stopped_parsing_after_extra_index] : @extra
 
       # an unknown option starts with - or -- and has no more --'s afterward.
-      unknown = to_check.select { |str| str =~ /^--?(?:(?!--).)*$/ }
+      unknown = to_check.select { |str| str =~ /\A--?(?:(?!--).)*$/ }
       raise UnknownArgumentError.new(@switches.keys, unknown) unless unknown.empty?
     end
 
