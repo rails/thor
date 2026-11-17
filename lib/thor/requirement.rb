@@ -107,6 +107,8 @@ class Thor
         problems
       end
 
+    private
+
       # Whether the command method on +instance+ accepts the given
       # positional arguments. Commands without a public method of their own
       # (method_missing) are not checked.
@@ -118,11 +120,6 @@ class Thor
         optional = parameters.count { |type, _| type == :opt }
         rest = parameters.any? { |type, _| type == :rest }
         command_args.size >= required && (rest || command_args.size <= required + optional)
-      end
-
-      # The declared option keys a command accepts: its own plus its class's.
-      def option_keys(klass, command) #:nodoc:
-        klass.class_options.keys + command.options.keys
       end
     end
 
@@ -159,8 +156,8 @@ class Thor
       end
 
       target = klass.all_commands[command_name]
-      source_names = self.class.option_keys(instance.class, command).map(&:to_s)
-      declared_keys = self.class.option_keys(klass, target)
+      source_names = option_keys(instance.class, command).map(&:to_s)
+      declared_keys = option_keys(klass, target)
       shared_keys = declared_keys.select { |key| source_names.include?(key.to_s) }
       current_options = instance.options
 
@@ -182,6 +179,11 @@ class Thor
     end
 
   private
+
+    # The declared option keys a command accepts: its own plus its class's.
+    def option_keys(klass, command)
+      klass.class_options.keys + command.options.keys
+    end
 
     # Positional arguments to pass to the required command.
     def args_for(current_args, current_options)
