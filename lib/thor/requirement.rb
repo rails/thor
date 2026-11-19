@@ -159,16 +159,20 @@ class Thor
     # Returns the target class even if the command does not exist.
     def target(klass)
       requirement_name = name.to_s
-      return [klass, requirement_name.tr("-", "_")] unless requirement_name.include?(":")
+      return [klass, normalize_command_name(requirement_name)] unless requirement_name.include?(":")
 
       *pieces, command_name = requirement_name.split(":")
       namespace = pieces.join(":")
       namespace = "default" if namespace.empty?
-      command_name = command_name.to_s.tr("-", "_")
+      command_name = normalize_command_name(command_name)
 
       candidates = Thor::Base.subclasses.select { |candidate| candidate <= Thor && candidate.namespace == namespace }
       target_klass = candidates.detect { |candidate| candidate.all_commands[command_name] } || candidates.first
       [target_klass, command_name]
+    end
+
+    def normalize_command_name(name)
+      name.to_s.tr("-", "_")
     end
 
     # The declared option keys a command accepts: its own plus its class's.
