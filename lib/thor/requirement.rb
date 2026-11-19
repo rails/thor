@@ -101,10 +101,7 @@ class Thor
       klass, command_name, target = resolve(instance.class)
       raise undefined_error(instance.class, klass) unless target
 
-      if stack.include?([klass, command_name])
-        chain = command_labels(stack + [[klass, command_name]])
-        raise RequirementError, "Circular requirement: #{chain.join(' -> ')}"
-      end
+      raise_if_circular_requirement!(klass, command_name, stack)
 
       source_names = option_keys(instance.class, command).map(&:to_s)
       declared_keys = option_keys(klass, target)
@@ -128,6 +125,13 @@ class Thor
     end
 
   private
+
+    def raise_if_circular_requirement!(klass, command_name, stack)
+      return unless stack.include?([klass, command_name])
+
+      chain = command_labels(stack + [[klass, command_name]])
+      raise RequirementError, "Circular requirement: #{chain.join(' -> ')}"
+    end
 
     def command_labels(stack)
       stack.map { |node_klass, node_name| self.class.label(node_klass, node_name) }
