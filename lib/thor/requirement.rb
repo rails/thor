@@ -36,13 +36,6 @@ class Thor
         end
       end
 
-      # Returns the target class, command name, and command, if it exists.
-      def resolve(klass, name) #:nodoc:
-        target_klass, command_name = target(klass, name)
-        command = target_klass && target_klass.all_commands[command_name]
-        [target_klass, command_name, command]
-      end
-
       # The label of a command in requirement error messages.
       def label(klass, command_name) #:nodoc:
         klass.namespace.to_s.empty? ? command_name : "#{klass.namespace}:#{command_name}"
@@ -67,7 +60,7 @@ class Thor
           path.push(node)
           node_klass, command_name = node
           node_klass.all_commands[command_name].requirements.each do |requirement|
-            target_klass, target_name, target_command = resolve(node_klass, requirement.name)
+            target_klass, target_name, target_command = requirement.resolve(node_klass)
             if target_command
               visit.call([target_klass, target_name])
             else
@@ -84,21 +77,6 @@ class Thor
       end
 
     private
-
-      # Returns the target class even if the command does not exist.
-      def target(klass, name)
-        name = name.to_s
-        return [klass, name.tr("-", "_")] unless name.include?(":")
-
-        *pieces, command_name = name.split(":")
-        namespace = pieces.join(":")
-        namespace = "default" if namespace.empty?
-        command_name = command_name.to_s.tr("-", "_")
-
-        candidates = Thor::Base.subclasses.select { |candidate| candidate <= Thor && candidate.namespace == namespace }
-        target_klass = candidates.detect { |candidate| candidate.all_commands[command_name] } || candidates.first
-        [target_klass, command_name]
-      end
 
       # Whether the command method on +instance+ accepts the given
       # positional arguments. Commands without a public method of their own
@@ -132,9 +110,16 @@ class Thor
       @options = options
     end
 
+    # Returns the target class, command name, and command, if it exists.
+    def resolve(klass) #:nodoc:
+      target_klass, command_name = target(klass)
+      command = target_klass && target_klass.all_commands[command_name]
+      [target_klass, command_name, command]
+    end
+
     # Runs the requirement through +invoke+, preserving Thor's once-per-run rule.
     def satisfy(instance, command, command_args, stack) #:nodoc:
-      klass, command_name, target = self.class.resolve(instance.class, name)
+      klass, command_name, target = resolve(instance.class)
       raise undefined_error(instance.class, klass) unless target
 
       if stack.include?([klass, command_name])
@@ -164,6 +149,21 @@ class Thor
     end
 
   private
+
+    # Returns the target class even if the command does not exist.
+    def target(klass)
+      requirement_name = name.to_s
+      return [klass, requirement_name.tr("-", "_")] unless requirement_name.include?(":")
+
+      *pieces, command_name = requirement_name.split(":")
+      namespace = pieces.join(":")
+      namespace = "default" if namespace.empty?
+      command_name = command_name.to_s.tr("-", "_")
+
+      candidates = Thor::Base.subclasses.select { |candidate| candidate <= Thor && candidate.namespace == namespace }
+      target_klass = candidates.detect { |candidate| candidate.all_commands[command_name] } || candidates.first
+      [target_klass, command_name]
+    end
 
     # The declared option keys a command accepts: its own plus its class's.
     def option_keys(klass, command)
