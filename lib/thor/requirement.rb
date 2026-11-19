@@ -127,9 +127,10 @@ class Thor
   private
 
     def raise_if_circular_requirement!(klass, command_name, stack)
-      return unless stack.include?([klass, command_name])
+      node = [klass, command_name]
+      return unless stack.include?(node)
 
-      chain = command_labels(stack + [[klass, command_name]])
+      chain = command_labels(stack + [node])
       raise RequirementError, "Circular requirement: #{chain.join(' -> ')}"
     end
 
