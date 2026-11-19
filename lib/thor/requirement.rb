@@ -102,7 +102,7 @@ class Thor
       raise undefined_error(instance.class, klass) unless target
 
       if stack.include?([klass, command_name])
-        chain = (stack + [[klass, command_name]]).map { |node_klass, node_name| self.class.label(node_klass, node_name) }
+        chain = command_labels(stack + [[klass, command_name]])
         raise RequirementError, "Circular requirement: #{chain.join(' -> ')}"
       end
 
@@ -121,13 +121,17 @@ class Thor
       message = "Requirement #{name.inspect} of command #{command.name.inspect} failed: #{e.message}"
       if stack.length > 1
         last = target ? self.class.label(klass, command_name) : name
-        chain = stack.map { |node_klass, node_name| self.class.label(node_klass, node_name) } + [last]
+        chain = command_labels(stack) + [last]
         message = "#{message}\nRequirements: #{chain.join(' -> ')}"
       end
       raise RequirementError, message
     end
 
   private
+
+    def command_labels(stack)
+      stack.map { |node_klass, node_name| self.class.label(node_klass, node_name) }
+    end
 
     def validate_command_name!(name)
       unless [ Symbol, String ].any? { |klass| name.is_a?(klass) } && !name.to_s.empty?
