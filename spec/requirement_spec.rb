@@ -292,6 +292,11 @@ describe Thor::Requirement do
       expect(journal).to eq([[:demanding, "mapped"], [:supplier_mapped]])
     end
 
+    it "matches a string mapping to a required option declared with a symbol" do
+      ReqsPipeline.start(%w(supplier_string_mapped))
+      expect(journal).to eq([[:demanding, "mapped"], [:supplier_string_mapped]])
+    end
+
     it "applies the required command's own default when nothing is passed" do
       ReqsPipeline.start(%w(needs_defaulted))
       expect(journal).to eq([[:defaulted, "info"], [:needs_defaulted]])

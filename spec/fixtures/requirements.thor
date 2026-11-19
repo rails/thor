@@ -207,6 +207,12 @@ class ReqsPipeline < Thor
     Reqs.journal << [:supplier_mapped]
   end
 
+  desc "supplier_string_mapped", "Maps the required option using a string key"
+  requires :demanding, options: {"must" => "mapped"}
+  def supplier_string_mapped
+    Reqs.journal << [:supplier_string_mapped]
+  end
+
   desc "defaulted", "Has an option with a default"
   method_option :level, type: :string, default: "info"
   def defaulted

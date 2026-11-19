@@ -103,14 +103,14 @@ class Thor
 
       raise_if_circular_requirement!(klass, command_name, stack)
 
-      source_names = option_keys(instance.class, command).map(&:to_s)
-      declared_keys = option_keys(klass, target)
+      source_option_names = option_keys(instance.class, command).map(&:to_s)
+      target_option_keys = option_keys(klass, target)
       current_options = instance.options
 
       instance.invoke(
         klass, command_name,
         args_for(command_args.dup, current_options),
-        options_for(command_args.dup, current_options, source_names, declared_keys)
+        options_for(command_args.dup, current_options, source_option_names, target_option_keys)
       )
     rescue RequirementError
       raise
@@ -190,25 +190,39 @@ class Thor
       resolved
     end
 
-    # Explicit mappings override shared options. Preserve the declared keys
-    # so the target command's option parser recognizes them.
-    def options_for(current_args, current_options, source_names, declared_keys)
-      passed = {}
-      declared_keys.each do |key|
-        next unless source_names.include?(key.to_s) && current_options.key?(key)
-        passed[key] = current_options[key]
+    # Builds the options for the required command.
+    #
+    # Shared options are forwarded first. The explicit +options:+ mapping
+    # then overrides them. Source names are strings; target keys retain their
+    # declared type so the option parser can validate required options.
+    # Explicit keys not declared by the target pass through unchanged.
+    #
+    # For example, if both commands declare +:env+ and the current value is
+    # +"development"+, the shared options are +{ env: "development" }+.
+    # The mapping +{ "env" => "production", "extra" => true }+ changes
+    # the result to +{ env: "production", "extra" => true }+.
+    def options_for(current_args, current_options, source_option_names, target_option_keys)
+      forwarded_options = shared_options(current_options, source_option_names, target_option_keys)
+      explicit_options = resolve_mapping(@options, current_args, current_options)
+      return forwarded_options if explicit_options.nil?
+
+      unless explicit_options.is_a?(Hash)
+        raise ArgumentError, "Expected options: for #{name.inspect} to resolve to a Hash, got #{explicit_options.inspect}"
       end
 
-      explicit = resolve_mapping(@options, current_args, current_options)
-      return passed if explicit.nil?
-      unless explicit.is_a?(Hash)
-        raise ArgumentError, "Expected options: for #{name.inspect} to resolve to a Hash, got #{explicit.inspect}"
+      explicit_options.each do |key, value|
+        declared_key = target_option_keys.find { |target_key| target_key.to_s == key.to_s }
+        forwarded_options[declared_key || key] = value
       end
-      explicit.each do |key, value|
-        declared = declared_keys.find { |declared_key| declared_key.to_s == key.to_s }
-        passed[declared || key] = value
+      forwarded_options
+    end
+
+    def shared_options(current_options, source_option_names, target_option_keys)
+      target_option_keys.each_with_object({}) do |key, shared|
+        next unless source_option_names.include?(key.to_s)
+        next unless current_options.key?(key)
+        shared[key] = current_options[key]
       end
-      passed
     end
 
     def resolve_mapping(mapping, args, options)

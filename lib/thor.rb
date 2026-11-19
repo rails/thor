@@ -282,6 +282,12 @@ class Thor
     #     # runs after :check_credentials, :package, and :build have run
     #   end
     #
+    # If both commands declare +:env+, an explicit mapping such as
+    # +options: { "env" => "production" }+ passes +"production"+ to
+    # +build+, even when the current value is different. String and symbol
+    # option names match. Explicit options not declared by +build+ are also
+    # passed through.
+    #
     # A required command that does not exist, a cycle between requirements, or
     # a Thor::Error raised by a required command raises Thor::RequirementError
     # with the original error as +cause+. Other exceptions propagate unchanged.
