@@ -80,15 +80,9 @@ class Thor
     attr_reader :name
 
     def initialize(name, args: nil, options: nil)
-      unless [ Symbol, String ].any? { |klass| name.is_a?(klass) } && !name.to_s.empty?
-        raise ArgumentError, "Expected a command name for requires, got #{name.inspect}"
-      end
-      unless args.nil? || args.is_a?(Array) || args.respond_to?(:call)
-        raise ArgumentError, "Expected an Array or a callable for args:, got #{args.inspect}"
-      end
-      unless options.nil? || options.is_a?(Hash) || options.respond_to?(:call)
-        raise ArgumentError, "Expected a Hash or a callable for options:, got #{options.inspect}"
-      end
+      validate_command_name!(name)
+      validate_args_mapping!(args)
+      validate_options_mapping!(options)
 
       @name = name.to_s
       @args = args
@@ -134,6 +128,24 @@ class Thor
     end
 
   private
+
+    def validate_command_name!(name)
+      unless [ Symbol, String ].any? { |klass| name.is_a?(klass) } && !name.to_s.empty?
+        raise ArgumentError, "Expected a command name for requires, got #{name.inspect}"
+      end
+    end
+
+    def validate_args_mapping!(args)
+      unless args.nil? || args.is_a?(Array) || args.respond_to?(:call)
+        raise ArgumentError, "Expected an Array or a callable for args:, got #{args.inspect}"
+      end
+    end
+
+    def validate_options_mapping!(options)
+      unless options.nil? || options.is_a?(Hash) || options.respond_to?(:call)
+        raise ArgumentError, "Expected a Hash or a callable for options:, got #{options.inspect}"
+      end
+    end
 
     # Returns the target class even if the command does not exist.
     def target(klass)
