@@ -21,12 +21,8 @@ class Thor
   # the requirement graph used by Thor.validate_requirements!.
   class Requirement
     class << self
-      # Runs the requirements of +command+ on +instance+ before its body,
-      # in declaration order. +stack+ is the list of [klass, command_name]
-      # pairs whose requirements are in progress; it travels with the
-      # invocation so cycles across classes are detected. Does nothing when
-      # the command has no requirements or when the command line is
-      # malformed: the usage error must come first, with no side effects.
+      # Runs requirements before the command body, unless its arguments are invalid.
+      # The invocation stack is shared for cycle detection.
       def satisfy_all(instance, command, command_args, stack) #:nodoc:
         requirements = command.requirements
         return if requirements.nil? || requirements.empty?
@@ -40,31 +36,11 @@ class Thor
         end
       end
 
-      # Resolves a requirement name from +klass+ to [klass, command_name],
-      # or nil when no such command exists. See +target+ for the rules.
+      # Returns the target class, command name, and command, if it exists.
       def resolve(klass, name) #:nodoc:
         target_klass, command_name = target(klass, name)
-        target_klass && target_klass.all_commands[command_name] ? [target_klass, command_name] : nil
-      end
-
-      # The class and normalized command name a requirement name points at
-      # from +klass+, whether or not the command exists; the class is nil
-      # when no loaded Thor class has the namespace. A name without ":" is
-      # a command of +klass+; a "namespace:command" name is a command of
-      # another loaded Thor class, inherited commands included. Dashes
-      # normalize to underscores, as in +invoke+.
-      def target(klass, name) #:nodoc:
-        name = name.to_s
-        return [klass, name.tr("-", "_")] unless name.include?(":")
-
-        *pieces, command_name = name.split(":")
-        namespace = pieces.join(":")
-        namespace = "default" if namespace.empty?
-        command_name = command_name.to_s.tr("-", "_")
-
-        candidates = Thor::Base.subclasses.select { |candidate| candidate <= Thor && candidate.namespace == namespace }
-        target_klass = candidates.detect { |candidate| candidate.all_commands[command_name] } || candidates.first
-        [target_klass, command_name]
+        command = target_klass && target_klass.all_commands[command_name]
+        [target_klass, command_name, command]
       end
 
       # The label of a command in requirement error messages.
@@ -91,9 +67,9 @@ class Thor
           path.push(node)
           node_klass, command_name = node
           node_klass.all_commands[command_name].requirements.each do |requirement|
-            target = resolve(node_klass, requirement.name)
-            if target
-              visit.call(target)
+            target_klass, target_name, target_command = resolve(node_klass, requirement.name)
+            if target_command
+              visit.call([target_klass, target_name])
             else
               owner = node_klass == klass ? command_name : label(node_klass, command_name)
               problems << "Requirement #{requirement.name.inspect} of command #{owner.inspect} names a command that does not exist"
@@ -108,6 +84,21 @@ class Thor
       end
 
     private
+
+      # Returns the target class even if the command does not exist.
+      def target(klass, name)
+        name = name.to_s
+        return [klass, name.tr("-", "_")] unless name.include?(":")
+
+        *pieces, command_name = name.split(":")
+        namespace = pieces.join(":")
+        namespace = "default" if namespace.empty?
+        command_name = command_name.to_s.tr("-", "_")
+
+        candidates = Thor::Base.subclasses.select { |candidate| candidate <= Thor && candidate.namespace == namespace }
+        target_klass = candidates.detect { |candidate| candidate.all_commands[command_name] } || candidates.first
+        [target_klass, command_name]
+      end
 
       # Whether the command method on +instance+ accepts the given
       # positional arguments. Commands without a public method of their own
@@ -141,37 +132,31 @@ class Thor
       @options = options
     end
 
-    # Runs the required command on behalf of +command+, through +invoke+ on
-    # +instance+, so a command that already ran in this invocation is
-    # skipped. A missing command, a cycle, or a Thor::Error from the
-    # required command raises RequirementError with the original error as
-    # cause. Other exceptions propagate unchanged.
+    # Runs the requirement through +invoke+, preserving Thor's once-per-run rule.
     def satisfy(instance, command, command_args, stack) #:nodoc:
-      klass, command_name = self.class.resolve(instance.class, name)
-      raise undefined_error(instance.class) unless klass
+      klass, command_name, target = self.class.resolve(instance.class, name)
+      raise undefined_error(instance.class, klass) unless target
 
       if stack.include?([klass, command_name])
         chain = (stack + [[klass, command_name]]).map { |node_klass, node_name| self.class.label(node_klass, node_name) }
         raise RequirementError, "Circular requirement: #{chain.join(' -> ')}"
       end
 
-      target = klass.all_commands[command_name]
       source_names = option_keys(instance.class, command).map(&:to_s)
       declared_keys = option_keys(klass, target)
-      shared_keys = declared_keys.select { |key| source_names.include?(key.to_s) }
       current_options = instance.options
 
       instance.invoke(
         klass, command_name,
         args_for(command_args.dup, current_options),
-        options_for(command_args.dup, current_options, shared_keys, declared_keys)
+        options_for(command_args.dup, current_options, source_names, declared_keys)
       )
     rescue RequirementError
       raise
     rescue Thor::Error => e
       message = "Requirement #{name.inspect} of command #{command.name.inspect} failed: #{e.message}"
       if stack.length > 1
-        last = klass ? self.class.label(klass, command_name) : name
+        last = target ? self.class.label(klass, command_name) : name
         chain = stack.map { |node_klass, node_name| self.class.label(node_klass, node_name) } + [last]
         message = "#{message}\nRequirements: #{chain.join(' -> ')}"
       end
@@ -187,7 +172,7 @@ class Thor
 
     # Positional arguments to pass to the required command.
     def args_for(current_args, current_options)
-      resolved = resolve(@args, current_args, current_options)
+      resolved = resolve_mapping(@args, current_args, current_options)
       return [] if resolved.nil?
       unless resolved.is_a?(Array)
         raise ArgumentError, "Expected args: for #{name.inspect} to resolve to an Array, got #{resolved.inspect}"
@@ -195,20 +180,16 @@ class Thor
       resolved
     end
 
-    # Options to pass to the required command: options shared by name between
-    # both commands auto-pass, then the explicit mapping (if any) merges over.
-    #
-    # +shared_keys+ are the required command's declared option keys that the
-    # current command also declares; +declared_keys+ are all of the required
-    # command's declared option keys. The hash is keyed with those declared
-    # keys so the required command's option parser recognizes the values.
-    def options_for(current_args, current_options, shared_keys, declared_keys = shared_keys)
+    # Explicit mappings override shared options. Preserve the declared keys
+    # so the target command's option parser recognizes them.
+    def options_for(current_args, current_options, source_names, declared_keys)
       passed = {}
-      shared_keys.each do |key|
-        passed[key] = current_options[key] if current_options.key?(key)
+      declared_keys.each do |key|
+        next unless source_names.include?(key.to_s) && current_options.key?(key)
+        passed[key] = current_options[key]
       end
 
-      explicit = resolve(@options, current_args, current_options)
+      explicit = resolve_mapping(@options, current_args, current_options)
       return passed if explicit.nil?
       unless explicit.is_a?(Hash)
         raise ArgumentError, "Expected options: for #{name.inspect} to resolve to a Hash, got #{explicit.inspect}"
@@ -220,16 +201,15 @@ class Thor
       passed
     end
 
-    def resolve(mapping, args, options)
+    def resolve_mapping(mapping, args, options)
       mapping.respond_to?(:call) ? mapping.call(args, options) : mapping
     end
 
     # The error for a name that resolves to no command, with a did-you-mean
     # dictionary from the class the name points at.
-    def undefined_error(source_klass)
+    def undefined_error(source_klass, klass)
       return UndefinedCommandError.new(name, source_klass.all_commands.keys, nil) unless name.include?(":")
 
-      klass, = self.class.target(source_klass, name)
       return UndefinedCommandError.new(name, [], nil) unless klass
 
       dictionary = klass.all_commands.keys.map { |key| "#{klass.namespace}:#{key}" }
