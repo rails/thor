@@ -26,7 +26,7 @@ class Thor
       def satisfy_all(instance, command, command_args, stack) #:nodoc:
         requirements = command.requirements
         return if requirements.nil? || requirements.empty?
-        return unless accepts?(instance, command, command_args)
+        return unless command.accepts_arguments?(instance, command_args)
 
         stack.push([instance.class, command.name])
         begin
@@ -74,21 +74,6 @@ class Thor
 
         klass.all_commands.each_key { |command_name| visit.call([klass, command_name]) }
         problems
-      end
-
-    private
-
-      # Whether the command method on +instance+ accepts the given
-      # positional arguments. Commands without a public method of their own
-      # (method_missing) are not checked.
-      def accepts?(instance, command, command_args) #:nodoc:
-        return true if (instance.public_methods & [command.name.to_s, command.name.to_sym]).empty?
-
-        parameters = instance.method(command.name).parameters
-        required = parameters.count { |type, _| type == :req }
-        optional = parameters.count { |type, _| type == :opt }
-        rest = parameters.any? { |type, _| type == :rest }
-        command_args.size >= required && (rest || command_args.size <= required + optional)
       end
     end
 

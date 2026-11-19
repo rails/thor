@@ -38,6 +38,19 @@ class Thor
       handle_no_method_error?(instance, e, caller) ? instance.class.handle_no_command_error(name) : (raise e)
     end
 
+    # Whether the command method on +instance+ accepts the given
+    # positional arguments. Commands without a public method of their own
+    # (method_missing) are not checked.
+    def accepts_arguments?(instance, args) #:nodoc:
+      return true unless public_method?(instance)
+
+      parameters = instance.method(name).parameters
+      required = parameters.count { |type, _| type == :req }
+      optional = parameters.count { |type, _| type == :opt }
+      rest = parameters.any? { |type, _| type == :rest }
+      args.size >= required && (rest || args.size <= required + optional)
+    end
+
     # Returns the formatted usage by injecting given required arguments
     # and required options into the given usage.
     def formatted_usage(klass, namespace = true, subcommand = false)
