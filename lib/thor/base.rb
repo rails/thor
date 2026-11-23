@@ -1,6 +1,7 @@
 require_relative "command"
 require_relative "core_ext/hash_with_indifferent_access"
 require_relative "error"
+require_relative "requirement"
 require_relative "invocation"
 require_relative "nested_context"
 require_relative "parser"

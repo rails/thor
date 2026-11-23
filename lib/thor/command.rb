@@ -1,15 +1,16 @@
 class Thor
-  class Command < Struct.new(:name, :description, :long_description, :wrap_long_description, :usage, :options, :options_relation, :ancestor_name)
+  class Command < Struct.new(:name, :description, :long_description, :wrap_long_description, :usage, :options, :options_relation, :ancestor_name, :requirements)
     FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
 
-    def initialize(name, description, long_description, wrap_long_description, usage, options = nil, options_relation = nil)
-      super(name.to_s, description, long_description, wrap_long_description, usage, options || {}, options_relation || {})
+    def initialize(name, description, long_description, wrap_long_description, usage, options = nil, options_relation = nil, requirements = nil)
+      super(name.to_s, description, long_description, wrap_long_description, usage, options || {}, options_relation || {}, nil, requirements || [])
     end
 
     def initialize_copy(other) #:nodoc:
       super(other)
       self.options = other.options.dup if other.options
       self.options_relation = other.options_relation.dup if other.options_relation
+      self.requirements = other.requirements.dup if other.requirements
     end
 
     def hidden?
@@ -35,6 +36,19 @@ class Thor
       handle_argument_error?(instance, e, caller) ? instance.class.handle_argument_error(self, e, args, arity) : (raise e)
     rescue NoMethodError => e
       handle_no_method_error?(instance, e, caller) ? instance.class.handle_no_command_error(name) : (raise e)
+    end
+
+    # Whether the command method on +instance+ accepts the given
+    # positional arguments. Commands without a public method of their own
+    # (method_missing) are not checked.
+    def accepts_arguments?(instance, args) #:nodoc:
+      return true unless public_method?(instance)
+
+      parameters = instance.method(name).parameters
+      required = parameters.count { |type, _| type == :req }
+      optional = parameters.count { |type, _| type == :opt }
+      rest = parameters.any? { |type, _| type == :rest }
+      args.size >= required && (rest || args.size <= required + optional)
     end
 
     # Returns the formatted usage by injecting given required arguments
