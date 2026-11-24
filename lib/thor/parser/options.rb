@@ -134,7 +134,7 @@ class Thor
 
       check_requirement! unless @disable_required_check
       check_exclusive!
-      check_at_least_one!
+      check_at_least_one! unless @disable_required_check
 
       assigns = Thor::CoreExt::HashWithIndifferentAccess.new(@assigns)
       assigns.freeze
