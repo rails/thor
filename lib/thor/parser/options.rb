@@ -38,9 +38,11 @@ class Thor
       super(options)
 
       # Add defaults
+      option_lookup = Thor::CoreExt::HashWithIndifferentAccess.new(hash_options)
+
       defaults.each do |key, value|
         @assigns[key.to_s] = value
-        @non_assigned_required.delete(hash_options[key])
+        @non_assigned_required.delete(option_lookup[key])
       end
 
       @shorts = {}
