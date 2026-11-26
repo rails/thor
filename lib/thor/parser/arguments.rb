@@ -170,14 +170,22 @@ class Thor
     # Raises an error if the switch is an enum and the values aren't included on it.
     #
     def validate_enum_value!(name, value, message)
-      return unless @switches.is_a?(Hash)
-
-      switch = @switches[name]
+      switch = enum_argument_for(name)
 
       return unless switch
 
       if switch.enum && !switch.enum.include?(value)
         raise MalformattedArgumentError, message % [name, switch.enum_to_s, value]
+      end
+    end
+
+    # Options store switches in a Hash keyed by switch name; Arguments store an
+    # Array of Argument objects. Look up the matching definition for enum checks.
+    def enum_argument_for(name)
+      if @switches.is_a?(Hash)
+        @switches[name]
+      else
+        @switches.find { |argument| argument.name == name }
       end
     end
 
