@@ -13,6 +13,7 @@ class Thor
       @group          = options[:group].to_s.capitalize if options[:group]
       @aliases        = normalize_aliases(options[:aliases])
       @hide           = options[:hide]
+      @inverse        = options[:inverse]
     end
 
     # This parse quick options given as method_options. It makes several
@@ -81,17 +82,7 @@ class Thor
     end
 
     def usage(padding = 0)
-      sample = if banner && !banner.to_s.empty?
-        "#{switch_name}=#{banner}".dup
-      else
-        switch_name
-      end
-
-      sample = "[#{sample}]".dup unless required?
-
-      if boolean? && name != "force" && !name.match(/\A(no|skip)[\-_]/)
-        sample << ", [#{dasherize('no-' + human_name)}], [#{dasherize('skip-' + human_name)}]"
-      end
+      sample = [ sample_banner, inverse_sample ].compact.join(", ")
 
       aliases_for_usage.ljust(padding) + sample
     end
@@ -113,6 +104,23 @@ class Thor
       end
     end
 
+    # The switch given through :inverse that sets a boolean option to false,
+    # replacing the default --no-<option> and --skip-<option> switches.
+    def inverse_switch_name
+      return unless boolean?
+
+      case @inverse
+      when Symbol, String
+        dasherize(@inverse.to_s)
+      end
+    end
+
+    # Whether --no-<option> and --skip-<option> can be used to set this option
+    # to false. Only boolean options can suppress them through :inverse.
+    def default_inverse?
+      !boolean? || @inverse.nil? || @inverse == true
+    end
+
     VALID_TYPES.each do |type|
       class_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{type}?
@@ -122,6 +130,25 @@ class Thor
     end
 
   protected
+
+    def sample_banner
+      sample_banner = if banner && !banner.to_s.empty?
+                        "#{switch_name}=#{banner}".dup
+                      else
+                        switch_name
+                      end
+      required? ? sample_banner : "[#{sample_banner}]"
+    end
+
+    def inverse_sample
+      return if !boolean? || name == "force" || name.match(/\A(no|skip)[\-_]/)
+
+      if inverse_switch_name
+        "[#{inverse_switch_name}]"
+      elsif default_inverse?
+        "[#{dasherize('no-' + human_name)}], [#{dasherize('skip-' + human_name)}]"
+      end
+    end
 
     def validate!
       raise ArgumentError, "An option cannot be boolean and required." if boolean? && required?
