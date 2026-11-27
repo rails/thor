@@ -312,8 +312,6 @@ class Thor
     #   uncomment_lines 'config/initializers/session_store.rb', /active_record/
     #
     def uncomment_lines(path, flag, *args)
-      flag = flag.respond_to?(:source) ? flag.source : flag
-
       gsub_file(path, /^(\s*)#[[:blank:]]?(.*#{flag})/, '\1\2', *args)
     end
 
@@ -331,8 +329,6 @@ class Thor
     #   comment_lines 'config/initializers/session_store.rb', /cookie_store/
     #
     def comment_lines(path, flag, *args)
-      flag = flag.respond_to?(:source) ? flag.source : flag
-
       gsub_file(path, /^(\s*)([^#\n]*#{flag})/, '\1# \2', *args)
     end
 
