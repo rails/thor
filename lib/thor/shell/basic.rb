@@ -351,6 +351,8 @@ class Thor
         until correct_answer
           answers = answer_set.join(", ")
           answer = ask_simply("#{statement} [#{answers}]", color, options)
+          return unless answer
+
           correct_answer = answer_match(answer_set, answer, case_insensitive)
           say("Your response must be one of: [#{answers}]. Please try again.") unless correct_answer
         end

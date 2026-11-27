@@ -112,6 +112,32 @@ describe Thor::Shell::Basic do
       expect(Thor::LineEditor).to receive(:readline).with("What's your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] (vanilla) ", {default: "vanilla", limited_to: flavors}).and_return("moose tracks", "")
       expect(shell.ask("What's your favorite Neopolitan flavor?", default: "vanilla", limited_to: flavors)).to eq("vanilla")
     end
+
+    it "prints a message and returns nil if EOF is given as input with limited answers" do
+      flavors = %w(strawberry chocolate vanilla)
+      readline_calls = 0
+
+      allow(Thor::LineEditor).to receive(:readline) do
+        readline_calls += 1
+        raise "asked again after EOF" if readline_calls > 1
+
+        nil
+      end
+
+      expect(shell.ask("What's your favorite Neopolitan flavor?", limited_to: flavors)).to eq(nil)
+      expect(Thor::LineEditor).to have_received(:readline)
+        .with("What's your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ", {limited_to: flavors})
+        .once
+    end
+
+    it "prints a message and returns nil if EOF is given as input with case-insensitive limited answers" do
+      flavors = %w(strawberry chocolate vanilla)
+      expect(Thor::LineEditor).to receive(:readline)
+        .with("What's your favorite Neopolitan flavor? [strawberry, chocolate, vanilla] ", {limited_to: flavors, case_insensitive: true})
+        .and_return(nil)
+
+      expect(shell.ask("What's your favorite Neopolitan flavor?", limited_to: flavors, case_insensitive: true)).to eq(nil)
+    end
   end
 
   describe "#yes?" do
