@@ -651,6 +651,11 @@ describe Thor::Actions do
         expect(File.binread(file)).to match(unmodified_comments_file)
       end
 
+      it "accepts a regexp and keeps its options" do
+        action :uncomment_lines, "doc/COMMENTER", /GREEN/i
+        expect(File.binread(file)).to match(/__start__\n greenblue\n#\n# yellowblue\n#yellowred\n greenred\norange\n    purple\n  ind#igo\n  # ind#igo\n  #   spaces_between\n__end__/)
+      end
+
       it "does not uncomment the wrong line when uncommenting lines preceded by blank commented line" do
         action :uncomment_lines, "doc/COMMENTER", "yellow"
         expect(File.binread(file)).to match(/__start__\n # greenblue\n#\nyellowblue\nyellowred\n #greenred\norange\n    purple\n  ind#igo\n  # ind#igo\n  #   spaces_between\n__end__/)
@@ -669,6 +674,16 @@ describe Thor::Actions do
       it "correctly comments lines with hashes in them" do
         action :comment_lines, "doc/COMMENTER", "ind#igo"
         expect(File.binread(file)).to match(/__start__\n # greenblue\n#\n# yellowblue\n#yellowred\n #greenred\norange\n    purple\n  # ind#igo\n  # ind#igo\n  #   spaces_between\n__end__/)
+      end
+
+      it "accepts a regexp and keeps its options" do
+        action :comment_lines, "doc/COMMENTER", /ORANGE/i
+        expect(File.binread(file)).to match(/__start__\n # greenblue\n#\n# yellowblue\n#yellowred\n #greenred\n# orange\n    purple\n  ind#igo\n  # ind#igo\n  #   spaces_between\n__end__/)
+      end
+
+      it "accepts a regexp without options" do
+        action :comment_lines, "doc/COMMENTER", /orange/
+        expect(File.binread(file)).to match(/__start__\n # greenblue\n#\n# yellowblue\n#yellowred\n #greenred\n# orange\n    purple\n  ind#igo\n  # ind#igo\n  #   spaces_between\n__end__/)
       end
 
       it "does not modify already commented lines" do
